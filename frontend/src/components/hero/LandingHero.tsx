@@ -89,14 +89,14 @@ export default function LandingHero() {
           onClick={handleGlobeClick}
           disabled={isTransitioning}
           aria-label="Enter EchoField dashboard"
-          className={`pointer-events-auto absolute left-[49%] top-[33%] h-[clamp(260px,32vw,500px)] w-[clamp(260px,32vw,500px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-all duration-[1250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`pointer-events-auto absolute left-[49%] top-[34%] h-[clamp(220px,28vw,420px)] w-[clamp(220px,28vw,420px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-all duration-[1250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               isTransitioning
                 ? "z-[20] scale-[3.4] opacity-0"
                 : "z-[10] scale-100 opacity-100 hover:scale-[1.03]"
-          } ${isTransitioning ? "cursor-default" : "cursor-pointer"}`}
+            } ${isTransitioning ? "cursor-default" : "cursor-pointer"}`}
         >
-          <div className="absolute inset-[-12%] rounded-full bg-[radial-gradient(circle,rgba(82,138,238,0.34)_0%,rgba(82,138,238,0.16)_38%,rgba(82,138,238,0)_72%)] blur-2xl" />
-          <div className="absolute inset-0 rounded-full shadow-[0_28px_50px_rgba(40,48,71,0.22)]" />
+          <div className="absolute inset-[-8%] rounded-full bg-[radial-gradient(circle,rgba(82,138,238,0.18)_0%,rgba(82,138,238,0.08)_36%,rgba(82,138,238,0)_72%)] blur-xl" />
+          <div className="absolute inset-0 rounded-full shadow-[0_18px_34px_rgba(40,48,71,0.16)]" />
           <HeroGlobe
             wrapperClassName="absolute inset-0 z-[1] overflow-visible"
             globeClassName="absolute inset-0"
@@ -106,10 +106,10 @@ export default function LandingHero() {
             sceneOptions={{
               backgroundColor: "rgba(0,0,0,0)",
               showStars: false,
-              atmosphereColor: "#7cb6ff",
-              atmosphereAltitude: 0.17,
+              atmosphereColor: "#4f7fc4",
+              atmosphereAltitude: 0.1,
               idleRotationSpeed: 0.03,
-              cameraPosition: { x: 0, y: 8, z: 220 },
+              cameraPosition: { x: 0, y: 8, z: 242 },
               controls: { minDistance: 180, maxDistance: 280 },
             }}
           />
