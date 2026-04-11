@@ -103,6 +103,19 @@ class CallDetail(EchoBaseModel):
     call_type: str
     confidence: float = Field(ge=0.0, le=1.0)
     acoustic_features: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class CallRecord(CallDetail):
+    animal_id: str | None = None
+    location: str | None = None
+    date: str | None = None
+
+
+class CallListResponse(EchoBaseModel):
+    total: int = Field(ge=0)
+    returned: int = Field(ge=0)
+    items: list[CallRecord] = Field(default_factory=list)
 
 
 class ProcessingResult(EchoBaseModel):

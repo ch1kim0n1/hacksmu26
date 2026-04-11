@@ -19,6 +19,8 @@ from fastapi.staticfiles import StaticFiles
 from echofield.config import get_settings
 from echofield.data_loader import RecordingStore, list_recordings_with_metadata
 from echofield.models import (
+    CallListResponse,
+    CallRecord,
     ErrorResponse,
     ExportRequest,
     ProcessingResult,
@@ -33,6 +35,7 @@ from echofield.models import (
 )
 from echofield.pipeline.cache_manager import CacheManager
 from echofield.pipeline.hybrid_pipeline import ProcessingPipeline
+from echofield.research.call_database import CallDatabase
 from echofield.research.exporter import export_csv, export_json, export_pdf, export_zip
 from echofield.utils.audio_utils import get_duration, load_audio
 from echofield.utils.logging_config import get_logger, request_context
@@ -53,6 +56,7 @@ async def lifespan(application: FastAPI):
     store = RecordingStore()
     preload = list_recordings_with_metadata(settings.audio_dir, settings.metadata_file)
     store.load_many(preload)
+    application.state.call_database = CallDatabase.from_metadata(settings.metadata_file)
     application.state.store = store
     application.state.cache = CacheManager(str(settings.cache_dir))
     application.state.pipeline = ProcessingPipeline(settings, application.state.cache)
@@ -93,6 +97,10 @@ def _get_store() -> RecordingStore:
 
 def _get_pipeline() -> ProcessingPipeline:
     return app.state.pipeline  # type: ignore[return-value]
+
+
+def _get_call_database() -> CallDatabase:
+    return app.state.call_database  # type: ignore[return-value]
 
 
 def _get_recording_path(recording: dict[str, Any]) -> Path:
@@ -199,6 +207,14 @@ async def _run_processing(
             )
             result = _serialize_result(result)
             store.update_result(recording_id, result)
+            _get_call_database().upsert_processed_calls(
+                recording_id=recording_id,
+                calls=list(result.get("calls") or []),
+                metadata={
+                    **(recording.get("metadata") or {}),
+                    "filename": recording.get("filename"),
+                },
+            )
             store.update_status(
                 recording_id,
                 "complete",
@@ -363,34 +379,41 @@ async def get_stats() -> StatsResponse:
     return StatsResponse(**_get_store().get_stats())
 
 
-@app.get("/api/calls", response_model=dict)
+@app.get("/api/calls", response_model=CallListResponse)
 async def list_calls(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
     call_type: str | None = Query(default=None),
     recording_id: str | None = Query(default=None),
-) -> dict[str, Any]:
-    calls: list[dict[str, Any]] = []
-    for recording in _get_store()._recordings.values():
-        result = recording.get("result") or {}
-        for call in result.get("calls", []):
-            if call_type and call.get("call_type") != call_type:
-                continue
-            if recording_id and call.get("recording_id") != recording_id:
-                continue
-            calls.append(call)
-    total = len(calls)
-    return {"items": calls[offset : offset + limit], "total": total}
+    location: str | None = Query(default=None),
+    animal_id: str | None = Query(default=None),
+    date_from: str | None = Query(default=None),
+    date_to: str | None = Query(default=None),
+    sort_by: str = Query(default="id"),
+    sort_desc: bool = Query(default=False),
+) -> CallListResponse:
+    items, total = _get_call_database().search(
+        location=location,
+        date_from=date_from,
+        date_to=date_to,
+        animal_id=animal_id,
+        call_type=call_type,
+        recording_id=recording_id,
+        sort_by=sort_by,
+        sort_desc=sort_desc,
+        limit=limit,
+        offset=offset,
+    )
+    records = [CallRecord(**item) for item in items]
+    return CallListResponse(total=total, returned=len(records), items=records)
 
 
-@app.get("/api/calls/{call_id}", response_model=dict)
-async def get_call(call_id: str) -> dict[str, Any]:
-    for recording in _get_store()._recordings.values():
-        result = recording.get("result") or {}
-        for call in result.get("calls", []):
-            if call.get("id") == call_id:
-                return call
-    raise HTTPException(status_code=404, detail="Call not found")
+@app.get("/api/calls/{call_id}", response_model=CallRecord)
+async def get_call(call_id: str) -> CallRecord:
+    call = _get_call_database().get_call(call_id)
+    if call is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    return CallRecord(**call)
 
 
 @app.post("/api/export/research")
