@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getRecording, API_BASE, type Recording } from "@/lib/audio-api";
+import { AnalysisLabels, AnalysisWindow } from "@/components/research/AnalysisLabels";
 
 interface ProcessingUpdate {
   stage: string;
@@ -612,6 +613,23 @@ export default function ProcessingPage() {
                 </div>
               </dl>
             </div>
+
+            {/* Analysis Labels */}
+            {recording && (recording.animal_id || recording.noise_type_ref || recording.call_id) && (
+              <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+                <h3 className="text-sm font-medium text-ev-warm-gray mb-4 uppercase tracking-wider">
+                  Analysis Labels
+                </h3>
+                <AnalysisLabels recording={recording} />
+              </div>
+            )}
+
+            {/* Analysis Window */}
+            {recording && recording.start_sec != null && recording.end_sec != null && (
+              <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+                <AnalysisWindow recording={recording} />
+              </div>
+            )}
 
             {/* Actions */}
             {isComplete && (
