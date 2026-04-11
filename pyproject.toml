@@ -21,6 +21,12 @@ dependencies = [
     "aiofiles>=23.0.0",
     "python-dotenv>=1.0.0",
     "uvicorn>=0.24.0",
+    "aiosqlite>=0.19",
+    "networkx>=3.0",
+    "python-louvain>=0.16",
+    "umap-learn>=0.5",
+    "structlog>=24.0",
+    "prometheus-fastapi-instrumentator>=0.9",
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
 ]

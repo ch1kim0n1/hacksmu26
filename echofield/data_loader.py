@@ -358,11 +358,24 @@ class RecordingStore:
         now = datetime.now(timezone.utc).isoformat()
         if status == "processing" and record["processing"]["started_at"] is None:
             record["processing"]["started_at"] = now
-        if status in {"complete", "failed"}:
+        if status in {"complete", "failed", "cancelled"}:
             record["processing"]["completed_at"] = now
             if status == "complete":
                 record["processing"]["progress"] = 100.0
         self._persist()
+
+    def update_metadata(self, recording_id: str, updates: dict[str, Any]) -> dict[str, Any] | None:
+        record = self._recordings.get(recording_id)
+        if record is None:
+            logger.warning("Unknown recording in update_metadata: %s", recording_id)
+            return None
+        metadata = dict(record.get("metadata") or {})
+        for key, value in updates.items():
+            if value is not None:
+                metadata[key] = value
+        record["metadata"] = metadata
+        self._persist()
+        return metadata
 
     def update_result(self, recording_id: str, result: dict[str, Any]) -> None:
         record = self._recordings.get(recording_id)

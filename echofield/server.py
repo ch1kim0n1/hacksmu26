@@ -12,21 +12,29 @@ from pathlib import Path
 from typing import Any
 
 import aiofiles
-from fastapi import BackgroundTasks, FastAPI, File, HTTPException, Query, Request, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import BackgroundTasks, FastAPI, File, Header, HTTPException, Query, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+from echofield.batch_store import BatchStore
 from echofield.config import get_settings
 from echofield.data_loader import RecordingStore, list_recordings_with_metadata
+from echofield.metrics import metrics
+from echofield.model_registry import ModelRegistry
 from echofield.models import (
+    BatchStatusResponse,
+    BatchSubmitResponse,
     CallListResponse,
     CallRecord,
     ContourMatch,
     ContourMatchResponse,
+    EmbeddingResponse,
     ErrorResponse,
     ExportRequest,
     HarmonicOverlayResponse,
+    MetadataPatchRequest,
+    ModelVersionInfo,
     ProcessingResult,
     ProcessingStatusModel,
     RecordingDetail,
@@ -34,14 +42,20 @@ from echofield.models import (
     RecordingMetadata,
     RecordingSummary,
     RecordingStatus,
+    ResearchStatsResponse,
+    ReviewLabelRequest,
+    ReviewQueueResponse,
     SimilarityEdge,
     SimilarityGraphResponse,
     SimilarityNode,
+    StatsRequest,
     StatsResponse,
     UploadResponse,
 )
 from echofield.pipeline.cache_manager import CacheManager
+from echofield.pipeline.circuit_breaker import get_circuit_breaker_registry
 from echofield.pipeline.hybrid_pipeline import ProcessingPipeline
+from echofield.pipeline.ingestion import validate_magic_bytes
 from echofield.research.call_database import CallDatabase
 from echofield.pipeline.feature_extract import (
     extract_acoustic_features,
@@ -52,8 +66,11 @@ from echofield.pipeline.feature_extract import (
 from echofield.research.acoustic_analysis import (
     build_identity_signature,
     build_similarity_graph,
+    compare_groups,
+    compute_embedding,
     contour_similarity,
     harmonic_to_noise_ratio,
+    SimilarityMatrixCache,
     track_frequency_contour,
 )
 from echofield.research.exporter import export_csv, export_json, export_pdf, export_zip
@@ -73,6 +90,12 @@ def _serialize_result(result: dict[str, Any]) -> dict[str, Any]:
 async def lifespan(application: FastAPI):
     settings = get_settings()
     settings.ensure_directories()
+    try:
+        from echofield.db import init_db
+
+        await init_db(settings.db_path)
+    except Exception as exc:
+        logger.warning("SQLite initialization skipped: %s", exc)
     store = RecordingStore(persist_path=settings.catalog_file)
     preload = list_recordings_with_metadata(settings.audio_dir, settings.metadata_file)
     store.load_many(preload)
@@ -80,8 +103,19 @@ async def lifespan(application: FastAPI):
     application.state.store = store
     application.state.cache = CacheManager(str(settings.cache_dir))
     application.state.pipeline = ProcessingPipeline(settings, application.state.cache)
-    load_classifier(settings.classifier_model_path)
-    yield
+    application.state.processing_tasks = {}
+    application.state.batch_store = BatchStore()
+    application.state.model_registry = ModelRegistry(settings.model_registry_dir)
+    application.state.embedding_cache = {}
+    application.state.similarity_cache = SimilarityMatrixCache(settings.cache_dir / "similarity_cache.json")
+    active_model = application.state.model_registry.active_model_path()
+    load_classifier(active_model or settings.classifier_model_path)
+    try:
+        yield
+    finally:
+        tasks: dict[str, asyncio.Task] = application.state.processing_tasks
+        for task in list(tasks.values()):
+            task.cancel()
 
 
 app = FastAPI(
@@ -105,10 +139,22 @@ app.mount("/processed", StaticFiles(directory=str(settings.processed_dir)), name
 
 @app.middleware("http")
 async def add_request_context(request: Request, call_next):
+    started = datetime.now(timezone.utc)
     request_id = request.headers.get("x-request-id") or uuid.uuid4().hex
     with request_context(request_id):
         response = await call_next(request)
     response.headers["x-request-id"] = request_id
+    duration = (datetime.now(timezone.utc) - started).total_seconds()
+    route_path = request.scope.get("route").path if request.scope.get("route") else request.url.path
+    metrics.inc(
+        "echofield_http_requests_total",
+        labels={"method": request.method, "path": str(route_path), "status": str(response.status_code)},
+    )
+    metrics.observe(
+        "echofield_http_request_duration_seconds",
+        duration,
+        {"method": request.method, "path": str(route_path), "status": str(response.status_code)},
+    )
     return response
 
 
@@ -124,10 +170,34 @@ def _get_call_database() -> CallDatabase:
     return app.state.call_database  # type: ignore[return-value]
 
 
+def _get_tasks() -> dict[str, asyncio.Task]:
+    return app.state.processing_tasks  # type: ignore[return-value]
+
+
+def _get_batch_store() -> BatchStore:
+    return app.state.batch_store  # type: ignore[return-value]
+
+
+def _get_model_registry() -> ModelRegistry:
+    return app.state.model_registry  # type: ignore[return-value]
+
+
+def _get_similarity_cache() -> SimilarityMatrixCache:
+    return app.state.similarity_cache  # type: ignore[return-value]
+
+
 def _get_recording_path(recording: dict[str, Any]) -> Path:
     if recording.get("source_path"):
         return Path(recording["source_path"])
     return settings.audio_dir / recording["filename"]
+
+
+def _audio_media_type(path: Path) -> str:
+    return {
+        ".wav": "audio/wav",
+        ".mp3": "audio/mpeg",
+        ".flac": "audio/flac",
+    }.get(path.suffix.lower(), "application/octet-stream")
 
 
 def _to_summary(recording: dict[str, Any]) -> RecordingSummary:
@@ -184,6 +254,8 @@ def _status_payload(recording: dict[str, Any]) -> dict[str, Any]:
         message = "Processing complete"
     elif status == "failed":
         message = "Processing failed"
+    elif status == "cancelled":
+        message = "Processing cancelled"
     elif status == "pending":
         message = "Pending processing"
     else:
@@ -245,10 +317,20 @@ async def _progress_callback(
         await manager.send_quality_score(recording_id, data["quality"])
 
 
+def _cleanup_partial_outputs(recording_id: str) -> None:
+    for directory in (settings.processed_dir, settings.spectrogram_dir):
+        if not directory.exists():
+            continue
+        for path in directory.glob(f"{recording_id}*"):
+            if path.is_file():
+                path.unlink(missing_ok=True)
+
+
 async def _run_processing(
     recording_id: str,
     method: str,
     aggressiveness: float,
+    batch_id: str | None = None,
 ) -> None:
     store = _get_store()
     recording = store.get(recording_id)
@@ -262,6 +344,7 @@ async def _run_processing(
 
     try:
         with request_context(recording_id):
+            metrics.set_gauge("echofield_pipeline_active_jobs", len(_get_tasks()) or 1)
             await manager.send_processing_started(recording_id, method)
             result = await _get_pipeline().process_recording(
                 recording_id,
@@ -275,7 +358,7 @@ async def _run_processing(
                     stage,
                     status,
                     progress,
-                    data,
+                    {**(data or {}), **({"batch_id": batch_id} if batch_id else {})},
                 ),
             )
             result = _serialize_result(result)
@@ -288,6 +371,7 @@ async def _run_processing(
                     "filename": recording.get("filename"),
                 },
             )
+            _get_similarity_cache().invalidate()
             store.update_status(
                 recording_id,
                 "complete",
@@ -297,10 +381,27 @@ async def _run_processing(
             )
             await manager.send_quality_score(recording_id, result["quality"])
             await manager.send_processing_complete(recording_id, result)
+            if batch_id:
+                _get_batch_store().update(batch_id, recording_id, status="complete", progress_pct=100)
+            metrics.inc("echofield_pipeline_jobs_total", labels={"status": "complete"})
+    except asyncio.CancelledError:
+        logger.info("Processing cancelled for %s", recording_id)
+        _cleanup_partial_outputs(recording_id)
+        store.update_status(recording_id, "cancelled", current_stage="cancelled")
+        if batch_id:
+            _get_batch_store().update(batch_id, recording_id, status="cancelled", progress_pct=0)
+        metrics.inc("echofield_pipeline_jobs_total", labels={"status": "cancelled"})
+        raise
     except Exception as exc:
         logger.exception("Processing failed for %s", recording_id)
         store.update_status(recording_id, "failed", current_stage="complete")
         await manager.send_processing_failed(recording_id, str(exc))
+        if batch_id:
+            _get_batch_store().update(batch_id, recording_id, status="failed", progress_pct=0, error=str(exc))
+        metrics.inc("echofield_pipeline_jobs_total", labels={"status": "failed"})
+    finally:
+        _get_tasks().pop(recording_id, None)
+        metrics.set_gauge("echofield_pipeline_active_jobs", len(_get_tasks()))
 
 
 @app.get("/health", response_model=dict)
@@ -320,10 +421,15 @@ async def upload_recording(
     suffix = Path(file.filename).suffix.lower()
     if suffix not in {".wav", ".mp3", ".flac"}:
         raise HTTPException(status_code=400, detail="Unsupported audio format")
+    header = await file.read(12)
+    valid_magic, magic_error = validate_magic_bytes(header, suffix)
+    if not valid_magic:
+        raise HTTPException(status_code=415, detail=magic_error)
 
     recording_id = str(uuid.uuid4())
     destination = settings.audio_dir / f"{recording_id}{suffix}"
     async with aiofiles.open(destination, "wb") as handle:
+        await handle.write(header)
         while chunk := await file.read(1024 * 1024):
             await handle.write(chunk)
 
@@ -367,6 +473,18 @@ async def get_recording(recording_id: str) -> RecordingDetail:
     return _to_detail(recording)
 
 
+@app.patch("/api/recordings/{recording_id}/metadata", response_model=RecordingDetail)
+async def patch_recording_metadata(recording_id: str, payload: MetadataPatchRequest) -> RecordingDetail:
+    updates = payload.model_dump(exclude_unset=True)
+    updated = _get_store().update_metadata(recording_id, updates)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    recording = _get_store().get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    return _to_detail(recording)
+
+
 @app.get("/api/recordings/{recording_id}/status", response_model=dict)
 async def get_recording_status(recording_id: str) -> dict[str, Any]:
     recording = _get_store().get(recording_id)
@@ -387,24 +505,57 @@ async def process_recording(
         raise HTTPException(status_code=404, detail="Recording not found")
     if recording["status"] == "processing":
         raise HTTPException(status_code=409, detail="Recording already processing")
-    background_tasks.add_task(_run_processing, recording_id, method, aggressiveness)
     _get_store().update_status(recording_id, "processing", progress=0, current_stage="ingestion")
+    task = asyncio.create_task(_run_processing(recording_id, method, aggressiveness))
+    _get_tasks()[recording_id] = task
     return {"id": recording_id, "status": "processing", "method": method}
 
 
-@app.post("/api/batch/process", response_model=dict)
+@app.post("/api/recordings/{recording_id}/cancel", response_model=dict)
+async def cancel_recording(recording_id: str) -> dict[str, Any]:
+    recording = _get_store().get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    if recording["status"] in {"complete", "failed", "cancelled"}:
+        raise HTTPException(status_code=409, detail=f"Recording already {recording['status']}")
+    task = _get_tasks().get(recording_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="No active processing task")
+    task.cancel()
+    _get_store().update_status(recording_id, "cancelled", current_stage="cancelled")
+    return {"id": recording_id, "status": "cancelled"}
+
+
+@app.post("/api/batch/process", response_model=BatchSubmitResponse)
 async def process_batch(
     payload: dict[str, Any],
     background_tasks: BackgroundTasks,
-) -> dict[str, Any]:
+) -> BatchSubmitResponse:
     recording_ids = payload.get("recording_ids") or []
     method = str(payload.get("method") or settings.DENOISE_METHOD)
     aggressiveness = float(payload.get("aggressiveness") or 1.5)
     if not isinstance(recording_ids, list) or not recording_ids:
         raise HTTPException(status_code=400, detail="recording_ids is required")
+    normalized_ids = [str(recording_id) for recording_id in recording_ids]
+    batch = _get_batch_store().create(normalized_ids)
     for recording_id in recording_ids:
-        background_tasks.add_task(_run_processing, str(recording_id), method, aggressiveness)
-    return {"queued": len(recording_ids), "status": "processing"}
+        recording_id = str(recording_id)
+        if _get_store().get(recording_id) is None:
+            _get_batch_store().update(batch["batch_id"], recording_id, status="failed", error="Recording not found")
+            continue
+        _get_store().update_status(recording_id, "processing", progress=0, current_stage="ingestion")
+        _get_batch_store().update(batch["batch_id"], recording_id, status="processing", progress_pct=0)
+        task = asyncio.create_task(_run_processing(recording_id, method, aggressiveness, batch_id=batch["batch_id"]))
+        _get_tasks()[recording_id] = task
+    return BatchSubmitResponse(batch_id=batch["batch_id"], queued=len(recording_ids), status="processing")
+
+
+@app.get("/api/batch/{batch_id}/status", response_model=BatchStatusResponse)
+async def get_batch_status(batch_id: str) -> BatchStatusResponse:
+    batch = _get_batch_store().get(batch_id)
+    if batch is None:
+        raise HTTPException(status_code=404, detail="Batch not found")
+    return BatchStatusResponse(**batch)
 
 
 @app.get("/api/recordings/{recording_id}/spectrogram")
@@ -442,17 +593,59 @@ async def get_audio(
         path = Path(result.get("output_audio_path", ""))
     if not path.exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
-    media_type = {
-        ".wav": "audio/wav",
-        ".mp3": "audio/mpeg",
-        ".flac": "audio/flac",
-    }.get(path.suffix.lower(), "application/octet-stream")
-    return FileResponse(path, media_type=media_type)
+    return FileResponse(path, media_type=_audio_media_type(path))
 
 
 @app.get("/api/recordings/{recording_id}/download")
-async def download_cleaned(recording_id: str) -> FileResponse:
-    return await get_audio(recording_id, type="cleaned")
+async def download_cleaned(
+    recording_id: str,
+    range_header: str | None = Header(default=None, alias="Range"),
+):
+    recording = _get_store().get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    result = recording.get("result") or {}
+    path = Path(result.get("output_audio_path", ""))
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Audio file not found")
+    file_size = path.stat().st_size
+    headers = {
+        "Accept-Ranges": "bytes",
+        "Content-Disposition": f'attachment; filename="{path.name}"',
+    }
+    media_type = _audio_media_type(path)
+    if not range_header:
+        return FileResponse(path, media_type=media_type, headers=headers)
+
+    if not range_header.startswith("bytes="):
+        raise HTTPException(status_code=416, detail="Invalid Range header")
+    start_text, _, end_text = range_header.removeprefix("bytes=").partition("-")
+    try:
+        start = int(start_text) if start_text else 0
+        end = int(end_text) if end_text else file_size - 1
+    except ValueError as exc:
+        raise HTTPException(status_code=416, detail="Invalid Range header") from exc
+    if start < 0 or end < start or start >= file_size:
+        raise HTTPException(status_code=416, detail="Requested range not satisfiable")
+    end = min(end, file_size - 1)
+    content_length = end - start + 1
+
+    async def _range_iter():
+        remaining = content_length
+        async with aiofiles.open(path, "rb") as handle:
+            await handle.seek(start)
+            while remaining > 0:
+                chunk = await handle.read(min(1024 * 1024, remaining))
+                if not chunk:
+                    break
+                remaining -= len(chunk)
+                yield chunk
+
+    headers.update({
+        "Content-Range": f"bytes {start}-{end}/{file_size}",
+        "Content-Length": str(content_length),
+    })
+    return StreamingResponse(_range_iter(), status_code=206, media_type=media_type, headers=headers)
 
 
 @app.get("/api/recordings/{recording_id}/harmonics", response_model=HarmonicOverlayResponse)
@@ -480,7 +673,9 @@ async def get_harmonics(recording_id: str) -> HarmonicOverlayResponse:
 
 @app.get("/api/stats", response_model=StatsResponse)
 async def get_stats() -> StatsResponse:
-    return StatsResponse(**_get_store().get_stats())
+    stats = _get_store().get_stats()
+    stats["circuit_breakers"] = get_circuit_breaker_registry().snapshot()
+    return StatsResponse(**stats)
 
 
 @app.get("/api/calls", response_model=CallListResponse)
@@ -519,16 +714,7 @@ async def get_call_similarity(
     limit: int = Query(default=100, ge=1, le=500),
 ) -> SimilarityGraphResponse:
     items, total = _get_call_database().search(call_type=call_type, limit=limit)
-    analyses = []
-    for call in items:
-        features = call.get("acoustic_features") or {}
-        sig = build_identity_signature(features)
-        analyses.append({
-            "call_id": call.get("id", ""),
-            "call_type": call.get("call_type", "unknown"),
-            "identity_signature": sig,
-        })
-    graph = build_similarity_graph(analyses, threshold=threshold)
+    graph = _get_similarity_cache().get_graph(items, threshold=threshold)
     return SimilarityGraphResponse(
         nodes=[SimilarityNode(**n) for n in graph["nodes"]],
         edges=[SimilarityEdge(**e) for e in graph["edges"]],
@@ -551,6 +737,7 @@ async def get_similar_contours(
     call_type: str | None = Query(default=None),
     limit: int = Query(default=10, ge=1, le=50),
     min_similarity: float = Query(default=0.5, ge=0.0, le=1.0),
+    method: str = Query(default="dtw", pattern="^(dtw|pearson)$"),
 ) -> ContourMatchResponse:
     target = _get_call_database().get_call(call_id)
     if target is None:
@@ -570,7 +757,7 @@ async def get_similar_contours(
         if not other_contour:
             continue
         compared += 1
-        sim = contour_similarity(target_contour, other_contour)
+        sim = contour_similarity(target_contour, other_contour, method=method)
         if sim >= min_similarity:
             matches.append(ContourMatch(
                 call_id=call.get("id", ""),
@@ -584,6 +771,45 @@ async def get_similar_contours(
         matches=matches[:limit],
         total_compared=compared,
     )
+
+
+@app.get("/api/research/embedding", response_model=EmbeddingResponse)
+async def get_research_embedding(
+    method: str = Query(default="pca", pattern="^(pca|umap)$"),
+    call_ids: list[str] | None = Query(default=None),
+) -> EmbeddingResponse:
+    if call_ids:
+        calls_by_id = _get_call_database().get_many(call_ids)
+        missing = [call_id for call_id in call_ids if call_id not in calls_by_id]
+        if missing:
+            raise HTTPException(status_code=404, detail=f"Call IDs not found: {', '.join(missing)}")
+        calls = [calls_by_id[call_id] for call_id in call_ids]
+    else:
+        calls, _ = _get_call_database().search(limit=10000)
+    cache_key = json.dumps({"method": method, "call_ids": [call.get("id") for call in calls]}, sort_keys=True)
+    embedding_cache: dict[str, Any] = app.state.embedding_cache
+    if cache_key not in embedding_cache:
+        embedding_cache[cache_key] = compute_embedding(calls, method=method)
+    return EmbeddingResponse(**embedding_cache[cache_key])
+
+
+@app.post("/api/research/stats", response_model=ResearchStatsResponse)
+async def compare_research_stats(request: StatsRequest) -> ResearchStatsResponse:
+    db = _get_call_database()
+    group_a_map = db.get_many(request.group_a_ids)
+    group_b_map = db.get_many(request.group_b_ids)
+    missing = [
+        call_id
+        for call_id in [*request.group_a_ids, *request.group_b_ids]
+        if call_id not in group_a_map and call_id not in group_b_map
+    ]
+    if missing:
+        raise HTTPException(status_code=404, detail=f"Call IDs not found: {', '.join(missing)}")
+    result = compare_groups(
+        [group_a_map[call_id] for call_id in request.group_a_ids],
+        [group_b_map[call_id] for call_id in request.group_b_ids],
+    )
+    return ResearchStatsResponse(**result)
 
 
 @app.post("/api/export/research")
@@ -631,20 +857,64 @@ async def export_research(request: ExportRequest):
 async def train_call_classifier() -> dict[str, Any]:
     """Train the ML call type classifier from existing call database data."""
     db = _get_call_database()
-    items, total = db.search(limit=10000)
-    training_data = []
-    for call in items:
-        call_type = call.get("call_type", "unknown")
-        features = call.get("acoustic_features") or {}
-        if call_type != "unknown" and features:
-            training_data.append({"features": features, "call_type": call_type})
+    training_data = db.training_data(include_reviewed=True)
     if len(training_data) < 5:
         raise HTTPException(status_code=400, detail=f"Need at least 5 labeled calls, found {len(training_data)}")
     try:
         result = train_classifier(training_data, settings.classifier_model_path)
-        return {"status": "trained", **result, "model_path": str(settings.classifier_model_path)}
+        version_info = _get_model_registry().register_model(settings.classifier_model_path, result)
+        load_classifier(Path(version_info["model_path"]))
+        metrics.inc("echofield_classifier_trains_total")
+        return {
+            "status": "trained",
+            **result,
+            "model_path": str(settings.classifier_model_path),
+            "registry_version": version_info,
+        }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/api/models", response_model=list[ModelVersionInfo])
+async def list_model_versions() -> list[ModelVersionInfo]:
+    return [ModelVersionInfo(**item) for item in _get_model_registry().list_versions()]
+
+
+@app.post("/api/models/{version}/activate", response_model=ModelVersionInfo)
+async def activate_model_version(version: str) -> ModelVersionInfo:
+    try:
+        info = _get_model_registry().activate(version)
+        load_classifier(Path(info["model_path"]))
+        return ModelVersionInfo(**info)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/review/queue", response_model=ReviewQueueResponse)
+async def review_queue(
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+) -> ReviewQueueResponse:
+    items, total = _get_call_database().review_queue(limit=limit, offset=offset)
+    records = [CallRecord(**_enrich_call(item)) for item in items]
+    return ReviewQueueResponse(total=total, returned=len(records), items=records)
+
+
+@app.post("/api/review/{call_id}/label", response_model=CallRecord)
+async def label_review_call(call_id: str, payload: ReviewLabelRequest) -> CallRecord:
+    call = _get_call_database().label_call(call_id, payload.label, payload.reviewed_by)
+    if call is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    app.state.embedding_cache = {}
+    metrics.inc("echofield_review_labels_total")
+    return CallRecord(**_enrich_call(call))
+
+
+@app.get("/metrics")
+async def prometheus_metrics() -> PlainTextResponse:
+    return PlainTextResponse(metrics.render_prometheus(), media_type="text/plain; version=0.0.4")
 
 
 @app.websocket("/ws/live")

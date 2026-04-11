@@ -27,6 +27,7 @@ import numpy as np
 
 from echofield.pipeline.feature_extract import (
     classify_call_type,
+    detect_anomaly,
     extract_acoustic_features,
 )
 
@@ -51,7 +52,30 @@ SUPPORTED_CALL_TYPES = [
     "greeting",
     "play",
     "unknown",
+    "novel",
 ]
+
+CALL_TYPE_TAXONOMY = {
+    "rumble": "low-frequency",
+    "contact call": "low-frequency",
+    "greeting": "low-frequency",
+    "trumpet": "high-frequency",
+    "cry": "high-frequency",
+    "bark": "broadband",
+    "roar": "broadband",
+    "play": "broadband",
+    "unknown": "unknown",
+    "novel": "unknown",
+}
+
+
+def _call_type_hierarchy(call_type: str, confidence: float, level2_confidence: float | None = None) -> dict[str, Any]:
+    return {
+        "level1": CALL_TYPE_TAXONOMY.get(call_type, "unknown"),
+        "level2": call_type,
+        "level1_confidence": round(float(confidence), 3),
+        "level2_confidence": round(float(level2_confidence if level2_confidence is not None else confidence), 3),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -158,7 +182,7 @@ class _ModelClassifier:
     def __init__(self, model_path: str | None) -> None:
         self._model = None
         self._available = False
-        self._label_map: list[str] = SUPPORTED_CALL_TYPES[:-1]  # exclude "unknown"
+        self._label_map: list[str] = [item for item in SUPPORTED_CALL_TYPES if item not in {"unknown", "novel"}]
 
         if not model_path or not Path(model_path).exists():
             logger.debug(
@@ -236,20 +260,41 @@ class _ModelClassifier:
         ], dtype=np.float32)
 
         tensor = torch.from_numpy(feature_vector).unsqueeze(0)
+        passes = []
+        was_training = bool(self._model.training)
+        self._model.train()
         with torch.no_grad():
-            logits = self._model(tensor)
-            probs = torch.softmax(logits, dim=-1).squeeze()
+            for _ in range(20):
+                logits = self._model(tensor)
+                passes.append(torch.softmax(logits, dim=-1).squeeze())
+        if not was_training:
+            self._model.eval()
+        probs_stack = torch.stack(passes)
+        probs = torch.mean(probs_stack, dim=0)
+        probs_std = torch.std(probs_stack, dim=0)
 
         best_idx = int(torch.argmax(probs).item())
         confidence = float(probs[best_idx].item())
+        prediction_uncertainty = float(probs_std[best_idx].item())
+        probabilities = [round(float(value), 5) for value in probs.tolist()]
 
         # Reject predictions below minimum threshold
         if confidence < CONFIDENCE_MINIMUM:
-            return {"call_type": "unknown", "confidence": confidence}
+            return {
+                "call_type": "unknown",
+                "confidence": confidence,
+                "classifier_probs": probabilities,
+                "prediction_uncertainty": round(prediction_uncertainty, 4),
+                "call_type_hierarchy": _call_type_hierarchy("unknown", confidence),
+            }
 
+        call_type = self._label_map[best_idx]
         return {
-            "call_type": self._label_map[best_idx],
+            "call_type": call_type,
             "confidence": round(confidence, 3),
+            "classifier_probs": probabilities,
+            "prediction_uncertainty": round(prediction_uncertainty, 4),
+            "call_type_hierarchy": _call_type_hierarchy(call_type, confidence),
         }
 
 
@@ -368,9 +413,22 @@ class CallDetector:
         self, snippet: np.ndarray, sr: int
     ) -> dict[str, Any]:
         features = extract_acoustic_features(snippet, sr)
+        anomaly_score = detect_anomaly(features)
+        if anomaly_score is not None and anomaly_score > 0.8:
+            return {
+                "classification": {
+                    "call_type": "novel",
+                    "confidence": round(anomaly_score, 3),
+                    "anomaly_score": anomaly_score,
+                    "prediction_uncertainty": 1.0 - anomaly_score,
+                    "call_type_hierarchy": _call_type_hierarchy("novel", anomaly_score),
+                },
+                "features": features,
+            }
         if self._classifier.available:
             try:
                 result = self._classifier.classify(features)
+                result["anomaly_score"] = anomaly_score
                 return {"classification": result, "features": features}
             except Exception as exc:
                 logger.debug("call_detector: model classifier failed, using heuristic: %s", exc)
@@ -461,6 +519,14 @@ class CallDetector:
                 "confidence": round(confidence, 3),
                 "confidence_tier": tier,
                 "acoustic_features": features,
+                "classifier_probs": classification.get("classifier_probs"),
+                "anomaly_score": classification.get("anomaly_score"),
+                "prediction_uncertainty": classification.get("prediction_uncertainty"),
+                "call_type_hierarchy": classification.get("call_type_hierarchy") or _call_type_hierarchy(
+                    classification["call_type"],
+                    confidence,
+                ),
+                "model_version": classification.get("model_version"),
                 "location": metadata.get("location"),
                 "date": metadata.get("date"),
                 "detector_backend": detector_backend,

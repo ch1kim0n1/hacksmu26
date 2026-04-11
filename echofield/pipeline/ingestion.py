@@ -16,6 +16,12 @@ SUPPORTED_EXTENSIONS = {".wav", ".mp3", ".flac"}
 MAX_FILE_SIZE_MB = 500
 MIN_SAMPLE_RATE = 16_000
 
+_MAGIC_BYTES = {
+    ".wav": (b"RIFF",),
+    ".mp3": (b"\xff\xfb", b"ID3"),
+    ".flac": (b"fLaC",),
+}
+
 
 @dataclass
 class AudioSegment:
@@ -49,6 +55,21 @@ def validate_audio_file(file_path: str) -> tuple[bool, str]:
     if size_mb > MAX_FILE_SIZE_MB:
         return False, f"File exceeds {MAX_FILE_SIZE_MB} MB"
     return True, ""
+
+
+def validate_magic_bytes(header: bytes, suffix: str) -> tuple[bool, str]:
+    normalized = suffix.lower()
+    expected = _MAGIC_BYTES.get(normalized)
+    if expected is None:
+        return False, f"Unsupported audio format: {suffix}"
+    if any(header.startswith(prefix) for prefix in expected):
+        return True, ""
+    expected_names = {
+        ".wav": "RIFF/WAV",
+        ".mp3": "MP3 frame or ID3",
+        ".flac": "fLaC",
+    }
+    return False, f"File content does not match {expected_names.get(normalized, normalized)} magic bytes"
 
 
 def segment_audio(

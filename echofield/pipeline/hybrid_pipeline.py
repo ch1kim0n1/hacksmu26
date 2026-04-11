@@ -13,6 +13,7 @@ from typing import Any, Awaitable, Callable
 import librosa
 import numpy as np
 
+from echofield.metrics import metrics
 from echofield.pipeline.cache_manager import CacheManager
 from echofield.pipeline.call_detector import CallDetector
 from echofield.pipeline.deep_denoise import deep_denoise
@@ -21,7 +22,7 @@ from echofield.pipeline.feature_extract import classify_call_type, extract_acous
 from echofield.pipeline.ingestion import IngestionResult, ingest_audio_file
 from echofield.pipeline.noise_classifier import classify_noise
 from echofield.pipeline.quality_check import assess_quality
-from echofield.pipeline.spectral_gate import spectral_gate_denoise
+from echofield.pipeline.spectral_gate import adaptive_gate_denoise, spectral_gate_denoise
 from echofield.pipeline.spectrogram import (
     build_spectrogram_artifacts,
     compute_stft,
@@ -69,6 +70,9 @@ class ProcessingPipeline:
             "sample_rate": getattr(self.settings, "SAMPLE_RATE", 44100),
             "n_fft": getattr(self.settings, "SPECTROGRAM_N_FFT", 2048),
             "hop_length": getattr(self.settings, "SPECTROGRAM_HOP_LENGTH", 512),
+            "spectrogram_type": getattr(self.settings, "SPECTROGRAM_TYPE", "stft"),
+            "post_process": bool(getattr(self.settings, "DENOISE_POST_PROCESS", False)),
+            "preserve_harmonics": bool(getattr(self.settings, "DENOISE_PRESERVE_HARMONICS", False)),
         }
 
     def _detect_calls(
@@ -111,6 +115,7 @@ class ProcessingPipeline:
             params=params,
         )
         if cached_audio and cached_metrics and cached_before and cached_after:
+            metrics.inc("echofield_cache_hits_total")
             await self._notify(progress_callback, PipelineStage.COMPLETE.value, "complete", 100)
             return {
                 "recording_id": recording_id,
@@ -124,8 +129,10 @@ class ProcessingPipeline:
                 "spectrogram_before_path": cached_before,
                 "spectrogram_after_path": cached_after,
             }
+        metrics.inc("echofield_cache_misses_total")
 
         await self._notify(progress_callback, PipelineStage.INGESTION.value, "active", 5)
+        stage_start = time.perf_counter()
         ingestion: IngestionResult = await asyncio.to_thread(
             ingest_audio_file,
             audio_path,
@@ -133,10 +140,12 @@ class ProcessingPipeline:
             segment_length_s=getattr(self.settings, "SEGMENT_SECONDS", 60),
             overlap_ratio=getattr(self.settings, "SEGMENT_OVERLAP_RATIO", 0.5),
         )
+        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.INGESTION.value})
         y = np.concatenate([segment.data for segment in ingestion.segments], axis=0)
         sr = ingestion.sample_rate
 
         await self._notify(progress_callback, PipelineStage.SPECTROGRAM.value, "active", 20)
+        stage_start = time.perf_counter()
         before_spec, before_viz = await asyncio.to_thread(
             build_spectrogram_artifacts,
             f"{recording_id}_before",
@@ -146,7 +155,9 @@ class ProcessingPipeline:
             n_fft=getattr(self.settings, "SPECTROGRAM_N_FFT", 2048),
             hop_length=getattr(self.settings, "SPECTROGRAM_HOP_LENGTH", 512),
             freq_max=getattr(self.settings, "SPECTROGRAM_FREQ_MAX", 1000),
+            spectrogram_type=getattr(self.settings, "SPECTROGRAM_TYPE", "stft"),
         )
+        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.SPECTROGRAM.value})
         await self._notify(
             progress_callback,
             PipelineStage.SPECTROGRAM.value,
@@ -156,7 +167,9 @@ class ProcessingPipeline:
         )
 
         await self._notify(progress_callback, PipelineStage.CLASSIFICATION.value, "active", 35)
+        stage_start = time.perf_counter()
         noise_info = await asyncio.to_thread(classify_noise, y, sr)
+        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.CLASSIFICATION.value})
         primary_range = noise_info["noise_types"][0]["frequency_range_hz"] if noise_info["noise_types"] else [0.0, 0.0]
         await self._notify(
             progress_callback,
@@ -173,7 +186,11 @@ class ProcessingPipeline:
         await self._notify(progress_callback, PipelineStage.DENOISING.value, "active", 50)
         model_path = getattr(self.settings, "MODEL_PATH", None)
         ensemble_meta: dict[str, Any] = {}
+        post_process = bool(getattr(self.settings, "DENOISE_POST_PROCESS", False))
+        preserve_harmonics = bool(getattr(self.settings, "DENOISE_PRESERVE_HARMONICS", False))
+        spectrogram_type = getattr(self.settings, "SPECTROGRAM_TYPE", "stft")
 
+        stage_start = time.perf_counter()
         if method == "hybrid":
             ensemble_result = await asyncio.to_thread(
                 run_ensemble,
@@ -181,6 +198,7 @@ class ProcessingPipeline:
                 sr,
                 model_path=model_path,
                 aggressiveness=aggressiveness,
+                post_process=post_process,
             )
             cleaned_audio = ensemble_result["audio"]
             ensemble_meta = {
@@ -189,7 +207,21 @@ class ProcessingPipeline:
                 "ensemble_confidence": ensemble_result["confidence"],
                 "candidates_evaluated": ensemble_result["candidates_evaluated"],
                 "per_method_scores": ensemble_result["per_method_scores"],
+                "score_variance": ensemble_result.get("score_variance", {}),
             }
+        elif method == "adaptive":
+            adaptive_result = await asyncio.to_thread(
+                adaptive_gate_denoise,
+                y,
+                sr,
+                chunk_s=float(getattr(self.settings, "DENOISE_CHUNK_S", 10.0)),
+                base_aggressiveness=aggressiveness,
+                noise_type=noise_info["primary_type"],
+                preserve_harmonics=preserve_harmonics,
+                post_process=post_process,
+            )
+            cleaned_audio = adaptive_result["cleaned_audio"]
+            ensemble_meta = {"chunk_aggressiveness": adaptive_result["chunk_aggressiveness"]}
         elif method == "deep":
             spectral = await asyncio.to_thread(
                 spectral_gate_denoise,
@@ -197,6 +229,9 @@ class ProcessingPipeline:
                 sr,
                 aggressiveness=aggressiveness,
                 noise_type=noise_info["primary_type"],
+                preserve_harmonics=preserve_harmonics,
+                post_process=post_process,
+                spectrogram_type=spectrogram_type,
             )
             cleaned_audio = await asyncio.to_thread(
                 deep_denoise,
@@ -211,10 +246,15 @@ class ProcessingPipeline:
                 sr,
                 aggressiveness=aggressiveness,
                 noise_type=noise_info["primary_type"],
+                preserve_harmonics=preserve_harmonics,
+                post_process=post_process,
+                spectrogram_type=spectrogram_type,
             )
             cleaned_audio = spectral["cleaned_audio"]
+        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.DENOISING.value})
 
         await self._notify(progress_callback, PipelineStage.SPECTROGRAM.value, "active", 65)
+        stage_start = time.perf_counter()
         after_spec, after_viz = await asyncio.to_thread(
             build_spectrogram_artifacts,
             f"{recording_id}_after",
@@ -224,7 +264,9 @@ class ProcessingPipeline:
             n_fft=getattr(self.settings, "SPECTROGRAM_N_FFT", 2048),
             hop_length=getattr(self.settings, "SPECTROGRAM_HOP_LENGTH", 512),
             freq_max=getattr(self.settings, "SPECTROGRAM_FREQ_MAX", 1000),
+            spectrogram_type=spectrogram_type,
         )
+        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.SPECTROGRAM.value})
         await self._notify(
             progress_callback,
             PipelineStage.SPECTROGRAM.value,
@@ -234,6 +276,7 @@ class ProcessingPipeline:
         )
 
         await self._notify(progress_callback, PipelineStage.FEATURE_EXTRACTION.value, "active", 80)
+        stage_start = time.perf_counter()
         calls = await asyncio.to_thread(
             self._detect_calls,
             recording_id,
@@ -241,9 +284,13 @@ class ProcessingPipeline:
             sr,
             ingestion.metadata,
         )
+        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.FEATURE_EXTRACTION.value})
+        metrics.inc("echofield_calls_detected_total", len(calls))
 
         await self._notify(progress_callback, PipelineStage.QUALITY_CHECK.value, "active", 90)
+        stage_start = time.perf_counter()
         quality = await asyncio.to_thread(assess_quality, y, cleaned_audio, sr)
+        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.QUALITY_CHECK.value})
         await self._notify(
             progress_callback,
             PipelineStage.QUALITY_CHECK.value,

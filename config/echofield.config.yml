@@ -100,6 +100,12 @@ elephant_vocalizations:
 # Sequential operations applied to each recording
 
 pipeline:
+  defaults:
+    denoise_method: hybrid
+    spectrogram_type: stft
+    denoise_chunk_s: 10
+    denoise_post_process: false
+    denoise_preserve_harmonics: false
   stages:
     # 1. Load and normalize
     - name: load

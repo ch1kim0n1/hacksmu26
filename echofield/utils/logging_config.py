@@ -75,6 +75,31 @@ def configure_logging(level: str = "INFO", log_format: str = "text") -> None:
         )
     handler.setFormatter(formatter)
     root.handlers = [handler]
+    try:
+        import structlog
+
+        processors = [
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.filter_by_level,
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+        ]
+        if log_format.lower() == "json":
+            processors.append(structlog.processors.JSONRenderer())
+        else:
+            processors.append(structlog.dev.ConsoleRenderer(colors=False))
+        structlog.configure(
+            processors=processors,
+            wrapper_class=structlog.stdlib.BoundLogger,
+            logger_factory=structlog.stdlib.LoggerFactory(),
+            cache_logger_on_first_use=True,
+        )
+    except Exception:
+        pass
     _configured = True
 
 
@@ -86,4 +111,9 @@ def get_logger(name: str) -> logging.Logger:
         configure_logging(settings.LOG_LEVEL, settings.LOG_FORMAT)
     except Exception:
         configure_logging()
-    return logging.getLogger(name)
+    try:
+        import structlog
+
+        return structlog.stdlib.get_logger(name)  # type: ignore[return-value]
+    except Exception:
+        return logging.getLogger(name)

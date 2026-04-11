@@ -17,6 +17,7 @@ class RecordingStatus(str, Enum):
     processing = "processing"
     complete = "complete"
     failed = "failed"
+    cancelled = "cancelled"
 
 
 class ProcessingStage(str, Enum):
@@ -45,6 +46,19 @@ class RecordingMetadata(EchoBaseModel):
     call_id: str | None = None
     animal_id: str | None = None
     noise_type_ref: str | None = Field(default=None, examples=["vehicle"])
+    start_sec: float | None = Field(default=None, ge=0.0)
+    end_sec: float | None = Field(default=None, ge=0.0)
+
+
+class MetadataPatchRequest(EchoBaseModel):
+    location: str | None = None
+    date: str | None = None
+    microphone_type: str | None = None
+    notes: str | None = None
+    species: str | None = None
+    call_id: str | None = None
+    animal_id: str | None = None
+    noise_type_ref: str | None = None
     start_sec: float | None = Field(default=None, ge=0.0)
     end_sec: float | None = Field(default=None, ge=0.0)
 
@@ -110,6 +124,13 @@ class CallDetail(EchoBaseModel):
     confidence_tier: str | None = None
     detector_backend: str | None = None
     classifier_backend: str | None = None
+    model_version: str | None = None
+    anomaly_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    prediction_uncertainty: float | None = Field(default=None, ge=0.0)
+    call_type_hierarchy: dict[str, Any] | None = None
+    review_label: str | None = None
+    reviewed_by: str | None = None
+    reviewed_at: str | None = None
     location: str | None = None
     date: str | None = None
     species: str | None = None
@@ -176,6 +197,31 @@ class UploadResponse(EchoBaseModel):
     message: str
 
 
+class BatchSubmitResponse(EchoBaseModel):
+    batch_id: str
+    queued: int = Field(ge=0)
+    status: str
+
+
+class BatchRecordingStatus(EchoBaseModel):
+    recording_id: str
+    status: str
+    progress_pct: float = Field(default=0.0, ge=0.0, le=100.0)
+    error: str | None = None
+
+
+class BatchStatusResponse(EchoBaseModel):
+    batch_id: str
+    total: int = Field(ge=0)
+    completed: int = Field(ge=0)
+    failed: int = Field(ge=0)
+    cancelled: int = Field(default=0, ge=0)
+    status: str
+    created_at: str
+    updated_at: str
+    results: list[BatchRecordingStatus] = Field(default_factory=list)
+
+
 class RecordingListResponse(EchoBaseModel):
     total: int = Field(ge=0)
     returned: int = Field(ge=0)
@@ -203,6 +249,7 @@ class StatsResponse(EchoBaseModel):
     avg_snr_improvement: float
     success_rate: float = Field(ge=0.0, le=1.0)
     processing_time_avg: float = Field(ge=0.0)
+    circuit_breakers: dict[str, Any] = Field(default_factory=dict)
 
 
 class WSMessage(EchoBaseModel):
@@ -233,6 +280,9 @@ class HarmonicOverlayResponse(EchoBaseModel):
 class SimilarityNode(EchoBaseModel):
     id: str
     label: str
+    community_id: int | None = None
+    degree_centrality: float | None = Field(default=None, ge=0.0)
+    betweenness_centrality: float | None = Field(default=None, ge=0.0)
 
 
 class SimilarityEdge(EchoBaseModel):
@@ -258,4 +308,70 @@ class ContourMatch(EchoBaseModel):
 class ContourMatchResponse(EchoBaseModel):
     query_call_id: str
     matches: list[ContourMatch] = Field(default_factory=list)
+    total_compared: int = Field(default=0, ge=0)
+
+
+class ReviewLabelRequest(EchoBaseModel):
+    label: str = Field(min_length=1)
+    reviewed_by: str | None = None
+
+
+class ReviewQueueResponse(EchoBaseModel):
+    total: int = Field(ge=0)
+    returned: int = Field(ge=0)
+    items: list[CallRecord] = Field(default_factory=list)
+
+
+class ModelVersionInfo(EchoBaseModel):
+    version: str
+    active: bool = False
+    model_path: str
+    metadata_path: str | None = None
+    trained_at: str | None = None
+    samples: int | None = None
+    classes: int | None = None
+    accuracy: float | None = None
+    ece: float | None = None
+    class_distribution: dict[str, int] = Field(default_factory=dict)
+
+
+class EmbeddingPoint(EchoBaseModel):
+    call_id: str
+    x: float
+    y: float
+    call_type: str
+    confidence: float = Field(ge=0.0, le=1.0)
+
+
+class EmbeddingResponse(EchoBaseModel):
+    method: str
+    points: list[EmbeddingPoint] = Field(default_factory=list)
+    total: int = Field(ge=0)
+
+
+class StatsRequest(EchoBaseModel):
+    group_a_ids: list[str] = Field(min_length=1)
+    group_b_ids: list[str] = Field(min_length=1)
+
+
+class FeatureTestResult(EchoBaseModel):
+    feature: str
+    group_a_mean: float
+    group_b_mean: float
+    mann_whitney_u: float
+    p_value: float
+    p_value_corrected: float
+    cohen_d: float
+    ci95_low: float
+    ci95_high: float
+    significant: bool
+
+
+class ResearchStatsResponse(EchoBaseModel):
+    group_a_count: int = Field(ge=0)
+    group_b_count: int = Field(ge=0)
+    alpha: float = Field(default=0.05, ge=0.0, le=1.0)
+    correction: str = "bonferroni"
+    results: list[FeatureTestResult] = Field(default_factory=list)
+    significant_features: list[str] = Field(default_factory=list)
     total_compared: int = Field(ge=0)

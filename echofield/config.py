@@ -91,6 +91,8 @@ class Config:
     CONFIG_FILE: str = "./config/echofield.config.yml"
     MODEL_PATH: str = "./models/echofield-denoise-v1.pt"
     CLASSIFIER_MODEL_PATH: str = "./models/call_classifier.joblib"
+    MODEL_REGISTRY_DIR: str = "./models"
+    DB_PATH: str = "./data/cache/echofield.sqlite"
 
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "text"
@@ -106,6 +108,10 @@ class Config:
     SPECTROGRAM_N_FFT: int = 2048
     SPECTROGRAM_HOP_LENGTH: int = 512
     SPECTROGRAM_FREQ_MAX: int = 1000
+    SPECTROGRAM_TYPE: str = "stft"
+    DENOISE_CHUNK_S: float = 10.0
+    DENOISE_POST_PROCESS: bool = False
+    DENOISE_PRESERVE_HARMONICS: bool = False
 
     pipeline_config: dict[str, Any] = field(default_factory=dict)
 
@@ -153,12 +159,21 @@ class Config:
     def classifier_model_path(self) -> Path:
         return self.resolve_path(self.CLASSIFIER_MODEL_PATH)
 
+    @property
+    def model_registry_dir(self) -> Path:
+        return self.resolve_path(self.MODEL_REGISTRY_DIR)
+
+    @property
+    def db_path(self) -> Path:
+        return self.resolve_path(self.DB_PATH)
+
     def ensure_directories(self) -> None:
         for directory in (
             self.audio_dir,
             self.processed_dir,
             self.spectrogram_dir,
             self.cache_dir,
+            self.model_registry_dir,
         ):
             directory.mkdir(parents=True, exist_ok=True)
         self.metadata_file.parent.mkdir(parents=True, exist_ok=True)
@@ -171,6 +186,8 @@ class Config:
             raise ConfigError("ECHOFIELD_SAMPLE_RATE must be at least 16000 Hz.")
         if self.SPECTROGRAM_N_FFT <= 0 or self.SPECTROGRAM_HOP_LENGTH <= 0:
             raise ConfigError("Spectrogram FFT and hop length must be positive.")
+        if self.SPECTROGRAM_TYPE.lower() not in {"stft", "cqt"}:
+            raise ConfigError("ECHOFIELD_SPECTROGRAM_TYPE must be one of: stft, cqt.")
 
         self.ensure_directories()
 
@@ -216,6 +233,7 @@ def get_settings() -> Config:
             .get("denoise_method", Config.DENOISE_METHOD)
         ),
     ) or Config.DENOISE_METHOD
+    pipeline_defaults = pipeline_config.get("pipeline", {}).get("defaults", {})
 
     settings = Config(
         AUDIO_DIR=_env_any("AUDIO_DIR", default=Config.AUDIO_DIR) or Config.AUDIO_DIR,
@@ -240,6 +258,8 @@ def get_settings() -> Config:
         CONFIG_FILE=str(config_path),
         MODEL_PATH=_env_any("MODEL_PATH", default=Config.MODEL_PATH) or Config.MODEL_PATH,
         CLASSIFIER_MODEL_PATH=_env_any("CLASSIFIER_MODEL_PATH", default=Config.CLASSIFIER_MODEL_PATH) or Config.CLASSIFIER_MODEL_PATH,
+        MODEL_REGISTRY_DIR=_env_any("MODEL_REGISTRY_DIR", default=Config.MODEL_REGISTRY_DIR) or Config.MODEL_REGISTRY_DIR,
+        DB_PATH=_env_any("DB_PATH", default=Config.DB_PATH) or Config.DB_PATH,
         LOG_LEVEL=_env_any("LOG_LEVEL", default=Config.LOG_LEVEL) or Config.LOG_LEVEL,
         LOG_FORMAT=_env_any("LOG_FORMAT", default=Config.LOG_FORMAT) or Config.LOG_FORMAT,
         SAMPLE_RATE=_env_int("SAMPLE_RATE", default=Config.SAMPLE_RATE),
@@ -264,6 +284,23 @@ def get_settings() -> Config:
         SPECTROGRAM_FREQ_MAX=_env_int(
             "SPECTROGRAM_FREQ_MAX",
             default=Config.SPECTROGRAM_FREQ_MAX,
+        ),
+        SPECTROGRAM_TYPE=_env_any(
+            "SPECTROGRAM_TYPE",
+            default=str(pipeline_defaults.get("spectrogram_type", Config.SPECTROGRAM_TYPE)),
+        )
+        or Config.SPECTROGRAM_TYPE,
+        DENOISE_CHUNK_S=_env_float(
+            "DENOISE_CHUNK_S",
+            default=float(pipeline_defaults.get("denoise_chunk_s", Config.DENOISE_CHUNK_S)),
+        ),
+        DENOISE_POST_PROCESS=_env_bool(
+            "DENOISE_POST_PROCESS",
+            default=bool(pipeline_defaults.get("denoise_post_process", Config.DENOISE_POST_PROCESS)),
+        ),
+        DENOISE_PRESERVE_HARMONICS=_env_bool(
+            "DENOISE_PRESERVE_HARMONICS",
+            default=bool(pipeline_defaults.get("denoise_preserve_harmonics", Config.DENOISE_PRESERVE_HARMONICS)),
         ),
         pipeline_config=pipeline_config,
     )

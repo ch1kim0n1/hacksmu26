@@ -8,11 +8,15 @@ and energy preservation, then selects and returns the best output.
 from __future__ import annotations
 
 import logging
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
 
+from echofield.metrics import metrics
+from echofield.pipeline.circuit_breaker import CircuitBreakerOpen, run_with_breaker
 from echofield.pipeline.quality_check import (
     compute_energy_preservation,
     compute_snr,
@@ -108,9 +112,9 @@ class CandidateResult:
 # Candidate generators
 # ---------------------------------------------------------------------------
 
-def _run_spectral(y: np.ndarray, sr: int, aggressiveness: float) -> np.ndarray:
+def _run_spectral(y: np.ndarray, sr: int, aggressiveness: float, post_process: bool = False) -> np.ndarray:
     from echofield.pipeline.spectral_gate import spectral_gate_denoise
-    result = spectral_gate_denoise(y, sr, aggressiveness=aggressiveness)
+    result = spectral_gate_denoise(y, sr, aggressiveness=aggressiveness, post_process=post_process)
     return result["cleaned_audio"]
 
 
@@ -216,6 +220,7 @@ def run_ensemble(
     *,
     model_path: str | None = None,
     aggressiveness: float = 1.5,
+    post_process: bool | None = None,
 ) -> dict[str, Any]:
     """Generate candidates from all available backends, score, and select best.
 
@@ -235,36 +240,36 @@ def run_ensemble(
           - ``candidates_evaluated``: Number of candidates compared.
     """
     candidates: list[CandidateResult] = []
+    if post_process is None:
+        post_process = os.getenv("ECHOFIELD_DENOISE_POST_PROCESS", "").strip().lower() in {"1", "true", "yes", "on"}
 
-    # --- Candidate 1: Spectral gating (always available) ---
-    try:
-        spectral_audio = _run_spectral(y, sr, aggressiveness)
-        candidates.append(CandidateResult(method="spectral", audio=spectral_audio))
-        logger.debug("ensemble: spectral candidate generated")
-    except Exception as exc:
-        logger.warning("ensemble: spectral gating failed: %s", exc)
+    candidate_jobs = {
+        "spectral": lambda: _run_spectral(y, sr, aggressiveness, post_process=post_process),
+        "unet": lambda: _run_unet(y, sr, model_path),
+        "demucs": lambda: _run_demucs(y, sr),
+    }
 
-    # --- Candidate 2: U-Net (optional, requires torch) ---
-    try:
-        unet_audio = _run_unet(y, sr, model_path)
-        if unet_audio is not None:
-            candidates.append(CandidateResult(method="unet", audio=unet_audio))
-            logger.debug("ensemble: U-Net candidate generated")
-        else:
-            logger.debug("ensemble: U-Net unavailable, skipping")
-    except Exception as exc:
-        logger.warning("ensemble: U-Net candidate failed: %s", exc)
+    def _run_backend(method_name: str) -> CandidateResult | None:
+        try:
+            audio = run_with_breaker(method_name, candidate_jobs[method_name])
+        except CircuitBreakerOpen as exc:
+            logger.info("ensemble: %s skipped: %s", method_name, exc)
+            return None
+        except Exception as exc:
+            logger.warning("ensemble: %s candidate failed: %s", method_name, exc)
+            return None
+        if audio is None:
+            logger.debug("ensemble: %s unavailable, skipping", method_name)
+            return None
+        logger.debug("ensemble: %s candidate generated", method_name)
+        return CandidateResult(method=method_name, audio=audio)
 
-    # --- Candidate 3: Demucs (optional, requires demucs package) ---
-    try:
-        demucs_audio = _run_demucs(y, sr)
-        if demucs_audio is not None:
-            candidates.append(CandidateResult(method="demucs", audio=demucs_audio))
-            logger.debug("ensemble: Demucs candidate generated")
-        else:
-            logger.debug("ensemble: Demucs unavailable, skipping")
-    except Exception as exc:
-        logger.warning("ensemble: Demucs candidate failed: %s", exc)
+    with ThreadPoolExecutor(max_workers=len(candidate_jobs)) as executor:
+        futures = {executor.submit(_run_backend, method_name): method_name for method_name in candidate_jobs}
+        for future in as_completed(futures):
+            result = future.result()
+            if result is not None:
+                candidates.append(result)
 
     # Fallback: if no candidates were generated, return original
     if not candidates:
@@ -275,6 +280,7 @@ def run_ensemble(
             "composite_score": 0.0,
             "confidence": 0.0,
             "per_method_scores": {},
+            "score_variance": {},
             "candidates_evaluated": 0,
         }
 
@@ -295,6 +301,11 @@ def run_ensemble(
         confidence = 1.0
 
     per_method_scores = {c.method: c.scores for c in candidates}
+    score_variance: dict[str, float] = {}
+    for key in sorted({key for candidate in candidates for key in candidate.scores}):
+        values = [candidate.scores[key] for candidate in candidates if key in candidate.scores]
+        if values:
+            score_variance[key] = round(float(np.var(values)), 6)
 
     logger.info(
         "ensemble: selected '%s' (score=%.1f, confidence=%.2f, candidates=%d)",
@@ -303,6 +314,8 @@ def run_ensemble(
         confidence,
         len(candidates),
     )
+    metrics.observe("echofield_ensemble_score", winner.composite_score)
+    metrics.set_gauge("echofield_ensemble_candidates_evaluated", len(candidates))
 
     return {
         "audio": winner.audio,
@@ -310,5 +323,6 @@ def run_ensemble(
         "composite_score": winner.composite_score,
         "confidence": round(confidence, 3),
         "per_method_scores": per_method_scores,
+        "score_variance": score_variance,
         "candidates_evaluated": len(candidates),
     }

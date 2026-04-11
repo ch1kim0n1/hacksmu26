@@ -95,6 +95,44 @@ def compute_mel_spectrogram(
     return normalize_per_segment(mel_db)
 
 
+def compute_cqt(
+    y: np.ndarray,
+    sr: int,
+    *,
+    fmin: float = 8.0,
+    bins_per_octave: int = 24,
+    n_bins: int = 168,
+    hop_length: int = 512,
+) -> dict[str, np.ndarray]:
+    if y.size == 0:
+        return {
+            "cqt": np.zeros((0, 0), dtype=np.complex64),
+            "magnitude_db": np.zeros((0, 0), dtype=np.float32),
+            "frequencies": np.zeros((0,), dtype=np.float32),
+            "times": np.zeros((0,), dtype=np.float32),
+        }
+    max_freq = min(sr / 2.0, fmin * 2 ** (n_bins / bins_per_octave))
+    effective_bins = max(1, min(n_bins, int(np.floor(bins_per_octave * np.log2(max_freq / fmin)))))
+    cqt = librosa.cqt(
+        pre_emphasis(y),
+        sr=sr,
+        hop_length=hop_length,
+        fmin=fmin,
+        n_bins=effective_bins,
+        bins_per_octave=bins_per_octave,
+    )
+    magnitude = np.abs(cqt)
+    magnitude_db = librosa.amplitude_to_db(magnitude, ref=np.max)
+    frequencies = librosa.cqt_frequencies(effective_bins, fmin=fmin, bins_per_octave=bins_per_octave)
+    times = librosa.frames_to_time(np.arange(cqt.shape[1]), sr=sr, hop_length=hop_length)
+    return {
+        "cqt": cqt.astype(np.complex64),
+        "magnitude_db": magnitude_db.astype(np.float32),
+        "frequencies": frequencies.astype(np.float32),
+        "times": times.astype(np.float32),
+    }
+
+
 def generate_spectrogram_png(
     magnitude_db: np.ndarray,
     sr: int,
@@ -171,6 +209,7 @@ def build_spectrogram_artifacts(
     hop_length: int = 512,
     n_mels: int = 128,
     freq_max: float = 1000.0,
+    spectrogram_type: str = "stft",
     progress_callback: Callable[[str, int], None] | None = None,
 ) -> tuple[Spectrogram, SpectrogramViz]:
     output_root = Path(output_dir)
@@ -203,7 +242,13 @@ def build_spectrogram_artifacts(
             progress_callback("SPECTROGRAM_READY", 100)
         return spectrogram, viz
 
-    stft_data = compute_stft(y, sr, n_fft=n_fft, hop_length=hop_length)
+    normalized_type = spectrogram_type.lower()
+    if normalized_type == "cqt":
+        stft_data = compute_cqt(y, sr, hop_length=hop_length)
+        stft_matrix = stft_data["cqt"]
+    else:
+        stft_data = compute_stft(y, sr, n_fft=n_fft, hop_length=hop_length)
+        stft_matrix = stft_data["stft"]
     mel = compute_mel_spectrogram(
         y,
         sr,
@@ -216,11 +261,12 @@ def build_spectrogram_artifacts(
     np.save(
         npy_path,
         {
-            "stft": stft_data["stft"],
+            "stft": stft_matrix,
             "magnitude_db": stft_data["magnitude_db"],
             "mel_spectrogram": mel,
             "frequencies_hz": stft_data["frequencies"],
             "times_s": stft_data["times"],
+            "spectrogram_type": normalized_type,
         },
         allow_pickle=True,
     )
@@ -235,7 +281,7 @@ def build_spectrogram_artifacts(
 
     spectrogram = Spectrogram(
         recording_id=recording_id,
-        stft=stft_data["stft"],
+        stft=stft_matrix,
         magnitude_db=stft_data["magnitude_db"],
         mel_spectrogram=mel,
         frequencies_hz=stft_data["frequencies"],
@@ -252,3 +298,25 @@ def build_spectrogram_artifacts(
     if progress_callback:
         progress_callback("SPECTROGRAM_READY", 100)
     return spectrogram, viz
+
+
+def build_cqt_artifacts(
+    recording_id: str,
+    y: np.ndarray,
+    sr: int,
+    output_dir: str | Path,
+    *,
+    hop_length: int = 512,
+    freq_max: float = 1000.0,
+    progress_callback: Callable[[str, int], None] | None = None,
+) -> tuple[Spectrogram, SpectrogramViz]:
+    return build_spectrogram_artifacts(
+        recording_id,
+        y,
+        sr,
+        output_dir,
+        hop_length=hop_length,
+        freq_max=freq_max,
+        spectrogram_type="cqt",
+        progress_callback=progress_callback,
+    )

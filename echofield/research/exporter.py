@@ -11,6 +11,8 @@ from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
+import numpy as np
+import soundfile as sf
 from matplotlib.backends.backend_pdf import PdfPages
 
 
@@ -116,6 +118,88 @@ def export_pdf(recordings: list[dict[str, Any]], destination: str | Path) -> Pat
         ax.text(0.02, 0.98, "\n".join(lines), va="top", family="monospace")
         pdf.savefig(fig)
         plt.close(fig)
+
+        if len(rows) >= 3:
+            f0_values = [float(row["fundamental_frequency_hz"]) for row in rows if row.get("fundamental_frequency_hz") not in {None, ""}]
+            if f0_values:
+                fig, ax = plt.subplots(figsize=(11.69, 8.27), dpi=300)
+                ax.hist(f0_values, bins=min(20, max(len(f0_values) // 2, 3)), color="#2A7A78", edgecolor="black")
+                ax.set_title("Fundamental Frequency Distribution")
+                ax.set_xlabel("Fundamental frequency (Hz)")
+                ax.set_ylabel("Call count")
+                fig.tight_layout()
+                pdf.savefig(fig)
+                plt.close(fig)
+
+            type_counts: dict[str, int] = {}
+            for row in rows:
+                call_type = str(row.get("call_type") or "unknown")
+                type_counts[call_type] = type_counts.get(call_type, 0) + 1
+            if type_counts:
+                fig, ax = plt.subplots(figsize=(11.69, 8.27), dpi=300)
+                ax.pie(type_counts.values(), labels=type_counts.keys(), autopct="%1.1f%%")
+                ax.set_title("Call Type Distribution")
+                fig.tight_layout()
+                pdf.savefig(fig)
+                plt.close(fig)
+
+            snr_by_recording: dict[str, list[float]] = {}
+            for row in rows:
+                try:
+                    snr_by_recording.setdefault(str(row["recording_id"]), []).append(float(row["snr_db"]))
+                except (TypeError, ValueError):
+                    continue
+            if snr_by_recording:
+                labels = list(snr_by_recording)
+                values = [float(np.mean(snr_by_recording[label])) for label in labels]
+                fig, ax = plt.subplots(figsize=(11.69, 8.27), dpi=300)
+                ax.bar(labels, values, color="#7A4E9D")
+                ax.set_title("Mean SNR by Recording")
+                ax.set_xlabel("Recording")
+                ax.set_ylabel("SNR (dB)")
+                ax.tick_params(axis="x", rotation=45)
+                fig.tight_layout()
+                pdf.savefig(fig)
+                plt.close(fig)
+
+            durations = [float(row["duration_ms"]) / 1000.0 for row in rows if row.get("duration_ms") not in {None, ""}]
+            confidences = [float(row["confidence"]) for row in rows if row.get("confidence") not in {None, ""}]
+            if durations and confidences:
+                min_len = min(len(durations), len(confidences))
+                fig, ax = plt.subplots(figsize=(11.69, 8.27), dpi=300)
+                ax.scatter(durations[:min_len], confidences[:min_len], color="#CF5C36", alpha=0.75)
+                ax.set_title("Call Duration vs Classifier Confidence")
+                ax.set_xlabel("Duration (s)")
+                ax.set_ylabel("Confidence")
+                ax.set_ylim(0, 1)
+                fig.tight_layout()
+                pdf.savefig(fig)
+                plt.close(fig)
+
+            waveform_figures = 0
+            for recording in recordings:
+                result = recording.get("result") or {}
+                audio_path = result.get("output_audio_path")
+                if not audio_path or not Path(audio_path).exists():
+                    continue
+                try:
+                    y, sr = sf.read(audio_path)
+                    if getattr(y, "ndim", 1) > 1:
+                        y = np.mean(y, axis=1)
+                    seconds = np.arange(len(y)) / sr
+                    fig, ax = plt.subplots(figsize=(11.69, 3.2), dpi=300)
+                    ax.plot(seconds, y, color="#1F2937", linewidth=0.5)
+                    ax.set_title(f"Waveform Thumbnail: {recording.get('filename') or recording.get('id')}")
+                    ax.set_xlabel("Time (s)")
+                    ax.set_ylabel("Amplitude")
+                    fig.tight_layout()
+                    pdf.savefig(fig)
+                    plt.close(fig)
+                    waveform_figures += 1
+                except Exception:
+                    continue
+                if waveform_figures >= 10:
+                    break
     return destination_path
 
 

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import csv
 import json
+import math
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -133,6 +135,14 @@ class CallDatabase:
 
     def __init__(self) -> None:
         self._calls: dict[str, dict[str, Any]] = {}
+        self._revision = 0
+
+    @property
+    def revision(self) -> int:
+        return self._revision
+
+    def _touch(self) -> None:
+        self._revision += 1
 
     @classmethod
     def from_metadata(
@@ -200,9 +210,17 @@ class CallDatabase:
                     (inventory_row or {}).get("call_type_confidence")
                     or (analysis_row or {}).get("call_type_confidence")
                 ),
+                "review_label": None,
+                "reviewed_by": None,
+                "reviewed_at": None,
+                "model_version": (analysis_row or {}).get("model_version"),
+                "anomaly_score": (analysis_row or {}).get("anomaly_score"),
+                "prediction_uncertainty": (analysis_row or {}).get("prediction_uncertainty"),
+                "call_type_hierarchy": (analysis_row or {}).get("call_type_hierarchy"),
                 "acoustic_features": features,
                 "metadata": metadata,
             }
+        self._touch()
 
     def upsert_processed_calls(
         self,
@@ -245,12 +263,73 @@ class CallDatabase:
                 "frequency_max_hz": frequency_max_hz,
                 "call_type": str(call.get("call_type") or "unknown"),
                 "confidence": _safe_float(call.get("confidence")),
+                "confidence_tier": call.get("confidence_tier"),
+                "detector_backend": call.get("detector_backend"),
+                "classifier_backend": call.get("classifier_backend"),
+                "model_version": call.get("model_version"),
+                "anomaly_score": call.get("anomaly_score"),
+                "prediction_uncertainty": call.get("prediction_uncertainty"),
+                "classifier_probs": call.get("classifier_probs"),
+                "call_type_hierarchy": call.get("call_type_hierarchy"),
+                "review_label": call.get("review_label"),
+                "reviewed_by": call.get("reviewed_by"),
+                "reviewed_at": call.get("reviewed_at"),
                 "acoustic_features": features,
                 "metadata": merged_metadata,
             }
+        self._touch()
 
     def get_call(self, call_id: str) -> dict[str, Any] | None:
         return self._calls.get(call_id)
+
+    def get_many(self, call_ids: list[str]) -> dict[str, dict[str, Any]]:
+        return {call_id: self._calls[call_id] for call_id in call_ids if call_id in self._calls}
+
+    def label_call(self, call_id: str, label: str, reviewed_by: str | None = None) -> dict[str, Any] | None:
+        call = self._calls.get(call_id)
+        if call is None:
+            return None
+        call["review_label"] = label
+        call["reviewed_by"] = reviewed_by
+        call["reviewed_at"] = datetime.now(timezone.utc).isoformat()
+        self._touch()
+        return call
+
+    @staticmethod
+    def _entropy_from_call(call: dict[str, Any]) -> float:
+        features = call.get("acoustic_features") or {}
+        probs = call.get("classifier_probs") or features.get("classifier_probs")
+        if isinstance(probs, list) and probs:
+            values = [max(float(value), 1e-12) for value in probs]
+            total = sum(values)
+            if total > 0:
+                normalized = [value / total for value in values]
+                return float(-sum(value * math.log(value) for value in normalized))
+        confidence = min(max(_safe_float(call.get("confidence")), 0.0), 1.0)
+        return float(1.0 - abs(confidence - 0.5) * 2.0)
+
+    def review_queue(self, *, limit: int = 100, offset: int = 0) -> tuple[list[dict[str, Any]], int]:
+        candidates = [
+            call
+            for call in self._calls.values()
+            if call.get("review_label") in {None, ""}
+            and (
+                _safe_float(call.get("confidence")) < 0.5
+                or str(call.get("call_type") or "").lower() in {"unknown", "novel"}
+            )
+        ]
+        candidates.sort(key=self._entropy_from_call, reverse=True)
+        total = len(candidates)
+        return candidates[offset : offset + limit], total
+
+    def training_data(self, *, include_reviewed: bool = True) -> list[dict[str, Any]]:
+        items: list[dict[str, Any]] = []
+        for call in self._calls.values():
+            label = call.get("review_label") if include_reviewed and call.get("review_label") else call.get("call_type")
+            features = call.get("acoustic_features") or {}
+            if label and label != "unknown" and features:
+                items.append({"features": features, "call_type": label})
+        return items
 
     def search(
         self,
