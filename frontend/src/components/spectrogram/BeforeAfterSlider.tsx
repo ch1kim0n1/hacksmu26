@@ -81,7 +81,7 @@ export default function BeforeAfterSlider({
   return (
     <div
       ref={containerRef}
-      className="relative rounded-lg border border-echofield-border bg-echofield-surface overflow-hidden select-none cursor-ew-resize shadow-lg shadow-accent-teal/5"
+      className="relative rounded-lg border border-ev-sand bg-ev-cream overflow-hidden select-none cursor-ew-resize shadow-lg shadow-accent-savanna/5"
       onClick={handleContainerClick}
     >
       {/* Before image (full, underneath) */}
@@ -117,7 +117,7 @@ export default function BeforeAfterSlider({
             height="16"
             viewBox="0 0 16 16"
             fill="none"
-            className="text-echofield-bg"
+            className="text-ev-ivory"
           >
             <path
               d="M4 8L6 6M4 8L6 10M4 8H12M12 8L10 6M12 8L10 10"

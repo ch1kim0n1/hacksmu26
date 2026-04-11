@@ -71,15 +71,15 @@ export default function ExportModal({
       />
 
       {/* Modal content */}
-      <div className="relative w-full max-w-md mx-4 rounded-xl border border-echofield-border bg-echofield-surface shadow-2xl">
+      <div className="relative w-full max-w-md mx-4 rounded-xl border border-ev-sand bg-ev-cream shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-echofield-border">
-          <h2 className="text-lg font-semibold text-echofield-text-primary">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-ev-sand">
+          <h2 className="text-lg font-semibold text-ev-charcoal">
             Export Data
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-echofield-text-muted hover:text-echofield-text-primary hover:bg-echofield-surface-elevated transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-ev-warm-gray hover:text-ev-charcoal hover:bg-background-elevated transition-colors"
             aria-label="Close modal"
           >
             <svg
@@ -102,7 +102,7 @@ export default function ExportModal({
         <div className="px-6 py-5 space-y-5">
           {/* Format selection */}
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-wide text-echofield-text-muted font-medium">
+            <label className="text-xs uppercase tracking-wide text-ev-warm-gray font-medium">
               Export Format
             </label>
             <div className="space-y-2">
@@ -111,8 +111,8 @@ export default function ExportModal({
                   key={option.value}
                   className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                     format === option.value
-                      ? "border-accent-teal bg-accent-teal/5"
-                      : "border-echofield-border hover:border-echofield-text-muted"
+                      ? "border-accent-savanna bg-accent-savanna/5"
+                      : "border-ev-sand hover:border-ev-warm-gray"
                   }`}
                 >
                   <input
@@ -126,19 +126,19 @@ export default function ExportModal({
                   <div
                     className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
                       format === option.value
-                        ? "border-accent-teal"
-                        : "border-echofield-border"
+                        ? "border-accent-savanna"
+                        : "border-ev-sand"
                     }`}
                   >
                     {format === option.value && (
-                      <div className="w-2 h-2 rounded-full bg-accent-teal" />
+                      <div className="w-2 h-2 rounded-full bg-accent-savanna" />
                     )}
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-echofield-text-primary">
+                    <span className="text-sm font-medium text-ev-charcoal">
                       {option.label}
                     </span>
-                    <span className="text-xs text-echofield-text-muted ml-2">
+                    <span className="text-xs text-ev-warm-gray ml-2">
                       {option.description}
                     </span>
                   </div>
@@ -149,7 +149,7 @@ export default function ExportModal({
 
           {/* Include options */}
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-wide text-echofield-text-muted font-medium">
+            <label className="text-xs uppercase tracking-wide text-ev-warm-gray font-medium">
               Include Files
             </label>
             <div className="space-y-2">
@@ -157,8 +157,8 @@ export default function ExportModal({
                 <div
                   className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                     includeAudio
-                      ? "border-accent-teal bg-accent-teal"
-                      : "border-echofield-border"
+                      ? "border-accent-savanna bg-accent-savanna"
+                      : "border-ev-sand"
                   }`}
                   onClick={() => setIncludeAudio(!includeAudio)}
                 >
@@ -171,7 +171,7 @@ export default function ExportModal({
                     >
                       <path
                         d="M2 6L5 9L10 3"
-                        stroke="#0A1A1F"
+                        stroke="#F8F5F0"
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -179,7 +179,7 @@ export default function ExportModal({
                     </svg>
                   )}
                 </div>
-                <span className="text-sm text-echofield-text-primary">
+                <span className="text-sm text-ev-charcoal">
                   Audio recordings
                 </span>
               </label>
@@ -187,8 +187,8 @@ export default function ExportModal({
                 <div
                   className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                     includeSpectrograms
-                      ? "border-accent-teal bg-accent-teal"
-                      : "border-echofield-border"
+                      ? "border-accent-savanna bg-accent-savanna"
+                      : "border-ev-sand"
                   }`}
                   onClick={() => setIncludeSpectrograms(!includeSpectrograms)}
                 >
@@ -201,7 +201,7 @@ export default function ExportModal({
                     >
                       <path
                         d="M2 6L5 9L10 3"
-                        stroke="#0A1A1F"
+                        stroke="#F8F5F0"
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -209,7 +209,7 @@ export default function ExportModal({
                     </svg>
                   )}
                 </div>
-                <span className="text-sm text-echofield-text-primary">
+                <span className="text-sm text-ev-charcoal">
                   Spectrogram images
                 </span>
               </label>
@@ -218,16 +218,16 @@ export default function ExportModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-echofield-border">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-ev-sand">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-echofield-text-secondary hover:text-echofield-text-primary border border-echofield-border hover:border-echofield-text-muted transition-colors"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-ev-elephant hover:text-ev-charcoal border border-ev-sand hover:border-ev-warm-gray transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleExport}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-echofield-bg bg-accent-teal hover:bg-accent-teal/90 transition-colors"
+            className="px-4 py-2 rounded-lg text-sm font-medium text-ev-ivory bg-accent-savanna hover:bg-accent-savanna/90 transition-colors"
           >
             Export
           </button>

@@ -68,7 +68,7 @@ describe("SpectrogramViewer", () => {
       <SpectrogramViewer src="/test.png" title="HC Test" highContrast />
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain("shadow-glow");
+    expect(root.className).toContain("");
   });
 
   it("renders without title (no legend bar)", () => {

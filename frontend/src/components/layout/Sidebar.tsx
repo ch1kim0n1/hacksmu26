@@ -29,13 +29,13 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`hidden sm:flex flex-col border-r border-echofield-border bg-echofield-surface transition-all duration-200 ${
+      className={`hidden sm:flex flex-col border-r border-ev-sand bg-ev-cream transition-all duration-200 ${
         collapsed ? "w-16" : "w-52"
       }`}
     >
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="flex h-10 items-center justify-center border-b border-echofield-border text-echofield-text-secondary hover:text-echofield-text-primary transition-colors"
+        className="flex h-10 items-center justify-center border-b border-ev-sand text-ev-elephant hover:text-ev-charcoal transition-colors"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         <svg
@@ -61,8 +61,8 @@ export default function Sidebar() {
               href={link.href}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors min-h-[44px] ${
                 isActive
-                  ? "bg-echofield-surface-elevated text-accent-teal"
-                  : "text-echofield-text-secondary hover:bg-echofield-surface-elevated hover:text-echofield-text-primary"
+                  ? "bg-background-elevated text-accent-savanna"
+                  : "text-ev-elephant hover:bg-background-elevated hover:text-ev-charcoal"
               }`}
               title={collapsed ? link.label : undefined}
             >

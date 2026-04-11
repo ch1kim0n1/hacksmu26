@@ -69,7 +69,7 @@ export default function ProcessingTimeline({
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}
-                    className="w-8 h-8 rounded-full bg-accent-teal flex items-center justify-center"
+                    className="w-8 h-8 rounded-full bg-accent-savanna flex items-center justify-center"
                   >
                     <motion.div
                       animate={{ rotate: 360 }}
@@ -82,8 +82,8 @@ export default function ProcessingTimeline({
                     />
                   </motion.div>
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-echofield-surface-elevated border-2 border-echofield-border flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-echofield-text-muted" />
+                  <div className="w-8 h-8 rounded-full bg-background-elevated border-2 border-ev-sand flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-ev-warm-gray" />
                   </div>
                 )}
               </div>
@@ -94,8 +94,8 @@ export default function ProcessingTimeline({
                   stage.status === "complete"
                     ? "text-success"
                     : stage.status === "active"
-                    ? "text-accent-teal"
-                    : "text-echofield-text-muted"
+                    ? "text-accent-savanna"
+                    : "text-ev-warm-gray"
                 }`}
               >
                 {STAGE_DISPLAY_NAMES[stage.name] || stage.name}
@@ -104,7 +104,7 @@ export default function ProcessingTimeline({
 
             {/* Connecting line */}
             {index < stages.length - 1 && (
-              <div className="flex-1 h-0.5 mx-2 mb-6 relative overflow-hidden rounded-full bg-echofield-border">
+              <div className="flex-1 h-0.5 mx-2 mb-6 relative overflow-hidden rounded-full bg-ev-sand">
                 {stage.status === "complete" && (
                   <motion.div
                     initial={{ width: "0%" }}
@@ -121,7 +121,7 @@ export default function ProcessingTimeline({
                       repeat: Infinity,
                       ease: "easeInOut",
                     }}
-                    className="absolute inset-y-0 left-0 w-1/3 bg-accent-teal rounded-full"
+                    className="absolute inset-y-0 left-0 w-1/3 bg-accent-savanna rounded-full"
                   />
                 )}
               </div>
@@ -133,17 +133,17 @@ export default function ProcessingTimeline({
       {/* Overall progress bar */}
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs">
-          <span className="text-echofield-text-muted">Overall Progress</span>
-          <span className="text-echofield-text-secondary font-mono">
+          <span className="text-ev-warm-gray">Overall Progress</span>
+          <span className="text-ev-elephant font-mono">
             {Math.round(progress)}%
           </span>
         </div>
-        <div className="h-1.5 bg-echofield-surface-elevated rounded-full overflow-hidden">
+        <div className="h-1.5 bg-background-elevated rounded-full overflow-hidden">
           <motion.div
             initial={{ width: "0%" }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="h-full rounded-full bg-gradient-to-r from-accent-teal to-success"
+            className="h-full rounded-full bg-gradient-to-r from-accent-savanna to-success"
           />
         </div>
       </div>

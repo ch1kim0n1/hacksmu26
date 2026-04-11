@@ -18,9 +18,9 @@ interface CallCardProps {
 }
 
 const CALL_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
-  contact: { bg: "bg-accent-teal/15", text: "text-accent-teal" },
+  contact: { bg: "bg-accent-savanna/15", text: "text-accent-savanna" },
   alarm: { bg: "bg-danger/15", text: "text-danger" },
-  song: { bg: "bg-gold/15", text: "text-gold" },
+  song: { bg: "bg-accent-gold/15", text: "text-accent-gold" },
   social: { bg: "bg-success/15", text: "text-success" },
   feeding: { bg: "bg-warning/15", text: "text-warning" },
   mating: { bg: "bg-[#A78BFA]/15", text: "text-[#A78BFA]" },
@@ -37,8 +37,8 @@ function formatDuration(ms: number): string {
 
 export default function CallCard({ call, onClick }: CallCardProps) {
   const typeColors = CALL_TYPE_COLORS[call.call_type] || {
-    bg: "bg-echofield-surface-elevated",
-    text: "text-echofield-text-secondary",
+    bg: "bg-background-elevated",
+    text: "text-ev-elephant",
   };
 
   const confidencePercent = Math.round(call.confidence * 100);
@@ -46,7 +46,7 @@ export default function CallCard({ call, onClick }: CallCardProps) {
   return (
     <button
       onClick={() => onClick?.(call)}
-      className="w-full text-left rounded-lg border border-echofield-border bg-echofield-surface p-4 space-y-3 hover:border-echofield-text-muted hover:bg-echofield-surface-elevated transition-all group"
+      className="w-full text-left rounded-lg border border-ev-sand bg-ev-cream p-4 space-y-3 hover:border-ev-warm-gray hover:bg-background-elevated transition-all group"
     >
       {/* Header row */}
       <div className="flex items-center justify-between">
@@ -55,7 +55,7 @@ export default function CallCard({ call, onClick }: CallCardProps) {
         >
           {call.call_type}
         </span>
-        <span className="text-[11px] text-echofield-text-muted font-mono">
+        <span className="text-[11px] text-ev-warm-gray font-mono">
           #{call.id.slice(0, 8)}
         </span>
       </div>
@@ -63,18 +63,18 @@ export default function CallCard({ call, onClick }: CallCardProps) {
       {/* Metrics */}
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <span className="text-[10px] uppercase tracking-wide text-echofield-text-muted block">
+          <span className="text-[10px] uppercase tracking-wide text-ev-warm-gray block">
             Frequency Range
           </span>
-          <span className="text-sm text-echofield-text-primary font-mono">
+          <span className="text-sm text-ev-charcoal font-mono">
             {call.frequency_min_hz} - {call.frequency_max_hz} Hz
           </span>
         </div>
         <div>
-          <span className="text-[10px] uppercase tracking-wide text-echofield-text-muted block">
+          <span className="text-[10px] uppercase tracking-wide text-ev-warm-gray block">
             Duration
           </span>
-          <span className="text-sm text-echofield-text-primary font-mono">
+          <span className="text-sm text-ev-charcoal font-mono">
             {formatDuration(call.duration_ms)}
           </span>
         </div>
@@ -83,14 +83,14 @@ export default function CallCard({ call, onClick }: CallCardProps) {
       {/* Confidence bar */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] uppercase tracking-wide text-echofield-text-muted">
+          <span className="text-[10px] uppercase tracking-wide text-ev-warm-gray">
             Confidence
           </span>
-          <span className="text-xs font-mono text-echofield-text-secondary">
+          <span className="text-xs font-mono text-ev-elephant">
             {confidencePercent}%
           </span>
         </div>
-        <div className="h-1.5 bg-echofield-surface-elevated rounded-full overflow-hidden">
+        <div className="h-1.5 bg-background-elevated rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{

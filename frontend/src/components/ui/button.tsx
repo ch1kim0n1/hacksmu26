@@ -4,20 +4,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-teal/50 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-savanna/50 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-accent-teal text-echofield-bg hover:bg-accent-teal/90 shadow-glow hover:shadow-glow-lg",
+          "bg-accent-savanna text-ev-ivory hover:bg-accent-savanna/90",
         success:
-          "bg-success text-white hover:bg-success/90 shadow-glow-success",
+          "bg-success text-white hover:bg-success/90",
         destructive: "bg-danger text-white hover:bg-danger/90",
         outline:
-          "border border-echofield-border bg-transparent text-echofield-text-primary hover:bg-echofield-surface-elevated hover:border-accent-teal/30",
+          "border border-ev-sand bg-transparent text-ev-charcoal hover:bg-background-elevated hover:border-accent-savanna/30",
         ghost:
-          "text-echofield-text-secondary hover:bg-echofield-surface-elevated hover:text-echofield-text-primary",
-        link: "text-accent-teal underline-offset-4 hover:underline",
+          "text-ev-elephant hover:bg-background-elevated hover:text-ev-charcoal",
+        link: "text-accent-savanna underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-5 py-2",
