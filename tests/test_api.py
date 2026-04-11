@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
+import soundfile as sf
+
 
 def _upload_one(client, wav_path: Path) -> str:
     with wav_path.open("rb") as handle:
@@ -22,7 +25,9 @@ def test_recordings_list_with_pagination(test_client, sample_wav_file: Path) -> 
     _upload_one(test_client, sample_wav_file)
 
     another = sample_wav_file.parent / "sample-2.wav"
-    another.write_bytes(sample_wav_file.read_bytes())
+    sr = 44_100
+    t = np.linspace(0, 1, sr, endpoint=False)
+    sf.write(another, (0.15 * np.sin(2 * np.pi * 24 * t)).astype(np.float32), sr)
     _upload_one(test_client, another)
 
     first_page = test_client.get("/api/recordings?limit=1&offset=0")

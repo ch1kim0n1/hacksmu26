@@ -18,7 +18,6 @@ Environment variables (ECHOFIELD_ prefix)
 
 from __future__ import annotations
 
-import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -30,8 +29,9 @@ from echofield.pipeline.feature_extract import (
     detect_anomaly,
     extract_acoustic_features,
 )
+from echofield.utils.logging_config import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Confidence thresholds

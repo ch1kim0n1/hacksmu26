@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import io
 import json
+import shutil
 import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -12,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import aiofiles
-from fastapi import BackgroundTasks, FastAPI, File, Header, HTTPException, Query, Request, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import BackgroundTasks, FastAPI, File, Header, HTTPException, Query, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -23,16 +25,21 @@ from echofield.data_loader import RecordingStore, list_recordings_with_metadata
 from echofield.metrics import metrics
 from echofield.model_registry import ModelRegistry
 from echofield.models import (
+    AnnotationRequest,
     BatchStatusResponse,
     BatchSubmitResponse,
+    CallAnnotation,
     CallListResponse,
     CallRecord,
+    ComponentHealth,
     ContourMatch,
     ContourMatchResponse,
     EmbeddingResponse,
     ErrorResponse,
     ExportRequest,
     HarmonicOverlayResponse,
+    HealthResponse,
+    IndividualProfile,
     MetadataPatchRequest,
     ModelVersionInfo,
     ProcessingResult,
@@ -51,11 +58,12 @@ from echofield.models import (
     StatsRequest,
     StatsResponse,
     UploadResponse,
+    WebhookConfig,
 )
 from echofield.pipeline.cache_manager import CacheManager
 from echofield.pipeline.circuit_breaker import get_circuit_breaker_registry
 from echofield.pipeline.hybrid_pipeline import ProcessingPipeline
-from echofield.pipeline.ingestion import validate_magic_bytes
+from echofield.pipeline.ingestion import validate_audio, validate_magic_bytes
 from echofield.research.call_database import CallDatabase
 from echofield.pipeline.feature_extract import (
     extract_acoustic_features,
@@ -74,8 +82,10 @@ from echofield.research.acoustic_analysis import (
     track_frequency_contour,
 )
 from echofield.research.exporter import export_csv, export_json, export_pdf, export_zip
+from echofield.research.individual_id import IndividualIdentifier
 from echofield.utils.audio_utils import get_duration, load_audio
 from echofield.utils.logging_config import get_logger, request_context
+from echofield.webhook_manager import WebhookManager
 from echofield.websocket import manager
 
 logger = get_logger(__name__)
@@ -96,10 +106,14 @@ async def lifespan(application: FastAPI):
         await init_db(settings.db_path)
     except Exception as exc:
         logger.warning("SQLite initialization skipped: %s", exc)
-    store = RecordingStore(persist_path=settings.catalog_file)
+    store = RecordingStore(persist_path=settings.catalog_file, db_path=settings.db_path)
     preload = list_recordings_with_metadata(settings.audio_dir, settings.metadata_file)
     store.load_many(preload)
-    application.state.call_database = CallDatabase.from_metadata(settings.metadata_file)
+    application.state.call_database = CallDatabase.from_metadata(
+        settings.metadata_file,
+        review_label_path=settings.cache_dir / "review_labels.json",
+        db_path=settings.db_path,
+    )
     application.state.store = store
     application.state.cache = CacheManager(str(settings.cache_dir))
     application.state.pipeline = ProcessingPipeline(settings, application.state.cache)
@@ -108,6 +122,9 @@ async def lifespan(application: FastAPI):
     application.state.model_registry = ModelRegistry(settings.model_registry_dir)
     application.state.embedding_cache = {}
     application.state.similarity_cache = SimilarityMatrixCache(settings.cache_dir / "similarity_cache.json")
+    application.state.webhook_manager = WebhookManager(settings.cache_dir / "webhooks.json")
+    application.state.individual_identifier = IndividualIdentifier()
+    application.state.batch_webhooks_emitted = set()
     active_model = application.state.model_registry.active_model_path()
     load_classifier(active_model or settings.classifier_model_path)
     try:
@@ -184,6 +201,44 @@ def _get_model_registry() -> ModelRegistry:
 
 def _get_similarity_cache() -> SimilarityMatrixCache:
     return app.state.similarity_cache  # type: ignore[return-value]
+
+
+def _get_webhooks() -> WebhookManager:
+    return app.state.webhook_manager  # type: ignore[return-value]
+
+
+def _get_individual_identifier() -> IndividualIdentifier:
+    return app.state.individual_identifier  # type: ignore[return-value]
+
+
+async def _emit_webhook(event_type: str, payload: dict[str, Any]) -> None:
+    await _get_webhooks().emit(
+        event_type,
+        {
+            **payload,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        },
+    )
+
+
+async def _maybe_emit_batch_complete(batch_id: str | None) -> None:
+    if not batch_id:
+        return
+    batch = _get_batch_store().get(batch_id)
+    if not batch or batch.get("status") == "processing":
+        return
+    emitted: set[str] = app.state.batch_webhooks_emitted
+    if batch_id in emitted:
+        return
+    emitted.add(batch_id)
+    await _emit_webhook(
+        "batch.complete",
+        {
+            "batch_id": batch_id,
+            "status": batch["status"],
+            "payload": batch,
+        },
+    )
 
 
 def _get_recording_path(recording: dict[str, Any]) -> Path:
@@ -285,6 +340,35 @@ def _enrich_call(call: dict[str, Any], recording: dict[str, Any] | None = None) 
     return payload
 
 
+def _identify_calls(call_type: str | None = None) -> tuple[list[dict[str, Any]], dict[str, str]]:
+    calls, _ = _get_call_database().search(call_type=call_type, limit=10000)
+    assignments = _get_individual_identifier().cluster(calls)
+    _get_call_database().set_individual_ids(assignments)
+    for call in calls:
+        call["individual_id"] = assignments.get(str(call.get("id")), call.get("individual_id"))
+    return calls, assignments
+
+
+def _recordings_with_call_database_fields(recordings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged: list[dict[str, Any]] = []
+    call_database = _get_call_database()
+    for recording in recordings:
+        item = dict(recording)
+        result = dict(item.get("result") or {})
+        calls = []
+        for call in result.get("calls", []):
+            enriched = dict(call)
+            db_call = call_database.get_call(str(call.get("id") or call.get("call_id") or ""))
+            if db_call is not None:
+                for key in ("annotations", "individual_id", "review_label", "reviewed_by", "reviewed_at"):
+                    enriched[key] = db_call.get(key)
+            calls.append(enriched)
+        result["calls"] = calls
+        item["result"] = result
+        merged.append(item)
+    return merged
+
+
 async def _progress_callback(
     recording_id: str,
     stage: str,
@@ -343,7 +427,7 @@ async def _run_processing(
         return
 
     try:
-        with request_context(recording_id):
+        with request_context(recording_id, recording_id=recording_id):
             metrics.set_gauge("echofield_pipeline_active_jobs", len(_get_tasks()) or 1)
             await manager.send_processing_started(recording_id, method)
             result = await _get_pipeline().process_recording(
@@ -383,6 +467,16 @@ async def _run_processing(
             await manager.send_processing_complete(recording_id, result)
             if batch_id:
                 _get_batch_store().update(batch_id, recording_id, status="complete", progress_pct=100)
+                await _maybe_emit_batch_complete(batch_id)
+            await _emit_webhook(
+                "processing.complete",
+                {
+                    "recording_id": recording_id,
+                    "status": "complete",
+                    "quality": result.get("quality"),
+                    "payload": result,
+                },
+            )
             metrics.inc("echofield_pipeline_jobs_total", labels={"status": "complete"})
     except asyncio.CancelledError:
         logger.info("Processing cancelled for %s", recording_id)
@@ -390,6 +484,7 @@ async def _run_processing(
         store.update_status(recording_id, "cancelled", current_stage="cancelled")
         if batch_id:
             _get_batch_store().update(batch_id, recording_id, status="cancelled", progress_pct=0)
+            await _maybe_emit_batch_complete(batch_id)
         metrics.inc("echofield_pipeline_jobs_total", labels={"status": "cancelled"})
         raise
     except Exception as exc:
@@ -398,19 +493,81 @@ async def _run_processing(
         await manager.send_processing_failed(recording_id, str(exc))
         if batch_id:
             _get_batch_store().update(batch_id, recording_id, status="failed", progress_pct=0, error=str(exc))
+            await _maybe_emit_batch_complete(batch_id)
+        await _emit_webhook(
+            "processing.failed",
+            {
+                "recording_id": recording_id,
+                "status": "failed",
+                "payload": {"error": str(exc)},
+            },
+        )
         metrics.inc("echofield_pipeline_jobs_total", labels={"status": "failed"})
     finally:
         _get_tasks().pop(recording_id, None)
         metrics.set_gauge("echofield_pipeline_active_jobs", len(_get_tasks()))
 
 
-@app.get("/health", response_model=dict)
-async def health_check() -> dict[str, str]:
-    return {"status": "healthy", "version": app.version}
+@app.get("/health", response_model=HealthResponse)
+async def health_check() -> HealthResponse:
+    components: dict[str, ComponentHealth] = {}
+    overall = "ok"
+
+    try:
+        cache_stats = _get_store().get_stats()
+        cache_manager_stats = _get_pipeline().cache.get_stats()
+        components["cache"] = ComponentHealth(status="ok", details={**cache_manager_stats, **cache_stats})
+    except Exception as exc:
+        components["cache"] = ComponentHealth(status="error", details={"error": str(exc)})
+        overall = "degraded"
+
+    try:
+        usage = shutil.disk_usage(settings.processed_dir)
+        free_gb = round(usage.free / (1024 ** 3), 3)
+        disk_status = "degraded" if free_gb < 1.0 else "ok"
+        components["disk"] = ComponentHealth(status=disk_status, details={"free_gb": free_gb})
+        if disk_status != "ok":
+            overall = "degraded"
+    except Exception as exc:
+        components["disk"] = ComponentHealth(status="error", details={"error": str(exc)})
+        overall = "degraded"
+
+    try:
+        versions = _get_model_registry().list_versions()
+        active = next((item for item in versions if item.get("active")), None)
+        components["models"] = ComponentHealth(
+            status="ok" if active else "degraded",
+            details={
+                "classifier": "loaded" if active else "fallback",
+                "version": active.get("version") if active else None,
+                "registered_versions": len(versions),
+            },
+        )
+        if active is None:
+            overall = "degraded"
+    except Exception as exc:
+        components["models"] = ComponentHealth(status="error", details={"error": str(exc)})
+        overall = "degraded"
+
+    try:
+        recordings = list(_get_store()._recordings.values())
+        components["recordings"] = ComponentHealth(
+            status="ok",
+            details={
+                "total": len(recordings),
+                "processing": sum(1 for item in recordings if item.get("status") == "processing"),
+            },
+        )
+    except Exception as exc:
+        components["recordings"] = ComponentHealth(status="error", details={"error": str(exc)})
+        overall = "degraded"
+
+    return HealthResponse(status=overall, version=str(app.version), components=components)
 
 
 @app.post("/api/upload", response_model=UploadResponse, status_code=201)
 async def upload_recording(
+    response: Response,
     file: UploadFile = File(...),
     location: str | None = Query(default=None),
     date: str | None = Query(default=None),
@@ -425,17 +582,34 @@ async def upload_recording(
     valid_magic, magic_error = validate_magic_bytes(header, suffix)
     if not valid_magic:
         raise HTTPException(status_code=415, detail=magic_error)
+    remaining = await file.read()
+    file_bytes = header + remaining
+    file_hash = hashlib.sha256(file_bytes).hexdigest()
+    duplicate = _get_store().find_by_hash(file_hash)
+    if duplicate is not None:
+        response.status_code = 200
+        return UploadResponse(
+            status=duplicate.get("status", "pending"),
+            recording_ids=[duplicate["id"]],
+            count=1,
+            total_duration_s=float(duplicate.get("duration_s", 0.0)),
+            message=f"Duplicate upload detected for {file.filename}",
+            duplicate=True,
+        )
 
     recording_id = str(uuid.uuid4())
     destination = settings.audio_dir / f"{recording_id}{suffix}"
     async with aiofiles.open(destination, "wb") as handle:
-        await handle.write(header)
-        while chunk := await file.read(1024 * 1024):
-            await handle.write(chunk)
+        await handle.write(file_bytes)
 
     y, sr = load_audio(destination, sr=None)
+    try:
+        validate_audio(y, sr)
+    except ValueError as exc:
+        destination.unlink(missing_ok=True)
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     duration_s = round(get_duration(y, sr), 3)
-    metadata = {k: v for k, v in {"location": location, "date": date, "notes": notes}.items() if v}
+    metadata = {k: v for k, v in {"location": location, "date": date, "notes": notes, "file_hash": file_hash}.items() if v}
     _get_store().add(
         recording_id,
         destination.name,
@@ -443,6 +617,7 @@ async def upload_recording(
         round(destination.stat().st_size / (1024 * 1024), 3),
         metadata=metadata,
         source_path=str(destination),
+        file_hash=file_hash,
     )
     return UploadResponse(
         status="pending",
@@ -450,6 +625,7 @@ async def upload_recording(
         count=1,
         total_duration_s=duration_s,
         message=f"Uploaded {file.filename}",
+        duplicate=False,
     )
 
 
@@ -688,6 +864,7 @@ async def list_calls(
     animal_id: str | None = Query(default=None),
     date_from: str | None = Query(default=None),
     date_to: str | None = Query(default=None),
+    tags: list[str] | None = Query(default=None),
     sort_by: str = Query(default="id"),
     sort_desc: bool = Query(default=False),
 ) -> CallListResponse:
@@ -698,6 +875,7 @@ async def list_calls(
         animal_id=animal_id,
         call_type=call_type,
         recording_id=recording_id,
+        tags=tags,
         sort_by=sort_by,
         sort_desc=sort_desc,
         limit=limit,
@@ -729,6 +907,65 @@ async def get_call(call_id: str) -> CallRecord:
     if call is None:
         raise HTTPException(status_code=404, detail="Call not found")
     return CallRecord(**_enrich_call(call))
+
+
+@app.post("/api/calls/{call_id}/annotations", response_model=CallAnnotation, status_code=201)
+async def create_call_annotation(call_id: str, payload: AnnotationRequest) -> CallAnnotation:
+    annotation = _get_call_database().add_annotation(
+        call_id,
+        payload.note,
+        tags=payload.tags,
+        researcher_id=payload.researcher_id,
+    )
+    if annotation is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    app.state.embedding_cache = {}
+    _get_similarity_cache().invalidate()
+    return CallAnnotation(**annotation)
+
+
+@app.get("/api/calls/{call_id}/annotations", response_model=list[CallAnnotation])
+async def list_call_annotations(call_id: str) -> list[CallAnnotation]:
+    annotations = _get_call_database().get_annotations(call_id)
+    if annotations is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    return [CallAnnotation(**annotation) for annotation in annotations]
+
+
+@app.delete("/api/calls/{call_id}/annotations/{annotation_id}", response_model=dict)
+async def delete_call_annotation(call_id: str, annotation_id: str) -> dict[str, Any]:
+    deleted = _get_call_database().delete_annotation(call_id, annotation_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Annotation not found")
+    app.state.embedding_cache = {}
+    _get_similarity_cache().invalidate()
+    return {"call_id": call_id, "annotation_id": annotation_id, "deleted": True}
+
+
+@app.get("/api/individuals", response_model=list[IndividualProfile])
+async def list_individuals(call_type: str | None = Query(default=None)) -> list[IndividualProfile]:
+    calls, _ = _identify_calls(call_type=call_type)
+    profiles = _get_individual_identifier().profiles(calls)
+    return [IndividualProfile(**profile) for profile in profiles]
+
+
+@app.get("/api/individuals/{individual_id}/calls", response_model=CallListResponse)
+async def list_individual_calls(
+    individual_id: str,
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+) -> CallListResponse:
+    calls, assignments = _identify_calls()
+    matched = [
+        {**call, "individual_id": assignments.get(str(call.get("id")), call.get("individual_id"))}
+        for call in calls
+        if assignments.get(str(call.get("id")), call.get("individual_id")) == individual_id
+    ]
+    total = len(matched)
+    records = [CallRecord(**_enrich_call(item)) for item in matched[offset : offset + limit]]
+    return CallListResponse(total=total, returned=len(records), items=records)
 
 
 @app.get("/api/calls/{call_id}/similar-contours", response_model=ContourMatchResponse)
@@ -820,6 +1057,7 @@ async def export_research(request: ExportRequest):
         recordings = list(_get_store()._recordings.values())
     if not recordings:
         raise HTTPException(status_code=404, detail="No recordings available for export")
+    recordings = _recordings_with_call_database_fields(recordings)
 
     if request.format == "csv":
         content = export_csv(recordings)
@@ -915,6 +1153,24 @@ async def label_review_call(call_id: str, payload: ReviewLabelRequest) -> CallRe
 @app.get("/metrics")
 async def prometheus_metrics() -> PlainTextResponse:
     return PlainTextResponse(metrics.render_prometheus(), media_type="text/plain; version=0.0.4")
+
+
+@app.post("/api/webhooks", response_model=WebhookConfig, status_code=201)
+async def register_webhook(config: WebhookConfig) -> WebhookConfig:
+    stored = _get_webhooks().register(str(config.url), config.event_type)
+    return WebhookConfig(**stored)
+
+
+@app.get("/api/webhooks", response_model=list[WebhookConfig])
+async def list_webhooks() -> list[WebhookConfig]:
+    return [WebhookConfig(**item) for item in _get_webhooks().list()]
+
+
+@app.delete("/api/webhooks/{webhook_id}", response_model=dict)
+async def delete_webhook(webhook_id: str) -> dict[str, Any]:
+    if not _get_webhooks().delete(webhook_id):
+        raise HTTPException(status_code=404, detail="Webhook not found")
+    return {"id": webhook_id, "deleted": True}
 
 
 @app.websocket("/ws/live")

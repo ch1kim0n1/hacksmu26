@@ -12,6 +12,9 @@ from scipy.signal import butter, iirnotch, sosfiltfilt
 
 from echofield.pipeline.quality_check import compute_snr
 from echofield.pipeline.spectrogram import compute_stft
+from echofield.utils.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 _NOISE_ADAPTIVE_PROFILES: dict[str, dict[str, Any]] = {
@@ -216,6 +219,39 @@ def _apply_cqt_gate(
         return y.astype(np.float32)
 
 
+def wiener_filter_denoise(
+    y: np.ndarray,
+    sr: int,
+    *,
+    noise_frames: int = 20,
+    n_fft: int = 2048,
+    hop_length: int = 512,
+) -> dict[str, np.ndarray]:
+    if y.size == 0:
+        return {
+            "cleaned_audio": y.astype(np.float32),
+            "cleaned_spectrogram": np.zeros((0, 0), dtype=np.float32),
+            "wiener_gain": np.zeros((0, 0), dtype=np.float32),
+        }
+    stft = librosa.stft(y.astype(np.float32), n_fft=n_fft, hop_length=hop_length)
+    mag = np.abs(stft)
+    phase = np.exp(1j * np.angle(stft))
+    frame_count = mag.shape[1]
+    noise_frame_count = max(1, min(noise_frames, frame_count))
+    noise_psd = np.mean(mag[:, :noise_frame_count] ** 2, axis=1, keepdims=True)
+    signal_psd = np.maximum(mag ** 2 - noise_psd, 0.0)
+    snr = signal_psd / np.maximum(noise_psd, 1e-12)
+    gain = snr / (1.0 + snr)
+    cleaned_stft = mag * gain * phase
+    cleaned = librosa.istft(cleaned_stft, hop_length=hop_length, length=len(y))
+    cleaned_spec = compute_stft(cleaned.astype(np.float32), sr)["magnitude_db"]
+    return {
+        "cleaned_audio": cleaned.astype(np.float32),
+        "cleaned_spectrogram": cleaned_spec.astype(np.float32),
+        "wiener_gain": gain.astype(np.float32),
+    }
+
+
 def apply_bandpass_filter(
     y: np.ndarray,
     sr: int,
@@ -355,6 +391,13 @@ def adaptive_gate_denoise(
             "snr_db": round(float(snr), 2),
             "aggressiveness": round(float(aggressiveness), 3),
         })
+        logger.info(
+            "adaptive_gate: chunk %.3f-%.3fs snr=%.2f aggressiveness=%.3f",
+            start / sr,
+            end / sr,
+            snr,
+            aggressiveness,
+        )
     weights = np.maximum(weights, 1e-6)
     return {
         "cleaned_audio": (output / weights).astype(np.float32),

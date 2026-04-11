@@ -7,7 +7,6 @@ and energy preservation, then selects and returns the best output.
 
 from __future__ import annotations
 
-import logging
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
@@ -22,8 +21,9 @@ from echofield.pipeline.quality_check import (
     compute_snr,
     compute_spectral_distortion,
 )
+from echofield.utils.logging_config import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -116,6 +116,12 @@ def _run_spectral(y: np.ndarray, sr: int, aggressiveness: float, post_process: b
     from echofield.pipeline.spectral_gate import spectral_gate_denoise
     result = spectral_gate_denoise(y, sr, aggressiveness=aggressiveness, post_process=post_process)
     return result["cleaned_audio"]
+
+
+def _run_wiener(y: np.ndarray, sr: int) -> np.ndarray:
+    from echofield.pipeline.spectral_gate import wiener_filter_denoise
+
+    return wiener_filter_denoise(y, sr)["cleaned_audio"]
 
 
 def _run_unet(y: np.ndarray, sr: int, model_path: str | None) -> np.ndarray | None:
@@ -245,6 +251,7 @@ def run_ensemble(
 
     candidate_jobs = {
         "spectral": lambda: _run_spectral(y, sr, aggressiveness, post_process=post_process),
+        "wiener": lambda: _run_wiener(y, sr),
         "unet": lambda: _run_unet(y, sr, model_path),
         "demucs": lambda: _run_demucs(y, sr),
     }

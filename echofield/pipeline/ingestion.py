@@ -43,6 +43,7 @@ class IngestionResult:
     file_size_mb: float
     segments: list[AudioSegment] = field(default_factory=list)
     metadata: dict[str, float | int | str] = field(default_factory=dict)
+    validation_warnings: list[str] = field(default_factory=list)
 
 
 def validate_audio_file(file_path: str) -> tuple[bool, str]:
@@ -70,6 +71,37 @@ def validate_magic_bytes(header: bytes, suffix: str) -> tuple[bool, str]:
         ".flac": "fLaC",
     }
     return False, f"File content does not match {expected_names.get(normalized, normalized)} magic bytes"
+
+
+def validate_audio(y: np.ndarray, sr: int) -> tuple[np.ndarray, list[str]]:
+    warnings: list[str] = []
+    if sr <= 0:
+        raise ValueError("Invalid sample rate")
+    if y.size == 0:
+        warnings.append("Audio contains no samples")
+        return y.astype(np.float32), warnings
+
+    repaired = np.asarray(y, dtype=np.float32)
+    finite_mask = np.isfinite(repaired)
+    invalid_count = int(repaired.size - np.count_nonzero(finite_mask))
+    if invalid_count:
+        invalid_ratio = invalid_count / repaired.size
+        if invalid_ratio > 0.5:
+            raise ValueError(f"Audio contains too many NaN/Inf samples ({invalid_count} of {repaired.size})")
+        repaired = np.nan_to_num(repaired, nan=0.0, posinf=0.0, neginf=0.0)
+        if not np.isfinite(repaired).all():
+            raise ValueError("Audio contains unrecoverable NaN/Inf samples")
+        warnings.append(f"Repaired {invalid_count} NaN/Inf audio sample(s)")
+
+    rms = float(np.sqrt(np.mean(repaired ** 2))) if repaired.size else 0.0
+    if rms <= 1e-8:
+        warnings.append("Audio has near-zero energy")
+
+    expected_duration = repaired.shape[-1] / sr
+    if not np.isfinite(expected_duration) or expected_duration < 0:
+        raise ValueError("Audio duration could not be validated from sample count and sample rate")
+
+    return repaired.astype(np.float32), warnings
 
 
 def segment_audio(
@@ -137,10 +169,13 @@ def ingest_audio_file(
     y, sr = load_audio(file_path, sr=None, mono=False)
     channels = 1 if y.ndim == 1 else int(y.shape[0])
     y = stereo_to_mono(y)
+    y, validation_warnings = validate_audio(y, sr)
     if sr < MIN_SAMPLE_RATE:
         y, sr = convert_sample_rate(y, sr, target_sr)
     elif sr != target_sr:
         y, sr = convert_sample_rate(y, sr, target_sr)
+    y, post_resample_warnings = validate_audio(y, sr)
+    validation_warnings.extend(post_resample_warnings)
 
     metadata = extract_metadata(file_path, y, sr)
     raw_segments = segment_audio(
@@ -173,4 +208,5 @@ def ingest_audio_file(
         file_size_mb=round(Path(file_path).stat().st_size / (1024 * 1024), 3),
         segments=segments,
         metadata=metadata,
+        validation_warnings=validation_warnings,
     )

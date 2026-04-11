@@ -6,14 +6,16 @@ from __future__ import annotations
 
 import csv
 import json
-import logging
 import os
+import sqlite3
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-logger = logging.getLogger(__name__)
+from echofield.utils.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 _AUDIO_EXTENSIONS = {".wav", ".mp3", ".flac"}
 _RECORDING_ID_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_DNS, "echofield-recordings")
@@ -195,12 +197,87 @@ def list_recordings_with_metadata(
 class RecordingStore:
     """In-memory store for recordings and their processing results."""
 
-    def __init__(self, persist_path: str | Path | None = None) -> None:
+    def __init__(self, persist_path: str | Path | None = None, db_path: str | Path | None = None) -> None:
         self._recordings: dict[str, dict[str, Any]] = {}
         self._persist_path = Path(persist_path) if persist_path else None
+        self._db_path = Path(db_path) if db_path else None
+        if self._db_path:
+            self._init_db()
+            self._load_sqlite()
         if self._persist_path:
             self._persist_path.parent.mkdir(parents=True, exist_ok=True)
             self._load_persisted()
+
+    def _connect(self) -> sqlite3.Connection:
+        if self._db_path is None:
+            raise RuntimeError("RecordingStore SQLite path is not configured")
+        self._db_path.parent.mkdir(parents=True, exist_ok=True)
+        connection = sqlite3.connect(self._db_path)
+        connection.row_factory = sqlite3.Row
+        return connection
+
+    def _init_db(self) -> None:
+        from echofield.db import SCHEMA, apply_sqlite_migrations
+
+        with self._connect() as db:
+            db.executescript(SCHEMA)
+            apply_sqlite_migrations(db)
+            db.commit()
+
+    @staticmethod
+    def _record_from_sqlite(row: sqlite3.Row) -> dict[str, Any]:
+        metadata = json.loads(row["metadata_json"] or "{}")
+        processing = json.loads(row["processing_json"] or "{}")
+        result = json.loads(row["result_json"]) if row["result_json"] else None
+        return {
+            "id": row["id"],
+            "filename": row["filename"],
+            "duration_s": float(row["duration_s"] or 0.0),
+            "filesize_mb": float(row["filesize_mb"] or 0.0),
+            "uploaded_at": row["uploaded_at"],
+            "status": row["status"],
+            "metadata": metadata,
+            "source_path": row["source_path"],
+            "file_hash": row["file_hash"] or metadata.get("file_hash"),
+            "processing": processing,
+            "result": result,
+        }
+
+    def _load_sqlite(self) -> None:
+        if self._db_path is None or not self._db_path.exists():
+            return
+        with self._connect() as db:
+            rows = db.execute("SELECT * FROM recordings").fetchall()
+        for row in rows:
+            record = self._normalize_record(self._record_from_sqlite(row))
+            self._recordings[record["id"]] = record
+
+    def _persist_sqlite_record(self, record: dict[str, Any]) -> None:
+        if self._db_path is None:
+            return
+        with self._connect() as db:
+            db.execute(
+                """
+                INSERT OR REPLACE INTO recordings (
+                    id, filename, duration_s, filesize_mb, uploaded_at, status,
+                    metadata_json, source_path, file_hash, processing_json, result_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    record["id"],
+                    record.get("filename") or "",
+                    float(record.get("duration_s") or 0.0),
+                    float(record.get("filesize_mb") or 0.0),
+                    record.get("uploaded_at") or datetime.now(timezone.utc).isoformat(),
+                    record.get("status") or "pending",
+                    json.dumps(record.get("metadata") or {}),
+                    record.get("source_path"),
+                    record.get("file_hash") or (record.get("metadata") or {}).get("file_hash"),
+                    json.dumps(record.get("processing") or {}),
+                    json.dumps(record.get("result")) if record.get("result") is not None else None,
+                ),
+            )
+            db.commit()
 
     @staticmethod
     def _default_processing() -> dict[str, Any]:
@@ -224,6 +301,7 @@ class RecordingStore:
             "status": record.get("status", "pending"),
             "metadata": record.get("metadata") or {},
             "source_path": record.get("source_path"),
+            "file_hash": record.get("file_hash") or (record.get("metadata") or {}).get("file_hash"),
             "processing": processing,
             "result": record.get("result"),
         }
@@ -272,7 +350,11 @@ class RecordingStore:
         filesize_mb: float,
         metadata: dict[str, Any] | None = None,
         source_path: str | None = None,
+        file_hash: str | None = None,
     ) -> dict[str, Any]:
+        metadata = dict(metadata or {})
+        if file_hash:
+            metadata["file_hash"] = file_hash
         record = {
             "id": recording_id,
             "filename": filename,
@@ -280,12 +362,14 @@ class RecordingStore:
             "filesize_mb": float(filesize_mb),
             "uploaded_at": datetime.now(timezone.utc).isoformat(),
             "status": "pending",
-            "metadata": metadata or {},
+            "metadata": metadata,
             "source_path": source_path,
+            "file_hash": file_hash,
             "processing": self._default_processing(),
             "result": None,
         }
         self._recordings[recording_id] = record
+        self._persist_sqlite_record(record)
         self._persist()
         return record
 
@@ -299,6 +383,7 @@ class RecordingStore:
                     "uploaded_at": existing.get("uploaded_at", normalized["uploaded_at"]),
                     "status": existing.get("status", normalized["status"]),
                     "source_path": existing.get("source_path") or normalized.get("source_path"),
+                    "file_hash": existing.get("file_hash") or normalized.get("file_hash"),
                     "processing": existing.get("processing") or normalized["processing"],
                     "result": existing.get("result") if existing.get("result") is not None else normalized.get("result"),
                     "metadata": self._merge_metadata(
@@ -307,12 +392,22 @@ class RecordingStore:
                     ),
                 }
                 self._recordings[normalized["id"]] = self._normalize_record(merged)
+                self._persist_sqlite_record(self._recordings[normalized["id"]])
                 continue
             self._recordings[normalized["id"]] = normalized
+            self._persist_sqlite_record(normalized)
         self._persist()
 
     def get(self, recording_id: str) -> dict[str, Any] | None:
         return self._recordings.get(recording_id)
+
+    def find_by_hash(self, file_hash: str) -> dict[str, Any] | None:
+        for record in self._recordings.values():
+            if record.get("file_hash") == file_hash:
+                return record
+            if (record.get("metadata") or {}).get("file_hash") == file_hash:
+                return record
+        return None
 
     def list(
         self,
@@ -362,6 +457,7 @@ class RecordingStore:
             record["processing"]["completed_at"] = now
             if status == "complete":
                 record["processing"]["progress"] = 100.0
+        self._persist_sqlite_record(record)
         self._persist()
 
     def update_metadata(self, recording_id: str, updates: dict[str, Any]) -> dict[str, Any] | None:
@@ -374,6 +470,7 @@ class RecordingStore:
             if value is not None:
                 metadata[key] = value
         record["metadata"] = metadata
+        self._persist_sqlite_record(record)
         self._persist()
         return metadata
 
@@ -383,6 +480,7 @@ class RecordingStore:
             logger.warning("Unknown recording in update_result: %s", recording_id)
             return
         record["result"] = result
+        self._persist_sqlite_record(record)
         self._persist()
 
     def get_stats(self) -> dict[str, Any]:
