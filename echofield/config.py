@@ -90,6 +90,7 @@ class Config:
     METADATA_FILE: str = "./data/metadata.csv"
     CONFIG_FILE: str = "./config/echofield.config.yml"
     MODEL_PATH: str = "./models/echofield-denoise-v1.pt"
+    CLASSIFIER_MODEL_PATH: str = "./models/call_classifier.joblib"
 
     LOG_LEVEL: str = "INFO"
     LOG_FORMAT: str = "text"
@@ -147,6 +148,10 @@ class Config:
     @property
     def model_path(self) -> Path:
         return self.resolve_path(self.MODEL_PATH)
+
+    @property
+    def classifier_model_path(self) -> Path:
+        return self.resolve_path(self.CLASSIFIER_MODEL_PATH)
 
     def ensure_directories(self) -> None:
         for directory in (
@@ -234,6 +239,7 @@ def get_settings() -> Config:
         or Config.METADATA_FILE,
         CONFIG_FILE=str(config_path),
         MODEL_PATH=_env_any("MODEL_PATH", default=Config.MODEL_PATH) or Config.MODEL_PATH,
+        CLASSIFIER_MODEL_PATH=_env_any("CLASSIFIER_MODEL_PATH", default=Config.CLASSIFIER_MODEL_PATH) or Config.CLASSIFIER_MODEL_PATH,
         LOG_LEVEL=_env_any("LOG_LEVEL", default=Config.LOG_LEVEL) or Config.LOG_LEVEL,
         LOG_FORMAT=_env_any("LOG_FORMAT", default=Config.LOG_FORMAT) or Config.LOG_FORMAT,
         SAMPLE_RATE=_env_int("SAMPLE_RATE", default=Config.SAMPLE_RATE),

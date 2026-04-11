@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import os
 import time
 from enum import Enum
 from pathlib import Path
@@ -77,147 +78,12 @@ class ProcessingPipeline:
         sr: int,
         metadata: dict[str, Any],
     ) -> list[dict[str, Any]]:
-        """Detect calls using onset detection with energy-based fallback."""
-        try:
-            calls = self._detect_calls_onset(recording_id, y, sr, metadata)
-            if calls:
-                return calls
-        except Exception:
-            pass
-        return self._detect_calls_energy(recording_id, y, sr, metadata)
-
-    def _detect_calls_onset(
-        self,
-        recording_id: str,
-        y: np.ndarray,
-        sr: int,
-        metadata: dict[str, Any],
-    ) -> list[dict[str, Any]]:
-        """Detect calls using librosa onset detection."""
-        if y.size == 0:
-            return []
-
-        hop_length = 512
-        onset_env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)
-        onset_frames = librosa.onset.onset_detect(
-            y=y, sr=sr, onset_envelope=onset_env,
-            hop_length=hop_length, backtrack=True,
+        """Detect and classify calls via CallDetector (model-backed or energy fallback)."""
+        detector = CallDetector(
+            detector_model_path=os.getenv("ECHOFIELD_DETECTOR_MODEL_PATH"),
+            classifier_model_path=os.getenv("ECHOFIELD_CLASSIFIER_MODEL_PATH"),
         )
-        if len(onset_frames) == 0:
-            return []
-
-        onset_samples = librosa.frames_to_samples(onset_frames, hop_length=hop_length)
-        min_gap_samples = int(0.3 * sr)
-
-        regions: list[tuple[int, int]] = []
-        region_start = int(onset_samples[0])
-        region_end = region_start
-        for sample in onset_samples[1:]:
-            sample = int(sample)
-            if sample - region_end > min_gap_samples:
-                regions.append((region_start, region_end))
-                region_start = sample
-            region_end = sample
-        regions.append((region_start, region_end))
-
-        calls = []
-        for call_index, (start, end) in enumerate(regions):
-            end_sample = min(len(y), end + int(0.5 * sr))
-            snippet = y[start:end_sample]
-            if snippet.size < int(0.05 * sr):
-                continue
-            features = extract_acoustic_features(snippet, sr)
-            classification = classify_call_type(features)
-            calls.append({
-                "id": f"{recording_id}-call-{call_index}",
-                "recording_id": recording_id,
-                "start_ms": round(start / sr * 1000.0, 2),
-                "duration_ms": round((end_sample - start) / sr * 1000.0, 2),
-                "frequency_min_hz": 8.0,
-                "frequency_max_hz": 1200.0,
-                "call_type": classification["call_type"],
-                "confidence": classification["confidence"],
-                "acoustic_features": features,
-                "location": metadata.get("location"),
-                "date": metadata.get("date"),
-            })
-        return calls
-
-    def _detect_calls_energy(
-        self,
-        recording_id: str,
-        y: np.ndarray,
-        sr: int,
-        metadata: dict[str, Any],
-    ) -> list[dict[str, Any]]:
-        """Detect calls using energy-based thresholding (fallback)."""
-        if y.size == 0:
-            return []
-
-        frame = max(int(0.25 * sr), 1)
-        hop = max(int(0.1 * sr), 1)
-        energies = []
-        starts = []
-        for start in range(0, max(len(y) - frame, 0) + 1, hop):
-            chunk = y[start : start + frame]
-            energies.append(float(np.sqrt(np.mean(chunk ** 2))))
-            starts.append(start)
-        if not energies:
-            features = extract_acoustic_features(y, sr)
-            classification = classify_call_type(features)
-            return [
-                {
-                    "id": f"{recording_id}-call-0",
-                    "recording_id": recording_id,
-                    "start_ms": 0.0,
-                    "duration_ms": round(len(y) / sr * 1000.0, 2),
-                    "frequency_min_hz": 8.0,
-                    "frequency_max_hz": 1200.0,
-                    "call_type": classification["call_type"],
-                    "confidence": classification["confidence"],
-                    "acoustic_features": features,
-                    "location": metadata.get("location"),
-                    "date": metadata.get("date"),
-                }
-            ]
-
-        threshold = max(float(np.percentile(energies, 75)), 1e-6)
-        active_ranges: list[tuple[int, int]] = []
-        current_start = None
-        for index, energy in enumerate(energies):
-            if energy >= threshold and current_start is None:
-                current_start = index
-            elif energy < threshold and current_start is not None:
-                active_ranges.append((current_start, index))
-                current_start = None
-        if current_start is not None:
-            active_ranges.append((current_start, len(energies)))
-        if not active_ranges:
-            active_ranges = [(0, len(energies))]
-
-        calls = []
-        for call_index, (frame_start, frame_end) in enumerate(active_ranges):
-            start_sample = starts[frame_start]
-            end_sample = min(len(y), starts[min(frame_end - 1, len(starts) - 1)] + frame)
-            snippet = y[start_sample:end_sample]
-            features = extract_acoustic_features(snippet, sr)
-            classification = classify_call_type(features)
-            calls.append(
-                {
-                    "id": f"{recording_id}-call-{call_index}",
-                    "recording_id": recording_id,
-                    "start_ms": round(start_sample / sr * 1000.0, 2),
-                    "duration_ms": round((end_sample - start_sample) / sr * 1000.0, 2),
-                    "frequency_min_hz": 8.0,
-                    "frequency_max_hz": 1200.0,
-                    "call_type": classification["call_type"],
-                    "confidence": classification["confidence"],
-                    "acoustic_features": features,
-                    "location": metadata.get("location"),
-                    "date": metadata.get("date"),
-                }
-            )
-        return calls
+        return detector.detect(recording_id, y, sr, metadata)
 
     async def process_recording(
         self,
@@ -305,22 +171,10 @@ class ProcessingPipeline:
         )
 
         await self._notify(progress_callback, PipelineStage.DENOISING.value, "active", 50)
-<<<<<<< HEAD
-        spectral = await asyncio.to_thread(
-            spectral_gate_denoise,
-            y,
-            sr,
-            aggressiveness=aggressiveness,
-            noise_type=noise_info["primary_type"],
-        )
-        cleaned_audio = spectral["cleaned_audio"]
-        if method in {"deep", "hybrid"}:
-=======
         model_path = getattr(self.settings, "MODEL_PATH", None)
         ensemble_meta: dict[str, Any] = {}
 
         if method == "hybrid":
-            # Run full ensemble: spectral + U-Net + Demucs, score and select best
             ensemble_result = await asyncio.to_thread(
                 run_ensemble,
                 y,
@@ -338,9 +192,12 @@ class ProcessingPipeline:
             }
         elif method == "deep":
             spectral = await asyncio.to_thread(
-                spectral_gate_denoise, y, sr, aggressiveness=aggressiveness
+                spectral_gate_denoise,
+                y,
+                sr,
+                aggressiveness=aggressiveness,
+                noise_type=noise_info["primary_type"],
             )
->>>>>>> b297c1bc6155044e04a33e0d1f6251883202c708
             cleaned_audio = await asyncio.to_thread(
                 deep_denoise,
                 spectral["cleaned_audio"],
@@ -349,7 +206,11 @@ class ProcessingPipeline:
             )
         else:
             spectral = await asyncio.to_thread(
-                spectral_gate_denoise, y, sr, aggressiveness=aggressiveness
+                spectral_gate_denoise,
+                y,
+                sr,
+                aggressiveness=aggressiveness,
+                noise_type=noise_info["primary_type"],
             )
             cleaned_audio = spectral["cleaned_audio"]
 

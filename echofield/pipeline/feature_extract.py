@@ -1,12 +1,44 @@
 """Acoustic feature extraction for elephant call analysis.
 
 Extracts 12 acoustic metrics from cleaned elephant recordings using librosa,
-and classifies call types based on extracted features using rule-based logic.
+and classifies call types based on extracted features. Supports both ML-based
+(Random Forest) and rule-based classification with automatic fallback.
 """
+
+from __future__ import annotations
+
+import logging
+from pathlib import Path
 
 import numpy as np
 import librosa
 from scipy.signal import find_peaks
+
+try:
+    from sklearn.ensemble import RandomForestClassifier
+    import joblib
+    _SKLEARN_AVAILABLE = True
+except ImportError:
+    _SKLEARN_AVAILABLE = False
+
+logger = logging.getLogger(__name__)
+
+_CLASSIFIER_FEATURE_KEYS = [
+    "fundamental_frequency_hz",
+    "harmonicity",
+    "harmonic_count",
+    "bandwidth_hz",
+    "spectral_centroid_hz",
+    "spectral_rolloff_hz",
+    "zero_crossing_rate",
+    "snr_db",
+    "duration_s",
+    "below_100hz",
+    "above_100hz",
+    "mfcc_0",
+]
+
+_classifier_model: object | None = None
 
 
 def _finite(value: float, default: float = 0.0) -> float:
@@ -78,6 +110,27 @@ def _count_harmonics(y: np.ndarray, sr: int, threshold_ratio: float = 0.1) -> in
 
     peaks, _ = find_peaks(mean_spectrum, height=threshold, distance=min_distance)
     return int(len(peaks))
+
+
+def get_harmonic_peaks(y: np.ndarray, sr: int, threshold_ratio: float = 0.1) -> list[float]:
+    """Return frequencies of detected harmonic peaks in the spectrum.
+
+    Same analysis as _count_harmonics but returns the actual frequencies.
+    """
+    n_fft = 4096
+    S = np.abs(librosa.stft(y, n_fft=n_fft))
+    mean_spectrum = np.mean(S, axis=1)
+
+    if np.max(mean_spectrum) == 0:
+        return []
+
+    threshold = np.max(mean_spectrum) * threshold_ratio
+    freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
+    freq_resolution = freqs[1] - freqs[0] if len(freqs) > 1 else 1.0
+    min_distance = max(int(20.0 / freq_resolution), 1)
+
+    peaks, _ = find_peaks(mean_spectrum, height=threshold, distance=min_distance)
+    return [round(float(freqs[p]), 2) for p in sorted(peaks)]
 
 
 def _find_formant_peaks(y: np.ndarray, sr: int, max_formants: int = 5) -> list[float]:
@@ -310,11 +363,87 @@ def extract_acoustic_features(y: np.ndarray, sr: int) -> dict:
     }
 
 
+def _features_to_vector(features: dict) -> list[float]:
+    """Convert a features dict to a numeric vector for ML classification."""
+    energy_dist = features.get("energy_distribution", {})
+    mfcc = features.get("mfcc", [])
+    return [
+        float(features.get("fundamental_frequency_hz", 0)),
+        float(features.get("harmonicity", 0)),
+        float(features.get("harmonic_count", 0)),
+        float(features.get("bandwidth_hz", 0)),
+        float(features.get("spectral_centroid_hz", 0)),
+        float(features.get("spectral_rolloff_hz", 0)),
+        float(features.get("zero_crossing_rate", 0)),
+        float(features.get("snr_db", 0)),
+        float(features.get("duration_s", 0)),
+        float(energy_dist.get("below_100hz", 0)),
+        float(energy_dist.get("above_100hz", 0)),
+        float(mfcc[0]) if mfcc else 0.0,
+    ]
+
+
+def load_classifier(model_path: str | Path) -> bool:
+    """Load a trained call type classifier from disk. Returns True on success."""
+    global _classifier_model
+    if not _SKLEARN_AVAILABLE:
+        return False
+    path = Path(model_path)
+    if not path.exists():
+        return False
+    try:
+        _classifier_model = joblib.load(path)
+        logger.info("Loaded call classifier from %s", path)
+        return True
+    except Exception:
+        logger.warning("Failed to load call classifier from %s", path)
+        _classifier_model = None
+        return False
+
+
+def train_classifier(
+    training_data: list[dict],
+    model_path: str | Path,
+) -> dict[str, int]:
+    """Train a Random Forest call type classifier and save to disk.
+
+    Args:
+        training_data: List of dicts with 'features' (acoustic features dict)
+            and 'call_type' (str label).
+        model_path: Path to save the trained model.
+
+    Returns:
+        Dict with 'samples' count and 'classes' count.
+    """
+    global _classifier_model
+    if not _SKLEARN_AVAILABLE:
+        raise RuntimeError("scikit-learn is required for ML classification")
+    X = []
+    y_labels = []
+    for item in training_data:
+        features = item.get("features") or item.get("acoustic_features") or {}
+        label = item.get("call_type", "unknown")
+        if label == "unknown":
+            continue
+        X.append(_features_to_vector(features))
+        y_labels.append(label)
+    if len(X) < 5:
+        raise ValueError(f"Need at least 5 labeled samples, got {len(X)}")
+    model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=10)
+    model.fit(X, y_labels)
+    path = Path(model_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, path)
+    _classifier_model = model
+    logger.info("Trained call classifier with %d samples, %d classes", len(X), len(set(y_labels)))
+    return {"samples": len(X), "classes": len(set(y_labels))}
+
+
 def classify_call_type(features: dict) -> dict:
     """Classify elephant call type based on acoustic features.
 
-    Uses simple rule-based heuristics derived from known acoustic
-    properties of elephant vocalizations.
+    Uses ML classifier if available, otherwise falls back to rule-based
+    heuristics derived from known acoustic properties of elephant vocalizations.
 
     Args:
         features: Dictionary of acoustic features as returned by
@@ -326,6 +455,20 @@ def classify_call_type(features: dict) -> dict:
               "bark", "cry", "unknown".
             - confidence: float -- confidence score between 0 and 1.
     """
+    if _classifier_model is not None and _SKLEARN_AVAILABLE:
+        try:
+            vector = [_features_to_vector(features)]
+            predicted = _classifier_model.predict(vector)[0]
+            proba = _classifier_model.predict_proba(vector)[0]
+            confidence = float(max(proba))
+            return {"call_type": str(predicted), "confidence": round(confidence, 3)}
+        except Exception:
+            pass
+    return _classify_call_type_rules(features)
+
+
+def _classify_call_type_rules(features: dict) -> dict:
+    """Rule-based call type classification (fallback)."""
     f0 = features.get("fundamental_frequency_hz", 0)
     harmonicity = features.get("harmonicity", 0)
     bandwidth = features.get("bandwidth_hz", 0)

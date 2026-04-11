@@ -22,8 +22,11 @@ from echofield.data_loader import RecordingStore, list_recordings_with_metadata
 from echofield.models import (
     CallListResponse,
     CallRecord,
+    ContourMatch,
+    ContourMatchResponse,
     ErrorResponse,
     ExportRequest,
+    HarmonicOverlayResponse,
     ProcessingResult,
     ProcessingStatusModel,
     RecordingDetail,
@@ -31,12 +34,28 @@ from echofield.models import (
     RecordingMetadata,
     RecordingSummary,
     RecordingStatus,
+    SimilarityEdge,
+    SimilarityGraphResponse,
+    SimilarityNode,
     StatsResponse,
     UploadResponse,
 )
 from echofield.pipeline.cache_manager import CacheManager
 from echofield.pipeline.hybrid_pipeline import ProcessingPipeline
 from echofield.research.call_database import CallDatabase
+from echofield.pipeline.feature_extract import (
+    extract_acoustic_features,
+    get_harmonic_peaks,
+    load_classifier,
+    train_classifier,
+)
+from echofield.research.acoustic_analysis import (
+    build_identity_signature,
+    build_similarity_graph,
+    contour_similarity,
+    harmonic_to_noise_ratio,
+    track_frequency_contour,
+)
 from echofield.research.exporter import export_csv, export_json, export_pdf, export_zip
 from echofield.utils.audio_utils import get_duration, load_audio
 from echofield.utils.logging_config import get_logger, request_context
@@ -61,6 +80,7 @@ async def lifespan(application: FastAPI):
     application.state.store = store
     application.state.cache = CacheManager(str(settings.cache_dir))
     application.state.pipeline = ProcessingPipeline(settings, application.state.cache)
+    load_classifier(settings.classifier_model_path)
     yield
 
 
@@ -435,6 +455,29 @@ async def download_cleaned(recording_id: str) -> FileResponse:
     return await get_audio(recording_id, type="cleaned")
 
 
+@app.get("/api/recordings/{recording_id}/harmonics", response_model=HarmonicOverlayResponse)
+async def get_harmonics(recording_id: str) -> HarmonicOverlayResponse:
+    recording = _get_store().get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    result = recording.get("result") or {}
+    audio_path = result.get("output_audio_path")
+    if not audio_path or not Path(audio_path).exists():
+        raise HTTPException(status_code=404, detail="Processed audio not found; process the recording first")
+    y, sr = load_audio(Path(audio_path))
+    features = extract_acoustic_features(y, sr)
+    peaks = get_harmonic_peaks(y, sr)
+    hnr = harmonic_to_noise_ratio(y)
+    return HarmonicOverlayResponse(
+        recording_id=recording_id,
+        fundamental_frequency_hz=features["fundamental_frequency_hz"],
+        harmonic_peaks_hz=peaks,
+        harmonic_count=len(peaks),
+        harmonic_to_noise_ratio_db=hnr,
+        harmonicity=features["harmonicity"],
+    )
+
+
 @app.get("/api/stats", response_model=StatsResponse)
 async def get_stats() -> StatsResponse:
     return StatsResponse(**_get_store().get_stats())
@@ -469,12 +512,78 @@ async def list_calls(
     return CallListResponse(total=total, returned=len(records), items=records)
 
 
+@app.get("/api/calls/similarity", response_model=SimilarityGraphResponse)
+async def get_call_similarity(
+    call_type: str | None = Query(default=None),
+    threshold: float = Query(default=0.75, ge=0.0, le=1.0),
+    limit: int = Query(default=100, ge=1, le=500),
+) -> SimilarityGraphResponse:
+    items, total = _get_call_database().search(call_type=call_type, limit=limit)
+    analyses = []
+    for call in items:
+        features = call.get("acoustic_features") or {}
+        sig = build_identity_signature(features)
+        analyses.append({
+            "call_id": call.get("id", ""),
+            "call_type": call.get("call_type", "unknown"),
+            "identity_signature": sig,
+        })
+    graph = build_similarity_graph(analyses, threshold=threshold)
+    return SimilarityGraphResponse(
+        nodes=[SimilarityNode(**n) for n in graph["nodes"]],
+        edges=[SimilarityEdge(**e) for e in graph["edges"]],
+        total_calls=total,
+        threshold=threshold,
+    )
+
+
 @app.get("/api/calls/{call_id}", response_model=CallRecord)
 async def get_call(call_id: str) -> CallRecord:
     call = _get_call_database().get_call(call_id)
     if call is None:
         raise HTTPException(status_code=404, detail="Call not found")
     return CallRecord(**_enrich_call(call))
+
+
+@app.get("/api/calls/{call_id}/similar-contours", response_model=ContourMatchResponse)
+async def get_similar_contours(
+    call_id: str,
+    call_type: str | None = Query(default=None),
+    limit: int = Query(default=10, ge=1, le=50),
+    min_similarity: float = Query(default=0.5, ge=0.0, le=1.0),
+) -> ContourMatchResponse:
+    target = _get_call_database().get_call(call_id)
+    if target is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    target_features = target.get("acoustic_features") or {}
+    target_contour = target_features.get("frequency_contour_hz")
+    if not target_contour:
+        raise HTTPException(status_code=404, detail="No frequency contour data for this call")
+    items, _ = _get_call_database().search(call_type=call_type, limit=500)
+    matches: list[ContourMatch] = []
+    compared = 0
+    for call in items:
+        if call.get("id") == call_id:
+            continue
+        other_features = call.get("acoustic_features") or {}
+        other_contour = other_features.get("frequency_contour_hz")
+        if not other_contour:
+            continue
+        compared += 1
+        sim = contour_similarity(target_contour, other_contour)
+        if sim >= min_similarity:
+            matches.append(ContourMatch(
+                call_id=call.get("id", ""),
+                call_type=call.get("call_type", "unknown"),
+                similarity=sim,
+                recording_id=call.get("recording_id"),
+            ))
+    matches.sort(key=lambda m: m.similarity, reverse=True)
+    return ContourMatchResponse(
+        query_call_id=call_id,
+        matches=matches[:limit],
+        total_compared=compared,
+    )
 
 
 @app.post("/api/export/research")
@@ -516,6 +625,26 @@ async def export_research(request: ExportRequest):
 
     pdf_path = export_pdf(recordings, settings.processed_dir / "echofield_export_report.pdf")
     return FileResponse(pdf_path, media_type="application/pdf")
+
+
+@app.post("/api/classifier/train", response_model=dict)
+async def train_call_classifier() -> dict[str, Any]:
+    """Train the ML call type classifier from existing call database data."""
+    db = _get_call_database()
+    items, total = db.search(limit=10000)
+    training_data = []
+    for call in items:
+        call_type = call.get("call_type", "unknown")
+        features = call.get("acoustic_features") or {}
+        if call_type != "unknown" and features:
+            training_data.append({"features": features, "call_type": call_type})
+    if len(training_data) < 5:
+        raise HTTPException(status_code=400, detail=f"Need at least 5 labeled calls, found {len(training_data)}")
+    try:
+        result = train_classifier(training_data, settings.classifier_model_path)
+        return {"status": "trained", **result, "model_path": str(settings.classifier_model_path)}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
 
 
 @app.websocket("/ws/live")

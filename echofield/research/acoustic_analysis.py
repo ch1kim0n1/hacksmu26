@@ -39,6 +39,31 @@ def build_identity_signature(features: dict[str, Any]) -> list[float]:
     ]
 
 
+def contour_similarity(contour_a: list[float], contour_b: list[float]) -> float:
+    """Compare two frequency contours using correlation after resampling.
+
+    Returns a similarity score between 0.0 and 1.0.
+    """
+    a = np.asarray(contour_a, dtype=np.float32)
+    b = np.asarray(contour_b, dtype=np.float32)
+    a = a[a > 0]
+    b = b[b > 0]
+    if a.size < 2 or b.size < 2:
+        return 0.0
+    target_len = max(len(a), len(b))
+    a_resampled = np.interp(
+        np.linspace(0, 1, target_len), np.linspace(0, 1, len(a)), a,
+    )
+    b_resampled = np.interp(
+        np.linspace(0, 1, target_len), np.linspace(0, 1, len(b)), b,
+    )
+    corr_matrix = np.corrcoef(a_resampled, b_resampled)
+    corr = float(corr_matrix[0, 1])
+    if not np.isfinite(corr):
+        return 0.0
+    return round(max(corr, 0.0), 3)
+
+
 def acoustic_similarity(signature_a: list[float], signature_b: list[float]) -> float:
     a = np.asarray(signature_a, dtype=np.float32)
     b = np.asarray(signature_b, dtype=np.float32)

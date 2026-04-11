@@ -5,6 +5,12 @@ from __future__ import annotations
 import numpy as np
 from scipy.signal import butter, sosfiltfilt
 
+try:
+    from pesq import pesq as _pesq_fn
+    _PESQ_AVAILABLE = True
+except ImportError:
+    _PESQ_AVAILABLE = False
+
 from echofield.pipeline.spectrogram import compute_stft
 
 
@@ -66,6 +72,28 @@ def compute_spectral_distortion(y_original: np.ndarray, y_cleaned: np.ndarray, s
     return float(np.sqrt(np.mean(diff ** 2)) / dynamic_range)
 
 
+def _compute_pesq(y_original: np.ndarray, y_cleaned: np.ndarray, sr: int) -> float | None:
+    """Compute PESQ score between original and cleaned signals.
+
+    Resamples to 16 kHz and uses wideband mode.
+    Returns None if pesq is unavailable or computation fails.
+    """
+    if not _PESQ_AVAILABLE:
+        return None
+    try:
+        import librosa
+        target_sr = 16000
+        ref = librosa.resample(y_original.astype(np.float64), orig_sr=sr, target_sr=target_sr)
+        deg = librosa.resample(y_cleaned.astype(np.float64), orig_sr=sr, target_sr=target_sr)
+        min_len = min(len(ref), len(deg))
+        if min_len < target_sr * 0.1:
+            return None
+        score = _pesq_fn(target_sr, ref[:min_len].astype(np.float32), deg[:min_len].astype(np.float32), "wb")
+        return round(float(score), 3)
+    except Exception:
+        return None
+
+
 def compute_energy_preservation(
     y_original: np.ndarray,
     y_cleaned: np.ndarray,
@@ -88,6 +116,7 @@ def assess_quality(y_original: np.ndarray, y_cleaned: np.ndarray, sr: int) -> di
     energy_preservation = round(compute_energy_preservation(y_original, y_cleaned, sr), 4)
     peak_before = round(_dominant_frequency(y_original, sr), 1)
     peak_after = round(_dominant_frequency(y_cleaned, sr), 1)
+    pesq_score = _compute_pesq(y_original, y_cleaned, sr)
 
     snr_component = np.clip(max(snr_improvement, 0.0) / 20.0, 0.0, 1.0) * 40.0
     preservation_component = energy_preservation * 35.0
@@ -107,7 +136,7 @@ def assess_quality(y_original: np.ndarray, y_cleaned: np.ndarray, sr: int) -> di
         "snr_before_db": snr_before,
         "snr_after_db": snr_after,
         "snr_improvement_db": snr_improvement,
-        "pesq": None,
+        "pesq": pesq_score,
         "peak_frequency_before_hz": peak_before,
         "peak_frequency_after_hz": peak_after,
         "spectral_distortion": spectral_distortion,

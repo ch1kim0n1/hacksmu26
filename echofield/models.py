@@ -107,6 +107,9 @@ class CallDetail(EchoBaseModel):
     frequency_max_hz: float = Field(ge=0.0)
     call_type: str
     confidence: float = Field(ge=0.0, le=1.0)
+    confidence_tier: str | None = None
+    detector_backend: str | None = None
+    classifier_backend: str | None = None
     location: str | None = None
     date: str | None = None
     species: str | None = None
@@ -216,3 +219,43 @@ class ErrorResponse(EchoBaseModel):
     code: str
     message: str
     status: int
+
+
+class HarmonicOverlayResponse(EchoBaseModel):
+    recording_id: str
+    fundamental_frequency_hz: float
+    harmonic_peaks_hz: list[float] = Field(default_factory=list)
+    harmonic_count: int = Field(ge=0)
+    harmonic_to_noise_ratio_db: float
+    harmonicity: float
+
+
+class SimilarityNode(EchoBaseModel):
+    id: str
+    label: str
+
+
+class SimilarityEdge(EchoBaseModel):
+    source: str
+    target: str
+    weight: float = Field(ge=0.0, le=1.0)
+
+
+class SimilarityGraphResponse(EchoBaseModel):
+    nodes: list[SimilarityNode] = Field(default_factory=list)
+    edges: list[SimilarityEdge] = Field(default_factory=list)
+    total_calls: int = Field(ge=0)
+    threshold: float
+
+
+class ContourMatch(EchoBaseModel):
+    call_id: str
+    call_type: str
+    similarity: float = Field(ge=0.0, le=1.0)
+    recording_id: str | None = None
+
+
+class ContourMatchResponse(EchoBaseModel):
+    query_call_id: str
+    matches: list[ContourMatch] = Field(default_factory=list)
+    total_compared: int = Field(ge=0)
