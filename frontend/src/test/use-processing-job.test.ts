@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 
 // Mock useWebSocket — we test useProcessingJob's state machine, not the socket itself
 const mockUseWebSocket = vi.fn();
