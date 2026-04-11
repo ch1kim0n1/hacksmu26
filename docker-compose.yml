@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: echofield-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ECHOFIELD_AUDIO_DIR=/app/data/recordings
+      - ECHOFIELD_PROCESSED_DIR=/app/data/processed
+      - ECHOFIELD_SPECTROGRAM_DIR=/app/data/spectrograms
+      - ECHOFIELD_METADATA_FILE=/app/data/metadata.csv
+      - ECHOFIELD_CONFIG_FILE=/app/config/echofield.config.yml
+      - ECHOFIELD_LOG_LEVEL=INFO
+      - ECHOFIELD_DEMO_MODE=true
+    volumes:
+      - ./data/recordings:/app/data/recordings
+      - ./data/processed:/app/data/processed
+      - ./data/spectrograms:/app/data/spectrograms
+      - ./config:/app/config
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: echofield-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+
+networks:
+  default:
+    name: echofield-network

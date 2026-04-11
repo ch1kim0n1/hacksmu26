@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --echofield-bg: #0A1A1F;
+  --echofield-surface: #141E24;
+  --echofield-surface-elevated: #1E2A32;
+  --echofield-border: #2A3A42;
+  --echofield-text-primary: #F0F5F8;
+  --echofield-text-secondary: #8B9BA5;
+  --echofield-text-muted: #5A6A75;
+  --accent-teal: #00D9FF;
+  --success: #10C876;
+  --warning: #F5A025;
+  --danger: #EF4444;
+  --gold: #D4AF37;
+  --elephant: #8B8680;
+  --spectrogram-low: #0C1A2A;
+  --spectrogram-mid: #00D9FF;
+  --spectrogram-high: #FFD700;
+  --spectrogram-peak: #EF4444;
+}
+
+html,
+body {
+  background-color: #0A1A1F;
+  color: #F0F5F8;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141E24;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A3A42;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A4A52;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2A3A42 #141E24;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
