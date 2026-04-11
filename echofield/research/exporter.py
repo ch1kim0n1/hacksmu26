@@ -23,6 +23,13 @@ def _flatten_calls(recordings: list[dict[str, Any]]) -> list[dict[str, Any]]:
         result = recording.get("result") or {}
         for call in result.get("calls", []):
             features = call.get("acoustic_features") or {}
+            annotations = call.get("annotations") or []
+            tags = sorted({
+                str(tag)
+                for annotation in annotations
+                for tag in annotation.get("tags", [])
+                if str(tag).strip()
+            })
             rows.append(
                 {
                     "call_id": call.get("id"),
@@ -42,6 +49,10 @@ def _flatten_calls(recordings: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     "mfcc": json.dumps(features.get("mfcc", [])),
                     "zero_crossing_rate": features.get("zero_crossing_rate"),
                     "snr_db": features.get("snr_db"),
+                    "individual_id": call.get("individual_id"),
+                    "review_label": call.get("review_label"),
+                    "tags": json.dumps(tags),
+                    "annotations": json.dumps(annotations),
                     "location": metadata.get("location"),
                     "date": metadata.get("date"),
                     "species": metadata.get("species"),
@@ -70,6 +81,10 @@ def export_csv(recordings: list[dict[str, Any]]) -> str:
         "mfcc",
         "zero_crossing_rate",
         "snr_db",
+        "individual_id",
+        "review_label",
+        "tags",
+        "annotations",
         "location",
         "date",
         "species",
@@ -120,6 +135,39 @@ def export_pdf(recordings: list[dict[str, Any]], destination: str | Path) -> Pat
         plt.close(fig)
 
         if len(rows) >= 3:
+            for recording in recordings:
+                result = recording.get("result") or {}
+                comparison_path = result.get("comparison_spectrogram_path")
+                before_path = result.get("spectrogram_before_path")
+                after_path = result.get("spectrogram_after_path")
+                try:
+                    if comparison_path and Path(comparison_path).exists():
+                        image = plt.imread(comparison_path)
+                        fig, ax = plt.subplots(figsize=(11.69, 8.27), dpi=300)
+                        ax.imshow(image)
+                        ax.axis("off")
+                        ax.set_title(f"Before/After Spectrogram: {recording.get('filename') or recording.get('id')}")
+                        fig.tight_layout()
+                        pdf.savefig(fig)
+                        plt.close(fig)
+                        break
+                    if before_path and after_path and Path(before_path).exists() and Path(after_path).exists():
+                        fig, axes = plt.subplots(1, 2, figsize=(11.69, 8.27), dpi=300)
+                        for axis, path, title in (
+                            (axes[0], before_path, "Before"),
+                            (axes[1], after_path, "After"),
+                        ):
+                            axis.imshow(plt.imread(path))
+                            axis.axis("off")
+                            axis.set_title(title)
+                        fig.suptitle(f"Before/After Spectrogram: {recording.get('filename') or recording.get('id')}")
+                        fig.tight_layout()
+                        pdf.savefig(fig)
+                        plt.close(fig)
+                        break
+                except Exception:
+                    continue
+
             f0_values = [float(row["fundamental_frequency_hz"]) for row in rows if row.get("fundamental_frequency_hz") not in {None, ""}]
             if f0_values:
                 fig, ax = plt.subplots(figsize=(11.69, 8.27), dpi=300)

@@ -8,7 +8,6 @@ and classifies call types based on extracted features. Supports both ML-based
 from __future__ import annotations
 
 import json
-import logging
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +16,7 @@ from typing import Any
 import numpy as np
 import librosa
 from scipy.signal import find_peaks
+from echofield.utils.logging_config import get_logger
 
 try:
     from sklearn.calibration import CalibratedClassifierCV
@@ -27,7 +27,7 @@ try:
 except ImportError:
     _SKLEARN_AVAILABLE = False
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 _BASE_FEATURE_KEYS = [
     "fundamental_frequency_hz",

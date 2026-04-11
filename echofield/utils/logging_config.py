@@ -14,13 +14,28 @@ _request_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
     "request_id",
     default="-",
 )
+_recording_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
+    "recording_id",
+    default="-",
+)
+_stage_var: contextvars.ContextVar[str] = contextvars.ContextVar(
+    "stage",
+    default="-",
+)
 
 _configured = False
 
 
-class RequestIdFilter(logging.Filter):
+class TraceContextFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        record.request_id = _request_id_var.get()
+        if not hasattr(record, "request_id"):
+            record.request_id = _request_id_var.get()
+        if not hasattr(record, "recording_id"):
+            record.recording_id = _recording_id_var.get()
+        if not hasattr(record, "stage"):
+            record.stage = _stage_var.get()
+        if not hasattr(record, "duration_ms"):
+            record.duration_ms = None
         return True
 
 
@@ -32,7 +47,11 @@ class JsonFormatter(logging.Formatter):
             "logger": record.name,
             "message": record.getMessage(),
             "request_id": getattr(record, "request_id", "-"),
+            "recording_id": getattr(record, "recording_id", "-"),
+            "stage": getattr(record, "stage", "-"),
         }
+        if getattr(record, "duration_ms", None) is not None:
+            payload["duration_ms"] = getattr(record, "duration_ms")
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
         return json.dumps(payload, default=str)
@@ -49,12 +68,21 @@ def get_request_id() -> str:
 
 
 @contextlib.contextmanager
-def request_context(request_id: str | None = None) -> Iterator[str]:
-    token = _request_id_var.set(request_id or uuid.uuid4().hex)
+def request_context(
+    request_id: str | None = None,
+    *,
+    recording_id: str | None = None,
+    stage: str | None = None,
+) -> Iterator[str]:
+    request_token = _request_id_var.set(request_id or uuid.uuid4().hex)
+    recording_token = _recording_id_var.set(recording_id or _recording_id_var.get())
+    stage_token = _stage_var.set(stage or _stage_var.get())
     try:
         yield _request_id_var.get()
     finally:
-        _request_id_var.reset(token)
+        _stage_var.reset(stage_token)
+        _recording_id_var.reset(recording_token)
+        _request_id_var.reset(request_token)
 
 
 def configure_logging(level: str = "INFO", log_format: str = "text") -> None:
@@ -65,12 +93,12 @@ def configure_logging(level: str = "INFO", log_format: str = "text") -> None:
     root = logging.getLogger()
     root.setLevel(getattr(logging, level.upper(), logging.INFO))
     handler = logging.StreamHandler(sys.stdout)
-    handler.addFilter(RequestIdFilter())
+    handler.addFilter(TraceContextFilter())
     if log_format.lower() == "json":
         formatter: logging.Formatter = JsonFormatter(datefmt="%Y-%m-%dT%H:%M:%SZ")
     else:
         formatter = logging.Formatter(
-            "%(asctime)s | %(levelname)-8s | %(name)s | %(request_id)s | %(message)s",
+            "%(asctime)s | %(levelname)-8s | %(name)s | %(request_id)s | %(recording_id)s | %(stage)s | %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
         )
     handler.setFormatter(formatter)
@@ -111,9 +139,4 @@ def get_logger(name: str) -> logging.Logger:
         configure_logging(settings.LOG_LEVEL, settings.LOG_FORMAT)
     except Exception:
         configure_logging()
-    try:
-        import structlog
-
-        return structlog.stdlib.get_logger(name)  # type: ignore[return-value]
-    except Exception:
-        return logging.getLogger(name)
+    return logging.getLogger(name)

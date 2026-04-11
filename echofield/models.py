@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 
 AUDIO_FORMATS = {"wav", "mp3", "flac"}
 MAX_FILESIZE_MB = 500.0
@@ -131,6 +131,8 @@ class CallDetail(EchoBaseModel):
     review_label: str | None = None
     reviewed_by: str | None = None
     reviewed_at: str | None = None
+    individual_id: str | None = None
+    annotations: list[dict[str, Any]] = Field(default_factory=list)
     location: str | None = None
     date: str | None = None
     species: str | None = None
@@ -161,6 +163,7 @@ class ProcessingResult(EchoBaseModel):
     output_audio_path: str | None = None
     spectrogram_before_path: str | None = None
     spectrogram_after_path: str | None = None
+    validation_warnings: list[str] = Field(default_factory=list)
     export_metadata: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -195,6 +198,7 @@ class UploadResponse(EchoBaseModel):
     count: int
     total_duration_s: float = Field(ge=0.0)
     message: str
+    duplicate: bool = False
 
 
 class BatchSubmitResponse(EchoBaseModel):
@@ -250,6 +254,17 @@ class StatsResponse(EchoBaseModel):
     success_rate: float = Field(ge=0.0, le=1.0)
     processing_time_avg: float = Field(ge=0.0)
     circuit_breakers: dict[str, Any] = Field(default_factory=dict)
+
+
+class ComponentHealth(EchoBaseModel):
+    status: str
+    details: dict[str, Any] = Field(default_factory=dict)
+
+
+class HealthResponse(EchoBaseModel):
+    status: str
+    version: str
+    components: dict[str, ComponentHealth] = Field(default_factory=dict)
 
 
 class WSMessage(EchoBaseModel):
@@ -374,4 +389,45 @@ class ResearchStatsResponse(EchoBaseModel):
     correction: str = "bonferroni"
     results: list[FeatureTestResult] = Field(default_factory=list)
     significant_features: list[str] = Field(default_factory=list)
-    total_compared: int = Field(ge=0)
+
+
+class AnnotationRequest(EchoBaseModel):
+    note: str = Field(min_length=1)
+    tags: list[str] = Field(default_factory=list)
+    researcher_id: str | None = None
+
+
+class CallAnnotation(EchoBaseModel):
+    id: str
+    call_id: str
+    note: str
+    tags: list[str] = Field(default_factory=list)
+    researcher_id: str | None = None
+    created_at: str
+
+
+class IndividualProfile(EchoBaseModel):
+    individual_id: str
+    call_count: int = Field(ge=0)
+    call_ids: list[str] = Field(default_factory=list)
+    recording_ids: list[str] = Field(default_factory=list)
+    dates: list[str] = Field(default_factory=list)
+    signature_mean: list[float] = Field(default_factory=list)
+    signature_std: list[float] = Field(default_factory=list)
+
+
+class WebhookConfig(EchoBaseModel):
+    id: str | None = None
+    url: HttpUrl
+    event_type: str = Field(pattern="^(processing.complete|processing.failed|batch.complete)$")
+    created_at: str | None = None
+
+
+class WebhookEvent(EchoBaseModel):
+    event_type: str
+    recording_id: str | None = None
+    batch_id: str | None = None
+    status: str
+    quality: dict[str, Any] | None = None
+    payload: dict[str, Any] = Field(default_factory=dict)
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")

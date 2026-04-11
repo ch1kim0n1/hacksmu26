@@ -17,6 +17,7 @@ def _reload_server(monkeypatch, tmp_path: Path):
     monkeypatch.setenv("ECHOFIELD_SPECTROGRAM_DIR", str(tmp_path / "spectrograms"))
     monkeypatch.setenv("ECHOFIELD_CACHE_DIR", str(tmp_path / "cache"))
     monkeypatch.setenv("ECHOFIELD_CATALOG_FILE", str(tmp_path / "cache" / "recording_catalog.json"))
+    monkeypatch.setenv("ECHOFIELD_DB_PATH", str(tmp_path / "cache" / "echofield.sqlite"))
     monkeypatch.setenv("ECHOFIELD_METADATA_FILE", str(tmp_path / "metadata.csv"))
     monkeypatch.setenv("ECHOFIELD_CONFIG_FILE", str(config_path))
     monkeypatch.setenv("ECHOFIELD_DEMO_MODE", "false")

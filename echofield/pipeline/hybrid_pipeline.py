@@ -22,13 +22,16 @@ from echofield.pipeline.feature_extract import classify_call_type, extract_acous
 from echofield.pipeline.ingestion import IngestionResult, ingest_audio_file
 from echofield.pipeline.noise_classifier import classify_noise
 from echofield.pipeline.quality_check import assess_quality
-from echofield.pipeline.spectral_gate import adaptive_gate_denoise, spectral_gate_denoise
+from echofield.pipeline.spectral_gate import adaptive_gate_denoise, spectral_gate_denoise, wiener_filter_denoise
 from echofield.pipeline.spectrogram import (
     build_spectrogram_artifacts,
     compute_stft,
     generate_comparison_png,
 )
 from echofield.utils.audio_utils import save_audio
+from echofield.utils.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class PipelineStage(str, Enum):
@@ -74,6 +77,19 @@ class ProcessingPipeline:
             "post_process": bool(getattr(self.settings, "DENOISE_POST_PROCESS", False)),
             "preserve_harmonics": bool(getattr(self.settings, "DENOISE_PRESERVE_HARMONICS", False)),
         }
+
+    def _record_stage_duration(self, recording_id: str, stage: PipelineStage, started_at: float) -> None:
+        duration_s = time.perf_counter() - started_at
+        duration_ms = round(duration_s * 1000.0, 3)
+        metrics.observe("echofield_pipeline_stage_duration_seconds", duration_s, {"stage": stage.value})
+        logger.info(
+            "pipeline stage complete",
+            extra={
+                "recording_id": recording_id,
+                "stage": stage.value,
+                "duration_ms": duration_ms,
+            },
+        )
 
     def _detect_calls(
         self,
@@ -140,7 +156,7 @@ class ProcessingPipeline:
             segment_length_s=getattr(self.settings, "SEGMENT_SECONDS", 60),
             overlap_ratio=getattr(self.settings, "SEGMENT_OVERLAP_RATIO", 0.5),
         )
-        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.INGESTION.value})
+        self._record_stage_duration(recording_id, PipelineStage.INGESTION, stage_start)
         y = np.concatenate([segment.data for segment in ingestion.segments], axis=0)
         sr = ingestion.sample_rate
 
@@ -157,7 +173,7 @@ class ProcessingPipeline:
             freq_max=getattr(self.settings, "SPECTROGRAM_FREQ_MAX", 1000),
             spectrogram_type=getattr(self.settings, "SPECTROGRAM_TYPE", "stft"),
         )
-        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.SPECTROGRAM.value})
+        self._record_stage_duration(recording_id, PipelineStage.SPECTROGRAM, stage_start)
         await self._notify(
             progress_callback,
             PipelineStage.SPECTROGRAM.value,
@@ -169,7 +185,7 @@ class ProcessingPipeline:
         await self._notify(progress_callback, PipelineStage.CLASSIFICATION.value, "active", 35)
         stage_start = time.perf_counter()
         noise_info = await asyncio.to_thread(classify_noise, y, sr)
-        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.CLASSIFICATION.value})
+        self._record_stage_duration(recording_id, PipelineStage.CLASSIFICATION, stage_start)
         primary_range = noise_info["noise_types"][0]["frequency_range_hz"] if noise_info["noise_types"] else [0.0, 0.0]
         await self._notify(
             progress_callback,
@@ -222,6 +238,9 @@ class ProcessingPipeline:
             )
             cleaned_audio = adaptive_result["cleaned_audio"]
             ensemble_meta = {"chunk_aggressiveness": adaptive_result["chunk_aggressiveness"]}
+        elif method == "wiener":
+            wiener = await asyncio.to_thread(wiener_filter_denoise, y, sr)
+            cleaned_audio = wiener["cleaned_audio"]
         elif method == "deep":
             spectral = await asyncio.to_thread(
                 spectral_gate_denoise,
@@ -251,7 +270,7 @@ class ProcessingPipeline:
                 spectrogram_type=spectrogram_type,
             )
             cleaned_audio = spectral["cleaned_audio"]
-        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.DENOISING.value})
+        self._record_stage_duration(recording_id, PipelineStage.DENOISING, stage_start)
 
         await self._notify(progress_callback, PipelineStage.SPECTROGRAM.value, "active", 65)
         stage_start = time.perf_counter()
@@ -266,7 +285,7 @@ class ProcessingPipeline:
             freq_max=getattr(self.settings, "SPECTROGRAM_FREQ_MAX", 1000),
             spectrogram_type=spectrogram_type,
         )
-        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.SPECTROGRAM.value})
+        self._record_stage_duration(recording_id, PipelineStage.SPECTROGRAM, stage_start)
         await self._notify(
             progress_callback,
             PipelineStage.SPECTROGRAM.value,
@@ -284,13 +303,13 @@ class ProcessingPipeline:
             sr,
             ingestion.metadata,
         )
-        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.FEATURE_EXTRACTION.value})
+        self._record_stage_duration(recording_id, PipelineStage.FEATURE_EXTRACTION, stage_start)
         metrics.inc("echofield_calls_detected_total", len(calls))
 
         await self._notify(progress_callback, PipelineStage.QUALITY_CHECK.value, "active", 90)
         stage_start = time.perf_counter()
         quality = await asyncio.to_thread(assess_quality, y, cleaned_audio, sr)
-        metrics.observe("echofield_pipeline_stage_duration_seconds", time.perf_counter() - stage_start, {"stage": PipelineStage.QUALITY_CHECK.value})
+        self._record_stage_duration(recording_id, PipelineStage.QUALITY_CHECK, stage_start)
         await self._notify(
             progress_callback,
             PipelineStage.QUALITY_CHECK.value,
@@ -373,6 +392,7 @@ class ProcessingPipeline:
             "spectrogram_before_path": before_viz.url,
             "spectrogram_after_path": after_viz.url,
             "comparison_spectrogram_path": str(comparison_path),
+            "validation_warnings": ingestion.validation_warnings,
             "noise_summary": noise_info,
             "ai_enhanced": method in {"deep", "hybrid"},
             **ensemble_meta,

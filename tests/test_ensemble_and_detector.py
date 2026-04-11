@@ -92,7 +92,7 @@ class TestRunEnsemble:
 
     def test_method_is_known(self, noisy_signal: np.ndarray) -> None:
         result = run_ensemble(noisy_signal, SR)
-        known = {"spectral", "unet", "demucs", "passthrough"}
+        known = {"spectral", "wiener", "unet", "demucs", "passthrough"}
         assert result["method"] in known
 
     def test_at_least_one_candidate_evaluated(self, noisy_signal: np.ndarray) -> None:
