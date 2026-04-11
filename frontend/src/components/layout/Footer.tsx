@@ -5,5 +5,5 @@ export default function Footer() {
         Built for HackSMU 2026 — ElephantVoices Track
       </p>
     </footer>
-  );
+  )
 }
