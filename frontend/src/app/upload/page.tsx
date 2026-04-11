@@ -14,8 +14,8 @@ import {
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; dot?: string }> = {
     pending: {
-      bg: "bg-echofield-text-muted/20",
-      text: "text-echofield-text-muted",
+      bg: "bg-ev-warm-gray/20",
+      text: "text-ev-warm-gray",
     },
     processing: {
       bg: "bg-warning/20",
@@ -194,23 +194,23 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-echofield-bg">
+    <div className="min-h-screen bg-ev-ivory">
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-10">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-echofield-text-muted hover:text-echofield-text-secondary transition-colors mb-4"
+            className="inline-flex items-center gap-2 text-ev-warm-gray hover:text-ev-elephant transition-colors mb-4"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back to Home
           </Link>
-          <h1 className="text-4xl font-bold text-echofield-text-primary">
+          <h1 className="text-4xl font-bold text-ev-charcoal">
             Upload Recordings
           </h1>
-          <p className="text-echofield-text-secondary mt-2">
+          <p className="text-ev-elephant mt-2">
             Upload elephant field recordings for AI-powered noise removal and
             vocalization analysis.
           </p>
@@ -223,8 +223,8 @@ export default function UploadPage() {
           onDrop={handleDrop}
           className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer mb-12 ${
             isDragging
-              ? "border-accent-teal bg-accent-teal/5 scale-[1.01]"
-              : "border-echofield-border hover:border-echofield-text-muted bg-echofield-surface"
+              ? "border-accent-savanna bg-accent-savanna/5 scale-[1.01]"
+              : "border-ev-sand hover:border-ev-warm-gray bg-ev-cream"
           }`}
           onClick={() => fileInputRef.current?.click()}
         >
@@ -240,12 +240,12 @@ export default function UploadPage() {
           <div className="flex flex-col items-center gap-4">
             <div
               className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-colors ${
-                isDragging ? "bg-accent-teal/20" : "bg-echofield-surface-elevated"
+                isDragging ? "bg-accent-savanna/20" : "bg-background-elevated"
               }`}
             >
               <svg
                 className={`w-8 h-8 transition-colors ${
-                  isDragging ? "text-accent-teal" : "text-echofield-text-muted"
+                  isDragging ? "text-accent-savanna" : "text-ev-warm-gray"
                 }`}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -261,17 +261,17 @@ export default function UploadPage() {
             </div>
 
             <div>
-              <p className="text-lg font-semibold text-echofield-text-primary">
+              <p className="text-lg font-semibold text-ev-charcoal">
                 {isDragging ? "Drop files here" : "Drop .wav or .mp3 here"}
               </p>
-              <p className="text-sm text-echofield-text-muted mt-1">
+              <p className="text-sm text-ev-warm-gray mt-1">
                 or click to browse &middot; Max 500 MB per file
               </p>
             </div>
 
             <button
               type="button"
-              className="px-6 py-2.5 bg-accent-teal/10 text-accent-teal font-medium rounded-lg hover:bg-accent-teal/20 transition-colors"
+              className="px-6 py-2.5 bg-accent-savanna/10 text-accent-savanna font-medium rounded-lg hover:bg-accent-savanna/20 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 fileInputRef.current?.click();
@@ -286,12 +286,12 @@ export default function UploadPage() {
             <div className="mt-8">
               <div className="w-full max-w-md mx-auto">
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-echofield-text-secondary">Uploading...</span>
-                  <span className="text-accent-teal">{Math.round(uploadProgress)}%</span>
+                  <span className="text-ev-elephant">Uploading...</span>
+                  <span className="text-accent-savanna">{Math.round(uploadProgress)}%</span>
                 </div>
-                <div className="h-2 bg-echofield-surface-elevated rounded-full overflow-hidden">
+                <div className="h-2 bg-background-elevated rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-accent-teal rounded-full transition-all duration-300"
+                    className="h-full bg-accent-savanna rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
@@ -320,7 +320,7 @@ export default function UploadPage() {
 
         {/* Recordings List */}
         <div>
-          <h2 className="text-2xl font-bold text-echofield-text-primary mb-6">
+          <h2 className="text-2xl font-bold text-ev-charcoal mb-6">
             Your Recordings
           </h2>
 
@@ -329,32 +329,32 @@ export default function UploadPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="p-6 rounded-xl bg-echofield-surface border border-echofield-border animate-pulse"
+                  className="p-6 rounded-xl bg-ev-cream border border-ev-sand animate-pulse"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-echofield-surface-elevated" />
+                    <div className="w-10 h-10 rounded-lg bg-background-elevated" />
                     <div className="flex-1">
-                      <div className="h-4 w-48 bg-echofield-surface-elevated rounded mb-2" />
-                      <div className="h-3 w-32 bg-echofield-surface-elevated rounded" />
+                      <div className="h-4 w-48 bg-background-elevated rounded mb-2" />
+                      <div className="h-3 w-32 bg-background-elevated rounded" />
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : error ? (
-            <div className="p-8 rounded-xl bg-echofield-surface border border-echofield-border text-center">
+            <div className="p-8 rounded-xl bg-ev-cream border border-ev-sand text-center">
               <p className="text-danger mb-4">{error}</p>
               <button
                 onClick={fetchRecordings}
-                className="px-4 py-2 bg-echofield-surface-elevated text-echofield-text-secondary rounded-lg hover:text-echofield-text-primary transition-colors"
+                className="px-4 py-2 bg-background-elevated text-ev-elephant rounded-lg hover:text-ev-charcoal transition-colors"
               >
                 Retry
               </button>
             </div>
           ) : recordings.length === 0 ? (
-            <div className="p-12 rounded-xl bg-echofield-surface border border-echofield-border text-center">
+            <div className="p-12 rounded-xl bg-ev-cream border border-ev-sand text-center">
               <svg
-                className="w-12 h-12 text-echofield-text-muted mx-auto mb-4"
+                className="w-12 h-12 text-ev-warm-gray mx-auto mb-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -366,8 +366,8 @@ export default function UploadPage() {
                   d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
                 />
               </svg>
-              <p className="text-echofield-text-secondary mb-1">No recordings yet</p>
-              <p className="text-echofield-text-muted text-sm">
+              <p className="text-ev-elephant mb-1">No recordings yet</p>
+              <p className="text-ev-warm-gray text-sm">
                 Upload your first field recording to get started.
               </p>
             </div>
@@ -381,7 +381,7 @@ export default function UploadPage() {
                       router.push(`/processing/${rec.id}`);
                     }
                   }}
-                  className={`p-6 rounded-xl bg-echofield-surface border border-echofield-border hover:border-echofield-text-muted/30 transition-all ${
+                  className={`p-6 rounded-xl bg-ev-cream border border-ev-sand hover:border-ev-warm-gray/30 transition-all ${
                     rec.status === "complete" || rec.status === "processing"
                       ? "cursor-pointer"
                       : ""
@@ -389,9 +389,9 @@ export default function UploadPage() {
                 >
                   <div className="flex items-center justify-between gap-4 flex-wrap">
                     <div className="flex items-center gap-4 min-w-0">
-                      <div className="w-10 h-10 rounded-lg bg-echofield-surface-elevated flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-background-elevated flex items-center justify-center flex-shrink-0">
                         <svg
-                          className="w-5 h-5 text-accent-teal"
+                          className="w-5 h-5 text-accent-savanna"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -405,10 +405,10 @@ export default function UploadPage() {
                         </svg>
                       </div>
                       <div className="min-w-0">
-                        <p className="font-medium text-echofield-text-primary truncate">
+                        <p className="font-medium text-ev-charcoal truncate">
                           {rec.filename}
                         </p>
-                        <div className="flex items-center gap-3 text-sm text-echofield-text-muted mt-0.5">
+                        <div className="flex items-center gap-3 text-sm text-ev-warm-gray mt-0.5">
                           <span>{formatDuration(rec.duration)}</span>
                           <span>&middot;</span>
                           <span>{formatFileSize(rec.file_size)}</span>
@@ -444,7 +444,7 @@ export default function UploadPage() {
                             e.stopPropagation();
                             handleDownload(rec.id);
                           }}
-                          className="px-4 py-2 bg-accent-teal/10 text-accent-teal text-sm font-medium rounded-lg hover:bg-accent-teal/20 transition-colors"
+                          className="px-4 py-2 bg-accent-savanna/10 text-accent-savanna text-sm font-medium rounded-lg hover:bg-accent-savanna/20 transition-colors"
                         >
                           Download
                         </button>

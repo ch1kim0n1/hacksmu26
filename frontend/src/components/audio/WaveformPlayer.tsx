@@ -18,7 +18,7 @@ function formatTime(seconds: number): string {
 export default function WaveformPlayer({
   src,
   label,
-  accentColor = "#00D9FF",
+  accentColor = "#C4A46C",
 }: WaveformPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -80,7 +80,7 @@ export default function WaveformPlayer({
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="rounded-lg border border-echofield-border bg-echofield-surface p-4 space-y-3">
+    <div className="rounded-lg border border-ev-sand bg-ev-cream p-4 space-y-3">
       <audio ref={audioRef} src={src} preload="metadata" />
 
       {/* Label */}
@@ -90,14 +90,14 @@ export default function WaveformPlayer({
             className="w-2 h-2 rounded-full"
             style={{ backgroundColor: accentColor }}
           />
-          <span className="text-sm font-medium text-echofield-text-primary">
+          <span className="text-sm font-medium text-ev-charcoal">
             {label}
           </span>
         </div>
       )}
 
       {/* Waveform placeholder bar */}
-      <div className="relative h-12 bg-echofield-surface-elevated rounded overflow-hidden">
+      <div className="relative h-12 bg-background-elevated rounded overflow-hidden">
         {/* Background wave pattern */}
         <div className="absolute inset-0 flex items-center justify-center gap-px px-1">
           {Array.from({ length: 60 }, (_, i) => {
@@ -134,7 +134,7 @@ export default function WaveformPlayer({
               height="16"
               viewBox="0 0 16 16"
               fill="none"
-              className="text-echofield-bg"
+              className="text-ev-ivory"
             >
               <rect
                 x="3"
@@ -159,7 +159,7 @@ export default function WaveformPlayer({
               height="16"
               viewBox="0 0 16 16"
               fill="none"
-              className="text-echofield-bg"
+              className="text-ev-ivory"
             >
               <path d="M4 2L14 8L4 14V2Z" fill="currentColor" />
             </svg>
@@ -177,14 +177,14 @@ export default function WaveformPlayer({
           className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
           style={
             {
-              background: `linear-gradient(to right, ${accentColor} ${progress}%, #2A3A42 ${progress}%)`,
+              background: `linear-gradient(to right, ${accentColor} ${progress}%, #D4CCC3 ${progress}%)`,
               "--thumb-color": accentColor,
             } as React.CSSProperties
           }
         />
 
         {/* Time display */}
-        <span className="text-xs text-echofield-text-secondary font-mono whitespace-nowrap min-w-[70px] text-right">
+        <span className="text-xs text-ev-elephant font-mono whitespace-nowrap min-w-[70px] text-right">
           {formatTime(currentTime)} / {formatTime(duration)}
         </span>
       </div>
@@ -198,7 +198,7 @@ export default function WaveformPlayer({
             height="16"
             viewBox="0 0 16 16"
             fill="none"
-            className="text-echofield-text-muted shrink-0"
+            className="text-ev-warm-gray shrink-0"
           >
             <path
               d="M3 6H1V10H3L7 13V3L3 6Z"
@@ -220,7 +220,7 @@ export default function WaveformPlayer({
             onChange={handleVolumeChange}
             className="w-20 h-1 rounded-full appearance-none cursor-pointer"
             style={{
-              background: `linear-gradient(to right, ${accentColor} ${volume * 100}%, #2A3A42 ${volume * 100}%)`,
+              background: `linear-gradient(to right, ${accentColor} ${volume * 100}%, #D4CCC3 ${volume * 100}%)`,
             }}
           />
         </div>
@@ -229,7 +229,7 @@ export default function WaveformPlayer({
         <a
           href={src}
           download
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-echofield-text-secondary hover:text-echofield-text-primary border border-echofield-border hover:border-echofield-text-muted transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-ev-elephant hover:text-ev-charcoal border border-ev-sand hover:border-ev-warm-gray transition-colors"
         >
           <svg
             width="14"

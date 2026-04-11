@@ -33,8 +33,8 @@ export default function FrequencyAxis({
             className={cn(
               "font-mono leading-none whitespace-nowrap",
               highContrast
-                ? "text-xs text-echofield-text-secondary"
-                : "text-[10px] text-echofield-text-muted"
+                ? "text-xs text-ev-elephant"
+                : "text-[10px] text-ev-warm-gray"
             )}
           >
             {formatFrequency(freq)}
@@ -42,7 +42,7 @@ export default function FrequencyAxis({
           <div
             className={cn(
               "shrink-0",
-              highContrast ? "w-2.5 h-px bg-echofield-text-muted" : "w-1.5 h-px bg-echofield-border"
+              highContrast ? "w-2.5 h-px bg-ev-warm-gray" : "w-1.5 h-px bg-ev-sand"
             )}
           />
         </div>

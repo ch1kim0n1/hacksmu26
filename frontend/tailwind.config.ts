@@ -6,80 +6,74 @@ const config: Config = {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: "class",
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
-        mono: ["Courier New", "Courier", "monospace"],
+        display: ["var(--font-cormorant)", "Georgia", "serif"],
+        accent: ["var(--font-instrument)", "Georgia", "serif"],
+        sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
       },
       colors: {
-        echofield: {
-          bg: "var(--echofield-bg)",
-          surface: "var(--echofield-surface)",
-          "surface-elevated": "var(--echofield-surface-elevated)",
-          border: "var(--echofield-border)",
-          "text-primary": "var(--echofield-text-primary)",
-          "text-secondary": "var(--echofield-text-secondary)",
-          "text-muted": "var(--echofield-text-muted)",
+        ev: {
+          charcoal: "#2C2926",
+          "charcoal-light": "#4A453F",
+          elephant: "#6B6560",
+          "warm-gray": "#8A837B",
+          dust: "#B5ADA4",
+          sand: "#D4CCC3",
+          cream: "#F0EBE3",
+          ivory: "#F8F5F0",
         },
         accent: {
-          teal: "var(--accent-teal)",
-          DEFAULT: "var(--accent-teal)",
+          savanna: "#C4A46C",
+          gold: "#A8873B",
+          "deep-gold": "#8B6E2F",
+        },
+        nature: {
+          sage: "#7A8B6F",
+          "deep-sage": "#5A6B4F",
+          earth: "#6B4F3A",
+          terracotta: "#C4785A",
+          sunset: "#D4956B",
+        },
+        background: {
+          page: "#F8F5F0",
+          surface: "#F0EBE3",
+          elevated: "#FFFFFF",
+          dark: "#2C2926",
+          "dark-surface": "#4A453F",
         },
         success: {
-          DEFAULT: "var(--success)",
+          DEFAULT: "#10C876",
           light: "#22DD88",
         },
         warning: {
-          DEFAULT: "var(--warning)",
+          DEFAULT: "#F5A025",
         },
         danger: {
-          DEFAULT: "var(--danger)",
-        },
-        gold: {
-          DEFAULT: "var(--gold)",
-        },
-        elephant: {
-          DEFAULT: "var(--elephant)",
+          DEFAULT: "#EF4444",
         },
         spectrogram: {
-          low: "var(--spectrogram-low)",
-          mid: "var(--spectrogram-mid)",
-          high: "var(--spectrogram-high)",
-          peak: "var(--spectrogram-peak)",
+          low: "#0C1A2A",
+          mid: "#00D9FF",
+          high: "#FFD700",
+          peak: "#EF4444",
         },
       },
+      borderColor: {
+        DEFAULT: "#D4CCC3",
+      },
       borderRadius: {
-        sm: "0.25rem",
+        sm: "0.125rem",
         DEFAULT: "0.5rem",
         md: "0.5rem",
         lg: "0.75rem",
-        xl: "1rem",
-        "2xl": "1.25rem",
-      },
-      boxShadow: {
-        glow: "0 0 20px rgba(0, 217, 255, 0.15)",
-        "glow-lg": "0 0 40px rgba(0, 217, 255, 0.2)",
-        "glow-success": "0 0 20px rgba(16, 200, 118, 0.2)",
-        "glow-gold": "0 0 20px rgba(212, 175, 55, 0.15)",
-        card: "0 2px 8px rgba(0, 0, 0, 0.3)",
-        "card-hover": "0 4px 16px rgba(0, 0, 0, 0.4)",
-      },
-      spacing: {
-        18: "4.5rem",
-        22: "5.5rem",
-        88: "22rem",
+        xl: "0.75rem",
+        "2xl": "1rem",
       },
       backgroundImage: {
         "gradient-spectrogram":
-          "linear-gradient(to right, var(--spectrogram-low), var(--spectrogram-mid), var(--spectrogram-high), var(--spectrogram-peak))",
-        "gradient-success":
-          "linear-gradient(135deg, var(--success), #22DD88)",
-        "gradient-radial-teal":
-          "radial-gradient(circle, rgba(0,217,255,0.08) 0%, transparent 70%)",
-        "gradient-radial-gold":
-          "radial-gradient(circle, rgba(212,175,55,0.06) 0%, transparent 70%)",
+          "linear-gradient(to right, #0C1A2A, #00D9FF, #FFD700, #EF4444)",
       },
       keyframes: {
         shimmer: {
@@ -90,15 +84,10 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
-        "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 8px rgba(0, 217, 255, 0.2)" },
-          "50%": { boxShadow: "0 0 20px rgba(0, 217, 255, 0.4)" },
-        },
       },
       animation: {
         shimmer: "shimmer 2s ease-in-out infinite",
         "fade-in": "fade-in 0.3s ease-out",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
       },
     },
   },

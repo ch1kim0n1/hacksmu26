@@ -47,13 +47,13 @@ export default function FilterPanel({
   };
 
   const inputBaseClass =
-    "bg-echofield-surface-elevated border border-echofield-border rounded px-3 py-1.5 text-sm text-echofield-text-primary placeholder:text-echofield-text-muted focus:outline-none focus:border-accent-teal focus:ring-1 focus:ring-accent-teal/30 transition-colors";
+    "bg-background-elevated border border-ev-sand rounded px-3 py-1.5 text-sm text-ev-charcoal placeholder:text-ev-warm-gray focus:outline-none focus:border-accent-savanna focus:ring-1 focus:ring-accent-savanna/30 transition-colors";
 
   return (
-    <div className="flex flex-wrap items-end gap-3 p-4 rounded-lg bg-echofield-surface border border-echofield-border">
+    <div className="flex flex-wrap items-end gap-3 p-4 rounded-lg bg-ev-cream border border-ev-sand">
       {/* Call type select */}
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] uppercase tracking-wide text-echofield-text-muted">
+        <label className="text-[10px] uppercase tracking-wide text-ev-warm-gray">
           Call Type
         </label>
         <select
@@ -71,7 +71,7 @@ export default function FilterPanel({
 
       {/* Date from */}
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] uppercase tracking-wide text-echofield-text-muted">
+        <label className="text-[10px] uppercase tracking-wide text-ev-warm-gray">
           Date From
         </label>
         <input
@@ -84,7 +84,7 @@ export default function FilterPanel({
 
       {/* Date to */}
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] uppercase tracking-wide text-echofield-text-muted">
+        <label className="text-[10px] uppercase tracking-wide text-ev-warm-gray">
           Date To
         </label>
         <input
@@ -97,7 +97,7 @@ export default function FilterPanel({
 
       {/* Location */}
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] uppercase tracking-wide text-echofield-text-muted">
+        <label className="text-[10px] uppercase tracking-wide text-ev-warm-gray">
           Location
         </label>
         <input
@@ -111,7 +111,7 @@ export default function FilterPanel({
 
       {/* Confidence slider */}
       <div className="flex flex-col gap-1">
-        <label className="text-[10px] uppercase tracking-wide text-echofield-text-muted">
+        <label className="text-[10px] uppercase tracking-wide text-ev-warm-gray">
           Min Confidence: {Math.round(filters.confidence * 100)}%
         </label>
         <input
@@ -123,7 +123,7 @@ export default function FilterPanel({
           onChange={(e) => updateFilter("confidence", parseFloat(e.target.value))}
           className="w-28 h-1.5 rounded-full appearance-none cursor-pointer mt-1.5"
           style={{
-            background: `linear-gradient(to right, #00D9FF ${filters.confidence * 100}%, #2A3A42 ${filters.confidence * 100}%)`,
+            background: `linear-gradient(to right, #C4A46C ${filters.confidence * 100}%, #D4CCC3 ${filters.confidence * 100}%)`,
           }}
         />
       </div>
@@ -132,13 +132,13 @@ export default function FilterPanel({
       <div className="flex items-center gap-2 ml-auto">
         <button
           onClick={handleReset}
-          className="px-3 py-1.5 text-sm text-echofield-text-muted hover:text-echofield-text-secondary transition-colors"
+          className="px-3 py-1.5 text-sm text-ev-warm-gray hover:text-ev-elephant transition-colors"
         >
           Reset
         </button>
         <button
           onClick={() => onFilterChange(filters)}
-          className="px-4 py-1.5 rounded bg-accent-teal text-echofield-bg text-sm font-medium hover:bg-accent-teal/90 transition-colors"
+          className="px-4 py-1.5 rounded bg-accent-savanna text-ev-ivory text-sm font-medium hover:bg-accent-savanna/90 transition-colors"
         >
           Apply
         </button>

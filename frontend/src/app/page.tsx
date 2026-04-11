@@ -54,22 +54,22 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-echofield-bg">
+    <div className="min-h-screen bg-ev-ivory">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-accent-teal/5 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[100px]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-accent-savanna/5 rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent-gold/5 rounded-full blur-[100px]" />
         </div>
 
         <div className="relative max-w-6xl mx-auto px-6 pt-24 pb-20">
           <div
-            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/30 bg-gold/5 mb-8 transition-all duration-700 ${
+            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent-gold/30 bg-accent-gold/5 mb-8 transition-all duration-700 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
-            <span className="text-gold text-sm font-medium">
+            <span className="w-2 h-2 rounded-full bg-accent-gold animate-pulse" />
+            <span className="text-accent-gold text-sm font-medium">
               HackSMU 2026 &middot; ElephantVoices Track
             </span>
           </div>
@@ -79,15 +79,15 @@ export default function LandingPage() {
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <span className="text-gold">Elephant Vocalization</span>
+            <span className="text-accent-gold">Elephant Vocalization</span>
             <br />
-            <span className="text-echofield-text-primary">
+            <span className="text-ev-charcoal">
               Noise Removal &amp; Research
             </span>
           </h1>
 
           <p
-            className={`text-xl md:text-2xl text-echofield-text-secondary max-w-2xl mb-12 transition-all duration-700 delay-200 ${
+            className={`text-xl md:text-2xl text-ev-elephant max-w-2xl mb-12 transition-all duration-700 delay-200 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
@@ -110,7 +110,7 @@ export default function LandingPage() {
             </Link>
             <a
               href="#how-it-works"
-              className="inline-flex items-center gap-2 px-8 py-4 border border-accent-teal text-accent-teal font-semibold rounded-xl hover:bg-accent-teal/10 transition-all hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-4 border border-accent-savanna text-accent-savanna font-semibold rounded-xl hover:bg-accent-savanna/10 transition-all hover:-translate-y-0.5"
             >
               How It Works
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -125,34 +125,34 @@ export default function LandingPage() {
             }`}
           >
             <div className="text-center">
-              <div className="text-4xl font-bold text-accent-teal">
+              <div className="text-4xl font-bold text-accent-savanna">
                 <AnimatedCounter target={44} />
               </div>
-              <div className="text-sm text-echofield-text-muted mt-1">Recordings</div>
+              <div className="text-sm text-ev-warm-gray mt-1">Recordings</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-gold">
+              <div className="text-4xl font-bold text-accent-gold">
                 <AnimatedCounter target={212} />
               </div>
-              <div className="text-sm text-echofield-text-muted mt-1">Calls Detected</div>
+              <div className="text-sm text-ev-warm-gray mt-1">Calls Detected</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold text-success">
                 <AnimatedCounter target={89} suffix="%" />
               </div>
-              <div className="text-sm text-echofield-text-muted mt-1">Success Rate</div>
+              <div className="text-sm text-ev-warm-gray mt-1">Success Rate</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Why This Matters */}
-      <section className="py-20 bg-echofield-surface">
+      <section className="py-20 bg-ev-cream">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-echofield-text-primary mb-4">
+          <h2 className="text-3xl font-bold text-ev-charcoal mb-4">
             Why This Matters
           </h2>
-          <p className="text-echofield-text-secondary mb-12 max-w-2xl">
+          <p className="text-ev-elephant mb-12 max-w-2xl">
             Elephant communication holds keys to understanding their social
             structures, emotional states, and conservation needs.
           </p>
@@ -182,18 +182,18 @@ export default function LandingPage() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="flex gap-4 p-6 rounded-xl bg-echofield-bg border border-echofield-border hover:border-accent-teal/30 transition-colors"
+                className="flex gap-4 p-6 rounded-xl bg-ev-ivory border border-ev-sand hover:border-accent-savanna/30 transition-colors"
               >
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent-teal/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-accent-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent-savanna/10 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-accent-savanna" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-echofield-text-primary mb-1">
+                  <h3 className="text-lg font-semibold text-ev-charcoal mb-1">
                     {item.title}
                   </h3>
-                  <p className="text-echofield-text-secondary text-sm leading-relaxed">
+                  <p className="text-ev-elephant text-sm leading-relaxed">
                     {item.desc}
                   </p>
                 </div>
@@ -204,12 +204,12 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-echofield-bg">
+      <section id="how-it-works" className="py-20 bg-ev-ivory">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-echofield-text-primary mb-4 text-center">
+          <h2 className="text-3xl font-bold text-ev-charcoal mb-4 text-center">
             How It Works
           </h2>
-          <p className="text-echofield-text-secondary mb-16 text-center max-w-xl mx-auto">
+          <p className="text-ev-elephant mb-16 text-center max-w-xl mx-auto">
             Three simple steps from raw field recording to research-ready data.
           </p>
 
@@ -219,13 +219,13 @@ export default function LandingPage() {
                 step: "01",
                 title: "Upload",
                 desc: "Drop your .wav or .mp3 field recordings into EchoField. We accept any sample rate and bit depth.",
-                color: "text-accent-teal/20",
+                color: "text-accent-savanna/20",
               },
               {
                 step: "02",
                 title: "AI Denoise",
                 desc: "Spectral gating powered by AI isolates elephant vocalizations from environmental noise in seconds.",
-                color: "text-gold/20",
+                color: "text-accent-gold/20",
               },
               {
                 step: "03",
@@ -235,20 +235,20 @@ export default function LandingPage() {
               },
             ].map((item, i) => (
               <div key={i} className="relative group">
-                <div className="p-8 rounded-2xl bg-echofield-surface border border-echofield-border hover:border-echofield-border/80 transition-all group-hover:-translate-y-1">
+                <div className="p-8 rounded-2xl bg-ev-cream border border-ev-sand hover:border-ev-sand/80 transition-all group-hover:-translate-y-1">
                   <div className={`text-5xl font-black mb-4 ${item.color}`}>
                     {item.step}
                   </div>
-                  <h3 className="text-xl font-bold text-echofield-text-primary mb-2">
+                  <h3 className="text-xl font-bold text-ev-charcoal mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-echofield-text-secondary text-sm leading-relaxed">
+                  <p className="text-ev-elephant text-sm leading-relaxed">
                     {item.desc}
                   </p>
                 </div>
                 {i < 2 && (
                   <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                    <svg className="w-8 h-8 text-echofield-border" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-8 h-8 text-ev-sand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
@@ -260,17 +260,17 @@ export default function LandingPage() {
       </section>
 
       {/* Footer CTA */}
-      <section className="py-16 bg-echofield-surface border-t border-echofield-border">
+      <section className="py-16 bg-ev-cream border-t border-ev-sand">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-2xl font-bold text-echofield-text-primary mb-4">
+          <h2 className="text-2xl font-bold text-ev-charcoal mb-4">
             Ready to start analyzing?
           </h2>
-          <p className="text-echofield-text-secondary mb-8">
+          <p className="text-ev-elephant mb-8">
             Upload your first recording and see the difference AI denoising makes.
           </p>
           <Link
             href="/upload"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-accent-teal text-echofield-bg font-semibold rounded-xl hover:bg-accent-teal/90 transition-all hover:shadow-lg hover:shadow-accent-teal/20 hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-accent-savanna text-ev-ivory font-semibold rounded-xl hover:bg-accent-savanna/90 transition-all hover:shadow-lg hover:shadow-accent-savanna/20 hover:-translate-y-0.5"
           >
             Get Started
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

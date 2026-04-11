@@ -16,10 +16,10 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-echofield-border bg-echofield-bg/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-ev-sand bg-ev-ivory/95 backdrop-blur-sm">
       <div className="flex h-14 items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-gold">EchoField</span>
+          <span className="text-xl font-bold text-accent-gold">EchoField</span>
         </Link>
 
         {/* Desktop nav */}
@@ -30,10 +30,10 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-accent-teal min-h-[44px] flex items-center ${
+                className={`text-sm font-medium transition-colors hover:text-accent-savanna min-h-[44px] flex items-center ${
                   isActive
-                    ? "text-accent-teal"
-                    : "text-echofield-text-secondary"
+                    ? "text-accent-savanna"
+                    : "text-ev-elephant"
                 }`}
               >
                 {link.label}
@@ -45,7 +45,7 @@ export default function Header() {
         {/* Mobile hamburger */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="sm:hidden flex items-center justify-center w-10 h-10 rounded-lg text-echofield-text-secondary hover:text-echofield-text-primary transition-colors"
+          className="sm:hidden flex items-center justify-center w-10 h-10 rounded-lg text-ev-elephant hover:text-ev-charcoal transition-colors"
           aria-label="Toggle menu"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -60,7 +60,7 @@ export default function Header() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <nav className="sm:hidden border-t border-echofield-border bg-echofield-surface px-4 py-2">
+        <nav className="sm:hidden border-t border-ev-sand bg-ev-cream px-4 py-2">
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -70,8 +70,8 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`block py-3 text-sm font-medium transition-colors min-h-[44px] ${
                   isActive
-                    ? "text-accent-teal"
-                    : "text-echofield-text-secondary"
+                    ? "text-accent-savanna"
+                    : "text-ev-elephant"
                 }`}
               >
                 {link.label}

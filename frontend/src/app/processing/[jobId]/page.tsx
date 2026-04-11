@@ -46,8 +46,8 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
                   isComplete
                     ? "bg-success text-white"
                     : isCurrent
-                    ? "bg-accent-teal text-echofield-bg ring-4 ring-accent-teal/20"
-                    : "bg-echofield-surface-elevated text-echofield-text-muted"
+                    ? "bg-accent-savanna text-ev-ivory ring-4 ring-accent-savanna/20"
+                    : "bg-background-elevated text-ev-warm-gray"
                 }`}
               >
                 {isComplete ? (
@@ -61,10 +61,10 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
               <span
                 className={`text-[10px] font-medium text-center whitespace-nowrap ${
                   isCurrent
-                    ? "text-accent-teal"
+                    ? "text-accent-savanna"
                     : isComplete
                     ? "text-success"
-                    : "text-echofield-text-muted"
+                    : "text-ev-warm-gray"
                 }`}
               >
                 {stage.label}
@@ -76,8 +76,8 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
                   isComplete
                     ? "bg-success"
                     : isPending
-                    ? "bg-echofield-border"
-                    : "bg-accent-teal/40"
+                    ? "bg-ev-sand"
+                    : "bg-accent-savanna/40"
                 }`}
               />
             )}
@@ -90,8 +90,8 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
 
 function SkeletonImage() {
   return (
-    <div className="w-full aspect-[2/1] bg-echofield-surface-elevated rounded-xl animate-pulse flex items-center justify-center">
-      <svg className="w-12 h-12 text-echofield-text-muted/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="w-full aspect-[2/1] bg-background-elevated rounded-xl animate-pulse flex items-center justify-center">
+      <svg className="w-12 h-12 text-ev-warm-gray/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     </div>
@@ -105,7 +105,7 @@ function QualityBadge({ score }: { score: number }) {
     score >= 90
       ? "text-success bg-success/10 border-success/20"
       : score >= 75
-      ? "text-accent-teal bg-accent-teal/10 border-accent-teal/20"
+      ? "text-accent-savanna bg-accent-savanna/10 border-accent-savanna/20"
       : score >= 50
       ? "text-warning bg-warning/10 border-warning/20"
       : "text-danger bg-danger/10 border-danger/20";
@@ -267,10 +267,10 @@ export default function ProcessingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-echofield-bg flex items-center justify-center">
+      <div className="min-h-screen bg-ev-ivory flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-accent-teal border-t-transparent rounded-full animate-spin" />
-          <p className="text-echofield-text-secondary">Loading recording...</p>
+          <div className="w-10 h-10 border-2 border-accent-savanna border-t-transparent rounded-full animate-spin" />
+          <p className="text-ev-elephant">Loading recording...</p>
         </div>
       </div>
     );
@@ -278,12 +278,12 @@ export default function ProcessingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-echofield-bg flex items-center justify-center">
+      <div className="min-h-screen bg-ev-ivory flex items-center justify-center">
         <div className="text-center p-8">
           <p className="text-danger text-lg mb-4">{error}</p>
           <button
             onClick={fetchData}
-            className="px-6 py-3 bg-echofield-surface text-echofield-text-primary rounded-xl hover:bg-echofield-surface-elevated transition-colors"
+            className="px-6 py-3 bg-ev-cream text-ev-charcoal rounded-xl hover:bg-background-elevated transition-colors"
           >
             Retry
           </button>
@@ -293,21 +293,21 @@ export default function ProcessingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-echofield-bg">
+    <div className="min-h-screen bg-ev-ivory">
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
             <Link
               href="/upload"
-              className="inline-flex items-center gap-2 text-echofield-text-muted hover:text-echofield-text-secondary transition-colors mb-3"
+              className="inline-flex items-center gap-2 text-ev-warm-gray hover:text-ev-elephant transition-colors mb-3"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back to Recordings
             </Link>
-            <h1 className="text-3xl font-bold text-echofield-text-primary">
+            <h1 className="text-3xl font-bold text-ev-charcoal">
               {recording?.filename || "Processing"}
             </h1>
           </div>
@@ -319,7 +319,7 @@ export default function ProcessingPage() {
               </span>
             )}
             {isProcessing && wsUpdate && (
-              <span className="text-sm text-echofield-text-secondary">
+              <span className="text-sm text-ev-elephant">
                 {wsUpdate.message || `${Math.round(wsUpdate.progress)}% complete`}
               </span>
             )}
@@ -327,17 +327,17 @@ export default function ProcessingPage() {
         </div>
 
         {/* Processing Timeline */}
-        <div className="p-6 rounded-xl bg-echofield-surface border border-echofield-border mb-8">
+        <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand mb-8">
           <ProcessingTimeline currentStage={currentStage} />
           {isProcessing && wsUpdate && (
             <div className="mt-4">
-              <div className="h-2 bg-echofield-surface-elevated rounded-full overflow-hidden">
+              <div className="h-2 bg-background-elevated rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-accent-teal rounded-full transition-all duration-500"
+                  className="h-full bg-accent-savanna rounded-full transition-all duration-500"
                   style={{ width: `${wsUpdate.progress}%` }}
                 />
               </div>
-              <p className="text-xs text-echofield-text-muted mt-2">
+              <p className="text-xs text-ev-warm-gray mt-2">
                 {wsUpdate.message || "Processing..."}
               </p>
             </div>
@@ -364,30 +364,30 @@ export default function ProcessingPage() {
           {/* Main Content */}
           <div className="space-y-8">
             {/* Spectrograms Side by Side */}
-            <div className="p-6 rounded-xl bg-echofield-surface border border-echofield-border">
-              <h2 className="text-lg font-semibold text-echofield-text-primary mb-4">
+            <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+              <h2 className="text-lg font-semibold text-ev-charcoal mb-4">
                 Spectrograms
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-echofield-text-muted mb-2">Original</p>
+                  <p className="text-sm text-ev-warm-gray mb-2">Original</p>
                   {isComplete ? (
                     <img
                       src={spectrogramBefore}
                       alt="Original spectrogram"
-                      className="w-full rounded-lg border border-echofield-border"
+                      className="w-full rounded-lg border border-ev-sand"
                     />
                   ) : (
                     <SkeletonImage />
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-echofield-text-muted mb-2">Cleaned</p>
+                  <p className="text-sm text-ev-warm-gray mb-2">Cleaned</p>
                   {isComplete ? (
                     <img
                       src={spectrogramAfter}
                       alt="Cleaned spectrogram"
-                      className="w-full rounded-lg border border-echofield-border"
+                      className="w-full rounded-lg border border-ev-sand"
                     />
                   ) : (
                     <SkeletonImage />
@@ -398,8 +398,8 @@ export default function ProcessingPage() {
 
             {/* Before/After Slider */}
             {isComplete && (
-              <div className="p-6 rounded-xl bg-echofield-surface border border-echofield-border">
-                <h2 className="text-lg font-semibold text-echofield-text-primary mb-4">
+              <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+                <h2 className="text-lg font-semibold text-ev-charcoal mb-4">
                   Before / After Comparison
                 </h2>
                 <div
@@ -439,7 +439,7 @@ export default function ProcessingPage() {
                     style={{ left: `${sliderPosition}%` }}
                   >
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center">
-                      <svg className="w-4 h-4 text-echofield-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-4 h-4 text-ev-ivory" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                       </svg>
                     </div>
@@ -457,27 +457,27 @@ export default function ProcessingPage() {
             )}
 
             {/* Audio Players */}
-            <div className="p-6 rounded-xl bg-echofield-surface border border-echofield-border">
-              <h2 className="text-lg font-semibold text-echofield-text-primary mb-4">
+            <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+              <h2 className="text-lg font-semibold text-ev-charcoal mb-4">
                 Audio Playback
               </h2>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-echofield-text-muted mb-3">Original Recording</p>
+                  <p className="text-sm text-ev-warm-gray mb-3">Original Recording</p>
                   <audio controls className="w-full" preload="metadata">
                     <source src={audioOriginal} type="audio/wav" />
                     Your browser does not support the audio element.
                   </audio>
                 </div>
                 <div>
-                  <p className="text-sm text-echofield-text-muted mb-3">Cleaned Audio</p>
+                  <p className="text-sm text-ev-warm-gray mb-3">Cleaned Audio</p>
                   {isComplete ? (
                     <audio controls className="w-full" preload="metadata">
                       <source src={audioCleaned} type="audio/wav" />
                       Your browser does not support the audio element.
                     </audio>
                   ) : (
-                    <div className="h-[54px] bg-echofield-surface-elevated rounded-full animate-pulse" />
+                    <div className="h-[54px] bg-background-elevated rounded-full animate-pulse" />
                   )}
                 </div>
               </div>
@@ -487,33 +487,33 @@ export default function ProcessingPage() {
           {/* Right Sidebar - Metrics */}
           <div className="space-y-6">
             {/* Quality Score */}
-            <div className="p-6 rounded-xl bg-echofield-surface border border-echofield-border">
-              <h3 className="text-sm font-medium text-echofield-text-muted mb-4 uppercase tracking-wider">
+            <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+              <h3 className="text-sm font-medium text-ev-warm-gray mb-4 uppercase tracking-wider">
                 Quality Score
               </h3>
               {metrics?.quality_score !== undefined ? (
                 <QualityBadge score={metrics.quality_score} />
               ) : (
-                <div className="h-12 bg-echofield-surface-elevated rounded-xl animate-pulse" />
+                <div className="h-12 bg-background-elevated rounded-xl animate-pulse" />
               )}
             </div>
 
             {/* SNR Metrics */}
-            <div className="p-6 rounded-xl bg-echofield-surface border border-echofield-border">
-              <h3 className="text-sm font-medium text-echofield-text-muted mb-4 uppercase tracking-wider">
+            <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+              <h3 className="text-sm font-medium text-ev-warm-gray mb-4 uppercase tracking-wider">
                 Signal-to-Noise Ratio
               </h3>
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-echofield-text-secondary">Before</span>
-                    <span className="text-sm font-mono text-echofield-text-primary">
+                    <span className="text-sm text-ev-elephant">Before</span>
+                    <span className="text-sm font-mono text-ev-charcoal">
                       {metrics?.snr_before !== undefined
                         ? `${metrics.snr_before.toFixed(1)} dB`
                         : "--"}
                     </span>
                   </div>
-                  <div className="h-2 bg-echofield-surface-elevated rounded-full overflow-hidden">
+                  <div className="h-2 bg-background-elevated rounded-full overflow-hidden">
                     <div
                       className="h-full bg-warning rounded-full transition-all"
                       style={{
@@ -526,14 +526,14 @@ export default function ProcessingPage() {
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-echofield-text-secondary">After</span>
-                    <span className="text-sm font-mono text-echofield-text-primary">
+                    <span className="text-sm text-ev-elephant">After</span>
+                    <span className="text-sm font-mono text-ev-charcoal">
                       {metrics?.snr_after !== undefined
                         ? `${metrics.snr_after.toFixed(1)} dB`
                         : "--"}
                     </span>
                   </div>
-                  <div className="h-2 bg-echofield-surface-elevated rounded-full overflow-hidden">
+                  <div className="h-2 bg-background-elevated rounded-full overflow-hidden">
                     <div
                       className="h-full bg-success rounded-full transition-all"
                       style={{
@@ -545,9 +545,9 @@ export default function ProcessingPage() {
                   </div>
                 </div>
                 {metrics?.snr_before !== undefined && metrics?.snr_after !== undefined && (
-                  <div className="pt-3 border-t border-echofield-border">
+                  <div className="pt-3 border-t border-ev-sand">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-echofield-text-secondary">Improvement</span>
+                      <span className="text-sm text-ev-elephant">Improvement</span>
                       <span className="text-sm font-bold text-success">
                         +{(metrics.snr_after - metrics.snr_before).toFixed(1)} dB
                       </span>
@@ -559,54 +559,54 @@ export default function ProcessingPage() {
 
             {/* Noise Reduction */}
             {metrics?.noise_reduction_db !== undefined && (
-              <div className="p-6 rounded-xl bg-echofield-surface border border-echofield-border">
-                <h3 className="text-sm font-medium text-echofield-text-muted mb-3 uppercase tracking-wider">
+              <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+                <h3 className="text-sm font-medium text-ev-warm-gray mb-3 uppercase tracking-wider">
                   Noise Reduction
                 </h3>
-                <p className="text-3xl font-bold text-accent-teal">
+                <p className="text-3xl font-bold text-accent-savanna">
                   {metrics.noise_reduction_db.toFixed(1)}
-                  <span className="text-lg font-normal text-echofield-text-muted ml-1">dB</span>
+                  <span className="text-lg font-normal text-ev-warm-gray ml-1">dB</span>
                 </p>
               </div>
             )}
 
             {/* Recording Info */}
-            <div className="p-6 rounded-xl bg-echofield-surface border border-echofield-border">
-              <h3 className="text-sm font-medium text-echofield-text-muted mb-4 uppercase tracking-wider">
+            <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+              <h3 className="text-sm font-medium text-ev-warm-gray mb-4 uppercase tracking-wider">
                 Recording Info
               </h3>
               <dl className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <dt className="text-echofield-text-muted">ID</dt>
-                  <dd className="text-echofield-text-secondary font-mono text-xs">
+                  <dt className="text-ev-warm-gray">ID</dt>
+                  <dd className="text-ev-elephant font-mono text-xs">
                     {jobId.slice(0, 12)}...
                   </dd>
                 </div>
                 {recording?.duration && (
                   <div className="flex justify-between">
-                    <dt className="text-echofield-text-muted">Duration</dt>
-                    <dd className="text-echofield-text-primary">
+                    <dt className="text-ev-warm-gray">Duration</dt>
+                    <dd className="text-ev-charcoal">
                       {Math.floor(recording.duration / 60)}m {Math.floor(recording.duration % 60)}s
                     </dd>
                   </div>
                 )}
                 {recording?.sample_rate && (
                   <div className="flex justify-between">
-                    <dt className="text-echofield-text-muted">Sample Rate</dt>
-                    <dd className="text-echofield-text-primary">
+                    <dt className="text-ev-warm-gray">Sample Rate</dt>
+                    <dd className="text-ev-charcoal">
                       {(recording.sample_rate / 1000).toFixed(1)} kHz
                     </dd>
                   </div>
                 )}
                 {recording?.location && (
                   <div className="flex justify-between">
-                    <dt className="text-echofield-text-muted">Location</dt>
-                    <dd className="text-echofield-text-primary">{recording.location}</dd>
+                    <dt className="text-ev-warm-gray">Location</dt>
+                    <dd className="text-ev-charcoal">{recording.location}</dd>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <dt className="text-echofield-text-muted">Status</dt>
-                  <dd className="capitalize text-echofield-text-primary">
+                  <dt className="text-ev-warm-gray">Status</dt>
+                  <dd className="capitalize text-ev-charcoal">
                     {recording?.status || currentStage}
                   </dd>
                 </div>
@@ -618,7 +618,7 @@ export default function ProcessingPage() {
               <div className="space-y-3">
                 <Link
                   href={`/results/${jobId}`}
-                  className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-accent-teal text-echofield-bg font-semibold rounded-xl hover:bg-accent-teal/90 transition-colors"
+                  className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-accent-savanna text-ev-ivory font-semibold rounded-xl hover:bg-accent-savanna/90 transition-colors"
                 >
                   View Full Results
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -627,7 +627,7 @@ export default function ProcessingPage() {
                 </Link>
                 <Link
                   href={`/export?recording=${jobId}`}
-                  className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-echofield-surface-elevated text-echofield-text-primary font-medium rounded-xl hover:bg-echofield-border transition-colors"
+                  className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-background-elevated text-ev-charcoal font-medium rounded-xl hover:bg-ev-sand transition-colors"
                 >
                   Export Data
                 </Link>

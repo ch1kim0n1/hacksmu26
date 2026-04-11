@@ -26,21 +26,21 @@ export default function TimeAxis({
   });
 
   return (
-    <div className="flex justify-between px-16 pb-2 pt-1.5 border-t border-echofield-border">
+    <div className="flex justify-between px-16 pb-2 pt-1.5 border-t border-ev-sand">
       {ticks.map((t, i) => (
         <div key={i} className="flex flex-col items-center gap-0.5">
           <div
             className={cn(
               "shrink-0",
-              highContrast ? "w-px h-2 bg-echofield-text-muted" : "w-px h-1.5 bg-echofield-border"
+              highContrast ? "w-px h-2 bg-ev-warm-gray" : "w-px h-1.5 bg-ev-sand"
             )}
           />
           <span
             className={cn(
               "font-mono leading-none",
               highContrast
-                ? "text-xs text-echofield-text-secondary"
-                : "text-[10px] text-echofield-text-muted"
+                ? "text-xs text-ev-elephant"
+                : "text-[10px] text-ev-warm-gray"
             )}
           >
             {formatTime(t)}

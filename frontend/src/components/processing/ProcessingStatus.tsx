@@ -23,11 +23,11 @@ export default function ProcessingStatus({
   const displayName = STAGE_DISPLAY_NAMES[stage] || stage;
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-echofield-surface border border-echofield-border">
+    <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-ev-cream border border-ev-sand">
       {/* Spinning indicator */}
       <div className="w-4 h-4 shrink-0">
         <svg
-          className="animate-spin text-accent-teal"
+          className="animate-spin text-accent-savanna"
           viewBox="0 0 16 16"
           fill="none"
         >
@@ -49,20 +49,20 @@ export default function ProcessingStatus({
       </div>
 
       {/* Stage name */}
-      <span className="text-sm font-medium text-echofield-text-primary truncate">
+      <span className="text-sm font-medium text-ev-charcoal truncate">
         {displayName}
       </span>
 
       {/* Progress */}
-      <span className="text-xs font-mono text-accent-teal shrink-0">
+      <span className="text-xs font-mono text-accent-savanna shrink-0">
         {Math.round(progress)}%
       </span>
 
       {/* ETA */}
       {eta && (
         <>
-          <div className="w-px h-3 bg-echofield-border" />
-          <span className="text-xs text-echofield-text-muted shrink-0">
+          <div className="w-px h-3 bg-ev-sand" />
+          <span className="text-xs text-ev-warm-gray shrink-0">
             ETA: {eta}
           </span>
         </>

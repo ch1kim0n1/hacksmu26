@@ -20,12 +20,12 @@ export default function AudioControls({
   onDownload,
 }: AudioControlsProps) {
   return (
-    <div className="flex items-center gap-4 px-4 py-2 rounded-lg bg-echofield-surface border border-echofield-border">
+    <div className="flex items-center gap-4 px-4 py-2 rounded-lg bg-ev-cream border border-ev-sand">
       {/* Volume control */}
       <div className="flex items-center gap-2">
         <button
           onClick={() => onVolumeChange(volume > 0 ? 0 : 0.8)}
-          className="text-echofield-text-muted hover:text-echofield-text-primary transition-colors"
+          className="text-ev-warm-gray hover:text-ev-charcoal transition-colors"
           aria-label={volume > 0 ? "Mute" : "Unmute"}
         >
           <svg
@@ -66,18 +66,18 @@ export default function AudioControls({
           onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
           className="w-20 h-1 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #00D9FF ${volume * 100}%, #2A3A42 ${volume * 100}%)`,
+            background: `linear-gradient(to right, #C4A46C ${volume * 100}%, #D4CCC3 ${volume * 100}%)`,
           }}
           aria-label="Volume"
         />
       </div>
 
       {/* Divider */}
-      <div className="w-px h-5 bg-echofield-border" />
+      <div className="w-px h-5 bg-ev-sand" />
 
       {/* Playback speed */}
       <div className="flex items-center gap-1">
-        <span className="text-[10px] text-echofield-text-muted uppercase tracking-wide mr-1">
+        <span className="text-[10px] text-ev-warm-gray uppercase tracking-wide mr-1">
           Speed
         </span>
         {SPEED_OPTIONS.map((rate) => (
@@ -86,8 +86,8 @@ export default function AudioControls({
             onClick={() => onPlaybackRateChange(rate)}
             className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
               playbackRate === rate
-                ? "bg-accent-teal/20 text-accent-teal"
-                : "text-echofield-text-muted hover:text-echofield-text-secondary"
+                ? "bg-accent-savanna/20 text-accent-savanna"
+                : "text-ev-warm-gray hover:text-ev-elephant"
             }`}
           >
             {rate}x
@@ -96,12 +96,12 @@ export default function AudioControls({
       </div>
 
       {/* Divider */}
-      <div className="w-px h-5 bg-echofield-border" />
+      <div className="w-px h-5 bg-ev-sand" />
 
       {/* Download button */}
       <button
         onClick={onDownload}
-        className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium text-echofield-text-secondary hover:text-echofield-text-primary border border-echofield-border hover:border-echofield-text-muted transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium text-ev-elephant hover:text-ev-charcoal border border-ev-sand hover:border-ev-warm-gray transition-colors"
         aria-label="Download audio"
       >
         <svg
