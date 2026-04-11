@@ -19,6 +19,11 @@ export interface Recording {
     progress_pct: number;
     current_stage?: string | null;
   };
+  call_id?: string;
+  animal_id?: string;
+  noise_type_ref?: string;
+  start_sec?: number;
+  end_sec?: number;
 }
 
 export interface RecordingListResponse {
@@ -65,6 +70,7 @@ export interface UploadResponse {
 
 function normalizeRecording(recording: Recording): Recording {
   const metadataSampleRate = Number(recording.metadata?.sample_rate ?? 0);
+  const meta = recording.metadata;
   return {
     ...recording,
     duration: recording.duration_s,
@@ -73,7 +79,12 @@ function normalizeRecording(recording: Recording): Recording {
     sample_rate:
       recording.sample_rate ??
       (metadataSampleRate > 0 ? metadataSampleRate : undefined),
-    location: recording.location ?? (recording.metadata?.location as string | undefined),
+    location: recording.location ?? (meta?.location as string | undefined),
+    call_id: recording.call_id ?? (meta?.call_id as string | undefined),
+    animal_id: recording.animal_id ?? (meta?.animal_id as string | undefined),
+    noise_type_ref: recording.noise_type_ref ?? (meta?.noise_type_ref as string | undefined),
+    start_sec: recording.start_sec ?? (typeof meta?.start_sec === "number" ? meta.start_sec : undefined),
+    end_sec: recording.end_sec ?? (typeof meta?.end_sec === "number" ? meta.end_sec : undefined),
   };
 }
 

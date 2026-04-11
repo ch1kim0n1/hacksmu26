@@ -10,6 +10,7 @@ import {
   downloadRecording,
   type Recording,
 } from "@/lib/audio-api";
+import { AnalysisLabelsBadge } from "@/components/research/AnalysisLabels";
 
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; dot?: string }> = {
@@ -405,9 +406,12 @@ export default function UploadPage() {
                         </svg>
                       </div>
                       <div className="min-w-0">
-                        <p className="font-medium text-ev-charcoal truncate">
-                          {rec.filename}
-                        </p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-ev-charcoal truncate">
+                            {rec.filename}
+                          </p>
+                          <AnalysisLabelsBadge recording={rec} />
+                        </div>
                         <div className="flex items-center gap-3 text-sm text-ev-warm-gray mt-0.5">
                           <span>{formatDuration(rec.duration)}</span>
                           <span>&middot;</span>
