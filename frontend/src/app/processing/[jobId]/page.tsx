@@ -9,6 +9,8 @@ interface ProcessingUpdate {
   stage: string;
   progress: number;
   message?: string;
+  status?: string;
+  spectrogram_url?: string;
   metrics?: {
     snr_before?: number;
     snr_after?: number;
@@ -163,10 +165,37 @@ export default function ProcessingPage() {
 
     ws.onmessage = (event) => {
       try {
-        const data: ProcessingUpdate = JSON.parse(event.data);
-        setWsUpdate(data);
+        const raw = JSON.parse(event.data) as {
+          type?: string;
+          data?: Record<string, unknown>;
+          status?: string;
+          progress?: number;
+          stage?: string;
+        };
 
-        if (data.stage === "complete") {
+        const normalized: ProcessingUpdate = raw.data
+          ? {
+              stage:
+                (raw.data.stage as string) ||
+                (raw.type === "PROCESSING_COMPLETE" ? "complete" : raw.type?.toLowerCase() || "processing"),
+              progress: (raw.data.progress as number) ?? 0,
+              status: raw.data.status as string | undefined,
+              spectrogram_url: raw.data.spectrogram_url as string | undefined,
+              metrics:
+                raw.type === "QUALITY_SCORE"
+                  ? {
+                      snr_before: raw.data.snr_before as number | undefined,
+                      snr_after: raw.data.snr_after as number | undefined,
+                      quality_score: raw.data.score as number | undefined,
+                      noise_reduction_db: raw.data.improvement as number | undefined,
+                    }
+                  : undefined,
+            }
+          : (raw as ProcessingUpdate);
+
+        setWsUpdate(normalized);
+
+        if (normalized.stage === "complete") {
           fetchData();
         }
       } catch {
