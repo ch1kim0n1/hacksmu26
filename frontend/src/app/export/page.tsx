@@ -160,7 +160,7 @@ function ExportPageInner() {
     try {
       if (selectedFormat === "wav" || selectedFormat === "png") {
         // For audio/image formats, download the first selected recording directly
-        const id = [...selectedIds][0];
+        const id = Array.from(selectedIds)[0];
         const url =
           selectedFormat === "wav"
             ? `${API_BASE}/api/recordings/${id}/audio?type=cleaned`
@@ -177,7 +177,7 @@ function ExportPageInner() {
       } else {
         const result = await exportResearch({
           format: selectedFormat,
-          recording_ids: [...selectedIds],
+          recording_ids: Array.from(selectedIds),
         });
         setExportResult({
           url: result.download_url,
