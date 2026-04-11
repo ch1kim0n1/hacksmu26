@@ -6,21 +6,30 @@ services:
       context: .
       dockerfile: Dockerfile.backend
     container_name: echofield-backend
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     environment:
-      - ECHOFIELD_AUDIO_DIR=/app/data/recordings
-      - ECHOFIELD_PROCESSED_DIR=/app/data/processed
-      - ECHOFIELD_SPECTROGRAM_DIR=/app/data/spectrograms
-      - ECHOFIELD_METADATA_FILE=/app/data/metadata.csv
-      - ECHOFIELD_CONFIG_FILE=/app/config/echofield.config.yml
-      - ECHOFIELD_LOG_LEVEL=INFO
-      - ECHOFIELD_DEMO_MODE=true
+      ECHOFIELD_AUDIO_DIR: /app/data/recordings
+      ECHOFIELD_PROCESSED_DIR: /app/data/processed
+      ECHOFIELD_SPECTROGRAM_DIR: /app/data/spectrograms
+      ECHOFIELD_CACHE_DIR: /app/data/cache
+      ECHOFIELD_METADATA_FILE: /app/data/metadata.csv
+      ECHOFIELD_CONFIG_FILE: /app/config/echofield.config.yml
+      ECHOFIELD_MODEL_PATH: /app/models/echofield-denoise-v1.pt
+      ECHOFIELD_LOG_LEVEL: INFO
+      ECHOFIELD_DEMO_MODE: "true"
     volumes:
       - ./data/recordings:/app/data/recordings
       - ./data/processed:/app/data/processed
       - ./data/spectrograms:/app/data/spectrograms
+      - ./data/cache:/app/data/cache
       - ./config:/app/config
+      - ./models:/app/models
+      - ./echofield:/app/echofield
+      - ./.env:/app/.env:ro
+    command: ["python", "-m", "echofield"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -35,10 +44,15 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_WS_URL: ws://localhost:8000/ws
     depends_on:
       backend:
         condition: service_healthy
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]
 
 networks:
   default:

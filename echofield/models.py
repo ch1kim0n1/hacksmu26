@@ -1,4 +1,5 @@
 """Pydantic models shared by the EchoField API and pipeline."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -88,7 +89,6 @@ class QualityMetrics(EchoBaseModel):
 
 
 class CallDetail(EchoBaseModel):
-    """A single detected elephant vocalization within a recording."""
     id: str
     recording_id: str
     animal_id: str | None = None
@@ -110,6 +110,13 @@ class CallListResponse(EchoBaseModel):
     returned: int
     offset: int
     calls: list[CallDetail]
+    start_ms: float = Field(ge=0.0)
+    duration_ms: float = Field(ge=0.0)
+    frequency_min_hz: float = Field(ge=0.0)
+    frequency_max_hz: float = Field(ge=0.0)
+    call_type: str
+    confidence: float = Field(ge=0.0, le=1.0)
+    acoustic_features: dict[str, Any] = Field(default_factory=dict)
 
 
 class ProcessingResult(EchoBaseModel):

@@ -1,14 +1,19 @@
-"""Entry point for `python -m echofield`."""
+"""Entry point for ``python -m echofield``."""
+
+from __future__ import annotations
 
 import uvicorn
 
+from echofield.config import get_settings
 
-def main():
+
+def main() -> None:
+    settings = get_settings()
     uvicorn.run(
         "echofield.server:app",
         host="0.0.0.0",
-        port=8000,
-        reload=True,
+        port=settings.API_PORT,
+        reload=settings.DEMO_MODE,
     )
 
 

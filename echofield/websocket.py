@@ -1,6 +1,8 @@
-"""WebSocket manager for real-time processing updates."""
+"""WebSocket connection manager for real-time processing updates."""
 
-import json
+from __future__ import annotations
+
+import asyncio
 from datetime import datetime, timezone
 from typing import Any
 
@@ -8,100 +10,122 @@ from fastapi import WebSocket
 
 
 class ConnectionManager:
-    """Manages WebSocket connections for real-time processing events."""
-
-    def __init__(self):
-        # recording_id -> set of WebSocket connections
+    def __init__(self) -> None:
         self._recording_connections: dict[str, set[WebSocket]] = {}
-        # Global feed connections
         self._global_connections: set[WebSocket] = set()
+        self._sequences: dict[str, int] = {}
 
-    async def connect_recording(self, websocket: WebSocket, recording_id: str):
-        """Accept and register a per-recording connection."""
+    async def connect_recording(self, websocket: WebSocket, recording_id: str) -> None:
         await websocket.accept()
-        if recording_id not in self._recording_connections:
-            self._recording_connections[recording_id] = set()
-        self._recording_connections[recording_id].add(websocket)
+        self._recording_connections.setdefault(recording_id, set()).add(websocket)
 
-    async def connect_global(self, websocket: WebSocket):
-        """Accept and register a global feed connection."""
+    async def connect_global(self, websocket: WebSocket) -> None:
         await websocket.accept()
         self._global_connections.add(websocket)
 
-    def disconnect_recording(self, websocket: WebSocket, recording_id: str):
-        """Remove a per-recording connection."""
-        if recording_id in self._recording_connections:
-            self._recording_connections[recording_id].discard(websocket)
-            if not self._recording_connections[recording_id]:
-                del self._recording_connections[recording_id]
+    def disconnect_recording(self, websocket: WebSocket, recording_id: str) -> None:
+        peers = self._recording_connections.get(recording_id)
+        if not peers:
+            return
+        peers.discard(websocket)
+        if not peers:
+            self._recording_connections.pop(recording_id, None)
 
-    def disconnect_global(self, websocket: WebSocket):
-        """Remove a global feed connection."""
+    def disconnect_global(self, websocket: WebSocket) -> None:
         self._global_connections.discard(websocket)
 
-    async def broadcast(self, recording_id: str, event_type: str, data: dict[str, Any]):
-        """Send event to all subscribers of a recording and global feed."""
-        message = {
+    def _message(self, recording_id: str, event_type: str, data: dict[str, Any]) -> dict[str, Any]:
+        sequence = self._sequences.get(recording_id, 0) + 1
+        self._sequences[recording_id] = sequence
+        return {
             "type": event_type,
             "recording_id": recording_id,
             "data": data,
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "sequence": sequence,
         }
-        payload = json.dumps(message)
 
-        # Send to recording-specific subscribers
-        dead = []
-        for ws in self._recording_connections.get(recording_id, set()):
+    async def broadcast(self, recording_id: str, event_type: str, data: dict[str, Any]) -> None:
+        message = self._message(recording_id, event_type, data)
+        dead_recording: list[WebSocket] = []
+        for websocket in self._recording_connections.get(recording_id, set()):
             try:
-                await ws.send_text(payload)
+                await websocket.send_json(message)
             except Exception:
-                dead.append(ws)
-        for ws in dead:
-            self.disconnect_recording(ws, recording_id)
+                dead_recording.append(websocket)
+        for websocket in dead_recording:
+            self.disconnect_recording(websocket, recording_id)
 
-        # Send to global feed subscribers
-        dead = []
-        for ws in self._global_connections:
+        dead_global: list[WebSocket] = []
+        for websocket in self._global_connections:
             try:
-                await ws.send_text(payload)
+                await websocket.send_json(message)
             except Exception:
-                dead.append(ws)
-        for ws in dead:
-            self.disconnect_global(ws)
+                dead_global.append(websocket)
+        for websocket in dead_global:
+            self.disconnect_global(websocket)
 
-    async def send_processing_started(self, recording_id: str):
-        await self.broadcast(recording_id, "PROCESSING_STARTED", {
-            "recording_id": recording_id,
-        })
+    async def send_processing_started(self, recording_id: str, method: str) -> None:
+        await self.broadcast(
+            recording_id,
+            "PROCESSING_STARTED",
+            {"recording_id": recording_id, "method": method},
+        )
 
-    async def send_stage_update(self, recording_id: str, stage: str, progress: int):
-        await self.broadcast(recording_id, "STAGE_UPDATE", {
-            "stage": stage,
-            "progress": progress,
-        })
+    async def send_stage_update(
+        self,
+        recording_id: str,
+        stage: str,
+        status: str,
+        progress: int,
+        extra: dict[str, Any] | None = None,
+    ) -> None:
+        payload = {"stage": stage, "status": status, "progress": progress}
+        if extra:
+            payload.update(extra)
+        await self.broadcast(recording_id, "STAGE_UPDATE", payload)
 
-    async def send_spectrogram_update(self, recording_id: str, spectrogram_url: str):
-        await self.broadcast(recording_id, "SPECTROGRAM_UPDATE", {
-            "spectrogram_url": spectrogram_url,
-        })
+    async def send_noise_classified(self, recording_id: str, noise_type: str, confidence: float, frequency_range: list[float]) -> None:
+        await self.broadcast(
+            recording_id,
+            "NOISE_CLASSIFIED",
+            {
+                "noise_type": noise_type,
+                "confidence": confidence,
+                "frequency_range": frequency_range,
+            },
+        )
 
-    async def send_noise_classified(self, recording_id: str, noise_type: str, confidence: float):
-        await self.broadcast(recording_id, "NOISE_CLASSIFIED", {
-            "noise_type": noise_type,
-            "confidence": confidence,
-        })
+    async def send_spectrogram_update(self, recording_id: str, spectrogram_url: str, variant: str) -> None:
+        await self.broadcast(
+            recording_id,
+            "SPECTROGRAM_UPDATE",
+            {"spectrogram_url": spectrogram_url, "variant": variant},
+        )
 
-    async def send_quality_score(self, recording_id: str, metrics: dict):
-        await self.broadcast(recording_id, "QUALITY_SCORE", metrics)
+    async def send_quality_score(self, recording_id: str, metrics: dict[str, Any]) -> None:
+        payload = dict(metrics)
+        payload.setdefault("snr_before", metrics.get("snr_before_db"))
+        payload.setdefault("snr_after", metrics.get("snr_after_db"))
+        payload.setdefault("improvement", metrics.get("snr_improvement_db"))
+        payload.setdefault("score", metrics.get("quality_score"))
+        await self.broadcast(recording_id, "QUALITY_SCORE", payload)
 
-    async def send_processing_complete(self, recording_id: str, result: dict):
+    async def send_processing_complete(self, recording_id: str, result: dict[str, Any]) -> None:
         await self.broadcast(recording_id, "PROCESSING_COMPLETE", result)
 
-    async def send_processing_failed(self, recording_id: str, error: str):
-        await self.broadcast(recording_id, "PROCESSING_FAILED", {
-            "error": error,
-        })
+    async def send_processing_failed(self, recording_id: str, error: str) -> None:
+        await self.broadcast(recording_id, "PROCESSING_FAILED", {"error": error})
+
+    async def heartbeat(self, websocket: WebSocket) -> None:
+        while True:
+            await asyncio.sleep(15)
+            await websocket.send_json(
+                {
+                    "type": "PING",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+            )
 
 
-# Global singleton
 manager = ConnectionManager()
