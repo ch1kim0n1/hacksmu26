@@ -3,41 +3,37 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import useProcessingJob from "@/hooks/useProcessingJob";
 import { getRecording, API_BASE, type Recording } from "@/lib/audio-api";
 import { AnalysisLabels, AnalysisWindow } from "@/components/research/AnalysisLabels";
 
-interface ProcessingUpdate {
-  stage: string;
-  progress: number;
-  message?: string;
-  status?: string;
-  spectrogram_url?: string;
-  metrics?: {
-    snr_before?: number;
-    snr_after?: number;
-    quality_score?: number;
-    noise_reduction_db?: number;
-  };
+interface ProcessingMetrics {
+  snr_before?: number;
+  snr_after?: number;
+  quality_score?: number;
+  noise_reduction_db?: number;
 }
 
 const STAGES = [
-  { key: "upload", label: "Uploaded" },
-  { key: "preprocessing", label: "Preprocessing" },
-  { key: "spectral_analysis", label: "Spectral Analysis" },
+  { key: "ingestion", label: "Ingestion" },
+  { key: "spectrogram", label: "Spectrogram" },
+  { key: "noise_classification", label: "Noise Classification" },
   { key: "noise_removal", label: "Noise Removal" },
-  { key: "call_detection", label: "Call Detection" },
+  { key: "feature_extraction", label: "Feature Extraction" },
+  { key: "quality_assessment", label: "Quality Assessment" },
   { key: "complete", label: "Complete" },
 ];
 
 function ProcessingTimeline({ currentStage }: { currentStage: string }) {
   const currentIndex = STAGES.findIndex((s) => s.key === currentStage);
+  const activeIndex = currentIndex >= 0 ? currentIndex : 0;
 
   return (
     <div className="flex items-center gap-1 w-full overflow-x-auto pb-2">
       {STAGES.map((stage, i) => {
-        const isComplete = i < currentIndex;
-        const isCurrent = i === currentIndex;
-        const isPending = i > currentIndex;
+        const isComplete = i < activeIndex || currentStage === "complete";
+        const isCurrent = i === activeIndex && currentStage !== "complete";
+        const isPending = i > activeIndex && currentStage !== "complete";
 
         return (
           <div key={stage.key} className="flex items-center flex-1 min-w-0">
@@ -122,19 +118,15 @@ function QualityBadge({ score }: { score: number }) {
 export default function ProcessingPage() {
   const params = useParams();
   const jobId = params.jobId as string;
+  const processing = useProcessingJob(jobId || null);
 
   const [recording, setRecording] = useState<Recording | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [wsUpdate, setWsUpdate] = useState<ProcessingUpdate | null>(null);
-  const [wsConnected, setWsConnected] = useState(false);
-
   const [sliderPosition, setSliderPosition] = useState(50);
   const sliderRef = useRef<HTMLDivElement>(null);
   const isDraggingSlider = useRef(false);
-
-  const wsRef = useRef<WebSocket | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -152,71 +144,11 @@ export default function ProcessingPage() {
     fetchData();
   }, [fetchData]);
 
-  // WebSocket connection for live updates
   useEffect(() => {
-    if (!jobId) return;
-
-    const wsUrl = `ws://localhost:8000/ws/processing/${jobId}`;
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      setWsConnected(true);
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const raw = JSON.parse(event.data) as {
-          type?: string;
-          data?: Record<string, unknown>;
-          status?: string;
-          progress?: number;
-          stage?: string;
-        };
-
-        const normalized: ProcessingUpdate = raw.data
-          ? {
-              stage:
-                (raw.data.stage as string) ||
-                (raw.type === "PROCESSING_COMPLETE" ? "complete" : raw.type?.toLowerCase() || "processing"),
-              progress: (raw.data.progress as number) ?? 0,
-              status: raw.data.status as string | undefined,
-              spectrogram_url: raw.data.spectrogram_url as string | undefined,
-              metrics:
-                raw.type === "QUALITY_SCORE"
-                  ? {
-                      snr_before: raw.data.snr_before as number | undefined,
-                      snr_after: raw.data.snr_after as number | undefined,
-                      quality_score: raw.data.score as number | undefined,
-                      noise_reduction_db: raw.data.improvement as number | undefined,
-                    }
-                  : undefined,
-            }
-          : (raw as ProcessingUpdate);
-
-        setWsUpdate(normalized);
-
-        if (normalized.stage === "complete") {
-          fetchData();
-        }
-      } catch {
-        // ignore parse errors
-      }
-    };
-
-    ws.onerror = () => {
-      setWsConnected(false);
-    };
-
-    ws.onclose = () => {
-      setWsConnected(false);
-    };
-
-    return () => {
-      ws.close();
-      wsRef.current = null;
-    };
-  }, [jobId, fetchData]);
+    if (processing.status === "complete") {
+      fetchData();
+    }
+  }, [processing.status, fetchData]);
 
   // Slider drag handling
   const handleSliderMove = useCallback((clientX: number) => {
@@ -252,19 +184,46 @@ export default function ProcessingPage() {
     };
   }, [handleSliderMove]);
 
-  const currentStage = wsUpdate?.stage || recording?.status || "pending";
-  const isProcessing = currentStage === "processing" || (
-    currentStage !== "complete" && currentStage !== "failed" && currentStage !== "pending"
-  );
-  const isComplete = recording?.status === "complete" || currentStage === "complete";
-  const isFailed = recording?.status === "failed" || currentStage === "failed";
+  const currentStage =
+    recording?.status === "complete"
+      ? "complete"
+      : processing.currentStage || recording?.processing?.current_stage || recording?.status || "pending";
+  const progress =
+    recording?.status === "complete"
+      ? 100
+      : Math.max(processing.progress, Number(recording?.processing?.progress_pct ?? 0));
+  const isComplete = recording?.status === "complete" || processing.status === "complete";
+  const isProcessing =
+    !isComplete &&
+    (recording?.status === "processing" ||
+      processing.status === "processing" ||
+      processing.status === "connecting");
+  const isFailed = recording?.status === "failed" || processing.status === "error";
 
   const spectrogramBefore = `${API_BASE}/api/recordings/${jobId}/spectrogram?type=before`;
   const spectrogramAfter = `${API_BASE}/api/recordings/${jobId}/spectrogram?type=after`;
   const audioOriginal = `${API_BASE}/api/recordings/${jobId}/audio?type=original`;
   const audioCleaned = `${API_BASE}/api/recordings/${jobId}/audio?type=cleaned`;
 
-  const metrics = wsUpdate?.metrics || (recording?.metadata as ProcessingUpdate["metrics"]);
+  const metricsFromLive: ProcessingMetrics | null = processing.quality
+    ? {
+        snr_before: processing.quality.snr_before,
+        snr_after: processing.quality.snr_after,
+        quality_score: processing.quality.score,
+        noise_reduction_db: processing.quality.improvement,
+      }
+    : null;
+  const quality = recording?.result?.quality;
+  const metricsFromResult: ProcessingMetrics | null = quality
+    ? {
+        snr_before: quality.snr_before_db,
+        snr_after: quality.snr_after_db,
+        quality_score: quality.quality_score,
+        noise_reduction_db: quality.snr_improvement_db,
+      }
+    : null;
+  const metrics = metricsFromLive || metricsFromResult;
+  const currentStageLabel = STAGES.find((stage) => stage.key === currentStage)?.label || "Processing";
 
   if (loading) {
     return (
@@ -313,15 +272,15 @@ export default function ProcessingPage() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {wsConnected && (
+            {(processing.status === "processing" || processing.status === "connecting") && (
               <span className="inline-flex items-center gap-1.5 text-xs text-success">
                 <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
                 Live
               </span>
             )}
-            {isProcessing && wsUpdate && (
+            {isProcessing && (
               <span className="text-sm text-ev-elephant">
-                {wsUpdate.message || `${Math.round(wsUpdate.progress)}% complete`}
+                {`${Math.round(progress)}% complete`}
               </span>
             )}
           </div>
@@ -330,16 +289,16 @@ export default function ProcessingPage() {
         {/* Processing Timeline */}
         <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand mb-8">
           <ProcessingTimeline currentStage={currentStage} />
-          {isProcessing && wsUpdate && (
+          {isProcessing && (
             <div className="mt-4">
               <div className="h-2 bg-background-elevated rounded-full overflow-hidden">
                 <div
                   className="h-full bg-accent-savanna rounded-full transition-all duration-500"
-                  style={{ width: `${wsUpdate.progress}%` }}
+                  style={{ width: `${progress}%` }}
                 />
               </div>
               <p className="text-xs text-ev-warm-gray mt-2">
-                {wsUpdate.message || "Processing..."}
+                Current stage: {currentStageLabel}
               </p>
             </div>
           )}
@@ -603,6 +562,36 @@ export default function ProcessingPage() {
                   <div className="flex justify-between">
                     <dt className="text-ev-warm-gray">Location</dt>
                     <dd className="text-ev-charcoal">{recording.location}</dd>
+                  </div>
+                )}
+                {recording?.metadata?.animal_id && (
+                  <div className="flex justify-between">
+                    <dt className="text-ev-warm-gray">Animal ID</dt>
+                    <dd className="text-ev-charcoal">{recording.metadata.animal_id}</dd>
+                  </div>
+                )}
+                {recording?.metadata?.call_id && (
+                  <div className="flex justify-between">
+                    <dt className="text-ev-warm-gray">Call ID</dt>
+                    <dd className="text-ev-charcoal">{recording.metadata.call_id}</dd>
+                  </div>
+                )}
+                {recording?.metadata?.noise_type_ref && (
+                  <div className="flex justify-between">
+                    <dt className="text-ev-warm-gray">Ref Noise</dt>
+                    <dd className="text-ev-charcoal capitalize">
+                      {recording.metadata.noise_type_ref}
+                    </dd>
+                  </div>
+                )}
+                {(recording?.metadata?.start_sec !== undefined ||
+                  recording?.metadata?.end_sec !== undefined) && (
+                  <div className="flex justify-between">
+                    <dt className="text-ev-warm-gray">Window</dt>
+                    <dd className="text-ev-charcoal">
+                      {recording?.metadata?.start_sec?.toFixed(2) ?? "0.00"}s -{" "}
+                      {recording?.metadata?.end_sec?.toFixed(2) ?? "--"}s
+                    </dd>
                   </div>
                 )}
                 <div className="flex justify-between">

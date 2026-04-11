@@ -16,6 +16,7 @@ def _reload_server(monkeypatch, tmp_path: Path):
     monkeypatch.setenv("ECHOFIELD_PROCESSED_DIR", str(tmp_path / "processed"))
     monkeypatch.setenv("ECHOFIELD_SPECTROGRAM_DIR", str(tmp_path / "spectrograms"))
     monkeypatch.setenv("ECHOFIELD_CACHE_DIR", str(tmp_path / "cache"))
+    monkeypatch.setenv("ECHOFIELD_CATALOG_FILE", str(tmp_path / "cache" / "recording_catalog.json"))
     monkeypatch.setenv("ECHOFIELD_METADATA_FILE", str(tmp_path / "metadata.csv"))
     monkeypatch.setenv("ECHOFIELD_CONFIG_FILE", str(config_path))
     monkeypatch.setenv("ECHOFIELD_DEMO_MODE", "false")
@@ -81,3 +82,92 @@ def test_server_preloads_analysis_metadata(monkeypatch, tmp_path: Path) -> None:
     assert metadata["noise_type_ref"] == "vehicle"
     assert metadata["start_sec"] == 0.0
     assert metadata["end_sec"] == 1.0
+
+
+def test_recording_status_endpoint(monkeypatch, tmp_path: Path) -> None:
+    server_module = _reload_server(monkeypatch, tmp_path)
+
+    sr = 44_100
+    t = np.linspace(0, 1, sr, endpoint=False)
+    waveform = (0.2 * np.sin(2 * np.pi * 18 * t)).astype(np.float32)
+    upload_source = tmp_path / "upload.wav"
+    sf.write(upload_source, waveform, sr)
+
+    with TestClient(server_module.app) as client:
+        with upload_source.open("rb") as handle:
+            response = client.post(
+                "/api/upload",
+                files={"file": ("upload.wav", handle, "audio/wav")},
+            )
+        recording_id = response.json()["recording_ids"][0]
+
+        status_response = client.get(f"/api/recordings/{recording_id}/status")
+
+    assert status_response.status_code == 200
+    payload = status_response.json()
+    assert payload["id"] == recording_id
+    assert payload["status"] == "pending"
+    assert payload["progress_pct"] == 0
+
+
+def test_recordings_persist_across_restart(monkeypatch, tmp_path: Path) -> None:
+    server_module = _reload_server(monkeypatch, tmp_path)
+
+    sr = 44_100
+    t = np.linspace(0, 1, sr, endpoint=False)
+    waveform = (0.2 * np.sin(2 * np.pi * 18 * t)).astype(np.float32)
+    upload_source = tmp_path / "upload.wav"
+    spectrogram_path = tmp_path / "spec.png"
+    sf.write(upload_source, waveform, sr)
+    spectrogram_path.write_bytes(b"PNG")
+
+    with TestClient(server_module.app) as client:
+        with upload_source.open("rb") as handle:
+            response = client.post(
+                "/api/upload",
+                files={"file": ("upload.wav", handle, "audio/wav")},
+            )
+        assert response.status_code == 201
+        recording_id = response.json()["recording_ids"][0]
+
+    store = server_module.app.state.store
+    store.update_result(
+        recording_id,
+        {
+            "recording_id": recording_id,
+            "status": "complete",
+            "stages_completed": ["complete"],
+            "noise_types": [],
+            "quality": {
+                "snr_before_db": 1.0,
+                "snr_after_db": 2.0,
+                "snr_improvement_db": 1.0,
+                "spectral_distortion": 0.1,
+                "energy_preservation": 0.9,
+                "quality_score": 80.0,
+                "quality_rating": "good",
+                "flagged_for_review": False,
+            },
+            "calls": [],
+            "processing_time_s": 0.1,
+            "output_audio_path": str(upload_source),
+            "spectrogram_before_path": str(spectrogram_path),
+            "spectrogram_after_path": str(spectrogram_path),
+            "comparison_spectrogram_path": str(spectrogram_path),
+        },
+    )
+    store.update_status(recording_id, "complete", progress=100, current_stage="complete")
+
+    reloaded_server_module = _reload_server(monkeypatch, tmp_path)
+    with TestClient(reloaded_server_module.app) as client:
+        listing = client.get("/api/recordings")
+        detail = client.get(f"/api/recordings/{recording_id}")
+        cleaned_audio = client.get(f"/api/recordings/{recording_id}/audio?type=cleaned")
+        spectrogram = client.get(f"/api/recordings/{recording_id}/spectrogram?type=after")
+
+    assert listing.status_code == 200
+    assert detail.status_code == 200
+    assert cleaned_audio.status_code == 200
+    assert spectrogram.status_code == 200
+    assert any(item["id"] == recording_id and item["status"] == "complete" for item in listing.json()["recordings"])
+    assert detail.json()["result"]["quality"]["quality_score"] == 80.0

@@ -33,6 +33,9 @@ dev = [
     "flake8>=6.0.0",
 ]
 
+[project.scripts]
+app = "echofield.server:app"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["echofield*"]

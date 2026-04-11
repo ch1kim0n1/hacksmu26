@@ -224,6 +224,9 @@ export default function DatabasePage() {
                     <p className="font-mono text-xs text-ev-warm-gray mb-1">
                       {call.id.slice(0, 12)}...
                     </p>
+                    {call.call_id && call.call_id !== call.id && (
+                      <p className="text-xs text-ev-warm-gray">Call: {call.call_id}</p>
+                    )}
                     <p className="text-xs text-ev-warm-gray">
                       Rec: {call.recording_id.slice(0, 8)}...
                     </p>
@@ -258,6 +261,18 @@ export default function DatabasePage() {
                     <p className="text-ev-warm-gray text-xs">Start</p>
                     <p className="text-ev-charcoal font-medium">
                       {call.start_time.toFixed(2)}s
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-ev-warm-gray text-xs">Animal ID</p>
+                    <p className="text-ev-charcoal font-medium">
+                      {call.animal_id || "Unknown"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-ev-warm-gray text-xs">Ref Noise</p>
+                    <p className="text-ev-charcoal font-medium capitalize">
+                      {call.noise_type_ref || "Unknown"}
                     </p>
                   </div>
                 </div>

@@ -96,12 +96,20 @@ class QualityMetrics(EchoBaseModel):
 class CallDetail(EchoBaseModel):
     id: str
     recording_id: str
+    call_id: str | None = None
+    animal_id: str | None = None
+    noise_type_ref: str | None = None
+    start_sec: float | None = Field(default=None, ge=0.0)
+    end_sec: float | None = Field(default=None, ge=0.0)
     start_ms: float = Field(ge=0.0)
     duration_ms: float = Field(ge=0.0)
     frequency_min_hz: float = Field(ge=0.0)
     frequency_max_hz: float = Field(ge=0.0)
     call_type: str
     confidence: float = Field(ge=0.0, le=1.0)
+    location: str | None = None
+    date: str | None = None
+    species: str | None = None
     acoustic_features: dict[str, Any] = Field(default_factory=dict)
     metadata: dict[str, Any] = Field(default_factory=dict)
 

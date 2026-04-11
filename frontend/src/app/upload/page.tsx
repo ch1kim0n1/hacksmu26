@@ -68,6 +68,7 @@ export default function UploadPage() {
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
 
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+  const [enhanceWithAI, setEnhanceWithAI] = useState(true);
 
   const fetchRecordings = useCallback(async () => {
     try {
@@ -172,7 +173,9 @@ export default function UploadPage() {
   const handleProcess = async (id: string) => {
     setProcessingIds((prev) => new Set(prev).add(id));
     try {
-      await processRecording(id);
+      await processRecording(id, {
+        method: enhanceWithAI ? "hybrid" : "spectral",
+      });
       await fetchRecordings();
       router.push(`/processing/${id}`);
     } catch (err) {
@@ -324,6 +327,27 @@ export default function UploadPage() {
           <h2 className="text-2xl font-bold text-ev-charcoal mb-6">
             Your Recordings
           </h2>
+          <div className="mb-4 inline-flex items-center gap-3 rounded-lg border border-ev-sand bg-ev-cream px-4 py-2">
+            <span className="text-sm text-ev-elephant">Enhance with AI</span>
+            <button
+              type="button"
+              onClick={() => setEnhanceWithAI((prev) => !prev)}
+              className={`relative h-6 w-11 rounded-full transition-colors ${
+                enhanceWithAI ? "bg-success" : "bg-ev-warm-gray/40"
+              }`}
+              aria-pressed={enhanceWithAI}
+              aria-label="Toggle AI enhancement"
+            >
+              <span
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
+                  enhanceWithAI ? "translate-x-5" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+            <span className="text-xs text-ev-warm-gray">
+              {enhanceWithAI ? "Hybrid (spectral + AI)" : "Spectral only"}
+            </span>
+          </div>
 
           {loading ? (
             <div className="grid gap-4">
@@ -421,6 +445,29 @@ export default function UploadPage() {
                               <span>&middot;</span>
                               <span>{(rec.sample_rate / 1000).toFixed(1)} kHz</span>
                             </>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
+                          {rec.metadata?.animal_id && (
+                            <span className="px-2 py-0.5 rounded-md bg-background-elevated text-ev-elephant">
+                              Animal: {rec.metadata.animal_id}
+                            </span>
+                          )}
+                          {rec.metadata?.noise_type_ref && (
+                            <span className="px-2 py-0.5 rounded-md bg-accent-savanna/10 text-accent-savanna">
+                              Noise: {rec.metadata.noise_type_ref}
+                            </span>
+                          )}
+                          {rec.metadata?.call_id && (
+                            <span className="px-2 py-0.5 rounded-md bg-ev-warm-gray/15 text-ev-elephant">
+                              Call: {rec.metadata.call_id}
+                            </span>
+                          )}
+                          {(rec.metadata?.start_sec !== undefined ||
+                            rec.metadata?.end_sec !== undefined) && (
+                            <span className="px-2 py-0.5 rounded-md bg-ev-warm-gray/10 text-ev-warm-gray">
+                              Window: {rec.metadata?.start_sec?.toFixed(2) ?? "0.00"}s - {rec.metadata?.end_sec?.toFixed(2) ?? "--"}s
+                            </span>
                           )}
                         </div>
                       </div>

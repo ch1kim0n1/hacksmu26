@@ -86,6 +86,7 @@ class Config:
     PROCESSED_DIR: str = "./data/processed"
     SPECTROGRAM_DIR: str = "./data/spectrograms"
     CACHE_DIR: str = "./data/cache"
+    CATALOG_FILE: str = "./data/cache/recording_catalog.json"
     METADATA_FILE: str = "./data/metadata.csv"
     CONFIG_FILE: str = "./config/echofield.config.yml"
     MODEL_PATH: str = "./models/echofield-denoise-v1.pt"
@@ -136,6 +137,10 @@ class Config:
         return self.resolve_path(self.METADATA_FILE)
 
     @property
+    def catalog_file(self) -> Path:
+        return self.resolve_path(self.CATALOG_FILE)
+
+    @property
     def config_file(self) -> Path:
         return self.resolve_path(self.CONFIG_FILE)
 
@@ -152,6 +157,7 @@ class Config:
         ):
             directory.mkdir(parents=True, exist_ok=True)
         self.metadata_file.parent.mkdir(parents=True, exist_ok=True)
+        self.catalog_file.parent.mkdir(parents=True, exist_ok=True)
 
     def validate(self) -> None:
         if not (0.0 <= self.SEGMENT_OVERLAP_RATIO < 1.0):
@@ -220,6 +226,7 @@ def get_settings() -> Config:
         )
         or Config.SPECTROGRAM_DIR,
         CACHE_DIR=_env_any("CACHE_DIR", default=Config.CACHE_DIR) or Config.CACHE_DIR,
+        CATALOG_FILE=_env_any("CATALOG_FILE", default=Config.CATALOG_FILE) or Config.CATALOG_FILE,
         METADATA_FILE=_env_any(
             "METADATA_FILE",
             default=Config.METADATA_FILE,

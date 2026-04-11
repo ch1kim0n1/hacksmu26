@@ -1,4 +1,4 @@
-.PHONY: dev backend frontend install clean build demo-setup
+.PHONY: dev backend frontend install clean build demo-setup demo-metadata review-inventory-labels
 
 dev:
 	@echo "Starting backend and frontend..."
@@ -25,5 +25,22 @@ clean:
 	rm -rf frontend/.next frontend/out
 
 demo-setup: install
-	mkdir -p data/recordings data/processed data/spectrograms
+	mkdir -p data/recordings data/audio-files data/processed data/spectrograms data/cache data/analysis
+	$(MAKE) demo-metadata
+	$(MAKE) review-inventory-labels
 	@echo "Demo environment ready. Run 'make dev' to start."
+
+demo-metadata:
+	@if ls data/audio-files/*.wav >/dev/null 2>&1; then \
+		python scripts/analyze_audio_files.py; \
+		echo "Generated data/metadata.csv and analysis inventory from bundled audio-files."; \
+	else \
+		echo "No bundled WAV files found in data/audio-files; skipping metadata generation."; \
+	fi
+
+review-inventory-labels:
+	@if [ -f data/analysis/audio_inventory.csv ]; then \
+		python scripts/review_inventory_labels.py; \
+	else \
+		echo "Inventory file not found; run 'make demo-metadata' first."; \
+	fi

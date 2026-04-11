@@ -34,16 +34,30 @@ export async function fetchAPI<T>(
 
   if (!response.ok) {
     let errorData: unknown = null;
+    let message = `API error: ${response.status} ${response.statusText}`;
     try {
       errorData = await response.json();
+      const payload = errorData as {
+        detail?: string | { msg?: string }[];
+        error?: { message?: string };
+        message?: string;
+      };
+      if (typeof payload.detail === "string") {
+        message = payload.detail;
+      } else if (Array.isArray(payload.detail) && payload.detail.length > 0) {
+        const first = payload.detail[0];
+        if (first && typeof first === "object" && typeof first.msg === "string") {
+          message = first.msg;
+        }
+      } else if (payload.error?.message) {
+        message = payload.error.message;
+      } else if (payload.message) {
+        message = payload.message;
+      }
     } catch {
       // Response body may not be JSON
     }
-    throw new ApiError(
-      `API error: ${response.status} ${response.statusText}`,
-      response.status,
-      errorData
-    );
+    throw new ApiError(message, response.status, errorData);
   }
 
   // Handle empty responses (204 No Content, etc.)

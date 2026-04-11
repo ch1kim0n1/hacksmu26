@@ -3,6 +3,7 @@
 import React from "react";
 import FrequencyAxis from "./FrequencyAxis";
 import TimeAxis from "./TimeAxis";
+import HarmonicOverlay from "./HarmonicOverlay";
 import { cn } from "@/lib/utils";
 
 export interface SpectrogramViewerProps {
@@ -13,6 +14,8 @@ export interface SpectrogramViewerProps {
   duration?: number;
   annotation?: string;
   annotationVariant?: "noise" | "clean" | "neutral";
+  harmonicFrequenciesHz?: number[];
+  showHarmonicToggle?: boolean;
   highContrast?: boolean;
   className?: string;
 }
@@ -25,9 +28,18 @@ export default function SpectrogramViewer({
   duration = 5,
   annotation,
   annotationVariant = "neutral",
+  harmonicFrequenciesHz,
+  showHarmonicToggle = true,
   highContrast = false,
   className,
 }: SpectrogramViewerProps) {
+  const hasHarmonics = (harmonicFrequenciesHz?.length || 0) > 0;
+  const [showHarmonics, setShowHarmonics] = React.useState(hasHarmonics);
+
+  React.useEffect(() => {
+    setShowHarmonics(hasHarmonics);
+  }, [hasHarmonics]);
+
   const annotationColors = {
     noise: "bg-danger/80 text-white border-danger/40",
     clean: "bg-success/80 text-white border-success/40",
@@ -44,14 +56,26 @@ export default function SpectrogramViewer({
     >
       {title && (
         <div className="px-4 py-2.5 border-b border-ev-sand flex items-center justify-between">
-          <h3
-            className={cn(
-              "text-sm font-semibold text-ev-charcoal",
-              highContrast && "text-base"
+          <div className="flex items-center gap-3">
+            <h3
+              className={cn(
+                "text-sm font-semibold text-ev-charcoal",
+                highContrast && "text-base"
+              )}
+            >
+              {title}
+            </h3>
+            {hasHarmonics && showHarmonicToggle && (
+              <button
+                type="button"
+                onClick={() => setShowHarmonics((prev) => !prev)}
+                className="rounded border border-ev-sand px-2 py-1 text-[10px] font-medium text-ev-elephant hover:bg-background-elevated"
+                aria-label="Toggle harmonic overlay"
+              >
+                {showHarmonics ? "Hide Harmonics" : "Show Harmonics"}
+              </button>
             )}
-          >
-            {title}
-          </h3>
+          </div>
           {/* Spectrogram color scale legend */}
           <div className="flex items-center gap-2">
             <span className="text-[10px] text-ev-warm-gray font-mono">Quiet</span>
@@ -86,6 +110,13 @@ export default function SpectrogramViewer({
                   backgroundSize: "20% 25%",
                 }}
               />
+              {hasHarmonics && harmonicFrequenciesHz && (
+                <HarmonicOverlay
+                  frequenciesHz={harmonicFrequenciesHz}
+                  maxFrequency={maxFrequency}
+                  visible={showHarmonics}
+                />
+              )}
             </>
           )}
 

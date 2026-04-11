@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import SpectrogramViewer from "@/components/spectrogram/SpectrogramViewer";
 import FrequencyAxis from "@/components/spectrogram/FrequencyAxis";
 import TimeAxis from "@/components/spectrogram/TimeAxis";
@@ -74,6 +74,34 @@ describe("SpectrogramViewer", () => {
   it("renders without title (no legend bar)", () => {
     render(<SpectrogramViewer src="/test.png" />);
     expect(screen.queryByText("Quiet")).not.toBeInTheDocument();
+  });
+
+  it("renders harmonic overlay labels when provided", () => {
+    render(
+      <SpectrogramViewer
+        src="/test.png"
+        title="Harmonics"
+        harmonicFrequenciesHz={[18.0, 36.0, 54.0]}
+      />
+    );
+    expect(screen.getByText("18.0 Hz")).toBeInTheDocument();
+    expect(screen.getByText("36.0 Hz")).toBeInTheDocument();
+    expect(screen.getByText("54.0 Hz")).toBeInTheDocument();
+  });
+
+  it("toggles harmonic overlay visibility", () => {
+    render(
+      <SpectrogramViewer
+        src="/test.png"
+        title="Toggle Harmonics"
+        harmonicFrequenciesHz={[20.0, 40.0]}
+      />
+    );
+    const toggle = screen.getByRole("button", { name: "Toggle harmonic overlay" });
+    expect(toggle).toBeInTheDocument();
+    expect(toggle).toHaveTextContent("Hide Harmonics");
+    fireEvent.click(toggle);
+    expect(toggle).toHaveTextContent("Show Harmonics");
   });
 });
 

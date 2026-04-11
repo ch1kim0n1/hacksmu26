@@ -235,14 +235,7 @@ class ProcessingPipeline:
             aggressiveness=aggressiveness,
         )
         cleaned_audio = spectral["cleaned_audio"]
-        if method == "deep":
-            cleaned_audio = await asyncio.to_thread(
-                deep_denoise,
-                y,
-                sr,
-                model_path=getattr(self.settings, "MODEL_PATH", None),
-            )
-        elif method == "hybrid":
+        if method in {"deep", "hybrid"}:
             cleaned_audio = await asyncio.to_thread(
                 deep_denoise,
                 cleaned_audio,
@@ -363,6 +356,7 @@ class ProcessingPipeline:
             "spectrogram_after_path": after_viz.url,
             "comparison_spectrogram_path": str(comparison_path),
             "noise_summary": noise_info,
+            "ai_enhanced": method in {"deep", "hybrid"},
         }
         await self._notify(
             progress_callback,

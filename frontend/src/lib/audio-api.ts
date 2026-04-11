@@ -2,6 +2,40 @@ import { fetchAPI, API_BASE } from "./api";
 
 export { API_BASE };
 
+export interface RecordingMetadata {
+  location?: string;
+  date?: string;
+  microphone_type?: string;
+  notes?: string;
+  species?: string;
+  call_id?: string;
+  animal_id?: string;
+  noise_type_ref?: string;
+  start_sec?: number;
+  end_sec?: number;
+  sample_rate?: number;
+}
+
+export interface QualityMetrics {
+  snr_before_db?: number;
+  snr_after_db?: number;
+  snr_improvement_db?: number;
+  quality_score?: number;
+  quality_rating?: string;
+  spectral_distortion?: number;
+  energy_preservation?: number;
+}
+
+export interface RecordingResult {
+  status: string;
+  quality?: QualityMetrics;
+  calls?: Call[];
+  output_audio_path?: string;
+  spectrogram_before_path?: string;
+  spectrogram_after_path?: string;
+  processing_time_s?: number;
+}
+
 export interface Recording {
   id: string;
   filename: string;
@@ -14,16 +48,20 @@ export interface Recording {
   created_at?: string;
   sample_rate?: number;
   location?: string;
-  metadata?: Record<string, unknown>;
+  metadata?: RecordingMetadata;
   processing?: {
     progress_pct: number;
     current_stage?: string | null;
+    started_at?: string | null;
+    completed_at?: string | null;
+    duration_s?: number | null;
   };
   call_id?: string;
   animal_id?: string;
   noise_type_ref?: string;
   start_sec?: number;
   end_sec?: number;
+  result?: RecordingResult | null;
 }
 
 export interface RecordingListResponse {
@@ -35,6 +73,14 @@ export interface RecordingListResponse {
 export interface Call {
   id: string;
   recording_id: string;
+  call_id?: string;
+  animal_id?: string;
+  noise_type_ref?: string;
+  start_sec?: number;
+  end_sec?: number;
+  location?: string;
+  date?: string;
+  species?: string;
   call_type: string;
   start_ms: number;
   duration_ms: number;
@@ -46,7 +92,7 @@ export interface Call {
   frequency_high?: number;
   confidence?: number;
   acoustic_features?: Record<string, unknown>;
-  metadata?: Record<string, unknown>;
+  metadata?: RecordingMetadata;
 }
 
 export interface CallListResponse {
@@ -144,9 +190,21 @@ export async function getRecording(id: string): Promise<Recording> {
 }
 
 export async function processRecording(
-  id: string
+  id: string,
+  options?: {
+    method?: "spectral" | "hybrid" | "deep";
+    aggressiveness?: number;
+  }
 ): Promise<{ id: string; status: string; method: string }> {
-  return fetchAPI(`/api/recordings/${id}/process`, { method: "POST" });
+  const params = new URLSearchParams();
+  if (options?.method) params.set("method", options.method);
+  if (typeof options?.aggressiveness === "number") {
+    params.set("aggressiveness", String(options.aggressiveness));
+  }
+  const query = params.toString();
+  return fetchAPI(`/api/recordings/${id}/process${query ? `?${query}` : ""}`, {
+    method: "POST",
+  });
 }
 
 export function getRecordingSpectrogram(id: string, type: "before" | "after" | "comparison" = "after"): string {
@@ -184,10 +242,11 @@ export async function getCalls(params?: {
   if (params?.call_type) searchParams.set("call_type", params.call_type);
   if (params?.recording_id) searchParams.set("recording_id", params.recording_id);
   const query = searchParams.toString();
-  const response = await fetchAPI<{ items: Call[]; total: number }>(
+  const response = await fetchAPI<{ calls?: Call[]; items?: Call[]; total: number }>(
     `/api/calls${query ? `?${query}` : ""}`
   );
-  const calls = response.items.map((call) => ({
+  const rows = response.calls ?? response.items ?? [];
+  const calls = rows.map((call) => ({
     ...call,
     start_time: call.start_ms / 1000,
     end_time: (call.start_ms + call.duration_ms) / 1000,

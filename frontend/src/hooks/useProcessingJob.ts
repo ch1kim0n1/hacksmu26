@@ -27,8 +27,11 @@ export interface ProcessingState {
 const INITIAL_STAGES: StageInfo[] = [
   { name: "ingestion", status: "pending" },
   { name: "spectrogram", status: "pending" },
+  { name: "noise_classification", status: "pending" },
   { name: "noise_removal", status: "pending" },
+  { name: "feature_extraction", status: "pending" },
   { name: "quality_assessment", status: "pending" },
+  { name: "complete", status: "pending" },
 ];
 
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/ws";
@@ -56,7 +59,7 @@ export default function useProcessingJob(
     error: null,
   });
 
-  // Update status based on connection
+  // Single source of truth for live state: backend websocket event stream.
   useEffect(() => {
     if (!recordingId) {
       setState({
@@ -69,10 +72,12 @@ export default function useProcessingJob(
       });
       return;
     }
-    if (isConnected && state.status === "idle") {
-      setState((prev) => ({ ...prev, status: "connecting" }));
+    if (isConnected) {
+      setState((prev) =>
+        prev.status === "idle" ? { ...prev, status: "connecting" } : prev
+      );
     }
-  }, [recordingId, isConnected, state.status]);
+  }, [recordingId, isConnected]);
 
   // Handle incoming messages
   useEffect(() => {
@@ -81,18 +86,37 @@ export default function useProcessingJob(
     const msg: WSMessage = lastMessage;
 
     switch (msg.type) {
+      case "PROCESSING_STARTED": {
+        setState((prev) => ({
+          ...prev,
+          status: "processing",
+          error: null,
+        }));
+        break;
+      }
+
       case "STAGE_UPDATE": {
         const stageName = msg.data.stage as string;
         const stageStatus = msg.data.status as
           | "pending"
           | "active"
           | "complete";
-        const progress = (msg.data.progress as number) ?? state.progress;
+        const progress = (msg.data.progress as number) ?? 0;
 
         setState((prev) => {
-          const newStages = prev.stages.map((s) => {
-            if (s.name === stageName) {
-              return { ...s, status: stageStatus };
+          const stageIndex = prev.stages.findIndex((s) => s.name === stageName);
+
+          const newStages = prev.stages.map((s, index) => {
+            if (stageName === "complete") {
+              return { ...s, status: "complete" as const };
+            }
+            if (stageIndex >= 0) {
+              if (index < stageIndex) {
+                return { ...s, status: "complete" as const };
+              }
+              if (index === stageIndex) {
+                return { ...s, status: stageStatus };
+              }
             }
             return s;
           });
@@ -110,10 +134,10 @@ export default function useProcessingJob(
 
       case "QUALITY_SCORE": {
         const quality: QualityInfo = {
-          snr_before: msg.data.snr_before as number,
-          snr_after: msg.data.snr_after as number,
-          improvement: msg.data.improvement as number,
-          score: msg.data.score as number,
+          snr_before: Number(msg.data.snr_before ?? msg.data.snr_before_db ?? 0),
+          snr_after: Number(msg.data.snr_after ?? msg.data.snr_after_db ?? 0),
+          improvement: Number(msg.data.improvement ?? msg.data.snr_improvement_db ?? 0),
+          score: Number(msg.data.score ?? msg.data.quality_score ?? 0),
         };
 
         setState((prev) => ({
@@ -124,12 +148,30 @@ export default function useProcessingJob(
       }
 
       case "PROCESSING_COMPLETE": {
+        const quality: QualityInfo | null = msg.data.quality
+          ? {
+              snr_before: Number(
+                (msg.data.quality as Record<string, unknown>).snr_before_db ?? 0
+              ),
+              snr_after: Number(
+                (msg.data.quality as Record<string, unknown>).snr_after_db ?? 0
+              ),
+              improvement: Number(
+                (msg.data.quality as Record<string, unknown>).snr_improvement_db ?? 0
+              ),
+              score: Number(
+                (msg.data.quality as Record<string, unknown>).quality_score ?? 0
+              ),
+            }
+          : null;
+
         setState((prev) => ({
           ...prev,
           status: "complete",
           progress: 100,
-          currentStage: "",
+          currentStage: "complete",
           stages: prev.stages.map((s) => ({ ...s, status: "complete" as const })),
+          quality: quality ?? prev.quality,
         }));
         break;
       }

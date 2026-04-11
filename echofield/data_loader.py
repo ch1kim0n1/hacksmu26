@@ -5,6 +5,7 @@ Data loading and in-memory storage for EchoField recordings.
 from __future__ import annotations
 
 import csv
+import json
 import logging
 import os
 import uuid
@@ -15,6 +16,18 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 _AUDIO_EXTENSIONS = {".wav", ".mp3", ".flac"}
+_RECORDING_ID_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_DNS, "echofield-recordings")
+
+
+def stable_recording_id(source_path: str | None, filename: str, call_id: str | None = None) -> str:
+    """Generate deterministic recording IDs so catalog entries survive restarts."""
+    if source_path:
+        key = str(Path(source_path).resolve()).lower()
+    elif call_id:
+        key = str(call_id).strip().lower()
+    else:
+        key = str(filename).strip().lower()
+    return str(uuid.uuid5(_RECORDING_ID_NAMESPACE, key))
 
 
 def _safe_float(value: Any, default: float = 0.0) -> float:
@@ -131,7 +144,7 @@ def match_metadata_to_audio(
 
         combined.append(
             {
-                "id": str(uuid.uuid4()),
+                "id": stable_recording_id(audio_path, filename, row.get("call_id")),
                 "filename": filename,
                 "source_path": audio_path,
                 "duration_s": row.get("duration_s") or 0.0,
@@ -157,7 +170,7 @@ def match_metadata_to_audio(
         logger.warning("Audio file %s has no matching metadata row", path.name)
         combined.append(
             {
-                "id": str(uuid.uuid4()),
+                "id": stable_recording_id(str(path), path.name),
                 "filename": path.name,
                 "source_path": str(path),
                 "duration_s": 0.0,
@@ -182,8 +195,74 @@ def list_recordings_with_metadata(
 class RecordingStore:
     """In-memory store for recordings and their processing results."""
 
-    def __init__(self) -> None:
+    def __init__(self, persist_path: str | Path | None = None) -> None:
         self._recordings: dict[str, dict[str, Any]] = {}
+        self._persist_path = Path(persist_path) if persist_path else None
+        if self._persist_path:
+            self._persist_path.parent.mkdir(parents=True, exist_ok=True)
+            self._load_persisted()
+
+    @staticmethod
+    def _default_processing() -> dict[str, Any]:
+        return {
+            "progress": 0.0,
+            "current_stage": None,
+            "started_at": None,
+            "completed_at": None,
+            "duration_s": None,
+        }
+
+    def _normalize_record(self, record: dict[str, Any]) -> dict[str, Any]:
+        processing = self._default_processing()
+        processing.update(record.get("processing") or {})
+        return {
+            "id": record["id"],
+            "filename": record.get("filename", ""),
+            "duration_s": float(record.get("duration_s", 0.0)),
+            "filesize_mb": float(record.get("filesize_mb", 0.0)),
+            "uploaded_at": record.get("uploaded_at") or datetime.now(timezone.utc).isoformat(),
+            "status": record.get("status", "pending"),
+            "metadata": record.get("metadata") or {},
+            "source_path": record.get("source_path"),
+            "processing": processing,
+            "result": record.get("result"),
+        }
+
+    def _merge_metadata(self, persisted: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
+        merged = dict(persisted)
+        for key, value in incoming.items():
+            if value is not None and value != "":
+                merged[key] = value
+        return merged
+
+    def _load_persisted(self) -> None:
+        if not self._persist_path or not self._persist_path.exists():
+            return
+        try:
+            payload = json.loads(self._persist_path.read_text(encoding="utf-8"))
+            records = payload.get("recordings", []) if isinstance(payload, dict) else []
+            if not isinstance(records, list):
+                logger.warning("Recording catalog at %s is malformed", self._persist_path)
+                return
+            for record in records:
+                if not isinstance(record, dict) or "id" not in record:
+                    continue
+                normalized = self._normalize_record(record)
+                self._recordings[normalized["id"]] = normalized
+            logger.info("Loaded %d persisted recordings from %s", len(self._recordings), self._persist_path)
+        except Exception:
+            logger.exception("Failed to load recording catalog from %s", self._persist_path)
+
+    def _persist(self) -> None:
+        if not self._persist_path:
+            return
+        payload = {
+            "version": 1,
+            "recordings": list(self._recordings.values()),
+        }
+        tmp_path = self._persist_path.with_suffix(self._persist_path.suffix + ".tmp")
+        tmp_path.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
+        tmp_path.replace(self._persist_path)
 
     def add(
         self,
@@ -203,35 +282,34 @@ class RecordingStore:
             "status": "pending",
             "metadata": metadata or {},
             "source_path": source_path,
-            "processing": {
-                "progress": 0.0,
-                "current_stage": None,
-                "started_at": None,
-                "completed_at": None,
-                "duration_s": None,
-            },
+            "processing": self._default_processing(),
             "result": None,
         }
         self._recordings[recording_id] = record
+        self._persist()
         return record
 
     def load_many(self, records: list[dict[str, Any]]) -> None:
         for record in records:
-            self._recordings[record["id"]] = {
-                **record,
-                "status": record.get("status", "pending"),
-                "processing": record.get(
-                    "processing",
-                    {
-                        "progress": 0.0,
-                        "current_stage": None,
-                        "started_at": None,
-                        "completed_at": None,
-                        "duration_s": None,
-                    },
-                ),
-                "result": record.get("result"),
-            }
+            normalized = self._normalize_record(record)
+            existing = self._recordings.get(normalized["id"])
+            if existing:
+                merged = {
+                    **normalized,
+                    "uploaded_at": existing.get("uploaded_at", normalized["uploaded_at"]),
+                    "status": existing.get("status", normalized["status"]),
+                    "source_path": existing.get("source_path") or normalized.get("source_path"),
+                    "processing": existing.get("processing") or normalized["processing"],
+                    "result": existing.get("result") if existing.get("result") is not None else normalized.get("result"),
+                    "metadata": self._merge_metadata(
+                        existing.get("metadata") or {},
+                        normalized.get("metadata") or {},
+                    ),
+                }
+                self._recordings[normalized["id"]] = self._normalize_record(merged)
+                continue
+            self._recordings[normalized["id"]] = normalized
+        self._persist()
 
     def get(self, recording_id: str) -> dict[str, Any] | None:
         return self._recordings.get(recording_id)
@@ -284,6 +362,7 @@ class RecordingStore:
             record["processing"]["completed_at"] = now
             if status == "complete":
                 record["processing"]["progress"] = 100.0
+        self._persist()
 
     def update_result(self, recording_id: str, result: dict[str, Any]) -> None:
         record = self._recordings.get(recording_id)
@@ -291,6 +370,7 @@ class RecordingStore:
             logger.warning("Unknown recording in update_result: %s", recording_id)
             return
         record["result"] = result
+        self._persist()
 
     def get_stats(self) -> dict[str, Any]:
         recordings = list(self._recordings.values())

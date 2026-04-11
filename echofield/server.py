@@ -7,6 +7,7 @@ import io
 import json
 import uuid
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -53,7 +54,7 @@ def _serialize_result(result: dict[str, Any]) -> dict[str, Any]:
 async def lifespan(application: FastAPI):
     settings = get_settings()
     settings.ensure_directories()
-    store = RecordingStore()
+    store = RecordingStore(persist_path=settings.catalog_file)
     preload = list_recordings_with_metadata(settings.audio_dir, settings.metadata_file)
     store.load_many(preload)
     application.state.call_database = CallDatabase.from_metadata(settings.metadata_file)
@@ -138,6 +139,58 @@ def _to_detail(recording: dict[str, Any]) -> RecordingDetail:
         **_to_summary(recording).model_dump(),
         result=ProcessingResult(**result) if result else None,
     )
+
+
+def _elapsed_seconds(started_at: str | None) -> float | None:
+    if not started_at:
+        return None
+    try:
+        started = datetime.fromisoformat(started_at.replace("Z", "+00:00"))
+        return max((datetime.now(timezone.utc) - started).total_seconds(), 0.0)
+    except ValueError:
+        return None
+
+
+def _status_payload(recording: dict[str, Any]) -> dict[str, Any]:
+    processing = recording.get("processing") or {}
+    progress = float(processing.get("progress", 0.0))
+    stage = processing.get("current_stage")
+    elapsed = _elapsed_seconds(processing.get("started_at"))
+    estimated_remaining = None
+    if elapsed is not None and progress > 0 and progress < 100:
+        estimated_remaining = round(elapsed * (100.0 - progress) / progress, 2)
+    status = recording.get("status", "pending")
+    if status == "complete":
+        message = "Processing complete"
+    elif status == "failed":
+        message = "Processing failed"
+    elif status == "pending":
+        message = "Pending processing"
+    else:
+        message = "Processing in progress"
+    return {
+        "id": recording["id"],
+        "status": status,
+        "progress_pct": progress,
+        "stage": stage,
+        "elapsed_s": round(elapsed, 2) if elapsed is not None else None,
+        "estimated_remaining_s": estimated_remaining,
+        "message": message,
+    }
+
+
+def _enrich_call(call: dict[str, Any], recording: dict[str, Any] | None = None) -> dict[str, Any]:
+    payload = dict(call)
+    metadata = (recording.get("metadata") if recording else payload.get("metadata")) or {}
+    if recording is not None:
+        payload.setdefault("recording_id", recording.get("id"))
+    for key in ("call_id", "animal_id", "noise_type_ref", "start_sec", "end_sec", "location", "date", "species"):
+        if payload.get(key) in {None, ""} and metadata.get(key) not in {None, ""}:
+            payload[key] = metadata[key]
+    payload.setdefault("call_id", payload.get("id"))
+    if "metadata" not in payload:
+        payload["metadata"] = metadata
+    return payload
 
 
 async def _progress_callback(
@@ -294,6 +347,14 @@ async def get_recording(recording_id: str) -> RecordingDetail:
     return _to_detail(recording)
 
 
+@app.get("/api/recordings/{recording_id}/status", response_model=dict)
+async def get_recording_status(recording_id: str) -> dict[str, Any]:
+    recording = _get_store().get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    return _status_payload(recording)
+
+
 @app.post("/api/recordings/{recording_id}/process", response_model=dict)
 async def process_recording(
     recording_id: str,
@@ -404,7 +465,7 @@ async def list_calls(
         limit=limit,
         offset=offset,
     )
-    records = [CallRecord(**item) for item in items]
+    records = [CallRecord(**_enrich_call(item)) for item in items]
     return CallListResponse(total=total, returned=len(records), items=records)
 
 
@@ -413,7 +474,7 @@ async def get_call(call_id: str) -> CallRecord:
     call = _get_call_database().get_call(call_id)
     if call is None:
         raise HTTPException(status_code=404, detail="Call not found")
-    return CallRecord(**call)
+    return CallRecord(**_enrich_call(call))
 
 
 @app.post("/api/export/research")

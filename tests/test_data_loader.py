@@ -38,3 +38,29 @@ def test_data_loader_matches_metadata_and_audio(tmp_path: Path) -> None:
     assert matched["metadata"]["animal_id"] == "E-1"
     assert matched["metadata"]["noise_type_ref"] == "wind"
     assert any(item["filename"] == "orphan.wav" for item in combined)
+
+
+def test_data_loader_generates_stable_ids(tmp_path: Path) -> None:
+    recordings_dir = tmp_path / "recordings"
+    recordings_dir.mkdir()
+    audio = recordings_dir / "call_001.wav"
+
+    sr = 44_100
+    t = np.linspace(0, 1, sr, endpoint=False)
+    sf.write(audio, 0.1 * np.sin(2 * np.pi * 20 * t), sr)
+
+    metadata_csv = tmp_path / "metadata.csv"
+    metadata_csv.write_text(
+        "call_id,filename,animal_id,location,date,start_sec,end_sec,noise_type_ref,species\n"
+        "call_001,call_001.wav,E-1,Amboseli,2026-04-11,0,1,wind,African bush elephant\n",
+        encoding="utf-8",
+    )
+
+    rows = load_metadata_csv(metadata_csv)
+    audio_files = discover_audio_files(recordings_dir)
+    first = match_metadata_to_audio(rows, audio_files)
+    second = match_metadata_to_audio(rows, audio_files)
+
+    first_id = next(item["id"] for item in first if item["filename"] == "call_001.wav")
+    second_id = next(item["id"] for item in second if item["filename"] == "call_001.wav")
+    assert first_id == second_id

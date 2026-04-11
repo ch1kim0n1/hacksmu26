@@ -51,13 +51,12 @@ pip install -r requirements.txt
 # 4. Install frontend dependencies
 cd frontend && npm install && cd ..
 
-# 5. Prepare local data/output directories
-mkdir -p data/recordings data/audio-files data/processed data/spectrograms data/cache
-# Current repo/demo data uses data/audio-files for bundled WAVs.
-# ECHOFIELD_AUDIO_DIR defaults to data/recordings, and the loader falls back to
-# sibling data/audio-files when data/recordings is empty.
-# Keep source recordings unchanged; generated output belongs in data/processed
-# and data/spectrograms.
+# 5. Prepare deterministic demo data + outputs
+make demo-setup
+# Canonical paths:
+# - data/audio-files: bundled demo source WAV files (read-only)
+# - data/recordings: upload/default input directory
+# - data/processed and data/spectrograms: generated outputs only
 
 # 6. Start the backend server
 python -m echofield
@@ -123,7 +122,16 @@ call_id,filename,animal_id,location,date,start_sec,end_sec,noise_type_ref,specie
 # 1. Verify all 44 files are present
 ls data/audio-files/*.wav | wc -l  # should print 44 when the bundled dataset is present
 
-# 2. Validate audio files
+# 2. Regenerate metadata and analysis inventory from bundled WAVs
+make demo-metadata
+
+# 3. Generate trusted/inferred label review artifacts
+make review-inventory-labels
+# Outputs:
+# - data/analysis/audio_inventory_review.csv
+# - data/analysis/audio_inventory_review.json
+
+# 4. Validate audio files
 python -c "
 import librosa
 import os
@@ -133,11 +141,11 @@ for f in files[:5]:
     print(f'{f}: {len(y)} samples @ {sr}Hz')
 "
 
-# 3. Start the API and confirm the loader can see recordings
+# 5. Start the API and confirm the loader can see recordings
 python -m echofield
 curl http://localhost:8000/api/recordings | python -m json.tool
 
-# 4. Process through the UI or API. Outputs are written to:
+# 6. Process through the UI or API. Outputs are written to:
 ls data/processed data/spectrograms
 ```
 

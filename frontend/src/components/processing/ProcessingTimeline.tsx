@@ -16,8 +16,11 @@ interface ProcessingTimelineProps {
 const STAGE_DISPLAY_NAMES: Record<string, string> = {
   ingestion: "Ingestion",
   spectrogram: "Spectrogram",
+  noise_classification: "Noise Classification",
   noise_removal: "Noise Removal",
+  feature_extraction: "Feature Extraction",
   quality_assessment: "Quality",
+  complete: "Complete",
 };
 
 export default function ProcessingTimeline({
