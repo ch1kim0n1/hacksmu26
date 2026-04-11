@@ -1,4 +1,4 @@
-.PHONY: dev backend frontend install clean build demo-setup demo-metadata review-inventory-labels
+.PHONY: dev backend frontend install clean build test preprocess demo-setup demo-metadata review-inventory-labels
 
 dev:
 	@echo "Starting backend and frontend..."
@@ -18,6 +18,14 @@ install:
 
 build:
 	cd frontend && npm run build
+
+test:
+	pytest tests/ -v
+	cd frontend && npm run lint
+
+preprocess:
+	python scripts/analyze_audio_files.py
+	@echo "Preprocessing complete."
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
