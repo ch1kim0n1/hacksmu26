@@ -35,7 +35,7 @@ export default function BeforeAfterSlider({
     setIsDragging(true);
   }, []);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+  const handleTouchStart = useCallback(() => {
     setIsDragging(true);
   }, []);
 

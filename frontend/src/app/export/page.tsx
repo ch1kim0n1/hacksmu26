@@ -201,7 +201,6 @@ function ExportPageInner() {
   };
 
   const allSelected = recordings.length > 0 && selectedIds.size === recordings.length;
-  const someSelected = selectedIds.size > 0 && selectedIds.size < recordings.length;
   const selectedFormat_ = FORMATS.find((f) => f.id === selectedFormat)!;
 
   return (
