@@ -31,22 +31,22 @@ export default function SpectrogramViewer({
   const annotationColors = {
     noise: "bg-danger/80 text-white border-danger/40",
     clean: "bg-success/80 text-white border-success/40",
-    neutral: "bg-echofield-surface-elevated/90 text-echofield-text-primary border-echofield-border",
+    neutral: "bg-background-elevated/90 text-ev-charcoal border-ev-sand",
   };
 
   return (
     <div
       className={cn(
-        "rounded-xl border border-echofield-border bg-echofield-surface shadow-card overflow-hidden",
-        highContrast && "border-echofield-text-muted shadow-glow",
+        "rounded-xl border border-ev-sand bg-ev-cream overflow-hidden",
+        highContrast && "border-ev-warm-gray",
         className
       )}
     >
       {title && (
-        <div className="px-4 py-2.5 border-b border-echofield-border flex items-center justify-between">
+        <div className="px-4 py-2.5 border-b border-ev-sand flex items-center justify-between">
           <h3
             className={cn(
-              "text-sm font-semibold text-echofield-text-primary",
+              "text-sm font-semibold text-ev-charcoal",
               highContrast && "text-base"
             )}
           >
@@ -54,9 +54,9 @@ export default function SpectrogramViewer({
           </h3>
           {/* Spectrogram color scale legend */}
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-echofield-text-muted font-mono">Quiet</span>
+            <span className="text-[10px] text-ev-warm-gray font-mono">Quiet</span>
             <div className="w-24 h-2 rounded-full bg-gradient-spectrogram" />
-            <span className="text-[10px] text-echofield-text-muted font-mono">Loud</span>
+            <span className="text-[10px] text-ev-warm-gray font-mono">Loud</span>
           </div>
         </div>
       )}

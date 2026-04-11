@@ -31,7 +31,7 @@ describe("Button", () => {
     render(<Button>Click me</Button>);
     const btn = screen.getByRole("button", { name: "Click me" });
     expect(btn).toBeInTheDocument();
-    expect(btn.className).toContain("bg-accent-teal");
+    expect(btn.className).toContain("bg-accent-savanna");
   });
 
   it("renders outline variant", () => {
@@ -50,7 +50,7 @@ describe("Button", () => {
   it("renders ghost variant", () => {
     render(<Button variant="ghost">Ghost</Button>);
     const btn = screen.getByRole("button", { name: "Ghost" });
-    expect(btn.className).toContain("hover:bg-echofield-surface-elevated");
+    expect(btn.className).toContain("hover:bg-background-elevated");
   });
 
   it("renders all sizes", () => {
@@ -91,7 +91,7 @@ describe("Badge", () => {
     render(<Badge>Status</Badge>);
     const badge = screen.getByText("Status");
     expect(badge).toBeInTheDocument();
-    expect(badge.className).toContain("bg-accent-teal/10");
+    expect(badge.className).toContain("bg-accent-savanna/10");
   });
 
   it("renders success variant", () => {
@@ -111,12 +111,12 @@ describe("Badge", () => {
 
   it("renders gold variant", () => {
     render(<Badge variant="gold">Gold</Badge>);
-    expect(screen.getByText("Gold").className).toContain("bg-gold/10");
+    expect(screen.getByText("Gold").className).toContain("bg-accent-gold/10");
   });
 
   it("renders outline variant", () => {
     render(<Badge variant="outline">Tag</Badge>);
-    expect(screen.getByText("Tag").className).toContain("border-echofield-border");
+    expect(screen.getByText("Tag").className).toContain("border-ev-sand");
   });
 });
 
@@ -135,8 +135,8 @@ describe("Card", () => {
       </Card>
     );
 
-    expect(screen.getByTestId("card").className).toContain("bg-echofield-surface");
-    expect(screen.getByTestId("card").className).toContain("border-echofield-border");
+    expect(screen.getByTestId("card").className).toContain("bg-ev-cream");
+    expect(screen.getByTestId("card").className).toContain("border-ev-sand");
     expect(screen.getByText("Title").tagName).toBe("H3");
     expect(screen.getByText("Description")).toBeInTheDocument();
     expect(screen.getByText("Body")).toBeInTheDocument();
@@ -156,8 +156,8 @@ describe("Input", () => {
     render(<Input placeholder="Search..." />);
     const input = screen.getByPlaceholderText("Search...");
     expect(input).toBeInTheDocument();
-    expect(input.className).toContain("bg-echofield-surface");
-    expect(input.className).toContain("border-echofield-border");
+    expect(input.className).toContain("bg-ev-cream");
+    expect(input.className).toContain("border-ev-sand");
   });
 
   it("can be disabled", () => {
@@ -172,7 +172,7 @@ describe("Progress", () => {
   it("renders with correct background", () => {
     render(<Progress value={50} data-testid="progress" />);
     const root = screen.getByTestId("progress");
-    expect(root.className).toContain("bg-echofield-surface-elevated");
+    expect(root.className).toContain("bg-background-elevated");
   });
 
   it("renders indicator", () => {
@@ -187,7 +187,7 @@ describe("Progress", () => {
 // ── Design Token Consistency ──
 
 describe("Design token consistency", () => {
-  it("all components use echofield color tokens (not hardcoded hex)", () => {
+  it("all components use EV design system tokens (not hardcoded hex)", () => {
     // Verify that our component variants reference theme tokens, not raw hex values.
     // This is a structural test — we check the variant strings contain token references.
     render(

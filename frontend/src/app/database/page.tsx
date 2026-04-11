@@ -22,8 +22,8 @@ const PAGE_SIZE = 12;
 
 function CallTypeBadge({ type }: { type: string }) {
   const colors: Record<string, string> = {
-    rumble: "bg-accent-teal/15 text-accent-teal border-accent-teal/20",
-    trumpet: "bg-gold/15 text-gold border-gold/20",
+    rumble: "bg-accent-savanna/15 text-accent-savanna border-accent-savanna/20",
+    trumpet: "bg-accent-gold/15 text-accent-gold border-accent-gold/20",
     roar: "bg-danger/15 text-danger border-danger/20",
     bark: "bg-warning/15 text-warning border-warning/20",
     cry: "bg-purple-400/15 text-purple-400 border-purple-400/20",
@@ -34,7 +34,7 @@ function CallTypeBadge({ type }: { type: string }) {
 
   const c =
     colors[type.toLowerCase()] ||
-    "bg-echofield-text-muted/15 text-echofield-text-muted border-echofield-text-muted/20";
+    "bg-ev-warm-gray/15 text-ev-warm-gray border-ev-warm-gray/20";
 
   return (
     <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${c}`}>
@@ -97,23 +97,23 @@ export default function DatabasePage() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <div className="min-h-screen bg-echofield-bg">
+    <div className="min-h-screen bg-ev-ivory">
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-echofield-text-muted hover:text-echofield-text-secondary transition-colors mb-4"
+            className="inline-flex items-center gap-2 text-ev-warm-gray hover:text-ev-elephant transition-colors mb-4"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Home
           </Link>
-          <h1 className="text-4xl font-bold text-echofield-text-primary">
+          <h1 className="text-4xl font-bold text-ev-charcoal">
             Call Database
           </h1>
-          <p className="text-echofield-text-secondary mt-2">
+          <p className="text-ev-elephant mt-2">
             Browse and search all detected elephant vocalizations.
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function DatabasePage() {
         <div className="mb-6">
           <div className="relative">
             <svg
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-echofield-text-muted"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ev-warm-gray"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -134,7 +134,7 @@ export default function DatabasePage() {
               placeholder="Search by call ID, recording ID, or type..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-echofield-surface border border-echofield-border rounded-xl text-echofield-text-primary placeholder:text-echofield-text-muted focus:outline-none focus:border-accent-teal/50 transition-colors"
+              className="w-full pl-12 pr-4 py-3 bg-ev-cream border border-ev-sand rounded-xl text-ev-charcoal placeholder:text-ev-warm-gray focus:outline-none focus:border-accent-savanna/50 transition-colors"
             />
           </div>
         </div>
@@ -147,7 +147,7 @@ export default function DatabasePage() {
               setCallTypeFilter(e.target.value);
               setPage(0);
             }}
-            className="px-4 py-2.5 bg-echofield-surface border border-echofield-border rounded-lg text-echofield-text-primary text-sm focus:outline-none focus:border-accent-teal/50"
+            className="px-4 py-2.5 bg-ev-cream border border-ev-sand rounded-lg text-ev-charcoal text-sm focus:outline-none focus:border-accent-savanna/50"
           >
             {CALL_TYPES.map((t) => (
               <option key={t} value={t}>
@@ -161,12 +161,12 @@ export default function DatabasePage() {
             placeholder="Filter by location..."
             value={locationFilter}
             onChange={(e) => setLocationFilter(e.target.value)}
-            className="px-4 py-2.5 bg-echofield-surface border border-echofield-border rounded-lg text-echofield-text-primary placeholder:text-echofield-text-muted text-sm focus:outline-none focus:border-accent-teal/50"
+            className="px-4 py-2.5 bg-ev-cream border border-ev-sand rounded-lg text-ev-charcoal placeholder:text-ev-warm-gray text-sm focus:outline-none focus:border-accent-savanna/50"
           />
 
           <div className="flex-1" />
 
-          <span className="flex items-center text-sm text-echofield-text-muted">
+          <span className="flex items-center text-sm text-ev-warm-gray">
             {total} total calls
           </span>
         </div>
@@ -177,37 +177,37 @@ export default function DatabasePage() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="p-5 rounded-xl bg-echofield-surface border border-echofield-border animate-pulse"
+                className="p-5 rounded-xl bg-ev-cream border border-ev-sand animate-pulse"
               >
-                <div className="h-4 w-24 bg-echofield-surface-elevated rounded mb-3" />
-                <div className="h-3 w-36 bg-echofield-surface-elevated rounded mb-4" />
-                <div className="h-6 w-16 bg-echofield-surface-elevated rounded mb-3" />
-                <div className="h-3 w-full bg-echofield-surface-elevated rounded" />
+                <div className="h-4 w-24 bg-background-elevated rounded mb-3" />
+                <div className="h-3 w-36 bg-background-elevated rounded mb-4" />
+                <div className="h-6 w-16 bg-background-elevated rounded mb-3" />
+                <div className="h-3 w-full bg-background-elevated rounded" />
               </div>
             ))}
           </div>
         ) : error ? (
-          <div className="p-8 rounded-xl bg-echofield-surface border border-echofield-border text-center">
+          <div className="p-8 rounded-xl bg-ev-cream border border-ev-sand text-center">
             <p className="text-danger mb-4">{error}</p>
             <button
               onClick={fetchCalls}
-              className="px-4 py-2 bg-echofield-surface-elevated text-echofield-text-secondary rounded-lg hover:text-echofield-text-primary transition-colors"
+              className="px-4 py-2 bg-background-elevated text-ev-elephant rounded-lg hover:text-ev-charcoal transition-colors"
             >
               Retry
             </button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="p-12 rounded-xl bg-echofield-surface border border-echofield-border text-center">
+          <div className="p-12 rounded-xl bg-ev-cream border border-ev-sand text-center">
             <svg
-              className="w-12 h-12 text-echofield-text-muted mx-auto mb-4"
+              className="w-12 h-12 text-ev-warm-gray mx-auto mb-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-echofield-text-secondary mb-1">No calls found</p>
-            <p className="text-echofield-text-muted text-sm">
+            <p className="text-ev-elephant mb-1">No calls found</p>
+            <p className="text-ev-warm-gray text-sm">
               Try adjusting your filters or upload recordings for processing.
             </p>
           </div>
@@ -217,14 +217,14 @@ export default function DatabasePage() {
               <button
                 key={call.id}
                 onClick={() => router.push(`/results/${call.id}`)}
-                className="p-5 rounded-xl bg-echofield-surface border border-echofield-border hover:border-accent-teal/30 transition-all text-left group"
+                className="p-5 rounded-xl bg-ev-cream border border-ev-sand hover:border-accent-savanna/30 transition-all text-left group"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <p className="font-mono text-xs text-echofield-text-muted mb-1">
+                    <p className="font-mono text-xs text-ev-warm-gray mb-1">
                       {call.id.slice(0, 12)}...
                     </p>
-                    <p className="text-xs text-echofield-text-muted">
+                    <p className="text-xs text-ev-warm-gray">
                       Rec: {call.recording_id.slice(0, 8)}...
                     </p>
                   </div>
@@ -233,36 +233,36 @@ export default function DatabasePage() {
 
                 <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
                   <div>
-                    <p className="text-echofield-text-muted text-xs">Duration</p>
-                    <p className="text-echofield-text-primary font-medium">
+                    <p className="text-ev-warm-gray text-xs">Duration</p>
+                    <p className="text-ev-charcoal font-medium">
                       {(call.end_time - call.start_time).toFixed(2)}s
                     </p>
                   </div>
                   <div>
-                    <p className="text-echofield-text-muted text-xs">Frequency</p>
-                    <p className="text-echofield-text-primary font-medium">
+                    <p className="text-ev-warm-gray text-xs">Frequency</p>
+                    <p className="text-ev-charcoal font-medium">
                       {call.frequency_low && call.frequency_high
                         ? `${call.frequency_low}-${call.frequency_high} Hz`
                         : "--"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-echofield-text-muted text-xs">Confidence</p>
-                    <p className="text-echofield-text-primary font-medium">
+                    <p className="text-ev-warm-gray text-xs">Confidence</p>
+                    <p className="text-ev-charcoal font-medium">
                       {call.confidence !== undefined
                         ? `${(call.confidence * 100).toFixed(0)}%`
                         : "--"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-echofield-text-muted text-xs">Start</p>
-                    <p className="text-echofield-text-primary font-medium">
+                    <p className="text-ev-warm-gray text-xs">Start</p>
+                    <p className="text-ev-charcoal font-medium">
                       {call.start_time.toFixed(2)}s
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center gap-1 text-xs text-accent-teal opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="mt-4 flex items-center gap-1 text-xs text-accent-savanna opacity-0 group-hover:opacity-100 transition-opacity">
                   View details
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -279,7 +279,7 @@ export default function DatabasePage() {
             <button
               onClick={() => setPage(Math.max(0, page - 1))}
               disabled={page === 0}
-              className="px-4 py-2 bg-echofield-surface border border-echofield-border rounded-lg text-echofield-text-secondary hover:text-echofield-text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-ev-cream border border-ev-sand rounded-lg text-ev-elephant hover:text-ev-charcoal transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -302,8 +302,8 @@ export default function DatabasePage() {
                   onClick={() => setPage(pageNum)}
                   className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
                     page === pageNum
-                      ? "bg-accent-teal text-echofield-bg"
-                      : "bg-echofield-surface border border-echofield-border text-echofield-text-secondary hover:text-echofield-text-primary"
+                      ? "bg-accent-savanna text-ev-ivory"
+                      : "bg-ev-cream border border-ev-sand text-ev-elephant hover:text-ev-charcoal"
                   }`}
                 >
                   {pageNum + 1}
@@ -314,7 +314,7 @@ export default function DatabasePage() {
             <button
               onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
               disabled={page >= totalPages - 1}
-              className="px-4 py-2 bg-echofield-surface border border-echofield-border rounded-lg text-echofield-text-secondary hover:text-echofield-text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-ev-cream border border-ev-sand rounded-lg text-ev-elephant hover:text-ev-charcoal transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Next
             </button>

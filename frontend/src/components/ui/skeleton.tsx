@@ -24,7 +24,7 @@ export function Skeleton({ className, variant = "default", ...props }: SkeletonP
 
 export function SkeletonCard() {
   return (
-    <div className="rounded-xl border border-echofield-border bg-echofield-surface p-6 space-y-4">
+    <div className="rounded-xl border border-ev-sand bg-ev-cream p-6 space-y-4">
       <div className="flex items-center gap-3">
         <Skeleton className="h-10 w-10 rounded-full" />
         <div className="space-y-2 flex-1">
@@ -44,8 +44,8 @@ export function SkeletonCard() {
 
 export function SkeletonSpectrogram() {
   return (
-    <div className="rounded-xl border border-echofield-border bg-echofield-surface overflow-hidden">
-      <div className="px-4 py-2.5 border-b border-echofield-border">
+    <div className="rounded-xl border border-ev-sand bg-ev-cream overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-ev-sand">
         <Skeleton className="h-4 w-32" />
       </div>
       <div className="flex">
@@ -62,7 +62,7 @@ export function SkeletonSpectrogram() {
 
 export function SkeletonMetricPanel() {
   return (
-    <div className="rounded-xl border border-echofield-border bg-echofield-surface p-4 space-y-3">
+    <div className="rounded-xl border border-ev-sand bg-ev-cream p-4 space-y-3">
       <Skeleton className="h-3 w-20" />
       <Skeleton className="h-8 w-16" />
       <Skeleton variant="waveform" />

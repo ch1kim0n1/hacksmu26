@@ -8,7 +8,7 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-accent-teal/10 text-accent-teal",
+          "border-transparent bg-accent-savanna/10 text-accent-savanna",
         success:
           "border-transparent bg-success/10 text-success",
         warning:
@@ -16,9 +16,9 @@ const badgeVariants = cva(
         danger:
           "border-transparent bg-danger/10 text-danger",
         outline:
-          "border-echofield-border text-echofield-text-secondary",
+          "border-ev-sand text-ev-elephant",
         gold:
-          "border-transparent bg-gold/10 text-gold",
+          "border-transparent bg-accent-gold/10 text-accent-gold",
       },
     },
     defaultVariants: {

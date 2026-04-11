@@ -41,25 +41,25 @@ function formatValue(value: unknown, unit: string): string {
 
 export default function AcousticPanel({ features }: AcousticPanelProps) {
   return (
-    <div className="rounded-lg border border-echofield-border bg-echofield-surface overflow-hidden">
-      <div className="px-4 py-3 border-b border-echofield-border">
-        <h3 className="text-sm font-medium text-echofield-text-primary">
+    <div className="rounded-lg border border-ev-sand bg-ev-cream overflow-hidden">
+      <div className="px-4 py-3 border-b border-ev-sand">
+        <h3 className="text-sm font-medium text-ev-charcoal">
           Acoustic Features
         </h3>
       </div>
 
-      <div className="grid grid-cols-2 gap-px bg-echofield-border">
+      <div className="grid grid-cols-2 gap-px bg-ev-sand">
         {METRIC_DEFINITIONS.map((metric) => {
           const rawValue = features[metric.key];
           return (
             <div
               key={metric.key}
-              className="bg-echofield-surface px-4 py-3 space-y-1"
+              className="bg-ev-cream px-4 py-3 space-y-1"
             >
-              <span className="text-[10px] uppercase tracking-wide text-echofield-text-muted block">
+              <span className="text-[10px] uppercase tracking-wide text-ev-warm-gray block">
                 {metric.label}
               </span>
-              <span className="text-sm font-mono text-echofield-text-primary block">
+              <span className="text-sm font-mono text-ev-charcoal block">
                 {formatValue(rawValue, metric.unit)}
               </span>
             </div>

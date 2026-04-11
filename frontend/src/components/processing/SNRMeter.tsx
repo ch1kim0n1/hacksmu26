@@ -12,7 +12,7 @@ interface SNRMeterProps {
 const MAX_SNR = 30;
 
 function getQualityLabel(snr: number): { label: string; color: string } {
-  if (snr >= 25) return { label: "Excellent", color: "#00D9FF" };
+  if (snr >= 25) return { label: "Excellent", color: "#C4A46C" };
   if (snr >= 18) return { label: "Good", color: "#10C876" };
   if (snr >= 10) return { label: "Fair", color: "#F5A025" };
   return { label: "Poor", color: "#EF4444" };
@@ -36,19 +36,19 @@ export default function SNRMeter({
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-echofield-border bg-echofield-surface p-4 space-y-4">
-        <div className="h-4 w-24 bg-echofield-surface-elevated animate-pulse rounded" />
-        <div className="h-6 bg-echofield-surface-elevated animate-pulse rounded" />
-        <div className="h-6 bg-echofield-surface-elevated animate-pulse rounded" />
+      <div className="rounded-lg border border-ev-sand bg-ev-cream p-4 space-y-4">
+        <div className="h-4 w-24 bg-background-elevated animate-pulse rounded" />
+        <div className="h-6 bg-background-elevated animate-pulse rounded" />
+        <div className="h-6 bg-background-elevated animate-pulse rounded" />
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border border-echofield-border bg-echofield-surface p-4 space-y-4">
+    <div className="rounded-lg border border-ev-sand bg-ev-cream p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-echofield-text-primary">
+        <h3 className="text-sm font-medium text-ev-charcoal">
           Signal-to-Noise Ratio
         </h3>
         <div className="flex items-center gap-2">
@@ -70,12 +70,12 @@ export default function SNRMeter({
       {/* Before bar */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-echofield-text-muted">Before</span>
-          <span className="text-xs font-mono text-echofield-text-secondary">
+          <span className="text-xs text-ev-warm-gray">Before</span>
+          <span className="text-xs font-mono text-ev-elephant">
             {snrBefore.toFixed(1)} dB
           </span>
         </div>
-        <div className="h-5 bg-echofield-surface-elevated rounded overflow-hidden">
+        <div className="h-5 bg-background-elevated rounded overflow-hidden">
           <motion.div
             initial={{ width: "0%" }}
             animate={{ width: `${beforeWidth}%` }}
@@ -89,12 +89,12 @@ export default function SNRMeter({
       {/* After bar */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-echofield-text-muted">After</span>
-          <span className="text-xs font-mono text-echofield-text-secondary">
+          <span className="text-xs text-ev-warm-gray">After</span>
+          <span className="text-xs font-mono text-ev-elephant">
             {snrAfter.toFixed(1)} dB
           </span>
         </div>
-        <div className="h-5 bg-echofield-surface-elevated rounded overflow-hidden">
+        <div className="h-5 bg-background-elevated rounded overflow-hidden">
           <motion.div
             initial={{ width: "0%" }}
             animate={{ width: `${afterWidth}%` }}

@@ -2,34 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── EchoField Design Tokens ─── */
+/* ─── ElephantVoices Design Tokens ─── */
 
 :root {
-  --echofield-bg: #0A1A1F;
-  --echofield-surface: #141E24;
-  --echofield-surface-elevated: #1E2A32;
-  --echofield-border: #2A3A42;
-  --echofield-text-primary: #F0F5F8;
-  --echofield-text-secondary: #8B9BA5;
-  --echofield-text-muted: #5A6A75;
+  /* Primary — Elephant grays (warm-shifted) */
+  --ev-charcoal: #2C2926;
+  --ev-charcoal-light: #4A453F;
+  --ev-elephant: #6B6560;
+  --ev-warm-gray: #8A837B;
+  --ev-dust: #B5ADA4;
+  --ev-sand: #D4CCC3;
+  --ev-cream: #F0EBE3;
+  --ev-ivory: #F8F5F0;
 
-  --accent-teal: #00D9FF;
-  --success: #10C876;
-  --warning: #F5A025;
-  --danger: #EF4444;
-  --gold: #D4AF37;
-  --elephant: #8B8680;
+  /* Accent — Savanna & landscape */
+  --ev-savanna: #C4A46C;
+  --ev-gold: #A8873B;
+  --ev-deep-gold: #8B6E2F;
 
+  /* Nature */
+  --ev-sage: #7A8B6F;
+  --ev-deep-sage: #5A6B4F;
+  --ev-earth: #6B4F3A;
+  --ev-terracotta: #C4785A;
+  --ev-sunset: #D4956B;
+
+  /* Spectrogram (retained for spectrogram visualizations) */
   --spectrogram-low: #0C1A2A;
   --spectrogram-mid: #00D9FF;
   --spectrogram-high: #FFD700;
   --spectrogram-peak: #EF4444;
 }
 
-html,
 body {
-  background-color: var(--echofield-bg);
-  color: var(--echofield-text-primary);
+  background-color: var(--ev-ivory);
+  color: var(--ev-charcoal);
   min-height: 100vh;
 }
 
@@ -41,21 +48,21 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--echofield-surface);
+  background: var(--ev-cream);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--echofield-border);
+  background: var(--ev-sand);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3A4A52;
+  background: var(--ev-dust);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--echofield-border) var(--echofield-surface);
+  scrollbar-color: var(--ev-sand) var(--ev-cream);
 }
 
 /* ─── Utility Classes ─── */
@@ -70,7 +77,7 @@ body {
 
 @layer components {
   .skeleton {
-    @apply relative overflow-hidden rounded bg-echofield-surface-elevated;
+    @apply relative overflow-hidden rounded bg-ev-cream;
   }
 
   .skeleton::after {
@@ -79,7 +86,7 @@ body {
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.04) 50%,
+      rgba(212, 204, 195, 0.3) 50%,
       transparent 100%
     );
     background-size: 200% 100%;
