@@ -1,10 +1,10 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-const pageVariants = {
+const pageVariants: Variants = {
   initial: {
     opacity: 0,
     y: 12,
@@ -14,7 +14,7 @@ const pageVariants = {
     y: 0,
     transition: {
       duration: 0.3,
-      ease: "easeOut",
+      ease: [0.25, 0.1, 0.25, 1], // easeOut cubic-bezier
     },
   },
   exit: {
@@ -22,7 +22,7 @@ const pageVariants = {
     y: -8,
     transition: {
       duration: 0.2,
-      ease: "easeIn",
+      ease: [0.42, 0, 1, 1], // easeIn cubic-bezier
     },
   },
 };
