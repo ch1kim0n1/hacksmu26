@@ -1237,4 +1237,112 @@ This wins because it solves a real problem for the judges' organization, the dem
 
 ---
 
+## CHANGELOG — Post-Hackathon Hardening
+
+The following changes were made after the initial 36-hour build as post-demo hardening work. All changes are backward-compatible and do not alter the existing API surface.
+
+---
+
+### Issue #31 — In-Memory Call Catalog
+
+**Files changed:** `echofield/research/call_database.py`, `echofield/models.py`, `echofield/server.py`
+
+#### Problem
+
+The original `GET /api/calls` and `GET /api/calls/{id}` endpoints scraped calls by scanning every recording's `result["calls"]` list on every request — an O(recordings × calls) linear scan with no filtering, no sort control, and no way to load the 212 pre-existing calls from CSV. The `CallDatabase` class existed in `echofield/research/` but was completely disconnected from the server.
+
+#### Changes
+
+**`echofield/research/call_database.py`**
+
+- Added `animal_id` field to every call record (stored, searchable, returned in stats).
+- Added `load_from_csv(path)` — reads a CSV file where each row is one call record. Handles JSON-encoded `acoustic_features`, coerces numeric fields gracefully, and skips malformed rows with a warning. The server reads `data/calls.csv` on startup (path overridable via `ECHOFIELD_CALLS_FILE` env var).
+- Added `register_pipeline_calls(recording_id, calls, recording_metadata)` — bulk-registers calls that come out of the processing pipeline, stamping each with the recording's `location` and `date` from its metadata.
+- Extended `search()` with an `animal_id` filter. The `sort_by` parameter now falls through to `acoustic_features` if the key is not a top-level field, so any of the 12 acoustic metrics (e.g. `?sort_by=fundamental_frequency_hz`) can be used as a sort key.
+- `get_stats()` now also reports `unique_animals`.
+
+**`echofield/models.py`**
+
+- `CallDetail` gained `animal_id`, `location`, `date`, and `created_at` fields.
+- New `CallListResponse` model with `total`, `returned`, `offset`, and `calls` list — replaces the ad-hoc `dict` response that previously had no schema.
+
+**`echofield/server.py`**
+
+- Added missing `import os`.
+- Added `import CallDatabase` and `import CallListResponse`.
+- Lifespan now creates a `CallDatabase`, attempts to load it from `data/calls.csv`, and seeds it from any already-processed recordings in the `RecordingStore`. A helper `_get_call_db()` mirrors the existing `_get_store()`.
+- `GET /api/calls` is rewritten — backed by `CallDatabase.search()`, typed as `CallListResponse`, and exposes query parameters for `call_type`, `recording_id`, `animal_id`, `location`, `date_from`, `date_to`, `min_confidence`, `sort_by`, and `sort_desc`. Response time for 212 calls is well under 100 ms (O(n) single-pass filter + sort).
+- `GET /api/calls/{call_id}` now uses `CallDatabase.get_call()` — O(1) dict lookup instead of a nested loop over all recordings.
+
+**To populate the call catalog from existing data**, create `data/calls.csv` with columns:
+
+```
+id, recording_id, call_type, confidence, start_ms, duration_ms,
+frequency_min_hz, frequency_max_hz, location, date, animal_id, acoustic_features
+```
+
+`acoustic_features` should be a JSON string. All columns are optional except `recording_id` and `call_type`.
+
+---
+
+### Issue #36 — Test Suite (Post-Demo Hardening)
+
+**Files created:** `tests/conftest.py`, `tests/test_pipeline.py`, `tests/test_api.py`, `pytest.ini`
+
+**Result:** 132 tests, all passing, in ~11 seconds.
+
+#### `pytest.ini`
+
+Configures pytest root so that `import echofield` resolves correctly from any working directory (`pythonpath = .`), points pytest at the `tests/` directory, and enables `asyncio_mode = auto` for async pipeline tests.
+
+#### `tests/conftest.py`
+
+Shared fixtures used across both test files:
+
+- `clean_audio` / `noisy_audio` / `long_audio` — session-scoped synthetic NumPy arrays (a 20 Hz sine wave, the same sine with heavy white noise added, and 5 minutes of random noise). Session scope means the arrays are generated once for the entire test run.
+- `clean_wav_path` / `noisy_wav_path` / `long_wav_path` — function-scoped: each test that requests one of these gets a freshly written WAV file in its own `tmp_path` directory.
+- `wav_bytes` — raw WAV bytes (built with the standard library `wave` module, no external deps) for upload endpoint tests.
+- `reset_settings` — clears the `get_settings()` singleton so that `monkeypatch.setenv` calls take effect before the settings object is constructed.
+- `api_client` — a `fastapi.testclient.TestClient` wired to fully isolated temp directories. Each test that uses this fixture gets a fresh in-memory `RecordingStore` and `CallDatabase` (triggered by the FastAPI lifespan), with all file paths monkeypatched away from the real `data/` tree.
+
+#### `tests/test_pipeline.py` — 69 tests
+
+Covers the full processing pipeline using real (small) synthetic audio:
+
+| Class | What is tested |
+|---|---|
+| `TestIngestionValidation` | `validate_audio_file` — exists, bad extension, oversized, `.mp3`/`.flac` accepted |
+| `TestIngestionLoad` | `load_audio` — dtype, mono, duration, resampling to a different SR |
+| `TestIngestionSegment` | Short audio → single segment; long audio → multiple segments; keys; sequential indices |
+| `TestIngestionMetadata` | All required keys present, values match file on disk |
+| `TestSTFT` | Complex output, dB max = 0, no NaN, correct frequency bin count |
+| `TestMelSpectrogram` | Shape `(n_mels, T)`, all values ≤ 0 dB, finite |
+| `TestSpectrogramPNG` | File is created, starts with PNG magic bytes |
+| `TestSpectralGate` | Length preservation, float dtype, signal is modified, bandpass attenuation, noise RMS reduced |
+| `TestEstimateNoiseProfile` | Returns ndarray, bounded by signal length |
+| `TestComputeSNR` | Finite float, silence → 0, burst signal > uniform noise |
+| `TestSNRImprovement` | Required keys, finite values, `improvement_db` = after − before |
+| `TestEnergyPreservation` | Identical → 1.0, silenced → 0.0, always in [0, 1] |
+| `TestAssessQuality` | All six keys, score in [0, 100], distortion ≥ 0 |
+| `TestHybridPipeline` | End-to-end: status `"complete"`, all result keys, cleaned WAV written, spectrograms written, metrics cached, progress callback fired, invalid file raises |
+| `TestCacheManager` | Save/retrieve/missing/invalidate/stats |
+
+#### `tests/test_api.py` — 63 tests
+
+Integration tests using `TestClient` — no network, no real pipeline execution:
+
+| Class | Endpoints covered |
+|---|---|
+| `TestHealth` | `GET /health` — 200, `status: healthy`, version present |
+| `TestUpload` | `POST /api/upload` — 201 with ID; 400 for bad extension; metadata fields stored; `.mp3`/`.flac` accepted |
+| `TestRecordingsList` | `GET /api/recordings` — empty store, after upload, `limit`/`offset` pagination, required fields, status filter |
+| `TestRecordingDetail` | `GET /api/recordings/{id}` — 404 unknown, 200 correct ID, status pending, `uploaded_at` present |
+| `TestProcessEndpoint` | `POST /api/recordings/{id}/process` — 404 unknown, status set to processing, ID in response, 409 if already processing |
+| `TestStats` | `GET /api/stats` — 200, all five required keys, zeros on empty store, count after upload |
+| `TestCallsList` | `GET /api/calls` — empty catalog, response shape, all filter params accepted, seeded data returned, call-type filter correct, `min_confidence` filter, descending sort order |
+| `TestCallDetail` | `GET /api/calls/{id}` — 404 unknown, correct fields including `location`/`animal_id`, all required fields present |
+| `TestSpectrogram` | `GET /api/recordings/{id}/spectrogram` — 404 unknown recording, 404 when no PNG generated |
+| `TestDownload` | `GET /api/recordings/{id}/download` — 404 unknown, 400 unprocessed |
+| `TestExport` | `POST /api/export/research` — JSON 200, correct content-type, valid list, recording ID in response; CSV 200, correct content-type, header row present, recording ID in body; 404 for unknown IDs; fallback to all recordings when no IDs given |
+
 *Last updated: April 11, 2026*

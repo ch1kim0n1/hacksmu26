@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run lint"
   },
   "dependencies": {
     "framer-motion": "^12.38.0",

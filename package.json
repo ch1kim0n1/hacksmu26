@@ -1,0 +1,12 @@
+{
+  "name": "echofield",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "validate": "cd frontend && npm run validate && cd .. && python -m pytest --tb=short -q --basetemp=/tmp/pytest_ef_validate",
+    "lint": "cd frontend && npm run lint",
+    "typecheck": "cd frontend && npm run typecheck",
+    "test": "python -m pytest --tb=short -q --basetemp=/tmp/pytest_ef_validate",
+    "build": "cd frontend && npm run build"
+  }
+}
