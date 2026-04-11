@@ -80,6 +80,20 @@ def compute_energy_preservation(
     return float(np.clip(cleaned / original, 0.0, 1.0))
 
 
+def compute_snr_improvement(
+    y_original: np.ndarray,
+    y_cleaned: np.ndarray,
+    sr: int,
+) -> dict[str, float]:
+    snr_before = round(compute_snr(y_original, sr), 2)
+    snr_after = round(compute_snr(y_cleaned, sr), 2)
+    return {
+        "snr_before": snr_before,
+        "snr_after": snr_after,
+        "improvement_db": round(snr_after - snr_before, 2),
+    }
+
+
 def assess_quality(y_original: np.ndarray, y_cleaned: np.ndarray, sr: int) -> dict[str, float | bool | str | None]:
     snr_before = round(compute_snr(y_original, sr), 2)
     snr_after = round(compute_snr(y_cleaned, sr), 2)
@@ -104,9 +118,9 @@ def assess_quality(y_original: np.ndarray, y_cleaned: np.ndarray, sr: int) -> di
         rating = "poor"
 
     return {
-        "snr_before_db": snr_before,
-        "snr_after_db": snr_after,
-        "snr_improvement_db": snr_improvement,
+        "snr_before": snr_before,
+        "snr_after": snr_after,
+        "snr_improvement": snr_improvement,
         "pesq": None,
         "peak_frequency_before_hz": peak_before,
         "peak_frequency_after_hz": peak_after,

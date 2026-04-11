@@ -54,7 +54,7 @@ def normalize_per_segment(spec: np.ndarray) -> np.ndarray:
 
 def compute_stft(
     y: np.ndarray,
-    sr: int,
+    sr: int = 22050,
     n_fft: int = 2048,
     hop_length: int = 512,
     window: str = "hann",
@@ -92,7 +92,7 @@ def compute_mel_spectrogram(
         fmax=fmax,
     )
     mel_db = librosa.power_to_db(mel_spec, ref=np.max)
-    return normalize_per_segment(mel_db)
+    return mel_db.astype(np.float32)
 
 
 def generate_spectrogram_png(

@@ -180,14 +180,14 @@ class Config:
 
 Settings = Config
 
-_config_instance: Config | None = None
+_settings_instance: Config | None = None
 
 
 def get_settings() -> Config:
     """Return the singleton config instance."""
-    global _config_instance
-    if _config_instance is not None:
-        return _config_instance
+    global _settings_instance
+    if _settings_instance is not None:
+        return _settings_instance
 
     load_dotenv(PROJECT_ROOT / ".env")
 
@@ -256,13 +256,13 @@ def get_settings() -> Config:
     )
     settings.validate()
 
-    _config_instance = settings
-    return _config_instance
+    _settings_instance = settings
+    return _settings_instance
 
 
 def reset_settings() -> None:
-    global _config_instance
-    _config_instance = None
+    global _settings_instance
+    _settings_instance = None
 
 
 config = get_settings()

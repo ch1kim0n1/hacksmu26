@@ -56,12 +56,13 @@ def segment_audio(
     sr: int,
     segment_length_s: float = 60.0,
     overlap_ratio: float = 0.5,
+    max_duration_s: float = 120.0,
 ) -> list[dict[str, np.ndarray | float | int]]:
     if len(y) == 0:
         return [{"data": y, "start_s": 0.0, "end_s": 0.0, "index": 0}]
 
     total_duration_s = len(y) / sr
-    if total_duration_s <= 120.0:
+    if total_duration_s <= max_duration_s:
         return [{"data": y, "start_s": 0.0, "end_s": total_duration_s, "index": 0}]
 
     segment_samples = int(segment_length_s * sr)
@@ -113,7 +114,7 @@ def ingest_audio_file(
         progress_callback("INGESTION_STARTED", 0)
 
     audio_id = uuid.uuid4().hex
-    y, sr = load_audio(file_path, sr=None, mono=False)
+    y, sr = load_audio(file_path, target_sr=None, mono=False)
     channels = 1 if y.ndim == 1 else int(y.shape[0])
     y = stereo_to_mono(y)
     if sr < MIN_SAMPLE_RATE:

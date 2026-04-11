@@ -322,7 +322,7 @@ async def upload_recording(
         while chunk := await file.read(1024 * 1024):
             await handle.write(chunk)
 
-    y, sr = load_audio(destination, sr=None)
+    y, sr = load_audio(destination, target_sr=None)
     duration_s = round(get_duration(y, sr), 3)
     metadata = {k: v for k, v in {"location": location, "date": date, "notes": notes}.items() if v}
     _get_store().add(
@@ -499,32 +499,6 @@ async def get_call(call_id: str):
     if record is None:
         raise HTTPException(status_code=404, detail=f"Call {call_id} not found")
     return CallDetail(**record)
-    limit: int = Query(50, ge=1, le=500),
-    offset: int = Query(0, ge=0),
-    call_type: str | None = Query(default=None),
-    recording_id: str | None = Query(default=None),
-) -> dict[str, Any]:
-    calls: list[dict[str, Any]] = []
-    for recording in _get_store()._recordings.values():
-        result = recording.get("result") or {}
-        for call in result.get("calls", []):
-            if call_type and call.get("call_type") != call_type:
-                continue
-            if recording_id and call.get("recording_id") != recording_id:
-                continue
-            calls.append(call)
-    total = len(calls)
-    return {"items": calls[offset : offset + limit], "total": total}
-
-
-@app.get("/api/calls/{call_id}", response_model=dict)
-async def get_call(call_id: str) -> dict[str, Any]:
-    for recording in _get_store()._recordings.values():
-        result = recording.get("result") or {}
-        for call in result.get("calls", []):
-            if call.get("id") == call_id:
-                return call
-    raise HTTPException(status_code=404, detail="Call not found")
 
 
 @app.post("/api/export/research")

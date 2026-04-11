@@ -54,7 +54,15 @@ class ProcessingPipeline:
     ) -> None:
         if callback is None:
             return
-        result = callback(stage, status, progress, data)
+        try:
+            sig = inspect.signature(callback)
+            n_params = len(sig.parameters)
+        except (ValueError, TypeError):
+            n_params = 4
+        if n_params <= 2:
+            result = callback(stage, progress)
+        else:
+            result = callback(stage, status, progress, data)
         if inspect.isawaitable(result):
             await result
 
@@ -333,6 +341,7 @@ class ProcessingPipeline:
             params=params,
         )
         self.cache.save_metrics(recording_id, quality, params=params)
+        self.cache.save_metrics(recording_id, quality)
 
         elapsed = round(time.perf_counter() - start_time, 2)
         result = {
@@ -356,6 +365,7 @@ class ProcessingPipeline:
                 for item in noise_info["noise_types"]
             ],
             "quality": quality,
+            "quality_metrics": quality,
             "calls": calls,
             "processing_time_s": elapsed,
             "output_audio_path": str(cleaned_audio_path),

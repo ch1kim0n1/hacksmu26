@@ -60,8 +60,11 @@ def save_audio(
 
 def load_audio(
     path: str | Path,
-    sr: int | None = 44100,
+    target_sr: int | None = 44100,
     mono: bool = True,
+    *,
+    sr: int | None = None,
 ) -> tuple[np.ndarray, int]:
-    y, sr_out = librosa.load(str(path), sr=sr, mono=mono)
+    effective_sr = sr if sr is not None else target_sr
+    y, sr_out = librosa.load(str(path), sr=effective_sr, mono=mono)
     return y.astype(np.float32), int(sr_out)
