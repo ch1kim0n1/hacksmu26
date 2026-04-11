@@ -2,8 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
 // Mock next/navigation
+const mockUsePathname = vi.fn(() => "/");
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/",
+  usePathname: () => mockUsePathname(),
 }));
 
 // Mock next/link
@@ -15,6 +16,8 @@ vi.mock("next/link", () => ({
 
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
+import Footer from "@/components/layout/Footer";
+import Breadcrumb from "@/components/layout/Breadcrumb";
 
 // ── Header ──
 
@@ -140,6 +143,59 @@ describe("Sidebar", () => {
     const { container } = render(<Sidebar />);
     const svgs = container.querySelectorAll("nav svg");
     expect(svgs.length).toBeGreaterThan(0);
+  });
+});
+
+// ── Footer ──
+
+describe("Footer", () => {
+  it("renders HackSMU credit text", () => {
+    render(<Footer />);
+    expect(screen.getByText(/HackSMU 2026/)).toBeInTheDocument();
+  });
+
+  it("renders ElephantVoices reference", () => {
+    render(<Footer />);
+    expect(screen.getByText(/ElephantVoices/)).toBeInTheDocument();
+  });
+
+  it("has border-top separator", () => {
+    const { container } = render(<Footer />);
+    const footer = container.querySelector("footer");
+    expect(footer?.className).toContain("border-t");
+  });
+});
+
+// ── Breadcrumb ──
+
+describe("Breadcrumb", () => {
+  beforeEach(() => {
+    mockUsePathname.mockReturnValue("/");
+  });
+
+  it("renders Home link on root path", () => {
+    render(<Breadcrumb />);
+    expect(screen.getByText("Home")).toBeInTheDocument();
+  });
+
+  it("renders current page segment for /upload", () => {
+    mockUsePathname.mockReturnValue("/upload");
+    render(<Breadcrumb />);
+    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getByText("Upload")).toBeInTheDocument();
+  });
+
+  it("renders nested segments for /processing/abc123", () => {
+    mockUsePathname.mockReturnValue("/processing/abc123");
+    render(<Breadcrumb />);
+    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getByText("Processing")).toBeInTheDocument();
+  });
+
+  it("Home link points to /", () => {
+    render(<Breadcrumb />);
+    const homeLink = screen.getByText("Home").closest("a");
+    expect(homeLink?.getAttribute("href")).toBe("/");
   });
 });
 
