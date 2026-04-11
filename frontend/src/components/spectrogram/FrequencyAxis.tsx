@@ -1,7 +1,10 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
 interface FrequencyAxisProps {
   maxFrequency?: number;
+  tickCount?: number;
+  highContrast?: boolean;
 }
 
 function formatFrequency(hz: number): string {
@@ -12,22 +15,36 @@ function formatFrequency(hz: number): string {
   return `${hz} Hz`;
 }
 
-const TICK_COUNT = 5;
-
-export default function FrequencyAxis({ maxFrequency = 1000 }: FrequencyAxisProps) {
-  const ticks = Array.from({ length: TICK_COUNT }, (_, i) => {
-    const freq = maxFrequency - (maxFrequency / (TICK_COUNT - 1)) * i;
+export default function FrequencyAxis({
+  maxFrequency = 1000,
+  tickCount = 5,
+  highContrast = false,
+}: FrequencyAxisProps) {
+  const ticks = Array.from({ length: tickCount }, (_, i) => {
+    const freq = maxFrequency - (maxFrequency / (tickCount - 1)) * i;
     return Math.round(freq);
   });
 
   return (
-    <div className="relative flex flex-col justify-between h-full py-1 pr-2 w-14 text-right">
+    <div className="relative flex flex-col justify-between h-full py-2 pr-2 w-16 text-right shrink-0">
       {ticks.map((freq) => (
         <div key={freq} className="flex items-center justify-end gap-1">
-          <span className="text-[10px] text-echofield-text-muted leading-none whitespace-nowrap">
+          <span
+            className={cn(
+              "font-mono leading-none whitespace-nowrap",
+              highContrast
+                ? "text-xs text-echofield-text-secondary"
+                : "text-[10px] text-echofield-text-muted"
+            )}
+          >
             {formatFrequency(freq)}
           </span>
-          <div className="w-1.5 h-px bg-echofield-border shrink-0" />
+          <div
+            className={cn(
+              "shrink-0",
+              highContrast ? "w-2.5 h-px bg-echofield-text-muted" : "w-1.5 h-px bg-echofield-border"
+            )}
+          />
         </div>
       ))}
     </div>
