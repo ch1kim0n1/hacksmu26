@@ -1,0 +1,1193 @@
+{
+  "version": 1,
+  "recordings": [
+    {
+      "id": "75d02571-b6de-5d56-853b-57d3328eb930",
+      "filename": "04-040920-02_vehicle_1.wav",
+      "duration_s": 57.53,
+      "filesize_mb": 5.267,
+      "uploaded_at": "2026-04-11T21:47:48.389127+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "04-040920-02",
+        "call_id": "04-040920-02_vehicle_1",
+        "start_sec": 0.0,
+        "end_sec": 57.53
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-040920-02_vehicle_1.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "84698b7a-bcdd-5cba-8e1e-9ec5330e677d",
+      "filename": "04-040920-02_vehicle_2.wav",
+      "duration_s": 51.474,
+      "filesize_mb": 4.713,
+      "uploaded_at": "2026-04-11T21:47:48.389286+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "04-040920-02",
+        "call_id": "04-040920-02_vehicle_2",
+        "start_sec": 0.0,
+        "end_sec": 51.474
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-040920-02_vehicle_2.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "4b43b01c-7722-599b-b187-481b6f9675e2",
+      "filename": "04-040920-03_vehicle_noise_1.wav",
+      "duration_s": 168.979,
+      "filesize_mb": 15.471,
+      "uploaded_at": "2026-04-11T21:47:48.389381+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "04-040920-03",
+        "call_id": "04-040920-03_vehicle_noise_1",
+        "start_sec": 0.0,
+        "end_sec": 168.979
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-040920-03_vehicle_noise_1.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "9b2858ae-08d6-578c-8178-f7b0703214c1",
+      "filename": "04-061218-25_vehicle_noise_1.wav",
+      "duration_s": 152.893,
+      "filesize_mb": 13.998,
+      "uploaded_at": "2026-04-11T21:47:48.389439+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "04-061218-25",
+        "call_id": "04-061218-25_vehicle_noise_1",
+        "start_sec": 0.0,
+        "end_sec": 152.893
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-061218-25_vehicle_noise_1.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "106888f4-54a4-5977-8b75-5cffc89a130d",
+      "filename": "061220-24_airplane_01.wav",
+      "duration_s": 45.833,
+      "filesize_mb": 4.196,
+      "uploaded_at": "2026-04-11T21:47:48.389505+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "061220-24",
+        "call_id": "061220-24_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 45.833
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/061220-24_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "287358b4-5afc-5079-a581-224b8960efcf",
+      "filename": "090224-09_generator_01.wav",
+      "duration_s": 411.058,
+      "filesize_mb": 37.634,
+      "uploaded_at": "2026-04-11T21:47:48.389610+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "generator",
+        "animal_id": "090224-09",
+        "call_id": "090224-09_generator_01",
+        "start_sec": 0.0,
+        "end_sec": 411.058
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/090224-09_generator_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "60d0063b-63f4-54c4-822c-12828e577e8c",
+      "filename": "1989-06_airplane_01.wav",
+      "duration_s": 83.038,
+      "filesize_mb": 7.602,
+      "uploaded_at": "2026-04-11T21:47:48.389678+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "1989-06",
+        "call_id": "1989-06_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 83.038
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-06_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "2f1e4431-2d6c-57a6-a8fd-4f07097180e6",
+      "filename": "1989-08_airplane_01.wav",
+      "duration_s": 115.023,
+      "filesize_mb": 10.531,
+      "uploaded_at": "2026-04-11T21:47:48.389771+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "1989-08",
+        "call_id": "1989-08_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 115.023
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-08_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "98396215-8523-5ab9-a15c-c965708a7dce",
+      "filename": "1989-08_airplane_02.wav",
+      "duration_s": 44.432,
+      "filesize_mb": 4.068,
+      "uploaded_at": "2026-04-11T21:47:48.389846+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "1989-08",
+        "call_id": "1989-08_airplane_02",
+        "start_sec": 0.0,
+        "end_sec": 44.432
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-08_airplane_02.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "c0c516d6-7e16-5ccd-ad03-ce72113793bb",
+      "filename": "1989-08_airplane_03.wav",
+      "duration_s": 192.056,
+      "filesize_mb": 17.583,
+      "uploaded_at": "2026-04-11T21:47:48.389917+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "1989-08",
+        "call_id": "1989-08_airplane_03",
+        "start_sec": 0.0,
+        "end_sec": 192.056
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-08_airplane_03.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "618fc0e2-d52c-5dd5-8bfd-b9d569d96949",
+      "filename": "2000-23_background_and_vehicle_noise_2.wav",
+      "duration_s": 66.255,
+      "filesize_mb": 6.066,
+      "uploaded_at": "2026-04-11T21:47:48.390016+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-23",
+        "call_id": "2000-23_background_and_vehicle_noise_2",
+        "start_sec": 0.0,
+        "end_sec": 66.255
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_background_and_vehicle_noise_2.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "b5bd4dd6-e80c-5c04-901a-ecbfff1fea36",
+      "filename": "2000-23_background_noise_1.wav",
+      "duration_s": 38.747,
+      "filesize_mb": 3.547,
+      "uploaded_at": "2026-04-11T21:47:48.390069+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "background",
+        "animal_id": "2000-23",
+        "call_id": "2000-23_background_noise_1",
+        "start_sec": 0.0,
+        "end_sec": 38.747
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_background_noise_1.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "59d0e48b-3399-525c-a9fd-e632f91d431c",
+      "filename": "2000-23_background_vehicle_noise.wav",
+      "duration_s": 45.838,
+      "filesize_mb": 4.197,
+      "uploaded_at": "2026-04-11T21:47:48.390132+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-23",
+        "call_id": "2000-23_background_vehicle_noise",
+        "start_sec": 0.0,
+        "end_sec": 45.838
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_background_vehicle_noise.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "d47712fc-0104-59c5-90d3-12e845de76df",
+      "filename": "2000-23_vehicle_noise_1.wav",
+      "duration_s": 210.502,
+      "filesize_mb": 19.272,
+      "uploaded_at": "2026-04-11T21:47:48.390217+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-23",
+        "call_id": "2000-23_vehicle_noise_1",
+        "start_sec": 0.0,
+        "end_sec": 210.502
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_1.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "ddbd318d-279b-5903-8bc3-a73fc845c952",
+      "filename": "2000-23_vehicle_noise_2.wav",
+      "duration_s": 21.552,
+      "filesize_mb": 1.973,
+      "uploaded_at": "2026-04-11T21:47:48.390296+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-23",
+        "call_id": "2000-23_vehicle_noise_2",
+        "start_sec": 0.0,
+        "end_sec": 21.552
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_2.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "efb0a5fa-b718-535a-ab78-6bb2dd4df602",
+      "filename": "2000-23_vehicle_noise_3.wav",
+      "duration_s": 37.142,
+      "filesize_mb": 3.4,
+      "uploaded_at": "2026-04-11T21:47:48.390371+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-23",
+        "call_id": "2000-23_vehicle_noise_3",
+        "start_sec": 0.0,
+        "end_sec": 37.142
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_3.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "c2b01ff7-1c5f-5e7b-aed3-03e1ef6fedc7",
+      "filename": "2000-23_vehicle_noise_4.wav",
+      "duration_s": 72.087,
+      "filesize_mb": 6.6,
+      "uploaded_at": "2026-04-11T21:47:48.390441+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-23",
+        "call_id": "2000-23_vehicle_noise_4",
+        "start_sec": 0.0,
+        "end_sec": 72.087
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_4.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "baff1013-df6d-5c5e-a08f-a7f6704a3ef3",
+      "filename": "2000-24_generator_noise_1.wav",
+      "duration_s": 101.235,
+      "filesize_mb": 9.268,
+      "uploaded_at": "2026-04-11T21:47:48.390519+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "generator",
+        "animal_id": "2000-24",
+        "call_id": "2000-24_generator_noise_1",
+        "start_sec": 0.0,
+        "end_sec": 101.235
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_1.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "9bfcae83-7502-546b-a6b7-9b218174bf4d",
+      "filename": "2000-24_generator_noise_2.wav",
+      "duration_s": 369.59,
+      "filesize_mb": 33.837,
+      "uploaded_at": "2026-04-11T21:47:48.390618+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "generator",
+        "animal_id": "2000-24",
+        "call_id": "2000-24_generator_noise_2",
+        "start_sec": 0.0,
+        "end_sec": 369.59
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_2.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "93d028e0-0a2b-5e27-9084-5b3f197ae33a",
+      "filename": "2000-24_generator_noise_3.wav",
+      "duration_s": 41.816,
+      "filesize_mb": 3.828,
+      "uploaded_at": "2026-04-11T21:47:48.390709+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "generator",
+        "animal_id": "2000-24",
+        "call_id": "2000-24_generator_noise_3",
+        "start_sec": 0.0,
+        "end_sec": 41.816
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_3.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "92fccffe-f397-5031-a534-73343a899331",
+      "filename": "2000-24_generator_noise_4.wav",
+      "duration_s": 230.662,
+      "filesize_mb": 21.118,
+      "uploaded_at": "2026-04-11T21:47:48.390798+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "generator",
+        "animal_id": "2000-24",
+        "call_id": "2000-24_generator_noise_4",
+        "start_sec": 0.0,
+        "end_sec": 230.662
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_4.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "49a83bff-d025-5559-b643-7f836ca962b7",
+      "filename": "2000-24_vehicle_and_generator_noise_1.wav",
+      "duration_s": 107.642,
+      "filesize_mb": 9.855,
+      "uploaded_at": "2026-04-11T21:47:48.390851+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle+generator",
+        "animal_id": "2000-24",
+        "call_id": "2000-24_vehicle_and_generator_noise_1",
+        "start_sec": 0.0,
+        "end_sec": 107.642
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_vehicle_and_generator_noise_1.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "90527abe-cfac-5eaa-9be2-93d926d5501e",
+      "filename": "2000-24_vehicle_noise_1.wav",
+      "duration_s": 302.702,
+      "filesize_mb": 27.713,
+      "uploaded_at": "2026-04-11T21:47:48.390937+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-24",
+        "call_id": "2000-24_vehicle_noise_1",
+        "start_sec": 0.0,
+        "end_sec": 302.702
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_vehicle_noise_1.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "0a5a88b8-1aef-58d0-a6cf-7269a3f70916",
+      "filename": "2000-24_vehicle_noise_2.wav",
+      "duration_s": 50.756,
+      "filesize_mb": 4.647,
+      "uploaded_at": "2026-04-11T21:47:48.390995+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-24",
+        "call_id": "2000-24_vehicle_noise_2",
+        "start_sec": 0.0,
+        "end_sec": 50.756
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_vehicle_noise_2.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "e29e576b-96fd-5bed-8e3c-8ccd281c7870",
+      "filename": "2000-27_airplane_01.wav",
+      "duration_s": 308.157,
+      "filesize_mb": 28.213,
+      "uploaded_at": "2026-04-11T21:47:48.391055+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2000-27",
+        "call_id": "2000-27_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 308.157
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-27_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "517de2d1-be5c-58ab-8035-afcc7e01b545",
+      "filename": "2000-3_airplane_01.wav",
+      "duration_s": 136.238,
+      "filesize_mb": 12.473,
+      "uploaded_at": "2026-04-11T21:47:48.391134+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2000-3",
+        "call_id": "2000-3_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 136.238
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "c8611c8a-d40d-50e5-a8d4-41930437453d",
+      "filename": "2000-3_airplane_02.wav",
+      "duration_s": 66.028,
+      "filesize_mb": 6.045,
+      "uploaded_at": "2026-04-11T21:47:48.391203+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2000-3",
+        "call_id": "2000-3_airplane_02",
+        "start_sec": 0.0,
+        "end_sec": 66.028
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_02.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "29f76859-7fcf-5688-9026-70197d3e7b0c",
+      "filename": "2000-3_airplane_03.wav",
+      "duration_s": 197.032,
+      "filesize_mb": 18.039,
+      "uploaded_at": "2026-04-11T21:47:48.391288+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2000-3",
+        "call_id": "2000-3_airplane_03",
+        "start_sec": 0.0,
+        "end_sec": 197.032
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_03.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "8127e458-71d3-5a02-8b0d-8e4b252a5ffb",
+      "filename": "2000-3_vehicle_01.wav",
+      "duration_s": 145.321,
+      "filesize_mb": 13.305,
+      "uploaded_at": "2026-04-11T21:47:48.391354+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-3",
+        "call_id": "2000-3_vehicle_01",
+        "start_sec": 0.0,
+        "end_sec": 145.321
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_vehicle_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "d25d33ac-cde7-50bd-84f9-a76d68146315",
+      "filename": "2000-4 _airplane_01.wav",
+      "duration_s": 80.827,
+      "filesize_mb": 7.4,
+      "uploaded_at": "2026-04-11T21:47:48.391563+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2000-4",
+        "call_id": "2000-4 _airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 80.827
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-4 _airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "e0a5df28-4bab-5e8e-b164-a0a0519fef3c",
+      "filename": "2000-4_airplane_02.wav",
+      "duration_s": 143.317,
+      "filesize_mb": 13.121,
+      "uploaded_at": "2026-04-11T21:47:48.391697+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2000-4",
+        "call_id": "2000-4_airplane_02",
+        "start_sec": 0.0,
+        "end_sec": 143.317
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-4_airplane_02.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "5d19c945-d834-51bc-a57b-77da16b34a81",
+      "filename": "2002-2_airplane_01.wav",
+      "duration_s": 207.858,
+      "filesize_mb": 19.03,
+      "uploaded_at": "2026-04-11T21:47:48.391820+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2002-2",
+        "call_id": "2002-2_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 207.858
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2002-2_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "a8c5e2bf-6db9-5fad-bfcf-a3433e328d2f",
+      "filename": "2003-7_airplane_01.wav",
+      "duration_s": 109.405,
+      "filesize_mb": 10.016,
+      "uploaded_at": "2026-04-11T21:47:48.392047+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2003-7",
+        "call_id": "2003-7_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 109.405
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2003-7_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "534662a5-b10c-514f-ba0b-a476626d5b5d",
+      "filename": "99-22A_airplane_01.wav",
+      "duration_s": 288.332,
+      "filesize_mb": 26.398,
+      "uploaded_at": "2026-04-11T21:47:48.392189+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "99-22A",
+        "call_id": "99-22A_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 288.332
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-22A_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "5850793e-c742-5049-8aa3-623544556134",
+      "filename": "99-24_airplane_01.wav",
+      "duration_s": 68.98,
+      "filesize_mb": 6.315,
+      "uploaded_at": "2026-04-11T21:47:48.392342+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "99-24",
+        "call_id": "99-24_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 68.98
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-24_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "3f37f0ed-6680-52a3-a996-1885a255945f",
+      "filename": "99-37_airplane_02.wav",
+      "duration_s": 41.129,
+      "filesize_mb": 3.766,
+      "uploaded_at": "2026-04-11T21:47:48.392541+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "99-37",
+        "call_id": "99-37_airplane_02",
+        "start_sec": 0.0,
+        "end_sec": 41.129
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_airplane_02.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "54a5e6c8-be48-59dd-a858-02d1860b675c",
+      "filename": "99-37_airplane_and_vehicle_01.wav",
+      "duration_s": 229.434,
+      "filesize_mb": 21.005,
+      "uploaded_at": "2026-04-11T21:47:48.392793+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane+vehicle",
+        "animal_id": "99-37",
+        "call_id": "99-37_airplane_and_vehicle_01",
+        "start_sec": 0.0,
+        "end_sec": 229.434
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_airplane_and_vehicle_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "2e0478de-3bba-5336-a055-9d2075b68d33",
+      "filename": "99-37_vehicle_01.wav",
+      "duration_s": 38.664,
+      "filesize_mb": 3.54,
+      "uploaded_at": "2026-04-11T21:47:48.392991+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "99-37",
+        "call_id": "99-37_vehicle_01",
+        "start_sec": 0.0,
+        "end_sec": 38.664
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_vehicle_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "1ae637f5-be9b-5e04-88f3-e86bb16cbc85",
+      "filename": "99-45_airplane_01.wav",
+      "duration_s": 239.413,
+      "filesize_mb": 21.919,
+      "uploaded_at": "2026-04-11T21:47:48.393099+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "99-45",
+        "call_id": "99-45_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 239.413
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "05198cad-4bd4-576b-94ba-1df0fbf7eccb",
+      "filename": "99-45_airplane_03.wav",
+      "duration_s": 262.077,
+      "filesize_mb": 23.994,
+      "uploaded_at": "2026-04-11T21:47:48.393199+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "99-45",
+        "call_id": "99-45_airplane_03",
+        "start_sec": 0.0,
+        "end_sec": 262.077
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_airplane_03.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "6b7d3b44-4294-5fff-ba23-5f10ea267785",
+      "filename": "99-45_vehicle_01.wav",
+      "duration_s": 378.943,
+      "filesize_mb": 34.693,
+      "uploaded_at": "2026-04-11T21:47:48.393319+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "99-45",
+        "call_id": "99-45_vehicle_01",
+        "start_sec": 0.0,
+        "end_sec": 378.943
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_vehicle_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "bbb14c55-299c-5fec-9c86-2cf4003820be",
+      "filename": "99-45_vehicle_02.wav",
+      "duration_s": 148.963,
+      "filesize_mb": 13.638,
+      "uploaded_at": "2026-04-11T21:47:48.393481+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "99-45",
+        "call_id": "99-45_vehicle_02",
+        "start_sec": 0.0,
+        "end_sec": 148.963
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_vehicle_02.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "c076e14e-e9a0-5082-9539-9cc06521785c",
+      "filename": "J86-1_airplane_01.wav",
+      "duration_s": 215.452,
+      "filesize_mb": 19.725,
+      "uploaded_at": "2026-04-11T21:47:48.393652+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "J86-1",
+        "call_id": "J86-1_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 215.452
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/J86-1_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "68527b6c-7e61-5234-be56-8bc0e88c1b99",
+      "filename": "J87-27_airplane_01.wav",
+      "duration_s": 97.277,
+      "filesize_mb": 8.906,
+      "uploaded_at": "2026-04-11T21:47:48.393816+00:00",
+      "status": "pending",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "J87-27",
+        "call_id": "J87-27_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 97.277
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/J87-27_airplane_01.wav",
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    }
+  ]
+}
