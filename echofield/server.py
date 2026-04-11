@@ -28,6 +28,7 @@ from echofield.config import get_settings
 from echofield.data_loader import RecordingStore, discover_audio_files, load_metadata_csv
 from echofield.models import (
     CallDetail,
+    CallListResponse,
     ErrorResponse,
     ExportRequest,
     ProcessingResult,
@@ -38,6 +39,7 @@ from echofield.models import (
     StatsResponse,
     UploadResponse,
 )
+from echofield.research.call_database import CallDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -84,8 +86,42 @@ async def lifespan(application: FastAPI):
             fsize = Path(fpath).stat().st_size / (1024 * 1024)
             store.add(rid, fname, duration_s=0.0, filesize_mb=round(fsize, 3))
 
+    # ---------------------------------------------------------------
+    # Initialise the call catalog
+    # ---------------------------------------------------------------
+    call_db = CallDatabase()
+    application.state.call_db = call_db
+
+    # 1. Load pre-existing call records from the calls CSV if present.
+    #    The calls CSV path is derived from the metadata file path:
+    #    data/metadata.csv  →  data/calls.csv
+    #    but can be overridden via ECHOFIELD_CALLS_FILE env var.
+    calls_csv_path = Path(
+        os.environ.get(
+            "ECHOFIELD_CALLS_FILE",
+            str(Path(settings.METADATA_FILE).with_name("calls.csv")),
+        )
+    )
+    n_loaded = call_db.load_from_csv(calls_csv_path)
+
+    # 2. Also seed from any already-processed recordings in the store.
+    for rec in store._recordings.values():
+        result = rec.get("result")
+        if result and isinstance(result, dict):
+            pipeline_calls = result.get("calls", [])
+            if pipeline_calls:
+                call_db.register_pipeline_calls(
+                    recording_id=rec["id"],
+                    calls=pipeline_calls,
+                    recording_metadata=rec.get("metadata") or {},
+                )
+
     logger.info(
-        "EchoField started — %d recordings in store", len(store._recordings)
+        "EchoField started — %d recordings in store, %d calls in catalog"
+        " (%d from CSV)",
+        len(store._recordings),
+        len(call_db),
+        n_loaded,
     )
 
     yield  # Application runs here
@@ -140,6 +176,11 @@ _mount_static()
 def _get_store() -> RecordingStore:
     """Retrieve the RecordingStore from app state."""
     return app.state.store  # type: ignore[return-value]
+
+
+def _get_call_db() -> CallDatabase:
+    """Retrieve the CallDatabase from app state."""
+    return app.state.call_db  # type: ignore[return-value]
 
 
 def _recording_to_summary(rec: dict[str, Any]) -> RecordingSummary:
@@ -430,59 +471,58 @@ async def get_stats():
 # Routes — Calls
 # ---------------------------------------------------------------------------
 
-@app.get("/api/calls", response_model=dict)
+@app.get("/api/calls", response_model=CallListResponse)
 async def list_calls(
-    limit: int = Query(50, ge=1, le=500),
-    offset: int = Query(0, ge=0),
-    call_type: str | None = Query(None, description="Filter by call type"),
-    recording_id: str | None = Query(None, description="Filter by recording ID"),
+    limit: int = Query(50, ge=1, le=500, description="Max results to return"),
+    offset: int = Query(0, ge=0, description="Results to skip (pagination)"),
+    call_type: str | None = Query(None, description="Filter by call type (exact)"),
+    recording_id: str | None = Query(None, description="Filter by recording ID (exact)"),
+    animal_id: str | None = Query(None, description="Filter by animal ID (exact)"),
+    location: str | None = Query(None, description="Filter by location (substring, case-insensitive)"),
+    date_from: str | None = Query(None, description="Earliest date inclusive (YYYY-MM-DD)"),
+    date_to: str | None = Query(None, description="Latest date inclusive (YYYY-MM-DD)"),
+    min_confidence: float | None = Query(None, ge=0.0, le=1.0, description="Minimum confidence threshold"),
+    sort_by: str = Query("confidence", description="Field to sort by (top-level or acoustic_features key)"),
+    sort_desc: bool = Query(True, description="Sort descending (default true)"),
 ):
-    """List all detected calls across recordings."""
-    store = _get_store()
-    all_calls: list[dict[str, Any]] = []
+    """List detected calls with filtering, sorting, and pagination.
 
-    for rec in store._recordings.values():
-        result = rec.get("result")
-        if result is None or not isinstance(result, dict):
-            continue
-        calls = result.get("calls", [])
-        for call in calls:
-            # Ensure recording_id is set on the call
-            call_data = dict(call)
-            call_data.setdefault("recording_id", rec["id"])
-            all_calls.append(call_data)
+    Searches the in-memory call catalog populated at startup from
+    ``data/calls.csv`` and any processed recordings. All filters are
+    optional and combined with AND logic. The ``sort_by`` parameter
+    accepts any top-level call field **or** any key within
+    ``acoustic_features`` (e.g. ``fundamental_frequency_hz``).
+    """
+    call_db = _get_call_db()
+    results, total = call_db.search(
+        call_type=call_type,
+        location=location,
+        recording_id=recording_id,
+        animal_id=animal_id,
+        min_confidence=min_confidence,
+        date_from=date_from,
+        date_to=date_to,
+        limit=limit,
+        offset=offset,
+        sort_by=sort_by,
+        sort_desc=sort_desc,
+    )
+    return CallListResponse(
+        total=total,
+        returned=len(results),
+        offset=offset,
+        calls=[CallDetail(**c) for c in results],
+    )
 
-    # Apply filters
-    if call_type is not None:
-        all_calls = [c for c in all_calls if c.get("call_type") == call_type]
-    if recording_id is not None:
-        all_calls = [c for c in all_calls if c.get("recording_id") == recording_id]
 
-    total = len(all_calls)
-    page = all_calls[offset : offset + limit]
-
-    return {
-        "items": page,
-        "total": total,
-    }
-
-
-@app.get("/api/calls/{call_id}", response_model=dict)
+@app.get("/api/calls/{call_id}", response_model=CallDetail)
 async def get_call(call_id: str):
-    """Return detail for a single detected call."""
-    store = _get_store()
-
-    for rec in store._recordings.values():
-        result = rec.get("result")
-        if result is None or not isinstance(result, dict):
-            continue
-        for call in result.get("calls", []):
-            if isinstance(call, dict) and call.get("id") == call_id:
-                call_data = dict(call)
-                call_data.setdefault("recording_id", rec["id"])
-                return call_data
-
-    raise HTTPException(status_code=404, detail=f"Call {call_id} not found")
+    """Return full detail for a single detected call by its ID."""
+    call_db = _get_call_db()
+    record = call_db.get_call(call_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail=f"Call {call_id} not found")
+    return CallDetail(**record)
 
 
 # ---------------------------------------------------------------------------

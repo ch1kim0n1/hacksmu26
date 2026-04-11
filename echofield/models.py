@@ -126,6 +126,7 @@ class CallDetail(BaseModel):
     """A single detected elephant vocalization within a recording."""
     id: str
     recording_id: str
+    animal_id: Optional[str] = None
     start_ms: float
     duration_ms: float
     frequency_min_hz: float
@@ -133,6 +134,17 @@ class CallDetail(BaseModel):
     call_type: str
     confidence: float = Field(ge=0.0, le=1.0)
     acoustic_features: Optional[dict[str, Any]] = None
+    location: Optional[str] = None
+    date: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+class CallListResponse(BaseModel):
+    """Paginated list of detected calls."""
+    total: int
+    returned: int
+    offset: int
+    calls: list[CallDetail]
 
 
 class ProcessingResult(BaseModel):
