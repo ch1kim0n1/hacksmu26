@@ -9,6 +9,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Awaitable, Callable
 
+import librosa
 import numpy as np
 
 from echofield.pipeline.cache_manager import CacheManager
@@ -74,6 +75,80 @@ class ProcessingPipeline:
         sr: int,
         metadata: dict[str, Any],
     ) -> list[dict[str, Any]]:
+        """Detect calls using onset detection with energy-based fallback."""
+        try:
+            calls = self._detect_calls_onset(recording_id, y, sr, metadata)
+            if calls:
+                return calls
+        except Exception:
+            pass
+        return self._detect_calls_energy(recording_id, y, sr, metadata)
+
+    def _detect_calls_onset(
+        self,
+        recording_id: str,
+        y: np.ndarray,
+        sr: int,
+        metadata: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Detect calls using librosa onset detection."""
+        if y.size == 0:
+            return []
+
+        hop_length = 512
+        onset_env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)
+        onset_frames = librosa.onset.onset_detect(
+            y=y, sr=sr, onset_envelope=onset_env,
+            hop_length=hop_length, backtrack=True,
+        )
+        if len(onset_frames) == 0:
+            return []
+
+        onset_samples = librosa.frames_to_samples(onset_frames, hop_length=hop_length)
+        min_gap_samples = int(0.3 * sr)
+
+        regions: list[tuple[int, int]] = []
+        region_start = int(onset_samples[0])
+        region_end = region_start
+        for sample in onset_samples[1:]:
+            sample = int(sample)
+            if sample - region_end > min_gap_samples:
+                regions.append((region_start, region_end))
+                region_start = sample
+            region_end = sample
+        regions.append((region_start, region_end))
+
+        calls = []
+        for call_index, (start, end) in enumerate(regions):
+            end_sample = min(len(y), end + int(0.5 * sr))
+            snippet = y[start:end_sample]
+            if snippet.size < int(0.05 * sr):
+                continue
+            features = extract_acoustic_features(snippet, sr)
+            classification = classify_call_type(features)
+            calls.append({
+                "id": f"{recording_id}-call-{call_index}",
+                "recording_id": recording_id,
+                "start_ms": round(start / sr * 1000.0, 2),
+                "duration_ms": round((end_sample - start) / sr * 1000.0, 2),
+                "frequency_min_hz": 8.0,
+                "frequency_max_hz": 1200.0,
+                "call_type": classification["call_type"],
+                "confidence": classification["confidence"],
+                "acoustic_features": features,
+                "location": metadata.get("location"),
+                "date": metadata.get("date"),
+            })
+        return calls
+
+    def _detect_calls_energy(
+        self,
+        recording_id: str,
+        y: np.ndarray,
+        sr: int,
+        metadata: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Detect calls using energy-based thresholding (fallback)."""
         if y.size == 0:
             return []
 
@@ -233,6 +308,7 @@ class ProcessingPipeline:
             y,
             sr,
             aggressiveness=aggressiveness,
+            noise_type=noise_info["primary_type"],
         )
         cleaned_audio = spectral["cleaned_audio"]
         if method in {"deep", "hybrid"}:
