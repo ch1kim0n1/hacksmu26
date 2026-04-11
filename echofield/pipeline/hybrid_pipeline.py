@@ -12,7 +12,9 @@ from typing import Any, Awaitable, Callable
 import numpy as np
 
 from echofield.pipeline.cache_manager import CacheManager
+from echofield.pipeline.call_detector import CallDetector
 from echofield.pipeline.deep_denoise import deep_denoise
+from echofield.pipeline.ensemble import run_ensemble
 from echofield.pipeline.feature_extract import classify_call_type, extract_acoustic_features
 from echofield.pipeline.ingestion import IngestionResult, ingest_audio_file
 from echofield.pipeline.noise_classifier import classify_noise
@@ -74,73 +76,9 @@ class ProcessingPipeline:
         sr: int,
         metadata: dict[str, Any],
     ) -> list[dict[str, Any]]:
-        if y.size == 0:
-            return []
-
-        frame = max(int(0.25 * sr), 1)
-        hop = max(int(0.1 * sr), 1)
-        energies = []
-        starts = []
-        for start in range(0, max(len(y) - frame, 0) + 1, hop):
-            chunk = y[start : start + frame]
-            energies.append(float(np.sqrt(np.mean(chunk ** 2))))
-            starts.append(start)
-        if not energies:
-            features = extract_acoustic_features(y, sr)
-            classification = classify_call_type(features)
-            return [
-                {
-                    "id": f"{recording_id}-call-0",
-                    "recording_id": recording_id,
-                    "start_ms": 0.0,
-                    "duration_ms": round(len(y) / sr * 1000.0, 2),
-                    "frequency_min_hz": 8.0,
-                    "frequency_max_hz": 1200.0,
-                    "call_type": classification["call_type"],
-                    "confidence": classification["confidence"],
-                    "acoustic_features": features,
-                    "location": metadata.get("location"),
-                    "date": metadata.get("date"),
-                }
-            ]
-
-        threshold = max(float(np.percentile(energies, 75)), 1e-6)
-        active_ranges: list[tuple[int, int]] = []
-        current_start = None
-        for index, energy in enumerate(energies):
-            if energy >= threshold and current_start is None:
-                current_start = index
-            elif energy < threshold and current_start is not None:
-                active_ranges.append((current_start, index))
-                current_start = None
-        if current_start is not None:
-            active_ranges.append((current_start, len(energies)))
-        if not active_ranges:
-            active_ranges = [(0, len(energies))]
-
-        calls = []
-        for call_index, (frame_start, frame_end) in enumerate(active_ranges):
-            start_sample = starts[frame_start]
-            end_sample = min(len(y), starts[min(frame_end - 1, len(starts) - 1)] + frame)
-            snippet = y[start_sample:end_sample]
-            features = extract_acoustic_features(snippet, sr)
-            classification = classify_call_type(features)
-            calls.append(
-                {
-                    "id": f"{recording_id}-call-{call_index}",
-                    "recording_id": recording_id,
-                    "start_ms": round(start_sample / sr * 1000.0, 2),
-                    "duration_ms": round((end_sample - start_sample) / sr * 1000.0, 2),
-                    "frequency_min_hz": 8.0,
-                    "frequency_max_hz": 1200.0,
-                    "call_type": classification["call_type"],
-                    "confidence": classification["confidence"],
-                    "acoustic_features": features,
-                    "location": metadata.get("location"),
-                    "date": metadata.get("date"),
-                }
-            )
-        return calls
+        """Detect and classify calls using CallDetector (model or heuristic fallback)."""
+        detector = CallDetector.from_env()
+        return detector.detect(recording_id, y, sr, metadata)
 
     async def process_recording(
         self,
@@ -228,20 +166,41 @@ class ProcessingPipeline:
         )
 
         await self._notify(progress_callback, PipelineStage.DENOISING.value, "active", 50)
-        spectral = await asyncio.to_thread(
-            spectral_gate_denoise,
-            y,
-            sr,
-            aggressiveness=aggressiveness,
-        )
-        cleaned_audio = spectral["cleaned_audio"]
-        if method in {"deep", "hybrid"}:
+        model_path = getattr(self.settings, "MODEL_PATH", None)
+        ensemble_meta: dict[str, Any] = {}
+
+        if method == "hybrid":
+            # Run full ensemble: spectral + U-Net + Demucs, score and select best
+            ensemble_result = await asyncio.to_thread(
+                run_ensemble,
+                y,
+                sr,
+                model_path=model_path,
+                aggressiveness=aggressiveness,
+            )
+            cleaned_audio = ensemble_result["audio"]
+            ensemble_meta = {
+                "denoising_method_selected": ensemble_result["method"],
+                "ensemble_score": ensemble_result["composite_score"],
+                "ensemble_confidence": ensemble_result["confidence"],
+                "candidates_evaluated": ensemble_result["candidates_evaluated"],
+                "per_method_scores": ensemble_result["per_method_scores"],
+            }
+        elif method == "deep":
+            spectral = await asyncio.to_thread(
+                spectral_gate_denoise, y, sr, aggressiveness=aggressiveness
+            )
             cleaned_audio = await asyncio.to_thread(
                 deep_denoise,
-                cleaned_audio,
+                spectral["cleaned_audio"],
                 sr,
-                model_path=getattr(self.settings, "MODEL_PATH", None),
+                model_path=model_path,
             )
+        else:
+            spectral = await asyncio.to_thread(
+                spectral_gate_denoise, y, sr, aggressiveness=aggressiveness
+            )
+            cleaned_audio = spectral["cleaned_audio"]
 
         await self._notify(progress_callback, PipelineStage.SPECTROGRAM.value, "active", 65)
         after_spec, after_viz = await asyncio.to_thread(
@@ -357,6 +316,7 @@ class ProcessingPipeline:
             "comparison_spectrogram_path": str(comparison_path),
             "noise_summary": noise_info,
             "ai_enhanced": method in {"deep", "hybrid"},
+            **ensemble_meta,
         }
         await self._notify(
             progress_callback,

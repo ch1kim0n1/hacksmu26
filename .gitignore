@@ -47,10 +47,12 @@ yarn-error.log
 *.cache
 .librosa_cache/
 
-# Model Weights
+# Model Weights (binary files ignored; docs committed)
 *.pt
 *.pth
 models/
+!models/README.md
+!models/*/model_card.md
 
 # Data Processing
 data/processed/
