@@ -96,6 +96,16 @@ Frontend: `next@14 react@18 wavesurfer.js framer-motion tailwindcss`
 - Frontend uses Next.js App Router with TypeScript. Tailwind for styling.
 - Config via `ECHOFIELD_*` environment variables with fallback defaults.
 
+## Working order
+
+1. **Pick an issue** — Either the user specifies one, or pick from what's assigned to `@cxdima` on GitHub.
+2. **Write tests first** — TDD. Write failing tests that define the expected behavior before any implementation.
+3. **Implement** — Write the code to make the tests pass.
+4. **Commit to a PR** — Create a PR with `(WIP)` in the title. Push commits as work progresses.
+5. **Remove (WIP)** — Once CI/CD passes, update the PR title to remove `(WIP)`.
+
+Goals: working code, tested, high quality, passes CI/CD, and cool.
+
 ## GitHub issues
 
 Issues are tracked at https://github.com/ch1kim0n1/hacksmu26/issues. Labels use priority (`P0: must-ship`, `P1: should-ship`, `P2: nice-to-have`) and role tags.

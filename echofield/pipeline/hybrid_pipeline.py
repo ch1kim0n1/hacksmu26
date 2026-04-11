@@ -13,7 +13,9 @@ import librosa
 import numpy as np
 
 from echofield.pipeline.cache_manager import CacheManager
+from echofield.pipeline.call_detector import CallDetector
 from echofield.pipeline.deep_denoise import deep_denoise
+from echofield.pipeline.ensemble import run_ensemble
 from echofield.pipeline.feature_extract import classify_call_type, extract_acoustic_features
 from echofield.pipeline.ingestion import IngestionResult, ingest_audio_file
 from echofield.pipeline.noise_classifier import classify_noise
@@ -303,6 +305,7 @@ class ProcessingPipeline:
         )
 
         await self._notify(progress_callback, PipelineStage.DENOISING.value, "active", 50)
+<<<<<<< HEAD
         spectral = await asyncio.to_thread(
             spectral_gate_denoise,
             y,
@@ -312,12 +315,43 @@ class ProcessingPipeline:
         )
         cleaned_audio = spectral["cleaned_audio"]
         if method in {"deep", "hybrid"}:
+=======
+        model_path = getattr(self.settings, "MODEL_PATH", None)
+        ensemble_meta: dict[str, Any] = {}
+
+        if method == "hybrid":
+            # Run full ensemble: spectral + U-Net + Demucs, score and select best
+            ensemble_result = await asyncio.to_thread(
+                run_ensemble,
+                y,
+                sr,
+                model_path=model_path,
+                aggressiveness=aggressiveness,
+            )
+            cleaned_audio = ensemble_result["audio"]
+            ensemble_meta = {
+                "denoising_method_selected": ensemble_result["method"],
+                "ensemble_score": ensemble_result["composite_score"],
+                "ensemble_confidence": ensemble_result["confidence"],
+                "candidates_evaluated": ensemble_result["candidates_evaluated"],
+                "per_method_scores": ensemble_result["per_method_scores"],
+            }
+        elif method == "deep":
+            spectral = await asyncio.to_thread(
+                spectral_gate_denoise, y, sr, aggressiveness=aggressiveness
+            )
+>>>>>>> b297c1bc6155044e04a33e0d1f6251883202c708
             cleaned_audio = await asyncio.to_thread(
                 deep_denoise,
-                cleaned_audio,
+                spectral["cleaned_audio"],
                 sr,
-                model_path=getattr(self.settings, "MODEL_PATH", None),
+                model_path=model_path,
             )
+        else:
+            spectral = await asyncio.to_thread(
+                spectral_gate_denoise, y, sr, aggressiveness=aggressiveness
+            )
+            cleaned_audio = spectral["cleaned_audio"]
 
         await self._notify(progress_callback, PipelineStage.SPECTROGRAM.value, "active", 65)
         after_spec, after_viz = await asyncio.to_thread(
@@ -433,6 +467,7 @@ class ProcessingPipeline:
             "comparison_spectrogram_path": str(comparison_path),
             "noise_summary": noise_info,
             "ai_enhanced": method in {"deep", "hybrid"},
+            **ensemble_meta,
         }
         await self._notify(
             progress_callback,
