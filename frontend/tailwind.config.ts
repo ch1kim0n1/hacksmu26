@@ -10,43 +10,95 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        mono: ["Courier New", "Courier", "monospace"],
       },
       colors: {
         echofield: {
-          bg: "#0A1A1F",
-          surface: "#141E24",
-          "surface-elevated": "#1E2A32",
-          border: "#2A3A42",
-          "text-primary": "#F0F5F8",
-          "text-secondary": "#8B9BA5",
-          "text-muted": "#5A6A75",
+          bg: "var(--echofield-bg)",
+          surface: "var(--echofield-surface)",
+          "surface-elevated": "var(--echofield-surface-elevated)",
+          border: "var(--echofield-border)",
+          "text-primary": "var(--echofield-text-primary)",
+          "text-secondary": "var(--echofield-text-secondary)",
+          "text-muted": "var(--echofield-text-muted)",
         },
         accent: {
-          teal: "#00D9FF",
-          DEFAULT: "#00D9FF",
+          teal: "var(--accent-teal)",
+          DEFAULT: "var(--accent-teal)",
         },
         success: {
-          DEFAULT: "#10C876",
+          DEFAULT: "var(--success)",
+          light: "#22DD88",
         },
         warning: {
-          DEFAULT: "#F5A025",
+          DEFAULT: "var(--warning)",
         },
         danger: {
-          DEFAULT: "#EF4444",
+          DEFAULT: "var(--danger)",
         },
         gold: {
-          DEFAULT: "#D4AF37",
+          DEFAULT: "var(--gold)",
         },
         elephant: {
-          DEFAULT: "#8B8680",
+          DEFAULT: "var(--elephant)",
         },
         spectrogram: {
-          low: "#0C1A2A",
-          mid: "#00D9FF",
-          high: "#FFD700",
-          peak: "#EF4444",
+          low: "var(--spectrogram-low)",
+          mid: "var(--spectrogram-mid)",
+          high: "var(--spectrogram-high)",
+          peak: "var(--spectrogram-peak)",
         },
+      },
+      borderRadius: {
+        sm: "0.25rem",
+        DEFAULT: "0.5rem",
+        md: "0.5rem",
+        lg: "0.75rem",
+        xl: "1rem",
+        "2xl": "1.25rem",
+      },
+      boxShadow: {
+        glow: "0 0 20px rgba(0, 217, 255, 0.15)",
+        "glow-lg": "0 0 40px rgba(0, 217, 255, 0.2)",
+        "glow-success": "0 0 20px rgba(16, 200, 118, 0.2)",
+        "glow-gold": "0 0 20px rgba(212, 175, 55, 0.15)",
+        card: "0 2px 8px rgba(0, 0, 0, 0.3)",
+        "card-hover": "0 4px 16px rgba(0, 0, 0, 0.4)",
+      },
+      spacing: {
+        18: "4.5rem",
+        22: "5.5rem",
+        88: "22rem",
+      },
+      backgroundImage: {
+        "gradient-spectrogram":
+          "linear-gradient(to right, var(--spectrogram-low), var(--spectrogram-mid), var(--spectrogram-high), var(--spectrogram-peak))",
+        "gradient-success":
+          "linear-gradient(135deg, var(--success), #22DD88)",
+        "gradient-radial-teal":
+          "radial-gradient(circle, rgba(0,217,255,0.08) 0%, transparent 70%)",
+        "gradient-radial-gold":
+          "radial-gradient(circle, rgba(212,175,55,0.06) 0%, transparent 70%)",
+      },
+      keyframes: {
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 8px rgba(0, 217, 255, 0.2)" },
+          "50%": { boxShadow: "0 0 20px rgba(0, 217, 255, 0.4)" },
+        },
+      },
+      animation: {
+        shimmer: "shimmer 2s ease-in-out infinite",
+        "fade-in": "fade-in 0.3s ease-out",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
       },
     },
   },

@@ -9,6 +9,10 @@ import librosa
 from scipy.signal import find_peaks
 
 
+def _finite(value: float, default: float = 0.0) -> float:
+    return default if not np.isfinite(value) else float(value)
+
+
 def _estimate_fundamental_frequency(y: np.ndarray, sr: int) -> float:
     """Estimate fundamental frequency using YIN algorithm.
 
@@ -19,7 +23,9 @@ def _estimate_fundamental_frequency(y: np.ndarray, sr: int) -> float:
     Returns:
         Median fundamental frequency in Hz, or 0.0 if undetectable.
     """
-    f0 = librosa.yin(y, fmin=8, fmax=200, sr=sr)
+    min_f0 = 8.0
+    frame_length = max(8192, int(np.ceil(sr / min_f0)) + 2)
+    f0 = librosa.yin(y, fmin=min_f0, fmax=200, sr=sr, frame_length=frame_length)
     # Filter out zero/NaN values
     valid = f0[(f0 > 0) & np.isfinite(f0)]
     if len(valid) == 0:
@@ -289,18 +295,18 @@ def extract_acoustic_features(y: np.ndarray, sr: int) -> dict:
     snr = _estimate_snr(y, sr)
 
     return {
-        "fundamental_frequency_hz": round(fundamental_frequency, 2),
-        "harmonicity": round(harmonicity, 4),
+        "fundamental_frequency_hz": round(_finite(fundamental_frequency), 2),
+        "harmonicity": round(_finite(harmonicity), 4),
         "harmonic_count": harmonic_count,
         "formant_peaks_hz": [round(f, 1) for f in formant_peaks],
-        "duration_s": round(duration_s, 3),
-        "bandwidth_hz": round(bandwidth, 1),
+        "duration_s": round(_finite(duration_s), 3),
+        "bandwidth_hz": round(_finite(bandwidth), 1),
         "energy_distribution": energy_dist,
-        "spectral_centroid_hz": round(spectral_centroid, 1),
-        "spectral_rolloff_hz": round(spectral_rolloff, 1),
+        "spectral_centroid_hz": round(_finite(spectral_centroid), 1),
+        "spectral_rolloff_hz": round(_finite(spectral_rolloff), 1),
         "mfcc": mfcc_means,
-        "zero_crossing_rate": round(zero_crossing_rate, 6),
-        "snr_db": snr,
+        "zero_crossing_rate": round(_finite(zero_crossing_rate), 6),
+        "snr_db": _finite(snr),
     }
 
 
