@@ -57,8 +57,8 @@ export default function LandingHero() {
         }`}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[4] flex items-center justify-between px-5 pt-5 text-[10px] uppercase tracking-[0.28em] text-[#f6f0e2]/72 sm:px-8 sm:pt-7 md:px-12 lg:px-16">
-        <div className="rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[4] flex items-center justify-between px-5 pt-5 text-[10px] uppercase tracking-[0.28em] text-[#5d4a34] sm:px-8 sm:pt-7 md:px-12 lg:px-16">
+        <div className="rounded-full border border-[#8d7658]/30 bg-white/30 px-4 py-2 backdrop-blur-sm">
           EchoField
         </div>
         <div className="hidden text-right leading-relaxed sm:block">
@@ -89,10 +89,10 @@ export default function LandingHero() {
           onClick={handleGlobeClick}
           disabled={isTransitioning}
           aria-label="Enter EchoField dashboard"
-          className={`pointer-events-auto absolute left-[48%] top-[31%] h-[clamp(320px,40vw,620px)] w-[clamp(320px,40vw,620px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-all duration-[1250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-            isTransitioning
-              ? "z-[20] scale-[3.4] opacity-0"
-              : "z-[10] scale-100 opacity-100 hover:scale-[1.03]"
+          className={`pointer-events-auto absolute left-[49%] top-[33%] h-[clamp(260px,32vw,500px)] w-[clamp(260px,32vw,500px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-all duration-[1250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              isTransitioning
+                ? "z-[20] scale-[3.4] opacity-0"
+                : "z-[10] scale-100 opacity-100 hover:scale-[1.03]"
           } ${isTransitioning ? "cursor-default" : "cursor-pointer"}`}
         >
           <div className="absolute inset-[-12%] rounded-full bg-[radial-gradient(circle,rgba(82,138,238,0.34)_0%,rgba(82,138,238,0.16)_38%,rgba(82,138,238,0)_72%)] blur-2xl" />
