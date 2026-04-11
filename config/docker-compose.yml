@@ -1,0 +1,230 @@
+# EchoField — Docker Compose Configuration
+# Elephant vocalization noise-removal platform
+#
+# Runs all services for the hackathon demo:
+# - FastAPI backend (audio processing engine)
+# - Next.js frontend (web UI)
+# - Redis (job queue for async processing)
+# - Volumes for audio data persistence
+#
+# Prerequisites:
+#   docker --version (19.03+)
+#   docker-compose --version (1.25+)
+#
+# Quick start:
+#   docker-compose up --build
+
+version: "3.9"
+
+services:
+  # ─────────────────────────────────────────
+  # FastAPI Backend
+  # Audio processing engine + REST API
+  # ─────────────────────────────────────────
+  backend:
+    build:
+      context: ../services/backend
+      dockerfile: Dockerfile
+    container_name: echofield-backend
+    environment:
+      # Audio I/O paths (internal to container)
+      ECHOFIELD_AUDIO_DIR: /app/data/recordings
+      ECHOFIELD_OUTPUT_DIR: /app/data/processed
+      ECHOFIELD_METADATA_FILE: /app/data/metadata.csv
+
+      # ML Pipeline
+      ECHOFIELD_USE_GPU: "false"          # GPU not usually available in Docker
+      ECHOFIELD_DENOISE_METHOD: hybrid
+      ECHOFIELD_SPECTRAL_THRESHOLD: "1.5"
+      ECHOFIELD_MIN_FREQUENCY: "8"
+      ECHOFIELD_MAX_FREQUENCY: "1200"
+
+      # Model configuration
+      ECHOFIELD_MODEL_PATH: /app/models/echofield-denoise-v1.pt
+      ECHOFIELD_MODEL_ARCHITECTURE: unet
+      ECHOFIELD_BATCH_SIZE: "4"           # smaller for Docker resource limits
+
+      # Server
+      ECHOFIELD_BACKEND_PORT: "8000"
+      ECHOFIELD_FRONTEND_URL: http://localhost:3000
+
+      # Redis (job queue)
+      ECHOFIELD_REDIS_HOST: redis
+      ECHOFIELD_REDIS_PORT: "6379"
+      ECHOFIELD_CACHE_TTL: "3600"
+
+      # Logging
+      ECHOFIELD_LOG_LEVEL: INFO
+      ECHOFIELD_LOG_FORMAT: json
+
+      # Database
+      ECHOFIELD_DB_PATH: /app/data/echofield.db
+
+      # Demo mode (adds mock endpoints)
+      ECHOFIELD_DEMO_MODE: "true"
+
+    ports:
+      - "8000:8000"                       # REST API
+
+    volumes:
+      # Audio data (persistent)
+      - echofield-recordings:/app/data/recordings
+      - echofield-processed:/app/data/processed
+      - echofield-models:/app/models
+
+      # Database
+      - echofield-db:/app/data
+
+      # Allow hot-reload during development (optional)
+      # - ../services/backend/app:/app/app
+
+    networks:
+      - echofield-network
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+      start_period: 10s                   # wait for startup
+
+    depends_on:
+      redis:
+        condition: service_healthy
+
+    # Restart policy
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Next.js Frontend
+  # Web UI for upload, processing, playback
+  # ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ../services/frontend
+      dockerfile: Dockerfile
+    container_name: echofield-frontend
+    environment:
+      # API endpoint (internal)
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_BACKEND_HOST: backend
+      NEXT_PUBLIC_BACKEND_PORT: "8000"
+
+      # Node environment
+      NODE_ENV: production
+
+      # Frontend port
+      PORT: "3000"
+
+    ports:
+      - "3000:3000"                       # Web UI
+
+    volumes:
+      # Next.js build cache
+      - echofield-nextjs-cache:/app/.next
+
+      # Allow hot-reload in dev mode (optional)
+      # - ../services/frontend:/app
+      # - /app/node_modules
+
+    networks:
+      - echofield-network
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+      start_period: 15s
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Redis
+  # Job queue for async audio processing
+  # Stores processing status, caches results
+  # ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine               # minimal image
+    container_name: echofield-redis
+    command:
+      - redis-server
+      - "--appendonly"                   # persistence
+      - "yes"
+      - "--appendfsync"                  # write strategy
+      - "everysec"
+
+    ports:
+      - "6379:6379"                       # Redis CLI access (dev only)
+
+    volumes:
+      # Redis data persistence
+      - echofield-redis-data:/data
+
+    networks:
+      - echofield-network
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 1s
+      retries: 5
+
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Optional: Nginx Reverse Proxy
+  # (Uncomment if you want routing/SSL)
+  # ─────────────────────────────────────────
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: echofield-nginx
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     - backend
+  #     - frontend
+  #   networks:
+  #     - echofield-network
+  #   restart: unless-stopped
+
+# ─────────────────────────────────────────
+# Networks
+# ─────────────────────────────────────────
+networks:
+  echofield-network:
+    driver: bridge
+
+# ─────────────────────────────────────────
+# Volumes (data persistence)
+# ─────────────────────────────────────────
+volumes:
+  # Backend: audio recordings (source files)
+  echofield-recordings:
+    driver: local
+
+  # Backend: processed output audio
+  echofield-processed:
+    driver: local
+
+  # Backend: ML model weights
+  echofield-models:
+    driver: local
+
+  # Backend: SQLite database
+  echofield-db:
+    driver: local
+
+  # Frontend: Next.js build cache (improves startup)
+  echofield-nextjs-cache:
+    driver: local
+
+  # Redis: append-only file (persistence)
+  echofield-redis-data:
+    driver: local

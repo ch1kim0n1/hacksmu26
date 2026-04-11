@@ -1,0 +1,333 @@
+# EchoField Configuration
+# Elephant vocalization noise-removal and analysis platform
+#
+# This file defines noise profiles, processing pipelines, quality thresholds,
+# and spectrogram parameters for acoustic analysis of elephant vocalizations.
+
+version: "1.0"
+
+# ─────────────────────────────────────────
+# Audio Environment Noise Profiles
+# ─────────────────────────────────────────
+# Each profile specifies frequency characteristics of common field noise sources.
+# Used by spectral denoiser to identify and attenuate non-elephant content.
+
+noise_profiles:
+  # Aircraft: low-frequency rumble from distant/overhead planes
+  aircraft:
+    frequency_range: [50, 300]           # Hz — engine noise fundamentals
+    characteristic_frequencies: [110, 220, 330]  # harmonic series
+    attack_time: 5000                    # ms — slow onset
+    decay_time: 2000                     # ms — longer tail
+    spectral_bandwidth: 50               # Hz — narrow peaks
+
+  # Vehicle traffic: road noise, engine idling, tire hum
+  vehicles:
+    frequency_range: [40, 250]           # Hz — dominated by engine RPM
+    characteristic_frequencies: [60, 120, 180]  # engine harmonics
+    attack_time: 200
+    decay_time: 300
+    spectral_bandwidth: 30
+    doppler_shifts: true                 # accounts for motion
+
+  # Generator/stationary engine: constant-frequency drone
+  generator:
+    frequency_range: [45, 200]           # Hz — 50/60 Hz power line reference
+    characteristic_frequencies: [50, 100, 150, 200]  # AC mains harmonics
+    attack_time: 100                     # immediate onset
+    decay_time: 50                       # abrupt cutoff
+    spectral_bandwidth: 10               # very narrow (constant frequency)
+    time_variance: low                   # extremely stable
+
+  # Wind/environmental: broadband white/pink noise
+  wind:
+    frequency_range: [100, 2000]         # Hz — very broad
+    spectral_shape: brown_noise          # -3dB/octave slope
+    attack_time: 1000
+    decay_time: 500
+    spectral_bandwidth: 500              # very broad, no peaks
+
+  # Rain: impulsive broadband noise with short bursts
+  rain:
+    frequency_range: [500, 8000]         # Hz — high frequency clicks
+    spectral_shape: broadband
+    attack_time: 50                      # very fast clicks
+    decay_time: 200                      # short decay
+    impulse_pattern: random_poisson      # Poisson arrival times
+
+  # Insect/bird chatter: narrow-band, varying frequency
+  biological_interference:
+    frequency_range: [2000, 8000]        # Hz — bird calls, insects
+    attack_time: 50
+    decay_time: 300
+    spectral_variability: high           # frequency modulation
+    temporal_pattern: stochastic         # unpredictable
+
+# ─────────────────────────────────────────
+# Elephant Vocalization Characteristics
+# ─────────────────────────────────────────
+# Reference bands for acoustic elephant calls — helps preserve target signal
+
+elephant_vocalizations:
+  infrasound:
+    frequency_range: [8, 35]             # Hz — deep rumbles, subsonic
+    typical_duration: 2000               # ms
+    amplitude_range: [-80, -30]          # dBFS (very quiet to moderate)
+    use_case: "Long-range communication, maternal-infant bonds"
+
+  low_frequency_rumbles:
+    frequency_range: [25, 100]           # Hz — extended from infrasound
+    typical_duration: 1500
+    amplitude_range: [-75, -25]
+    use_case: "Social coordination, estrus advertisement"
+
+  trumpet_calls:
+    frequency_range: [200, 1200]         # Hz — high-energy vocalizations
+    typical_duration: 1000
+    amplitude_range: [-70, -15]
+    use_case: "Alarm, excitement, greeting"
+
+  modulated_calls:
+    frequency_range: [50, 800]           # Hz — varying pitch over time
+    modulation_rate: [2, 10]             # Hz — FM sweep rate
+    typical_duration: 2000
+    amplitude_range: [-75, -20]
+    use_case: "Distress, social contact"
+
+# ─────────────────────────────────────────
+# Processing Pipeline Stages
+# ─────────────────────────────────────────
+# Sequential operations applied to each recording
+
+pipeline:
+  stages:
+    # 1. Load and normalize
+    - name: load
+      operation: read_audio_file
+      output_format: float32
+      sample_rate: 16000               # Hz — re-sample if needed (16kHz standard)
+      channels: mono                   # convert stereo → mono (elephant centered)
+
+    # 2. Silence detection and trimming
+    - name: silence_gate
+      operation: remove_silence
+      threshold_db: -50                # dB — silence threshold
+      min_duration_ms: 100             # ms — ignore short gaps
+      padding_ms: 500                  # preserve context around calls
+
+    # 3. Noise profile estimation
+    - name: noise_estimation
+      operation: estimate_background
+      method: median_subtraction       # robust non-spectral method
+      window_duration_ms: 2000         # estimate from first 2s of quiet
+      update_interval_secs: 30         # re-estimate every 30 seconds
+
+    # 4. Spectral noise reduction (FFT-based)
+    - name: spectral_denoise
+      operation: spectral_subtraction
+      threshold: 1.5                   # std devs above noise floor
+      over_subtraction: 1.0            # conservative (no over-subtraction artifacts)
+      floor_db: -80                    # prevent noise from going silent
+
+    # 5. Deep learning denoiser (neural network)
+    - name: deep_denoise
+      operation: neural_denoiser
+      model_name: unet_echofield_v1
+      post_processing: wiener_filter   # smooth output
+
+    # 6. Frequency masking (preserve elephant range)
+    - name: frequency_mask
+      operation: bandpass_filter
+      low_cutoff_hz: 8                 # preserve infrasound
+      high_cutoff_hz: 1200             # keep trumpet harmonics
+      filter_order: 5                  # Butterworth IIR
+
+    # 7. Artifact reduction
+    - name: artifact_suppression
+      operation: click_removal
+      detection_threshold: 0.5          # relative to local RMS
+      window_ms: 10
+
+    # 8. Normalization and quality check
+    - name: normalize
+      operation: loudness_normalization
+      target_loudness: -20              # LUFS (loudness units relative to full scale)
+      headroom_db: 3                    # safe margin
+
+    # 9. Quality assessment
+    - name: quality_check
+      operation: evaluate_output
+      min_snr_db: 8                     # minimum signal-to-noise ratio
+      max_distortion: 0.05              # THD (total harmonic distortion)
+      confidence_threshold: 0.7         # model certainty
+
+    # 10. Save output
+    - name: export
+      operation: write_audio_file
+      output_formats: [wav, mp3, webm]  # multi-format export
+      metadata_tagging: true
+
+# ─────────────────────────────────────────
+# Quality Control Thresholds
+# ─────────────────────────────────────────
+# Acceptance criteria for processed audio
+
+quality_thresholds:
+  # Signal-to-noise ratio (higher = cleaner)
+  signal_to_noise_ratio:
+    pass: 8                              # dB — minimum acceptable
+    good: 12
+    excellent: 16
+
+  # Presence of elephant vocalization in output
+  vocalization_confidence:
+    pass: 0.60                           # >= 60% confidence of elephant
+    good: 0.75
+    excellent: 0.90
+
+  # Artifact suppression (lower = fewer artifacts)
+  artifact_level:
+    pass: 0.10                           # <= 10% of processed power
+    good: 0.05
+    excellent: 0.02
+
+  # Spectral distortion (how much we changed the signal)
+  spectral_distortion:
+    pass: 15                             # dB
+    good: 10
+    excellent: 5
+
+  # Perceptual score (human-like quality rating)
+  mos_score:                             # Mean Opinion Score (1-5)
+    pass: 2.5
+    good: 3.5
+    excellent: 4.0
+
+# ─────────────────────────────────────────
+# Spectrogram Analysis Settings
+# ─────────────────────────────────────────
+# Parameters for time-frequency decomposition (FFT analysis)
+
+spectrogram:
+  # FFT window configuration
+  window:
+    type: hann                           # Hann taper (best for most signals)
+    size: 4096                           # samples — good frequency resolution
+    overlap: 75                          # % — 75% overlap = 1024 hop length
+    hop_length: 1024                     # samples — stride between frames
+
+  # Frequency resolution (Hz per bin)
+  # freq_resolution = sample_rate / window_size = 16000 / 4096 = 3.9 Hz/bin
+  frequency_resolution: 3.9              # Hz
+
+  # Time resolution
+  # time_resolution = hop_length / sample_rate = 1024 / 16000 = 0.064 s = 64 ms
+  time_resolution: 0.064                 # seconds
+
+  # Frequency range for visualization
+  frequency_range: [0, 2000]             # Hz — focus on relevant band
+  spectrogram_colormap: viridis          # perceptually uniform color scheme
+
+  # Dynamic range for display
+  dynamic_range: 80                      # dB — compress for visualization
+
+  # Mel-scale transformation (perceptually motivated)
+  use_mel_scale: true
+  n_mels: 128                            # mel frequency bins
+  mel_range: [8, 1200]                   # Hz — elephant vocalization space
+
+# ─────────────────────────────────────────
+# Export Formats
+# ─────────────────────────────────────────
+# Output specifications for processed audio
+
+export_formats:
+  wav:
+    codec: pcm_float                     # floating-point PCM (lossless)
+    bit_depth: 32                        # bits
+    sample_rate: 16000                   # Hz
+    channels: mono
+    use_case: "Research archive, quality assurance"
+
+  mp3:
+    codec: mp3
+    bitrate: 192                         # kbps
+    quality: 4                           # high quality
+    sample_rate: 16000
+    channels: mono
+    use_case: "Web playback, listening verification"
+
+  webm:
+    codec: opus                          # modern, efficient codec
+    bitrate: 128                         # kbps
+    sample_rate: 16000
+    channels: mono
+    use_case: "Streaming in web UI, mobile playback"
+
+  json_metadata:
+    include_fields:
+      - filename
+      - duration_seconds
+      - detected_call_types
+      - snr_db
+      - vocalization_confidence
+      - processing_stage_timings
+      - quality_score
+    use_case: "Machine-readable annotations"
+
+# ─────────────────────────────────────────
+# Batch Processing Configuration
+# ─────────────────────────────────────────
+# Settings for processing multiple files
+
+batch:
+  # Parallel processing
+  num_workers: 4                         # CPU threads (adapt to machine)
+  queue_type: priority                   # prioritize high-quality source files
+
+  # Job timeout
+  timeout_seconds: 600                   # 10 min per file
+
+  # Retry on failure
+  max_retries: 2
+  retry_backoff: exponential             # 1s, 2s, 4s intervals
+
+  # Checkpoint (resume after interruption)
+  checkpoint_enabled: true
+  checkpoint_interval: 5                 # files processed
+
+# ─────────────────────────────────────────
+# Demo Configuration
+# ─────────────────────────────────────────
+# Pre-loaded example recordings for hackathon demo
+
+demo:
+  # Sample recordings (place in data/demo/)
+  sample_recordings:
+    - id: demo-1
+      filename: "elephant-rumble-clean.wav"
+      location: "Amboseli, Kenya"
+      description: "Clear low-frequency rumble (infrasound)"
+      quality: excellent
+
+    - id: demo-2
+      filename: "elephant-trumpet-noisy.wav"
+      location: "Serengeti, Tanzania"
+      description: "Trumpet call with aircraft and wind noise"
+      quality: good
+
+    - id: demo-3
+      filename: "elephant-modulated-traffic.wav"
+      location: "Hwange, Zimbabwe"
+      description: "Modulated call masked by vehicle noise"
+      quality: challenging
+
+  # Demo flow: upload → select file → process → compare before/after
+  default_flow:
+    - action: homepage
+    - action: select_demo_file
+      file: demo-2
+    - action: process
+    - action: play_before_after
+    - action: show_spectrogram_comparison
+    - action: download_results
