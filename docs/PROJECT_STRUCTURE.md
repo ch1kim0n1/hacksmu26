@@ -6,6 +6,8 @@ EchoField is a real-time elephant vocalization noise-removal platform built for 
 
 ## File Tree — Complete Directory Structure
 
+This tree is the target project map and includes planned routes/components. For the current runnable app, use `python -m echofield` for the backend, `cd frontend && npm run dev` for the frontend on `http://localhost:3000`, and the implemented API routes in `echofield/server.py`.
+
 ```
 echofield/
 │
@@ -141,7 +143,7 @@ echofield/
 │       │
 │       ├── lib/               # Utility functions and API client
 │       │   ├── api.ts         # Fetch wrapper, base URL, header injection, error handling
-│       │   ├── audio-api.ts   # POST /api/process, GET /api/results/:id, WebSocket URL builder
+│       │   ├── audio-api.ts   # Current API wrapper for upload, recordings, processing, calls, export
 │       │   ├── constants.ts   # API endpoints, UI text, color palette, model names
 │       │   ├── format.ts      # Duration formatting (MM:SS), kHz label, percentage strings
 │       │   └── validation.ts  # File type check (WAV), file size limit, sample rate validation
@@ -152,11 +154,13 @@ echofield/
 │
 ├── data/                      # Audio recordings, metadata, and outputs
 │   │
-│   ├── recordings/           # 44 .wav files (ElephantVoices corpus subset)
-│   │   ├── call_001.wav      # Duration: 5-30 seconds each, 16 kHz or 44.1 kHz sample rate
+│   ├── recordings/           # Default upload/input directory
+│   │   ├── call_001.wav      # Example filename; current bundled data may live in audio-files/
 │   │   ├── call_002.wav
 │   │   ├── ...
 │   │   └── call_044.wav
+│   │
+│   ├── audio-files/          # Bundled/reference WAVs when present
 │   │
 │   ├── spectrograms/         # Pre-generated spectrogram PNG images (demo cache)
 │   │   ├── call_001_mel.png
@@ -479,11 +483,11 @@ htmlcov/
 - [ ] `python -m venv venv && source venv/bin/activate`
 - [ ] `pip install -r requirements.txt`
 - [ ] `cd frontend && npm install`
-- [ ] Copy `.env.example` to `.env`, fill in HuggingFace token
-- [ ] `docker-compose up -d` (spin up dev database if needed)
+- [ ] Copy `.env.example` to `.env`
 - [ ] Verify backend server starts: `python -m echofield` (should see "Uvicorn running on 8000")
 - [ ] Verify frontend dev server: `cd frontend && npm run dev` (should see "Ready on 3000")
-- [ ] Test upload endpoint: `curl -X POST http://localhost:8000/api/process -F file=@data/recordings/call_001.wav`
+- [ ] Test health endpoint: `curl http://localhost:8000/health`
+- [ ] Test recordings endpoint: `curl http://localhost:8000/api/recordings`
 - [ ] Open http://localhost:3000 in browser, see landing page
 - [ ] **Checkpoint:** Backend + frontend both running, no errors in console
 
@@ -494,7 +498,7 @@ htmlcov/
 1. **Start services:** `docker-compose up` (or `make demo`)
 2. **Open browser:** http://localhost:3000
 3. **Navigate:** Click "Upload" in sidebar
-4. **Drop file:** Drag `data/recordings/call_001.wav` into drop zone
+4. **Drop file:** Drag a WAV from `data/audio-files/` or `data/recordings/` into the drop zone
 5. **Process:** Hit "Denoise" button
 6. **Watch:** See pipeline stages animate (ingestion → classify → spectral gate → quality check)
 7. **Compare:** Before/after spectrogram slider (show noise removed, call preserved)
@@ -504,4 +508,3 @@ htmlcov/
 11. **Pivot to database:** (If time) Show call catalog search (filtered by location, animal type)
 
 **Target demo time:** 3–5 minutes. Judge impression: "This preserves elephant calls while removing real-world noise. Useful for conservation research. Clean architecture, real-time feedback."
-

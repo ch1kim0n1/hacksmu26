@@ -53,3 +53,31 @@ def test_server_upload_list_and_process(monkeypatch, tmp_path: Path) -> None:
         detail = client.get(f"/api/recordings/{recording_id}")
         assert detail.status_code == 200
         assert detail.json()["status"] in {"processing", "complete"}
+
+
+def test_server_preloads_analysis_metadata(monkeypatch, tmp_path: Path) -> None:
+    recordings_dir = tmp_path / "recordings"
+    recordings_dir.mkdir()
+    sr = 44_100
+    t = np.linspace(0, 1, sr, endpoint=False)
+    sf.write(recordings_dir / "call_001.wav", 0.1 * np.sin(2 * np.pi * 20 * t), sr)
+    (tmp_path / "metadata.csv").write_text(
+        "call_id,filename,animal_id,location,date,start_sec,end_sec,noise_type_ref,species\n"
+        "call_001,call_001.wav,E-1,Amboseli,2026-04-11,0,1,vehicle,African bush elephant\n",
+        encoding="utf-8",
+    )
+
+    server_module = _reload_server(monkeypatch, tmp_path)
+
+    with TestClient(server_module.app) as client:
+        response = client.get("/api/recordings")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] == 1
+    metadata = payload["recordings"][0]["metadata"]
+    assert metadata["call_id"] == "call_001"
+    assert metadata["animal_id"] == "E-1"
+    assert metadata["noise_type_ref"] == "vehicle"
+    assert metadata["start_sec"] == 0.0
+    assert metadata["end_sec"] == 1.0

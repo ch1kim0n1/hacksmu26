@@ -33,6 +33,8 @@ def test_data_loader_matches_metadata_and_audio(tmp_path: Path) -> None:
     assert len(rows) == 1
     assert len(audio_files) == 2
     assert len(combined) == 2
-    assert any(item["filename"] == "call_001.wav" for item in combined)
+    matched = next(item for item in combined if item["filename"] == "call_001.wav")
+    assert matched["metadata"]["call_id"] == "call_001"
+    assert matched["metadata"]["animal_id"] == "E-1"
+    assert matched["metadata"]["noise_type_ref"] == "wind"
     assert any(item["filename"] == "orphan.wav" for item in combined)
-

@@ -41,34 +41,32 @@ cd echofield
 
 # 2. Set up environment
 cp .env.example .env
-# No API keys needed for local demo
+# No API keys needed for the local demo
 
 # 3. Install Python dependencies
-pip install -r requirements.txt --break-system-packages
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 
 # 4. Install frontend dependencies
 cd frontend && npm install && cd ..
 
-# 5. Download and prepare audio dataset
-# (Team already has 44 files downloaded locally)
-mkdir -p data/raw data/processed
-# Copy the 44 .wav files from shared drive to data/raw/
-# Copy metadata.csv to data/raw/
+# 5. Prepare local data/output directories
+mkdir -p data/recordings data/audio-files data/processed data/spectrograms data/cache
+# Current repo/demo data uses data/audio-files for bundled WAVs.
+# ECHOFIELD_AUDIO_DIR defaults to data/recordings, and the loader falls back to
+# sibling data/audio-files when data/recordings is empty.
+# Keep source recordings unchanged; generated output belongs in data/processed
+# and data/spectrograms.
 
-# 6. Preprocess audio files (creates spectrograms)
-python -m echofield.preprocess \
-  --input-dir data/raw \
-  --output-dir data/processed \
-  --n-workers 4
+# 6. Start the backend server
+python -m echofield
 
-# 7. Start the backend server
-python -m echofield.server &
-
-# 8. Start the frontend dev server
+# 7. In another shell, start the frontend dev server
 cd frontend && npm run dev &
 
-# 9. Open in browser
-# http://localhost:5173
+# 8. Open in browser
+# http://localhost:3000
 ```
 
 ---
@@ -77,16 +75,22 @@ cd frontend && npm run dev &
 
 ```bash
 # .env file
-ECHOFIELD_AUDIO_DIR=./data/raw
+ECHOFIELD_AUDIO_DIR=./data/recordings
 ECHOFIELD_PROCESSED_DIR=./data/processed
-ECHOFIELD_MODEL_PATH=./models/denoise-v1.pt
+ECHOFIELD_SPECTROGRAM_DIR=./data/spectrograms
+ECHOFIELD_CACHE_DIR=./data/cache
+ECHOFIELD_METADATA_FILE=./data/metadata.csv
+ECHOFIELD_CONFIG_FILE=./config/echofield.config.yml
+ECHOFIELD_MODEL_PATH=./models/echofield-denoise-v1.pt
 ECHOFIELD_LOG_LEVEL=INFO           # DEBUG for development
-ECHOFIELD_DEVICE=cuda              # or 'cpu' if no GPU
-ECHOFIELD_BATCH_SIZE=8             # audio chunks per batch
-ECHOFIELD_SAMPLE_RATE=16000        # Hz
-ECHOFIELD_CHUNK_DURATION=10        # seconds per processing chunk
+ECHOFIELD_LOG_FORMAT=text
+ECHOFIELD_DEMO_MODE=true
+ECHOFIELD_SAMPLE_RATE=44100        # Hz
+ECHOFIELD_SEGMENT_SECONDS=60
+ECHOFIELD_SEGMENT_OVERLAP_RATIO=0.5
+ECHOFIELD_DENOISE_METHOD=hybrid
 ECHOFIELD_API_PORT=8000
-ECHOFIELD_CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+ECHOFIELD_CORS_ORIGINS=http://localhost:3000,http://localhost:5173
 ```
 
 ---
@@ -96,52 +100,48 @@ ECHOFIELD_CORS_ORIGINS=http://localhost:5173,http://localhost:3000
 ### Directory Structure
 ```
 data/
-├── raw/
-│   ├── elephant_call_001.wav
-│   ├── elephant_call_002.wav
-│   ├── ... (44 total)
-│   └── metadata.csv
+├── audio-files/         # Bundled/reference WAVs when present
+│   ├── 061220-24_airplane_01.wav
+│   ├── 090224-09_generator_01.wav
+│   └── ... (44 total)
+├── recordings/          # Upload/default input directory; do not modify source recordings
+├── metadata.csv         # Optional metadata used by the recording loader
 ├── processed/
-│   ├── elephant_call_001_spectrogram.npy
-│   ├── elephant_call_001_clean.wav
-│   └── ... (processed outputs)
-└── demo/
-    └── before_after_sample.wav
+├── spectrograms/
+└── cache/
 ```
 
 ### Metadata CSV Format
 ```
-filename,species,location,duration_seconds,noise_type,snr_db,researcher
-elephant_call_001.wav,African bush elephant,Kenya Amboseli,8.5,wind_rain,2.1,John Smith
-elephant_call_002.wav,African forest elephant,Congo,12.3,vehicle,3.5,Jane Doe
+call_id,filename,animal_id,location,date,start_sec,end_sec,noise_type_ref,species
+061220-24_airplane_01,061220-24_airplane_01.wav,061220-24,,,0.0,45.833,airplane,African bush elephant
 ...
 ```
 
 ### Data Preparation
 ```bash
 # 1. Verify all 44 files are present
-ls data/raw/*.wav | wc -l  # should print 44
+ls data/audio-files/*.wav | wc -l  # should print 44 when the bundled dataset is present
 
 # 2. Validate audio files
 python -c "
 import librosa
 import os
-files = [f for f in os.listdir('data/raw') if f.endswith('.wav')]
+files = [f for f in os.listdir('data/audio-files') if f.endswith('.wav')]
 for f in files[:5]:
-    y, sr = librosa.load(f'data/raw/{f}')
+    y, sr = librosa.load(f'data/audio-files/{f}')
     print(f'{f}: {len(y)} samples @ {sr}Hz')
 "
 
-# 3. Preprocess (creates spectrograms + aligned metadata)
-python -m echofield.preprocess \
-  --input-dir data/raw \
-  --output-dir data/processed \
-  --n-workers 4 \
-  --force-reprocess  # re-run preprocessing
+# 3. Start the API and confirm the loader can see recordings
+python -m echofield
+curl http://localhost:8000/api/recordings | python -m json.tool
 
-# 4. Verify preprocessed outputs
-ls data/processed/*.npy | wc -l  # should be ~88 (spectrogram + clean audio per file)
+# 4. Process through the UI or API. Outputs are written to:
+ls data/processed data/spectrograms
 ```
+
+The repo currently does not expose a standalone `echofield.preprocess` command. Use the FastAPI processing endpoints or the frontend upload/processing flow.
 
 ---
 
@@ -149,11 +149,11 @@ ls data/processed/*.npy | wc -l  # should be ~88 (spectrogram + clean audio per 
 
 | Person | Responsibility | Primary Files |
 |--------|---------------|---------------|
-| **ML/Audio Lead** | Noise removal model, denoiser architecture, training pipeline | `echofield/ml/`, `echofield/models/` |
-| **Backend Lead** | FastAPI server, audio processing queue, WebSocket events, file I/O | `echofield/server.py`, `echofield/api/` |
+| **ML/Audio Lead** | Noise removal model, denoiser architecture, training pipeline | `echofield/pipeline/`, `echofield/research/` |
+| **Backend Lead** | FastAPI server, audio processing queue, WebSocket events, file I/O | `echofield/server.py`, `echofield/websocket.py` |
 | **Frontend Lead** | Spectrogram visualization, waveform display, story UI, data table | `frontend/src/components/` |
-| **UI/UX + Animation Lead** | Before/after slider, loading states, playback controls, polish | `frontend/src/animations/`, `frontend/src/styles/` |
-| **Research/Data Lead** | Acoustic analysis, CSV export, presentation prep, demo scripting | `data/`, `notebooks/`, docs |
+| **UI/UX + Animation Lead** | Before/after slider, loading states, playback controls, polish | `frontend/src/app/`, `frontend/src/components/` |
+| **Research/Data Lead** | Acoustic analysis, CSV export, presentation prep, demo scripting | `echofield/research/`, `data/`, docs |
 
 ---
 
@@ -183,7 +183,7 @@ main ← stable, demo-ready at all times
 
 ### Backend Only (FastAPI + Audio Processing)
 ```bash
-python -m echofield.server
+python -m echofield
 # Runs on http://localhost:8000
 # API docs: http://localhost:8000/docs (auto-generated)
 # WebSocket: ws://localhost:8000/ws
@@ -193,29 +193,24 @@ python -m echofield.server
 ```bash
 cd frontend
 npm run dev
-# Runs on http://localhost:5173
+# Runs on http://localhost:3000 by default
 # Connects to ws://localhost:8000/ws for live events
 ```
 
 ### Preprocessing Only
 ```bash
-python -m echofield.preprocess \
-  --input-dir data/raw \
-  --output-dir data/processed \
-  --verbose
+# Not currently implemented as a CLI command.
+# Start the backend and trigger processing through:
+# - POST /api/recordings/{recording_id}/process
+# - POST /api/batch/process
+# - the frontend upload/processing flow
 ```
 
 ### Model Inference (Standalone)
 ```bash
-python -c "
-from echofield.ml.denoiser import Denoiser
-import librosa
-
-denoiser = Denoiser(model_path='models/denoise-v1.pt', device='cuda')
-y, sr = librosa.load('data/raw/elephant_call_001.wav')
-y_clean = denoiser.denoise(y, sr)
-print(f'SNR improvement: {compute_snr(y, y_clean):.2f} dB')
-"
+# There is no separate echofield.ml package in the current tree.
+# Use the pipeline modules directly when debugging:
+python -c "from echofield.pipeline.deep_denoise import deep_denoise; print(deep_denoise)"
 ```
 
 ---
@@ -225,92 +220,55 @@ print(f'SNR improvement: {compute_snr(y, y_clean):.2f} dB')
 ### Unit Tests
 ```bash
 # Run all tests
-pytest tests/ -v
+.venv/bin/pytest tests/ -v
 
 # Run specific test suites
-pytest tests/test_denoiser.py -v
-pytest tests/test_preprocessor.py -v
-pytest tests/test_api.py -v
-pytest tests/test_audio_utils.py -v
+.venv/bin/pytest tests/test_pipeline.py -v
+.venv/bin/pytest tests/test_server.py -v
+.venv/bin/pytest tests/test_data_loader.py -v
+.venv/bin/pytest tests/test_exporter.py -v
 ```
 
 ### Key Test Scenarios
 
 ```python
-# tests/test_denoiser.py
+# tests/test_pipeline.py
 
-def test_denoise_reduces_noise():
-    """Verify noise power decreases after denoising."""
-    
-def test_denoise_preserves_signal():
-    """Verify elephant call features are preserved."""
-    
-def test_denoise_handles_different_sample_rates():
-    """Verify model works with 16kHz and 44.1kHz."""
-    
-def test_denoise_gpu_vs_cpu_consistent():
-    """Verify GPU and CPU outputs match (within tolerance)."""
-    
-def test_batch_processing_identical_to_sequential():
-    """Verify batch inference produces same output as sequential."""
+def test_processing_pipeline_creates_outputs():
+    """Verify cleaned audio, spectrograms, calls, and quality metrics are created."""
 
-# tests/test_preprocessor.py
+# tests/test_data_loader.py
 
-def test_spectrogram_shape():
-    """Verify output spectrogram dimensions are correct."""
-    
-def test_metadata_alignment():
-    """Verify CSV metadata aligns with processed files."""
-    
-def test_audio_normalization():
-    """Verify audio levels are normalized to [-1, 1]."""
+def test_data_loader_matches_metadata_and_audio():
+    """Verify metadata rows and audio files are discovered and combined."""
+
+# tests/test_server.py
+
+def test_server_upload_list_and_process():
+    """Verify upload, listing, process start, and detail endpoints."""
 ```
 
 ### Audio Quality Tests
 ```bash
-# Compute SNR (Signal-to-Noise Ratio) on all processed files
-python -m echofield.evaluate \
-  --input-dir data/raw \
-  --output-dir data/processed \
-  --metric snr
-
-# Generate quality report (CSV)
-python -m echofield.evaluate \
-  --input-dir data/raw \
-  --output-dir data/processed \
-  --metric snr \
-  --export-csv reports/quality_metrics.csv
+# No standalone echofield.evaluate CLI exists yet.
+# For now, run the pipeline tests and inspect quality metrics returned by
+# POST /api/recordings/{recording_id}/process and GET /api/recordings/{id}.
+.venv/bin/pytest tests/test_pipeline.py -v
 ```
 
 ### Integration Test (Full Pipeline)
 ```bash
-# Runs a complete processing cycle: upload → preprocess → denoise → export
-python -m echofield.integration_test
-
-# Expected output:
-# 1. Load 44 audio files
-# 2. Preprocess to spectrograms
-# 3. Denoise all files
-# 4. Generate before/after visualizations
-# 5. Compute metrics
-# 6. Print: PASS / FAIL
+# Current repeatable integration coverage is in pytest.
+.venv/bin/pytest tests/test_server.py -v
 ```
 
 ### Demo Rehearsal Test
 ```bash
-# Simulates the exact demo sequence with timing
-python -m echofield.demo_rehearsal
-
-# Runs the full 5-minute demo cycle:
-# - Load dataset (show metadata table)
-# - Select a file
-# - Show before/after spectrogram
-# - Play before audio
-# - Play denoised audio
-# - Show acoustic analysis
-# - Export CSV
-#
-# Reports: total duration, model inference time, UI responsiveness
+# Manual rehearsal for the current app:
+# 1. Run python -m echofield
+# 2. Run cd frontend && npm run dev
+# 3. Open http://localhost:3000
+# 4. Upload/process one WAV and verify audio + spectrogram output.
 ```
 
 ---
@@ -349,33 +307,24 @@ ffmpeg -version
 # Problem: "Unsupported codec" or "File corrupted"
 
 # Solution 1: Re-encode with ffmpeg
-ffmpeg -i data/raw/bad_file.wav -acodec pcm_s16le -ar 16000 data/raw/bad_file_fixed.wav
+ffmpeg -i data/audio-files/bad_file.wav -acodec pcm_s16le -ar 44100 data/audio-files/bad_file_fixed.wav
 
 # Solution 2: Use sox to inspect/fix
-sox data/raw/bad_file.wav -t wav data/raw/bad_file_fixed.wav
+sox data/audio-files/bad_file.wav -t wav data/audio-files/bad_file_fixed.wav
 
-# Solution 3: Skip bad files in preprocessing
-python -m echofield.preprocess \
-  --input-dir data/raw \
-  --output-dir data/processed \
-  --skip-errors
+# Solution 3: Start the backend and process a different recording.
+# The current repo has no standalone preprocessing CLI.
 ```
 
 ### **Out of Memory During Processing**
 ```bash
 # Problem: "CUDA out of memory" or "MemoryError"
 
-# Solution 1: Reduce batch size
-ECHOFIELD_BATCH_SIZE=4 python -m echofield.server
+# Solution 1: Use the default spectral-gate path when deep model weights are unavailable.
+ECHOFIELD_DENOISE_METHOD=spectral_gate python -m echofield
 
-# Solution 2: Switch to CPU
-ECHOFIELD_DEVICE=cpu python -m echofield.server
-
-# Solution 3: Process in smaller chunks
-python -m echofield.preprocess \
-  --input-dir data/raw \
-  --output-dir data/processed \
-  --chunk-size 5  # 5-second chunks instead of 10
+# Solution 2: Reduce segment length for local processing.
+ECHOFIELD_SEGMENT_SECONDS=30 python -m echofield
 ```
 
 ### **WebSocket Connection Fails**
@@ -386,7 +335,7 @@ python -m echofield.preprocess \
 curl http://localhost:8000/health
 
 # Solution 2: Check CORS settings
-# Edit .env, verify ECHOFIELD_CORS_ORIGINS includes http://localhost:5173
+# Edit .env, verify ECHOFIELD_CORS_ORIGINS includes http://localhost:3000
 
 # Solution 3: Check firewall
 # Ensure port 8000 is not blocked
@@ -401,17 +350,16 @@ lsof -i :8000
 # Problem: Denoising 10 seconds of audio takes >10 seconds
 
 # Likely causes:
-# 1. CPU inference (should be ~1-2s on GPU)
-# 2. Model quantization not applied
-# 3. Batch size too small
+# 1. Deep denoising fallback is too slow for the local machine
+# 2. Segment length is too large
+# 3. Spectrogram generation is running on a long recording
 
 # Solutions:
-# 1. Verify ECHOFIELD_DEVICE=cuda
-# 2. Load quantized model
-python -c "from echofield.ml.denoiser import Denoiser; d = Denoiser(device='cuda', quantized=True)"
+# 1. Use spectral gate for the demo path
+ECHOFIELD_DENOISE_METHOD=spectral_gate python -m echofield
 
-# 3. Increase batch size (if memory allows)
-ECHOFIELD_BATCH_SIZE=16 python -m echofield.server
+# 2. Process a shorter clip first
+ECHOFIELD_SEGMENT_SECONDS=30 python -m echofield
 ```
 
 ### **Spectrogram Visualization Shows Blank**
@@ -421,15 +369,11 @@ ECHOFIELD_BATCH_SIZE=16 python -m echofield.server
 # Solution 1: Check audio normalization
 python -c "
 import numpy as np
-spec = np.load('data/processed/elephant_call_001_spectrogram.npy')
-print(f'Min: {spec.min()}, Max: {spec.max()}, Mean: {spec.mean()}')
+from pathlib import Path
+print(sorted(Path('data/spectrograms').glob('*.png'))[:5])
 "
 
-# Solution 2: Check log scaling
-# Frontend may need log-scale conversion: 20 * log10(spec + 1e-5)
-
-# Solution 3: Regenerate spectrograms
-python -m echofield.preprocess --force-reprocess
+# Solution 2: Re-run processing for the recording from the frontend or API.
 ```
 
 ---
@@ -444,13 +388,10 @@ pkill -f npm
 
 # 2. Clean start
 rm -rf data/processed/*
-python -m echofield.preprocess \
-  --input-dir data/raw \
-  --output-dir data/processed \
-  --n-workers 4
+rm -rf data/spectrograms/*
 
 # 3. Start backend
-python -m echofield.server &
+python -m echofield &
 
 # 4. Start frontend
 cd frontend && npm run dev &
@@ -458,26 +399,20 @@ cd frontend && npm run dev &
 # 5. Wait for both to be ready
 sleep 5
 curl http://localhost:8000/health
-curl http://localhost:5173 2>/dev/null | head -1
+curl http://localhost:3000 2>/dev/null | head -1
 
-# 6. Run integration test
-python -m echofield.integration_test
-# Must print PASS
-
-# 7. Run demo rehearsal 2x
-python -m echofield.demo_rehearsal
-python -m echofield.demo_rehearsal
-# Both must complete without errors
+# 6. Run integration tests
+.venv/bin/pytest tests/test_server.py -v
 ```
 
 ### T-10 Minutes: Final Prep
 ```bash
 # Verify everything is running
-curl http://localhost:8000/api/files | python -m json.tool
+curl http://localhost:8000/api/recordings | python -m json.tool
 # Should list all 44 files
 
 # Open browser windows
-# http://localhost:5173 (full screen, no dev tools)
+# http://localhost:3000 (full screen, no dev tools)
 
 # Position window on projector
 # Have audio playback working (test speaker volume)
@@ -532,9 +467,9 @@ curl http://localhost:8000/api/files | python -m json.tool
 ### For Demo (Local)
 ```bash
 # Backend: FastAPI on http://localhost:8000
-python -m echofield.server
+python -m echofield
 
-# Frontend: React dev server on http://localhost:5173
+# Frontend: Next.js dev server on http://localhost:3000
 cd frontend && npm run dev
 ```
 
@@ -545,16 +480,16 @@ cd frontend && npm run dev
 # 1. Create Railway/Render account
 # 2. Connect repo
 # 3. Add environment variables:
-#    - ECHOFIELD_AUDIO_DIR=/app/data/raw
+#    - ECHOFIELD_AUDIO_DIR=/app/data/recordings
 #    - ECHOFIELD_PROCESSED_DIR=/app/data/processed
-#    - ECHOFIELD_DEVICE=cpu  (use CPU on servers)
+#    - ECHOFIELD_SPECTROGRAM_DIR=/app/data/spectrograms
 # 4. Dockerfile (provided):
 FROM python:3.10-slim
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
-CMD ["python", "-m", "echofield.server"]
+CMD ["python", "-m", "echofield"]
 ```
 
 **Frontend (Vercel):**
@@ -576,7 +511,7 @@ curl https://echofield-api.railway.app/health
 curl https://echofield.vercel.app
 
 # Full pipeline (hit the API)
-curl https://echofield-api.railway.app/api/files
+curl https://echofield-api.railway.app/api/recordings
 ```
 
 ---
@@ -606,40 +541,30 @@ cd frontend && npx eslint . && npx prettier --write .
 
 ```bash
 # Watch Python server logs
-python -m echofield.server 2>&1 | grep -E "ERROR|INFO|Uvicorn"
+python -m echofield 2>&1 | grep -E "ERROR|INFO|Uvicorn"
 
 # Check if ports are in use
 lsof -i :8000
-lsof -i :5173
+lsof -i :3000
 
 # Test API endpoints
-curl -X GET http://localhost:8000/api/files
-curl -X POST http://localhost:8000/api/denoise \
-  -H "Content-Type: application/json" \
-  -d '{"filename": "elephant_call_001.wav"}'
+curl -X GET http://localhost:8000/api/recordings
+curl -X GET http://localhost:8000/api/stats
 
-# Monitor preprocessing progress
-tail -f .preprocess.log
+# Process a recording after getting an id from /api/recordings
+curl -X POST http://localhost:8000/api/recordings/<recording_id>/process
 
-# Generate quality metrics
-python -m echofield.evaluate \
-  --input-dir data/raw \
-  --output-dir data/processed \
-  --metric snr \
-  --metric pesq \
-  --export-csv reports/metrics.csv
-
-# Clear caches and temp files
-python -m echofield.clean --all
+# Clear generated output
+rm -rf data/processed/* data/spectrograms/* data/cache/*
 
 # Validate audio files
 python -c "
 import librosa
 import os
-for f in os.listdir('data/raw'):
+for f in os.listdir('data/audio-files'):
     if f.endswith('.wav'):
         try:
-            y, sr = librosa.load(f'data/raw/{f}')
+            y, sr = librosa.load(f'data/audio-files/{f}')
             print(f'✓ {f} ({len(y)//sr}s @ {sr}Hz)')
         except Exception as e:
             print(f'✗ {f}: {e}')

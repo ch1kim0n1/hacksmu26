@@ -196,6 +196,8 @@ Display the EchoField home page: clean, minimal, research-focused. A hero image:
 
 ## TECHNICAL ARCHITECTURE
 
+**Current implementation note:** the runnable local app is FastAPI + in-process async/background tasks, a Next.js frontend on `http://localhost:3000`, local filesystem storage under `data/processed/` and `data/spectrograms/`, and an in-memory recording store. Items such as Celery/Redis, PostgreSQL/pgvector, S3/GCS, and vector search are planned scale-out architecture unless they are explicitly wired into the current code.
+
 ### System Overview
 
 ```
@@ -214,7 +216,7 @@ Display the EchoField home page: clean, minimal, research-focused. A hero image:
 └─────────────────────────┼──────────────────────────────────────┘
                           │
 ┌─────────────────────────┼──────────────────────────────────────┐
-│                  BACKEND (FastAPI + Celery)                     │
+│                  BACKEND (FastAPI; Celery planned)              │
 │                         │                                       │
 │  ┌──────────────────────┴──────────────────────────────────┐   │
 │  │              JOB ORCHESTRATOR                            │   │
@@ -237,15 +239,15 @@ Display the EchoField home page: clean, minimal, research-focused. A hero image:
 │                         │                                    │
 │                    ┌────▼──────────────────────────────┐   │
 │                    │ RESEARCH DATABASE & SEARCH INDEX  │   │
-│                    │ (PostgreSQL + Vector embeddings)  │   │
+│                    │ in-memory now; PostgreSQL planned │   │
 │                    └────────────────────────────────────┘   │
 └────────────────────────────────────────────────────────────┘
 
 EXTERNAL SERVICES:
 ┌────────────────┬──────────────────┬──────────────┐
 │ Audio Features │ Classification   │ Storage      │
-│ (librosa,      │ (Trained models) │ (S3, GCS)    │
-│  essentia)     │                  │              │
+│ (librosa,      │ (Trained models) │ local now;   │
+│  essentia)     │                  │ S3 planned   │
 └────────────────┴──────────────────┴──────────────┘
 ```
 
@@ -269,13 +271,13 @@ EXTERNAL SERVICES:
 | Component | Library | Why |
 |-----------|---------|-----|
 | **Framework** | FastAPI (Python) | Async, WebSocket support, fast startup, minimal overhead |
-| **Job Queue** | Celery + Redis | Distribute denoising jobs across workers, handle large audio files |
+| **Job Queue** | In-process FastAPI background work now; Celery + Redis planned | Current demo keeps processing local; queue workers are the scale-out path |
 | **Audio Denoising** | See ML Pipeline section | Multiple approaches, selectable by user |
 | **Feature Extraction** | librosa + essentia | Extract acoustic metrics (frequency, harmonicity, formants, etc.) |
 | **ML Models** | PyTorch (U-Net, Demucs) | Pre-trained or fine-tuned on elephant recordings |
-| **Database** | PostgreSQL + pgvector | Store recordings, metrics, acoustic embeddings for semantic search |
-| **Vector Store** | Pinecone or pgvector | Semantic search: "Find calls similar to this one" |
-| **File Storage** | AWS S3 or Google Cloud Storage | Store original + cleaned recordings, spectrograms |
+| **Database** | In-memory store now; PostgreSQL + pgvector planned | Current demo state lives in process; durable query/search is future work |
+| **Vector Store** | Pinecone or pgvector (planned) | Semantic search: "Find calls similar to this one" |
+| **File Storage** | Local filesystem now; AWS S3 or Google Cloud Storage planned | Current cleaned recordings and spectrograms are local files |
 | **WebSocket** | FastAPI WebSocket | Stream real-time progress updates, spectrogram animations to frontend |
 | **API Format** | REST + WebSocket | RESTful for file upload/management, WebSocket for streaming denoising progress |
 | **Logging/Monitoring** | Structlog + OpenTelemetry | Track denoising performance, identify bottlenecks |
@@ -297,8 +299,8 @@ EXTERNAL SERVICES:
 3. Generate synthetic noisy versions of clean elephant calls for testing
 4. Pre-train or gather pre-trained U-Net + Demucs weights
 5. Create spectral feature templates for metric extraction
-6. Set up S3/GCS buckets for audio storage
-7. Initialize PostgreSQL with schema for recordings, metrics, elephants
+6. Future scale-out: set up S3/GCS buckets for audio storage
+7. Future scale-out: initialize PostgreSQL with schema for recordings, metrics, elephants
 
 ---
 
@@ -933,12 +935,14 @@ Day 3: Morning briefing: "212 elephant calls recovered, 23 new individuals detec
 
 ## 36-HOUR BUILD PLAN
 
+This section is a sprint plan. Some entries describe planned scale-out work rather than the current runnable app; use the implementation note above and `docs/DEVELOPMENT_GUIDE.md` for current local commands.
+
 ### Team Roles (4-5 people)
 
 | Role | Lead | Key Responsibilities |
 |------|------|---------------------|
 | **ML Engineer** | Denoising pipeline | U-Net + Demucs integration, ensemble voting, metrics extraction, call classification |
-| **Backend Engineer** | API + job queue | FastAPI server, Celery job management, database schema, WebSocket streaming, audio processing workflow |
+| **Backend Engineer** | API + job queue | FastAPI server, current in-process jobs, planned Celery/database scale-out, WebSocket streaming, audio processing workflow |
 | **Frontend Lead** | React UI | Spectrogram visualization, before/after comparison, real-time animation, metrics dashboard, routing |
 | **Full-Stack Support** | Glue + features | Database integration, audio file handling, export logic, deployment, documentation |
 | **Demo/QA** | Presentation | Continuous testing, recording demo video, quality assurance, timing, edge case handling |
@@ -948,7 +952,7 @@ Day 3: Morning briefing: "212 elephant calls recovered, 23 new individuals detec
 | Hour | ML Engineer | Backend Engineer | Frontend Lead | Full-Stack | Demo/QA |
 |------|-------------|------------------|---------------|-----------|---------|
 | **0-2** | Set up Python env, load U-Net model, test on 1 call | FastAPI skeleton, /upload route, file save logic | Next.js project setup, layout components, Tailwind config | Git repo, dev env, docker-compose | Testing baseline (download & test data files) |
-| **2-4** | Implement spectral gating (baseline method) | Job queue schema (Redis + Celery), /process endpoint | Upload UI + drag-drop zone, progress indicator | Connect frontend to API, test upload flow | Test end-to-end with 1 recording |
+| **2-4** | Implement spectral gating (baseline method) | Job queue schema (Redis + Celery planned), `/api/recordings/{id}/process` endpoint | Upload UI + drag-drop zone, progress indicator | Connect frontend to API, test upload flow | Test end-to-end with 1 recording |
 | **4-6** | Spectral gating working, extract 1 metric | Async job processing, WebSocket connection for progress | Spectrogram visualization (Konva.js or Canvas), before/after side-by-side | S3 setup for audio storage, environment config | Performance profile: spectrogram render time |
 | **6-8** | Extract all 12 metrics from clean calls | Store results in PostgreSQL, /recordings/:id route | Metrics dashboard (Recharts), layout grid, colored indicators | Wire up database to frontend, API pagination | Score on 3 test recordings |
 | **8-10** | Load U-Net model, run on noisy call, compare | WebSocket streaming of spectrogram data, real-time animation frames | Smooth animations (Framer Motion), before/after fade transition, metrics card animations | Export to JSON/CSV, add filtering routes | Check demo timing: can we process 1 recording in <2 min? |

@@ -42,6 +42,11 @@ class RecordingMetadata(EchoBaseModel):
     microphone_type: str | None = Field(default=None, examples=["Parabolic"])
     notes: str | None = None
     species: str | None = Field(default=None, examples=["African bush elephant"])
+    call_id: str | None = None
+    animal_id: str | None = None
+    noise_type_ref: str | None = Field(default=None, examples=["vehicle"])
+    start_sec: float | None = Field(default=None, ge=0.0)
+    end_sec: float | None = Field(default=None, ge=0.0)
 
 
 class AudioFile(EchoBaseModel):
