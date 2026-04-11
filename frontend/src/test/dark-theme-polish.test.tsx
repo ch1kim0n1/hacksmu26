@@ -64,12 +64,10 @@ describe("Stagger animations", () => {
 // ── Theme Consistency ──
 
 describe("Theme consistency", () => {
-  it("globals.css sets body background to EV ivory", () => {
-    // Verify the CSS custom property is defined
-    const root = document.documentElement;
+  it("body element exists in DOM", () => {
     // In jsdom, CSS custom properties from external files aren't loaded,
-    // so we verify the code references the right tokens.
-    expect(true).toBe(true); // Structural assertion — verified in theme-tokens.test.tsx
+    // so we verify the DOM structure is present.
+    expect(document.body).toBeTruthy();
   });
 
   it("all spectrogram colormap stops are defined", async () => {
