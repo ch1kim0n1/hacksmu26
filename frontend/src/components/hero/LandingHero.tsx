@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import HeroGlobe from "@/components/hero/HeroGlobe";
+import Header from "@/components/layout/Header";
 
 const DASHBOARD_ROUTE = "/dashboard";
 const TRANSITION_MS = 1350;
@@ -36,6 +37,8 @@ export default function LandingHero() {
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#d8ccb9] text-white">
+      <Header variant="overlay" />
+
       <div
         className={`absolute inset-0 z-0 transform-gpu transition-all duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isTransitioning ? "scale-[1.04] blur-[6px]" : "scale-100 blur-0"
@@ -57,10 +60,7 @@ export default function LandingHero() {
         }`}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[4] flex items-center justify-between px-5 pt-5 text-[10px] uppercase tracking-[0.28em] text-[#5d4a34] sm:px-8 sm:pt-7 md:px-12 lg:px-16">
-        <div className="rounded-full border border-[#8d7658]/30 bg-white/30 px-4 py-2 backdrop-blur-sm">
-          EchoField
-        </div>
+      <div className="pointer-events-none absolute inset-x-0 top-16 z-[11] flex items-center justify-end px-5 pt-3 text-[10px] uppercase tracking-[0.28em] text-[#5d4a34] sm:px-8 md:px-12 lg:px-16">
         <div className="hidden text-right leading-relaxed sm:block">
           Cinematic Wildlife
           <br />
@@ -114,6 +114,20 @@ export default function LandingHero() {
             }}
           />
         </button>
+      </div>
+
+      <div className="pointer-events-none absolute right-[5vw] top-[26%] z-[8] hidden max-w-[24rem] rounded-[2rem] border border-[#b59a76]/26 bg-white/24 p-6 text-[#4e3b28] shadow-[0_24px_50px_rgba(125,98,63,0.12)] backdrop-blur-md lg:block">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#7b6246]">
+          Mission Statement
+        </p>
+        <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-[-0.04em] text-[#3f3121]">
+          Reveal the intelligence hidden inside every field recording.
+        </h2>
+        <p className="mt-4 text-sm leading-7 text-[#5d4a34]">
+          EchoField helps researchers isolate elephant vocalizations, reduce
+          environmental noise, and move from raw capture to meaningful acoustic
+          insight with clarity, speed, and confidence.
+        </p>
       </div>
 
       <div

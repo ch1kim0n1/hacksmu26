@@ -12,12 +12,23 @@ const NAV_LINKS = [
   { href: "/about", label: "About" },
 ];
 
-export default function Header() {
+type HeaderProps = {
+  variant?: "default" | "overlay";
+};
+
+export default function Header({ variant = "default" }: HeaderProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isOverlay = variant === "overlay";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-ev-sand bg-ev-ivory/95 backdrop-blur-sm">
+    <header
+      className={
+        isOverlay
+          ? "absolute inset-x-0 top-0 z-[12] w-full border-b border-[#b59a76]/30 bg-[#f4ebdf]/55 backdrop-blur-md"
+          : "sticky top-0 z-50 w-full border-b border-ev-sand bg-ev-ivory/95 backdrop-blur-sm"
+      }
+    >
       <div className="flex h-14 items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold text-accent-gold">EchoField</span>
@@ -34,7 +45,9 @@ export default function Header() {
                 className={`text-sm font-medium transition-colors hover:text-accent-savanna min-h-[44px] flex items-center ${
                   isActive
                     ? "text-accent-savanna"
-                    : "text-ev-elephant"
+                    : isOverlay
+                      ? "text-[#5d4a34]"
+                      : "text-ev-elephant"
                 }`}
               >
                 {link.label}
@@ -46,7 +59,11 @@ export default function Header() {
         {/* Mobile hamburger */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="sm:hidden flex items-center justify-center w-10 h-10 rounded-lg text-ev-elephant hover:text-ev-charcoal transition-colors"
+          className={`sm:hidden flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${
+            isOverlay
+              ? "text-[#5d4a34] hover:text-[#3f3121]"
+              : "text-ev-elephant hover:text-ev-charcoal"
+          }`}
           aria-label="Toggle menu"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -61,7 +78,13 @@ export default function Header() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <nav className="sm:hidden border-t border-ev-sand bg-ev-cream px-4 py-2">
+        <nav
+          className={
+            isOverlay
+              ? "sm:hidden border-t border-[#b59a76]/30 bg-[#f4ebdf]/90 px-4 py-2"
+              : "sm:hidden border-t border-ev-sand bg-ev-cream px-4 py-2"
+          }
+        >
           {NAV_LINKS.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -72,7 +95,9 @@ export default function Header() {
                 className={`block py-3 text-sm font-medium transition-colors min-h-[44px] ${
                   isActive
                     ? "text-accent-savanna"
-                    : "text-ev-elephant"
+                    : isOverlay
+                      ? "text-[#5d4a34]"
+                      : "text-ev-elephant"
                 }`}
               >
                 {link.label}
