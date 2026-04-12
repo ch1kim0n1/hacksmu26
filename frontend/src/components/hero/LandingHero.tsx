@@ -1,42 +1,47 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import HeroGlobe from "@/components/hero/HeroGlobe";
 import Header from "@/components/layout/Header";
-
-const DASHBOARD_ROUTE = "/dashboard";
-const TRANSITION_MS = 1350;
+import { useSceneTransition } from "@/components/transition/SceneTransitionProvider";
 
 export default function LandingHero() {
-  const router = useRouter();
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  useEffect(() => {
-    router.prefetch(DASHBOARD_ROUTE);
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [router]);
+  const { isTransitioning, startDashboardTransition } = useSceneTransition();
 
   const handleGlobeClick = () => {
     if (isTransitioning) {
       return;
     }
 
-    setIsTransitioning(true);
-    timeoutRef.current = setTimeout(() => {
-      router.push(DASHBOARD_ROUTE);
-    }, TRANSITION_MS);
+    const globe = document.getElementById("landing-globe-trigger");
+    const rect = globe?.getBoundingClientRect();
+    const globeCanvas = globe?.querySelector("canvas") as HTMLCanvasElement | null;
+
+    if (!rect) {
+      return;
+    }
+
+    let globeSnapshotUrl: string | undefined;
+
+    if (globeCanvas) {
+      try {
+        globeSnapshotUrl = globeCanvas.toDataURL("image/png");
+      } catch {}
+    }
+
+    startDashboardTransition(
+      {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+      },
+      globeSnapshotUrl
+    );
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#d8ccb9] text-white">
+    <section className="relative min-h-screen overflow-hidden bg-[#c5b294] text-white">
       <Header variant="overlay" />
 
       <div
@@ -44,9 +49,9 @@ export default function LandingHero() {
           isTransitioning ? "scale-[1.04] blur-[6px]" : "scale-100 blur-0"
         }`}
       >
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#e9dfcf_0%,#d9c7ac_38%,#ccb08a_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_26%,rgba(255,250,240,0.68),transparent_24%),radial-gradient(circle_at_78%_36%,rgba(255,240,204,0.26),transparent_20%),radial-gradient(circle_at_18%_18%,rgba(128,95,52,0.16),transparent_18%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_20%,rgba(123,89,49,0.08)_62%,rgba(88,61,32,0.14)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#dcccb6_0%,#c3ab88_38%,#a8875c_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_26%,rgba(255,248,236,0.52),transparent_24%),radial-gradient(circle_at_78%_36%,rgba(255,236,196,0.18),transparent_20%),radial-gradient(circle_at_18%_18%,rgba(104,75,38,0.22),transparent_18%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0)_18%,rgba(103,73,37,0.14)_62%,rgba(55,37,18,0.28)_100%)]" />
         <Image
           src="/background_texture.jpg"
           alt=""
@@ -55,16 +60,16 @@ export default function LandingHero() {
           className="pointer-events-none object-cover opacity-[0.3] mix-blend-multiply"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_24%,rgba(255,255,255,0.22),transparent_22%),radial-gradient(circle_at_72%_32%,rgba(255,255,255,0.16),transparent_18%),radial-gradient(circle_at_48%_68%,rgba(196,156,92,0.14),transparent_24%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_24%,rgba(255,255,255,0.16),transparent_22%),radial-gradient(circle_at_72%_32%,rgba(255,255,255,0.1),transparent_18%),radial-gradient(circle_at_48%_68%,rgba(162,121,64,0.18),transparent_24%)]" />
       </div>
 
       <div
-        className={`absolute inset-0 z-[1] bg-[radial-gradient(circle_at_80%_26%,rgba(255,255,255,0.16),transparent_16%),linear-gradient(180deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0)_24%,rgba(95,64,31,0.08)_100%)] transition-opacity duration-[900ms] ${
+        className={`absolute inset-0 z-[1] bg-[radial-gradient(circle_at_80%_26%,rgba(255,255,255,0.12),transparent_16%),linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0)_24%,rgba(76,50,24,0.14)_100%)] transition-opacity duration-[900ms] ${
           isTransitioning ? "opacity-35" : "opacity-100"
         }`}
       />
       <div
-        className={`absolute inset-x-0 bottom-0 z-[2] h-[32vh] bg-[linear-gradient(180deg,rgba(208,177,124,0)_0%,rgba(198,161,104,0.14)_40%,rgba(132,96,48,0.22)_100%)] transition-opacity duration-[900ms] ${
+        className={`absolute inset-x-0 bottom-0 z-[2] h-[32vh] bg-[linear-gradient(180deg,rgba(208,177,124,0)_0%,rgba(167,130,78,0.16)_40%,rgba(90,61,27,0.3)_100%)] transition-opacity duration-[900ms] ${
           isTransitioning ? "opacity-30" : "opacity-100"
         }`}
       />
@@ -86,6 +91,7 @@ export default function LandingHero() {
         </div>
 
         <button
+          id="landing-globe-trigger"
           type="button"
           onClick={handleGlobeClick}
           disabled={isTransitioning}

@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes cloudDrift {
+  0% {
+    transform: translate3d(0, 8%, 0) scale(0.86);
+    opacity: 0;
+  }
+
+  16% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate3d(0, -18%, 0) scale(1.22);
+    opacity: 0;
+  }
+}
+
 /* ─── ElephantVoices Design Tokens ─── */
 
 :root {
