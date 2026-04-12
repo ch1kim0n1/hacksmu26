@@ -90,7 +90,7 @@ export function QualityRing({
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-ev-cream"
+          className="text-[#1A1F2A]"
         />
         <circle
           cx={size / 2}
@@ -106,10 +106,10 @@ export function QualityRing({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl font-bold text-ev-charcoal tabular-nums leading-none">
+        <span className="text-xl font-bold text-dark-text-primary tabular-nums leading-none">
           {Math.round(score)}
         </span>
-        <span className="text-[9px] text-ev-warm-gray uppercase tracking-wider font-medium leading-none mt-1">
+        <span className="text-[9px] text-dark-text-secondary uppercase tracking-wider font-medium leading-none mt-1">
           {score >= 90
             ? "Excellent"
             : score >= 75

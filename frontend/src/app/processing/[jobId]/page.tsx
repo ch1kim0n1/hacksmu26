@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -19,6 +19,10 @@ import {
   AnalysisWindow,
 } from "@/components/research/AnalysisLabels";
 import { QualityRing } from "@/components/ui/motion-primitives";
+import InteractiveSpectrogram from "@/components/spectrogram/InteractiveSpectrogram";
+import DarkAudioPlayer from "@/components/audio/DarkAudioPlayer";
+import NoiseDissolve from "@/components/processing/NoiseDissolve";
+import SNRContext from "@/components/processing/SNRContext";
 
 interface ProcessingMetrics {
   snr_before?: number;
@@ -53,7 +57,7 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
                 initial={false}
                 animate={{
                   scale: isCurrent ? 1.1 : 1,
-                  backgroundColor: isComplete ? "#10C876" : isCurrent ? "#C4A46C" : "#F0EBE3",
+                  backgroundColor: isComplete ? "#10C876" : isCurrent ? "#C4A46C" : "#141820",
                 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
                 className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold"
@@ -62,17 +66,17 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
                 {isComplete ? (
                   <Check className="w-3.5 h-3.5 text-white" />
                 ) : (
-                  <span className={isCurrent ? "text-white" : "text-ev-warm-gray"}>{i + 1}</span>
+                  <span className={isCurrent ? "text-white" : "text-dark-text-muted"}>{i + 1}</span>
                 )}
               </motion.div>
-              <span className={`text-[10px] font-medium text-center leading-tight whitespace-nowrap ${isCurrent ? "text-accent-savanna" : isComplete ? "text-success" : "text-ev-warm-gray/60"}`}>
+              <span className={`text-[10px] font-medium text-center leading-tight whitespace-nowrap ${isCurrent ? "text-accent-savanna" : isComplete ? "text-success" : "text-dark-text-muted/60"}`}>
                 {stage.shortLabel}
               </span>
             </div>
             {i < STAGES.length - 1 && (
               <motion.div
                 initial={false}
-                animate={{ backgroundColor: isComplete ? "#10C876" : "#D4CCC350" }}
+                animate={{ backgroundColor: isComplete ? "#10C876" : "#1A1F2A" }}
                 transition={{ duration: 0.4 }}
                 className="flex-1 h-0.5 mx-0.5 rounded-full min-w-[12px]"
               />
@@ -86,8 +90,8 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
 
 function MetricCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="p-4 rounded-xl glass border border-ev-sand/30">
-      <h3 className="text-[11px] font-medium text-ev-warm-gray mb-3 uppercase tracking-wider leading-none">{label}</h3>
+    <div className="p-4 rounded-xl glass border border-white/[0.06]">
+      <h3 className="text-[11px] font-medium text-dark-text-muted mb-3 uppercase tracking-wider leading-none">{label}</h3>
       <div className="min-h-0">{children}</div>
     </div>
   );
@@ -95,8 +99,8 @@ function MetricCard({ label, children }: { label: string; children: React.ReactN
 
 function SkeletonBlock() {
   return (
-    <div className="w-full aspect-[2/1] bg-ev-cream rounded-xl animate-pulse flex items-center justify-center">
-      <svg className="w-10 h-10 text-ev-sand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="w-full aspect-[2/1] bg-dark-surface rounded-xl animate-pulse flex items-center justify-center">
+      <svg className="w-10 h-10 text-dark-text-muted/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
     </div>
@@ -111,9 +115,11 @@ export default function ProcessingPage() {
   const [recording, setRecording] = useState<Recording | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sliderPosition, setSliderPosition] = useState(50);
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const isDraggingSlider = useRef(false);
+
+  // Audio <-> Spectrogram sync state
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
+  const [audioSeekTo, setAudioSeekTo] = useState<number | undefined>(undefined);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -129,25 +135,6 @@ export default function ProcessingPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => { if (processing.status === "complete") fetchData(); }, [processing.status, fetchData]);
-
-  const handleSliderMove = useCallback((clientX: number) => {
-    if (!sliderRef.current || !isDraggingSlider.current) return;
-    const rect = sliderRef.current.getBoundingClientRect();
-    const pct = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-    setSliderPosition(pct);
-  }, []);
-
-  useEffect(() => {
-    const onMM = (e: MouseEvent) => handleSliderMove(e.clientX);
-    const onMU = () => { isDraggingSlider.current = false; };
-    const onTM = (e: TouchEvent) => { if (e.touches.length > 0) handleSliderMove(e.touches[0].clientX); };
-    const onTE = () => { isDraggingSlider.current = false; };
-    window.addEventListener("mousemove", onMM);
-    window.addEventListener("mouseup", onMU);
-    window.addEventListener("touchmove", onTM);
-    window.addEventListener("touchend", onTE);
-    return () => { window.removeEventListener("mousemove", onMM); window.removeEventListener("mouseup", onMU); window.removeEventListener("touchmove", onTM); window.removeEventListener("touchend", onTE); };
-  }, [handleSliderMove]);
 
   const currentStage = recording?.status === "complete" ? "complete" : processing.currentStage || recording?.processing?.current_stage || recording?.status || "pending";
   const progress = recording?.status === "complete" ? 100 : Math.max(processing.progress, Number(recording?.processing?.progress_pct ?? 0));
@@ -166,12 +153,29 @@ export default function ProcessingPage() {
   const metrics = metricsFromLive || metricsFromResult;
   const currentStageLabel = STAGES.find((s) => s.key === currentStage)?.label || "Processing";
 
+  // Compute denoise stage progress for NoiseDissolve
+  const denoiseStageIndex = STAGES.findIndex((s) => s.key === "noise_removal");
+  const currentStageIndex = STAGES.findIndex((s) => s.key === currentStage);
+  const isDenoiseActive = currentStage === "noise_removal";
+  const isDenoiseComplete = currentStageIndex > denoiseStageIndex || isComplete;
+  const denoiseProgress = isDenoiseComplete ? 100 : isDenoiseActive ? Math.max(0, Math.min(100, progress)) : 0;
+
+  // Dynamic page title
+  useEffect(() => {
+    if (isProcessing) {
+      document.title = `${Math.round(progress)}% ${currentStageLabel} | EchoField`;
+    } else if (isComplete) {
+      document.title = `${recording?.filename || 'Complete'} | EchoField`;
+    }
+    return () => { document.title = 'EchoField'; };
+  }, [isProcessing, isComplete, progress, currentStageLabel, recording?.filename]);
+
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-12">
+      <div className="flex-1 flex items-center justify-center p-12 bg-dark-surface">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 text-accent-savanna animate-spin" />
-          <p className="text-sm text-ev-elephant">Loading recording&hellip;</p>
+          <p className="text-sm text-dark-text-muted">Loading recording&hellip;</p>
         </motion.div>
       </div>
     );
@@ -179,11 +183,11 @@ export default function ProcessingPage() {
 
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center p-12">
+      <div className="flex-1 flex items-center justify-center p-12 bg-dark-surface">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
           <AlertCircle className="w-8 h-8 text-danger mx-auto mb-3" />
           <p className="text-danger mb-4">{error}</p>
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={fetchData} className="px-5 py-2.5 bg-ev-cream text-ev-charcoal text-sm rounded-xl hover:bg-ev-sand transition-colors font-medium">
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={fetchData} className="px-5 py-2.5 bg-dark-surface text-dark-text-primary text-sm rounded-xl hover:bg-dark-surface-elevated transition-colors font-medium">
             Retry
           </motion.button>
         </motion.div>
@@ -196,12 +200,12 @@ export default function ProcessingPage() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <div className="flex items-center gap-2 text-sm text-ev-warm-gray mb-1">
-            <Link href="/upload" className="hover:text-ev-elephant transition-colors">Recordings</Link>
+          <div className="flex items-center gap-2 text-sm text-dark-text-secondary mb-1">
+            <Link href="/upload" className="hover:text-dark-text-primary transition-colors">Recordings</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-ev-elephant">{recording?.filename || "Processing"}</span>
+            <span className="text-dark-text-secondary">{recording?.filename || "Processing"}</span>
           </div>
-          <h1 className="text-2xl font-bold text-ev-charcoal">{recording?.filename || "Processing"}</h1>
+          <h1 className="text-2xl font-bold text-dark-text-primary">{recording?.filename || "Processing"}</h1>
         </div>
         <div className="flex items-center gap-3">
           {(processing.status === "processing" || processing.status === "connecting") && (
@@ -209,19 +213,19 @@ export default function ProcessingPage() {
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />Live
             </span>
           )}
-          {isProcessing && <span className="text-sm text-ev-elephant tabular-nums font-medium">{Math.round(progress)}%</span>}
+          {isProcessing && <span className="text-sm text-dark-text-muted tabular-nums font-medium">{Math.round(progress)}%</span>}
         </div>
       </motion.div>
 
       {/* Timeline */}
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="p-5 rounded-xl glass border border-ev-sand/30">
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="p-5 rounded-xl glass border border-white/[0.06]">
         <ProcessingTimeline currentStage={currentStage} />
         {isProcessing && (
           <div className="mt-4">
-            <div className="h-2 bg-ev-cream rounded-full overflow-hidden">
+            <div className="h-2 bg-dark-surface-elevated rounded-full overflow-hidden">
               <motion.div className="h-full bg-gradient-to-r from-accent-savanna to-accent-gold rounded-full" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.5 }} style={{ boxShadow: "0 0 12px rgba(196,164,108,0.3)" }} />
             </div>
-            <p className="text-[11px] text-ev-warm-gray mt-1.5">{currentStageLabel}</p>
+            <p className="text-[11px] text-dark-text-secondary mt-1.5">{currentStageLabel}</p>
           </div>
         )}
       </motion.div>
@@ -236,58 +240,80 @@ export default function ProcessingPage() {
         </motion.div>
       )}
 
-      <div className="grid lg:grid-cols-[1fr_300px] gap-6">
-        {/* Main content */}
-        <div className="space-y-6">
-          {/* Spectrograms */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="p-5 rounded-xl glass border border-ev-sand/30">
-            <h2 className="text-sm font-semibold text-ev-charcoal mb-4">Spectrograms</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-ev-warm-gray mb-2 font-medium">Original</p>
-                {isComplete ? <img src={spectrogramBefore} alt="Original spectrogram" className="w-full rounded-lg border border-ev-sand/30" /> : <SkeletonBlock />}
-              </div>
-              <div>
-                <p className="text-xs text-ev-warm-gray mb-2 font-medium">Cleaned</p>
-                {isComplete ? <img src={spectrogramAfter} alt="Cleaned spectrogram" className="w-full rounded-lg border border-ev-sand/30" /> : <SkeletonBlock />}
-              </div>
+      {/* Spectrogram — full width hero */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+        {isComplete ? (
+          <InteractiveSpectrogram
+            src={spectrogramAfter}
+            duration={recording?.duration || 0}
+            currentTime={audioCurrentTime}
+            onSeek={(time) => setAudioSeekTo(time)}
+            isPlaying={isAudioPlaying}
+            label="Cleaned Spectrogram"
+          />
+        ) : isProcessing && (isDenoiseActive || isDenoiseComplete) ? (
+          <NoiseDissolve
+            beforeSrc={spectrogramBefore}
+            afterSrc={spectrogramAfter}
+            progress={denoiseProgress}
+            isActive={isDenoiseActive}
+          />
+        ) : (
+          <div className="rounded-xl overflow-hidden border border-white/[0.06] bg-[#0C1A2A]">
+            <div className="flex items-center px-4 py-2.5 border-b border-white/[0.06]">
+              <span className="text-xs font-medium text-dark-text-secondary uppercase tracking-wider">Spectrogram</span>
             </div>
-          </motion.div>
+            <SkeletonBlock />
+          </div>
+        )}
+      </motion.div>
 
-          {/* Before/After Slider */}
-          {isComplete && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="p-5 rounded-xl glass border border-ev-sand/30">
-              <h2 className="text-sm font-semibold text-ev-charcoal mb-4">Before / After Comparison</h2>
-              <div ref={sliderRef} className="relative w-full aspect-[2/1] rounded-xl overflow-hidden cursor-col-resize select-none" role="slider" aria-label="Before/After comparison slider" aria-valuenow={Math.round(sliderPosition)} aria-valuemin={0} aria-valuemax={100} onMouseDown={() => { isDraggingSlider.current = true; }} onTouchStart={() => { isDraggingSlider.current = true; }}>
-                <img src={spectrogramAfter} alt="Cleaned spectrogram" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-                <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}>
-                  <img src={spectrogramBefore} alt="Original spectrogram" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-                </div>
-                <div className="absolute top-0 bottom-0 w-0.5 bg-white/80 z-10 pointer-events-none" style={{ left: `${sliderPosition}%` }}>
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border border-ev-sand/20">
-                    <svg className="w-3.5 h-3.5 text-ev-elephant" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" /></svg>
+      <div className="grid lg:grid-cols-[1fr_300px] gap-6">
+        {/* Main content — Audio players */}
+        <div className="space-y-6">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>
+            <div className="space-y-4">
+              <DarkAudioPlayer
+                src={audioOriginal}
+                label="Original Recording"
+                accentColor="#F5A025"
+              />
+              {isComplete ? (
+                <DarkAudioPlayer
+                  src={audioCleaned}
+                  label="Cleaned Audio"
+                  accentColor="#10C876"
+                  onTimeUpdate={(time) => {
+                    setAudioCurrentTime(time);
+                    setIsAudioPlaying(true);
+                  }}
+                  seekTo={audioSeekTo}
+                />
+              ) : (
+                <div className="rounded-xl border border-white/[0.06] bg-dark-surface overflow-hidden">
+                  <div className="flex items-center gap-2 px-4 py-2 border-b border-white/[0.06]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-dark-text-muted" />
+                    <span className="text-xs font-medium text-dark-text-secondary">Cleaned Audio</span>
+                  </div>
+                  <div className="px-4 py-3">
+                    <div className="h-12 bg-dark-surface-elevated rounded animate-pulse" />
                   </div>
                 </div>
-                <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-md text-[10px] text-white font-medium pointer-events-none">Before</div>
-                <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/50 backdrop-blur-sm rounded-md text-[10px] text-white font-medium pointer-events-none">After</div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Audio */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="p-5 rounded-xl glass border border-ev-sand/30">
-            <h2 className="text-sm font-semibold text-ev-charcoal mb-4">Audio Playback</h2>
-            <div className="grid md:grid-cols-2 gap-5">
-              <div>
-                <p className="text-xs text-ev-warm-gray mb-2.5 font-medium">Original Recording</p>
-                <audio controls className="w-full" preload="metadata"><source src={audioOriginal} type="audio/wav" /></audio>
-              </div>
-              <div>
-                <p className="text-xs text-ev-warm-gray mb-2.5 font-medium">Cleaned Audio</p>
-                {isComplete ? <audio controls className="w-full" preload="metadata"><source src={audioCleaned} type="audio/wav" /></audio> : <div className="h-[54px] bg-ev-cream rounded-full animate-pulse" />}
-              </div>
+              )}
             </div>
           </motion.div>
+
+          {/* NoiseDissolve replay when complete */}
+          {isComplete && (
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}>
+              <NoiseDissolve
+                beforeSrc={spectrogramBefore}
+                afterSrc={spectrogramAfter}
+                progress={100}
+                isActive={false}
+              />
+            </motion.div>
+          )}
         </div>
 
         {/* Metrics sidebar */}
@@ -295,54 +321,61 @@ export default function ProcessingPage() {
           <MetricCard label="Quality Score">
             {metrics?.quality_score !== undefined ? (
               <div className="flex justify-center py-1"><QualityRing score={metrics.quality_score} size={90} /></div>
-            ) : <div className="h-20 bg-ev-cream rounded-xl animate-pulse" />}
+            ) : <div className="h-20 bg-dark-surface rounded-xl animate-pulse" />}
           </MetricCard>
 
           <MetricCard label="Signal-to-Noise Ratio">
             <div className="space-y-3">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-ev-elephant">Before</span>
-                  <span className="text-xs font-mono text-ev-charcoal tabular-nums">{metrics?.snr_before !== undefined ? `${metrics.snr_before.toFixed(1)} dB` : "--"}</span>
+                  <span className="text-xs text-dark-text-secondary">Before</span>
+                  <span className="text-xs font-mono text-dark-text-primary tabular-nums">{metrics?.snr_before !== undefined ? `${metrics.snr_before.toFixed(1)} dB` : "--"}</span>
                 </div>
-                <div className="h-1.5 bg-ev-cream rounded-full overflow-hidden">
+                <div className="h-1.5 bg-dark-surface-elevated rounded-full overflow-hidden">
                   <motion.div className="h-full bg-warning rounded-full" initial={{ width: 0 }} animate={{ width: metrics?.snr_before ? `${Math.min(100, (metrics.snr_before / 40) * 100)}%` : "0%" }} transition={{ duration: 0.8, delay: 0.3 }} />
                 </div>
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-ev-elephant">After</span>
-                  <span className="text-xs font-mono text-ev-charcoal tabular-nums">{metrics?.snr_after !== undefined ? `${metrics.snr_after.toFixed(1)} dB` : "--"}</span>
+                  <span className="text-xs text-dark-text-secondary">After</span>
+                  <span className="text-xs font-mono text-dark-text-primary tabular-nums">{metrics?.snr_after !== undefined ? `${metrics.snr_after.toFixed(1)} dB` : "--"}</span>
                 </div>
-                <div className="h-1.5 bg-ev-cream rounded-full overflow-hidden">
+                <div className="h-1.5 bg-dark-surface-elevated rounded-full overflow-hidden">
                   <motion.div className="h-full bg-success rounded-full" initial={{ width: 0 }} animate={{ width: metrics?.snr_after ? `${Math.min(100, (metrics.snr_after / 40) * 100)}%` : "0%" }} transition={{ duration: 0.8, delay: 0.5 }} />
                 </div>
               </div>
               {metrics?.snr_before !== undefined && metrics?.snr_after !== undefined && (
-                <div className="pt-2.5 border-t border-ev-sand/30 flex items-center justify-between">
-                  <span className="text-xs text-ev-elephant">Improvement</span>
+                <div className="pt-2.5 border-t border-white/[0.06] flex items-center justify-between">
+                  <span className="text-xs text-dark-text-secondary">Improvement</span>
                   <span className="text-xs font-bold text-success tabular-nums">+{(metrics.snr_after - metrics.snr_before).toFixed(1)} dB</span>
                 </div>
               )}
             </div>
           </MetricCard>
 
+          {/* SNR Context */}
+          {metrics?.snr_before !== undefined && metrics?.snr_after !== undefined && (
+            <MetricCard label="What This Sounds Like">
+              <SNRContext snrBefore={metrics.snr_before} snrAfter={metrics.snr_after} />
+            </MetricCard>
+          )}
+
           {metrics?.noise_reduction_db !== undefined && (
             <MetricCard label="Noise Reduction">
-              <p className="text-2xl font-bold text-accent-savanna tabular-nums">{metrics.noise_reduction_db.toFixed(1)}<span className="text-sm font-normal text-ev-warm-gray ml-1">dB</span></p>
+              <p className="text-2xl font-bold text-accent-savanna tabular-nums">{metrics.noise_reduction_db.toFixed(1)}<span className="text-sm font-normal text-dark-text-secondary ml-1">dB</span></p>
             </MetricCard>
           )}
 
           <MetricCard label="Recording Info">
             <dl className="space-y-2.5 text-xs">
-              <div className="flex items-baseline justify-between gap-3"><dt className="text-ev-warm-gray shrink-0">ID</dt><dd className="text-ev-elephant font-mono text-[11px] truncate">{jobId.slice(0, 12)}&hellip;</dd></div>
-              {recording?.duration && <div className="flex items-baseline justify-between gap-3"><dt className="text-ev-warm-gray shrink-0">Duration</dt><dd className="text-ev-charcoal tabular-nums">{Math.floor(recording.duration / 60)}m {Math.floor(recording.duration % 60)}s</dd></div>}
-              {recording?.sample_rate && <div className="flex items-baseline justify-between gap-3"><dt className="text-ev-warm-gray shrink-0">Sample Rate</dt><dd className="text-ev-charcoal tabular-nums">{(recording.sample_rate / 1000).toFixed(1)} kHz</dd></div>}
-              {recording?.location && <div className="flex items-baseline justify-between gap-3"><dt className="text-ev-warm-gray shrink-0">Location</dt><dd className="text-ev-charcoal truncate">{recording.location}</dd></div>}
-              {recording?.metadata?.animal_id && <div className="flex items-baseline justify-between gap-3"><dt className="text-ev-warm-gray shrink-0">Animal ID</dt><dd className="text-ev-charcoal truncate">{recording.metadata.animal_id}</dd></div>}
-              {recording?.metadata?.call_id && <div className="flex items-baseline justify-between gap-3"><dt className="text-ev-warm-gray shrink-0">Call ID</dt><dd className="text-ev-charcoal truncate">{recording.metadata.call_id}</dd></div>}
-              {recording?.metadata?.noise_type_ref && <div className="flex items-baseline justify-between gap-3"><dt className="text-ev-warm-gray shrink-0">Ref Noise</dt><dd className="text-ev-charcoal capitalize truncate">{recording.metadata.noise_type_ref}</dd></div>}
-              <div className="flex items-baseline justify-between gap-3"><dt className="text-ev-warm-gray shrink-0">Status</dt><dd className="capitalize text-ev-charcoal">{recording?.status || currentStage}</dd></div>
+              <div className="flex items-baseline justify-between gap-3"><dt className="text-dark-text-muted shrink-0">ID</dt><dd className="text-dark-text-muted font-mono text-[11px] truncate">{jobId.slice(0, 12)}&hellip;</dd></div>
+              {recording?.duration && <div className="flex items-baseline justify-between gap-3"><dt className="text-dark-text-muted shrink-0">Duration</dt><dd className="text-dark-text-secondary tabular-nums">{Math.floor(recording.duration / 60)}m {Math.floor(recording.duration % 60)}s</dd></div>}
+              {recording?.sample_rate && <div className="flex items-baseline justify-between gap-3"><dt className="text-dark-text-muted shrink-0">Sample Rate</dt><dd className="text-dark-text-secondary tabular-nums">{(recording.sample_rate / 1000).toFixed(1)} kHz</dd></div>}
+              {recording?.location && <div className="flex items-baseline justify-between gap-3"><dt className="text-dark-text-muted shrink-0">Location</dt><dd className="text-dark-text-secondary truncate">{recording.location}</dd></div>}
+              {recording?.metadata?.animal_id && <div className="flex items-baseline justify-between gap-3"><dt className="text-dark-text-muted shrink-0">Animal ID</dt><dd className="text-dark-text-secondary truncate">{recording.metadata.animal_id}</dd></div>}
+              {recording?.metadata?.call_id && <div className="flex items-baseline justify-between gap-3"><dt className="text-dark-text-muted shrink-0">Call ID</dt><dd className="text-dark-text-secondary truncate">{recording.metadata.call_id}</dd></div>}
+              {recording?.metadata?.noise_type_ref && <div className="flex items-baseline justify-between gap-3"><dt className="text-dark-text-muted shrink-0">Ref Noise</dt><dd className="text-dark-text-secondary capitalize truncate">{recording.metadata.noise_type_ref}</dd></div>}
+              <div className="flex items-baseline justify-between gap-3"><dt className="text-dark-text-muted shrink-0">Status</dt><dd className="text-dark-text-secondary capitalize">{recording?.status || currentStage}</dd></div>
             </dl>
           </MetricCard>
 
@@ -350,7 +383,7 @@ export default function ProcessingPage() {
             <MetricCard label="Analysis Labels"><AnalysisLabels recording={recording} /></MetricCard>
           )}
           {recording && recording.start_sec != null && recording.end_sec != null && (
-            <div className="p-4 rounded-xl glass border border-ev-sand/30"><AnalysisWindow recording={recording} /></div>
+            <div className="p-4 rounded-xl glass border border-white/[0.06]"><AnalysisWindow recording={recording} /></div>
           )}
 
           {isComplete && (
@@ -362,7 +395,7 @@ export default function ProcessingPage() {
                 </Link>
               </motion.div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Link href={`/export?recording=${jobId}`} aria-label="Export data" className="flex items-center justify-center gap-2 w-full px-5 py-2.5 glass border border-ev-sand/30 text-ev-charcoal text-sm font-medium rounded-xl card-hover">
+                <Link href={`/export?recording=${jobId}`} aria-label="Export data" className="flex items-center justify-center gap-2 w-full px-5 py-2.5 glass border border-white/[0.06] text-dark-text-primary text-sm font-medium rounded-xl card-hover">
                   <Download className="w-4 h-4" />
                   <span>Export Data</span>
                 </Link>

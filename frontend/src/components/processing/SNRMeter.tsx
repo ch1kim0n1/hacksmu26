@@ -36,19 +36,19 @@ export default function SNRMeter({
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-ev-sand bg-ev-cream p-4 space-y-4">
-        <div className="h-4 w-24 bg-background-elevated animate-pulse rounded" />
-        <div className="h-6 bg-background-elevated animate-pulse rounded" />
-        <div className="h-6 bg-background-elevated animate-pulse rounded" />
+      <div className="rounded-lg border border-white/[0.06] bg-dark-surface p-4 space-y-4">
+        <div className="h-4 w-24 bg-dark-surface-elevated animate-pulse rounded" />
+        <div className="h-6 bg-dark-surface-elevated animate-pulse rounded" />
+        <div className="h-6 bg-dark-surface-elevated animate-pulse rounded" />
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border border-ev-sand bg-ev-cream p-4 space-y-4">
+    <div className="rounded-lg border border-white/[0.06] bg-dark-surface p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-ev-charcoal">
+        <h3 className="text-sm font-medium text-dark-text-primary">
           Signal-to-Noise Ratio
         </h3>
         <div className="flex items-center gap-2">
@@ -70,12 +70,12 @@ export default function SNRMeter({
       {/* Before bar */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-ev-warm-gray">Before</span>
-          <span className="text-xs font-mono text-ev-elephant">
+          <span className="text-xs text-dark-text-secondary">Before</span>
+          <span className="text-xs font-mono text-dark-text-primary">
             {snrBefore.toFixed(1)} dB
           </span>
         </div>
-        <div className="h-5 bg-background-elevated rounded overflow-hidden">
+        <div className="h-5 bg-dark-surface-elevated rounded overflow-hidden">
           <motion.div
             initial={{ width: "0%" }}
             animate={{ width: `${beforeWidth}%` }}
@@ -89,12 +89,12 @@ export default function SNRMeter({
       {/* After bar */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-ev-warm-gray">After</span>
-          <span className="text-xs font-mono text-ev-elephant">
+          <span className="text-xs text-dark-text-secondary">After</span>
+          <span className="text-xs font-mono text-dark-text-primary">
             {snrAfter.toFixed(1)} dB
           </span>
         </div>
-        <div className="h-5 bg-background-elevated rounded overflow-hidden">
+        <div className="h-5 bg-dark-surface-elevated rounded overflow-hidden">
           <motion.div
             initial={{ width: "0%" }}
             animate={{ width: `${afterWidth}%` }}

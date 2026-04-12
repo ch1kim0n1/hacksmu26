@@ -59,6 +59,15 @@ const config: Config = {
           high: "#FFD700",
           peak: "#EF4444",
         },
+        dark: {
+          bg: "#0B0D10",
+          surface: "#141820",
+          "surface-elevated": "#1A1F2A",
+          "surface-overlay": "#232930",
+          "text-primary": "#E8E4DF",
+          "text-secondary": "#9B9590",
+          "text-muted": "#6B6560",
+        },
       },
       borderColor: {
         DEFAULT: "#D4CCC3",
@@ -83,6 +92,10 @@ const config: Config = {
           "0 8px 25px rgba(44, 41, 38, 0.08), 0 2px 8px rgba(44, 41, 38, 0.04)",
         "card-elevated":
           "0 12px 40px rgba(44, 41, 38, 0.1), 0 4px 12px rgba(44, 41, 38, 0.06)",
+        "dark-glow": "0 0 20px rgba(196, 164, 108, 0.1)",
+        "dark-glow-lg": "0 0 40px rgba(196, 164, 108, 0.15)",
+        "dark-card": "0 2px 8px rgba(0, 0, 0, 0.3), 0 0 1px rgba(255, 255, 255, 0.05)",
+        "spectrogram-glow": "0 0 30px rgba(0, 217, 255, 0.1), 0 0 60px rgba(0, 217, 255, 0.05)",
       },
       keyframes: {
         shimmer: {
@@ -113,6 +126,10 @@ const config: Config = {
             boxShadow: "0 0 24px 4px rgba(196, 164, 108, 0.12)",
           },
         },
+        "playhead-glow": {
+          "0%, 100%": { boxShadow: "0 0 4px rgba(196, 164, 108, 0.3)" },
+          "50%": { boxShadow: "0 0 12px rgba(196, 164, 108, 0.6)" },
+        },
       },
       animation: {
         shimmer: "shimmer 2s ease-in-out infinite",
@@ -121,6 +138,7 @@ const config: Config = {
         "slide-up": "slide-up 0.5s ease-out",
         "scale-in": "scale-in 0.4s ease-out",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
+        "playhead-glow": "playhead-glow 2s ease-in-out infinite",
       },
     },
   },

@@ -81,7 +81,7 @@ export default function BeforeAfterSlider({
   return (
     <div
       ref={containerRef}
-      className="relative rounded-lg border border-ev-sand bg-ev-cream overflow-hidden select-none cursor-ew-resize shadow-lg shadow-accent-savanna/5"
+      className="relative rounded-lg border border-white/[0.06] bg-[#0C1A2A] overflow-hidden select-none cursor-ew-resize shadow-lg shadow-accent-savanna/5"
       onClick={handleContainerClick}
     >
       {/* Before image (full, underneath) */}

@@ -34,6 +34,21 @@
   --spectrogram-peak: #EF4444;
 }
 
+/* ─── Dark Lab Theme ─── */
+.dark {
+  --ev-page-bg: #0B0D10;
+  --ev-surface: #141820;
+  --ev-surface-elevated: #1A1F2A;
+  --ev-surface-overlay: #232930;
+  --ev-border: rgba(255, 255, 255, 0.06);
+  --ev-border-bright: rgba(255, 255, 255, 0.12);
+  --ev-text-primary: #E8E4DF;
+  --ev-text-secondary: #9B9590;
+  --ev-text-muted: #6B6560;
+  --ev-accent: #C4A46C;
+  --ev-accent-glow: rgba(196, 164, 108, 0.15);
+}
+
 body {
   background-color: var(--ev-ivory);
   color: var(--ev-charcoal);
@@ -312,4 +327,80 @@ audio {
 select {
   -webkit-appearance: none;
   -moz-appearance: none;
+}
+
+/* ─── Dark Theme Overrides ─── */
+
+.dark .glass {
+  background: rgba(20, 24, 32, 0.7);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark .glass-strong {
+  background: rgba(26, 31, 42, 0.85);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark ::-webkit-scrollbar-track { background: #141820; }
+.dark ::-webkit-scrollbar-thumb { background: #2C3238; border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #3C4248; }
+.dark * { scrollbar-color: #2C3238 #141820; }
+
+.dark .bg-orbs::before {
+  background: radial-gradient(circle, rgba(196, 164, 108, 0.04) 0%, transparent 70%);
+}
+
+.dark .bg-orbs::after {
+  background: radial-gradient(circle, rgba(0, 217, 255, 0.025) 0%, transparent 70%);
+}
+
+.dark .card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(196, 164, 108, 0.08);
+}
+
+.dark .skeleton { background: var(--ev-surface); }
+.dark .skeleton::after {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%);
+  background-size: 200% 100%;
+}
+
+/* Spectrogram hero ambient glow */
+.spectrogram-hero {
+  position: relative;
+}
+
+.spectrogram-hero::after {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(ellipse at center, rgba(0, 217, 255, 0.06) 0%, rgba(196, 164, 108, 0.03) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 24px;
+  filter: blur(20px);
+}
+
+/* Crosshair cursor for interactive spectrograms */
+.cursor-instrument { cursor: crosshair; }
+.cursor-instrument:active { cursor: grabbing; }
+
+/* Noise dissolve animation */
+@keyframes noise-dissolve {
+  0% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 0 100%); }
+}
+
+/* Playhead glow animation */
+@keyframes playhead-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(196, 164, 108, 0.3); }
+  50% { box-shadow: 0 0 12px rgba(196, 164, 108, 0.6); }
+}
+
+.animate-playhead-glow {
+  animation: playhead-glow 2s ease-in-out infinite;
 }

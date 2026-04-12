@@ -44,7 +44,7 @@ const CALL_TYPE_COLORS: Record<string, string> = {
 function CallTypeBadge({ type }: { type: string }) {
   const c =
     CALL_TYPE_COLORS[type.toLowerCase()] ||
-    "bg-ev-warm-gray/10 text-ev-warm-gray border-ev-warm-gray/20";
+    "bg-dark-text-muted/10 text-dark-text-muted border-dark-text-muted/20";
   return (
     <span
       className={`px-2 py-0.5 rounded-md text-[11px] font-semibold border ${c}`}
@@ -118,10 +118,10 @@ export default function DatabasePage() {
         className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold text-ev-charcoal">
+          <h1 className="text-2xl font-bold text-dark-text-primary">
             Call Database
           </h1>
-          <p className="text-sm text-ev-warm-gray mt-1">
+          <p className="text-sm text-dark-text-secondary mt-1">
             Browse and search all detected elephant vocalizations.
           </p>
         </div>
@@ -129,7 +129,7 @@ export default function DatabasePage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.15 }}
-          className="glass border border-ev-sand/30 px-3 py-1.5 rounded-xl tabular-nums text-sm text-ev-warm-gray font-medium"
+          className="bg-dark-surface border border-white/[0.06] px-3 py-1.5 rounded-xl tabular-nums text-sm text-dark-text-secondary font-medium"
         >
           {total} total calls
         </motion.span>
@@ -143,13 +143,13 @@ export default function DatabasePage() {
         className="flex flex-col sm:flex-row gap-3"
       >
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ev-warm-gray" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-text-muted" />
           <input
             type="text"
             placeholder="Search by call ID, recording ID, or type..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 glass border border-ev-sand/40 rounded-xl text-sm text-ev-charcoal placeholder:text-ev-warm-gray/50 focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-dark-surface border border-white/[0.06] rounded-xl text-sm text-dark-text-primary placeholder:text-dark-text-muted focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all"
           />
         </div>
 
@@ -160,7 +160,7 @@ export default function DatabasePage() {
             setPage(0);
           }}
           aria-label="Filter by call type"
-          className="px-3.5 py-2.5 glass border border-ev-sand/40 rounded-xl text-sm text-ev-charcoal focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all appearance-none bg-[right_0.75rem_center] bg-[length:16px_16px] bg-no-repeat pr-9"
+          className="px-3.5 py-2.5 bg-dark-surface border border-white/[0.06] rounded-xl text-sm text-dark-text-primary focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all appearance-none bg-[right_0.75rem_center] bg-[length:16px_16px] bg-no-repeat pr-9"
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238A837B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")` }}
         >
           {CALL_TYPES.map((t) => (
@@ -171,13 +171,13 @@ export default function DatabasePage() {
         </select>
 
         <div className="relative sm:w-44">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ev-warm-gray" />
+          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-dark-text-muted" />
           <input
             type="text"
             placeholder="Location..."
             value={locationFilter}
             onChange={(e) => setLocationFilter(e.target.value)}
-            className="w-full pl-9 pr-3.5 py-2.5 glass border border-ev-sand/40 rounded-xl text-sm text-ev-charcoal placeholder:text-ev-warm-gray/50 focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all"
+            className="w-full pl-9 pr-3.5 py-2.5 bg-dark-surface border border-white/[0.06] rounded-xl text-sm text-dark-text-primary placeholder:text-dark-text-muted focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all"
           />
         </div>
       </motion.div>
@@ -188,29 +188,29 @@ export default function DatabasePage() {
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="p-4 rounded-xl glass border border-ev-sand/30 animate-pulse"
+              className="p-4 rounded-xl bg-dark-surface border border-white/[0.06] animate-pulse"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
               <div className="flex items-center justify-between mb-3">
-                <div className="h-3 w-20 bg-ev-cream rounded" />
-                <div className="h-5 w-14 bg-ev-cream rounded" />
+                <div className="h-3 w-20 bg-dark-surface-elevated rounded" />
+                <div className="h-5 w-14 bg-dark-surface-elevated rounded" />
               </div>
               <div className="space-y-2 mt-4">
-                <div className="h-3 w-full bg-ev-cream rounded" />
-                <div className="h-3 w-2/3 bg-ev-cream rounded" />
+                <div className="h-3 w-full bg-dark-surface-elevated rounded" />
+                <div className="h-3 w-2/3 bg-dark-surface-elevated rounded" />
               </div>
             </div>
           ))}
         </div>
       ) : error ? (
-        <div className="p-8 rounded-xl glass border border-ev-sand/30 text-center">
+        <div className="p-8 rounded-xl bg-dark-surface border border-white/[0.06] text-center">
           <AlertCircle className="w-8 h-8 text-danger mx-auto mb-3" />
           <p className="text-danger mb-4">{error}</p>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={fetchCalls}
-            className="px-5 py-2 bg-ev-cream text-ev-elephant rounded-xl hover:text-ev-charcoal transition-colors text-sm font-medium inline-flex items-center gap-1.5"
+            className="px-5 py-2 bg-dark-surface-elevated text-dark-text-secondary rounded-xl hover:text-dark-text-primary transition-colors text-sm font-medium inline-flex items-center gap-1.5"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Retry
@@ -220,13 +220,13 @@ export default function DatabasePage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-16 rounded-2xl glass border border-dashed border-ev-sand/60 text-center"
+          className="p-16 rounded-2xl bg-dark-surface border border-dashed border-white/[0.08] text-center"
         >
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-savanna/10 to-accent-gold/5 flex items-center justify-center mx-auto mb-4">
             <DatabaseIcon className="w-7 h-7 text-accent-savanna/50" />
           </div>
-          <p className="text-ev-elephant font-medium mb-1">No calls found</p>
-          <p className="text-ev-warm-gray text-sm">
+          <p className="text-dark-text-secondary font-medium mb-1">No calls found</p>
+          <p className="text-dark-text-muted text-sm">
             Try adjusting your filters or upload recordings for processing.
           </p>
         </motion.div>
@@ -243,16 +243,16 @@ export default function DatabasePage() {
               variants={fadeUp}
               onClick={() => router.push(`/results/${call.id}`)}
               aria-label={`View call ${call.call_type} ${call.id.slice(0, 8)}`}
-              className="group p-4 rounded-xl glass border border-ev-sand/30 card-hover text-left flex flex-col"
+              className="group p-4 rounded-xl bg-dark-surface border border-white/[0.06] card-hover hover:shadow-spectrogram-glow hover:border-white/[0.12] text-left flex flex-col"
             >
               {/* Top row */}
               <div className="flex items-start justify-between gap-2 mb-3">
                 <div className="min-w-0">
-                  <p className="font-mono text-[11px] text-ev-warm-gray truncate">
+                  <p className="font-mono text-[11px] text-dark-text-secondary truncate">
                     {call.id.slice(0, 12)}&hellip;
                   </p>
                   {call.call_id && call.call_id !== call.id && (
-                    <p className="text-[11px] text-ev-warm-gray/70 truncate">
+                    <p className="text-[11px] text-dark-text-muted/70 truncate">
                       Call: {call.call_id}
                     </p>
                   )}
@@ -263,7 +263,7 @@ export default function DatabasePage() {
               {/* Frequency range bar */}
               {call.frequency_low != null && call.frequency_high != null && (
                 <div className="mb-3">
-                  <div className="h-1 bg-ev-cream rounded-full overflow-hidden">
+                  <div className="h-1 bg-dark-surface-elevated rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-accent-savanna/60 to-accent-gold/40 rounded-full"
                       style={{
@@ -278,35 +278,35 @@ export default function DatabasePage() {
               {/* Metrics */}
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 <div>
-                  <p className="text-[10px] text-ev-warm-gray/60 uppercase tracking-wider">
+                  <p className="text-[10px] text-dark-text-muted/60 uppercase tracking-wider">
                     Duration
                   </p>
-                  <p className="text-ev-charcoal font-medium text-xs tabular-nums">
+                  <p className="text-dark-text-primary font-medium text-xs tabular-nums">
                     {(call.end_time - call.start_time).toFixed(2)}s
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-ev-warm-gray/60 uppercase tracking-wider">
+                  <p className="text-[10px] text-dark-text-muted/60 uppercase tracking-wider">
                     Frequency
                   </p>
-                  <p className="text-ev-charcoal font-medium text-xs tabular-nums">
+                  <p className="text-dark-text-primary font-medium text-xs tabular-nums">
                     {call.frequency_low && call.frequency_high
                       ? `${call.frequency_low}-${call.frequency_high} Hz`
                       : "--"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-ev-warm-gray/60 uppercase tracking-wider">
+                  <p className="text-[10px] text-dark-text-muted/60 uppercase tracking-wider">
                     Confidence
                   </p>
                   <div className="flex items-center gap-1.5">
-                    <p className="text-ev-charcoal font-medium text-xs tabular-nums">
+                    <p className="text-dark-text-primary font-medium text-xs tabular-nums">
                       {call.confidence !== undefined
                         ? `${(call.confidence * 100).toFixed(0)}%`
                         : "--"}
                     </p>
                     {call.confidence !== undefined && (
-                      <div className="flex-1 h-1 bg-ev-cream rounded-full overflow-hidden">
+                      <div className="flex-1 h-1 bg-dark-surface-elevated rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-accent-savanna to-success transition-all"
                           style={{
@@ -318,33 +318,33 @@ export default function DatabasePage() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-[10px] text-ev-warm-gray/60 uppercase tracking-wider">
+                  <p className="text-[10px] text-dark-text-muted/60 uppercase tracking-wider">
                     Start
                   </p>
-                  <p className="text-ev-charcoal font-medium text-xs tabular-nums">
+                  <p className="text-dark-text-primary font-medium text-xs tabular-nums">
                     {call.start_time.toFixed(2)}s
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-ev-warm-gray/60 uppercase tracking-wider">
+                  <p className="text-[10px] text-dark-text-muted/60 uppercase tracking-wider">
                     Animal
                   </p>
-                  <p className="text-ev-charcoal font-medium text-xs truncate">
+                  <p className="text-dark-text-primary font-medium text-xs truncate">
                     {call.animal_id || "Unknown"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] text-ev-warm-gray/60 uppercase tracking-wider">
+                  <p className="text-[10px] text-dark-text-muted/60 uppercase tracking-wider">
                     Noise Ref
                   </p>
-                  <p className="text-ev-charcoal font-medium text-xs capitalize truncate">
+                  <p className="text-dark-text-primary font-medium text-xs capitalize truncate">
                     {call.noise_type_ref || "Unknown"}
                   </p>
                 </div>
               </div>
 
               {/* Hover indicator */}
-              <div className="mt-3 pt-2.5 border-t border-ev-sand/20 flex items-center gap-1 text-[11px] text-accent-savanna font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-3 pt-2.5 border-t border-white/[0.06] flex items-center gap-1 text-[11px] text-accent-savanna font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                 View details
                 <ChevronRight className="w-3 h-3" />
               </div>
@@ -367,7 +367,7 @@ export default function DatabasePage() {
             onClick={() => setPage(Math.max(0, page - 1))}
             disabled={page === 0}
             aria-label="Previous page"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 glass border border-ev-sand/30 rounded-lg text-ev-elephant hover:text-ev-charcoal transition-all text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-dark-surface border border-white/[0.06] rounded-lg text-dark-text-secondary hover:text-dark-text-primary transition-all text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span>Previous</span>
@@ -395,7 +395,7 @@ export default function DatabasePage() {
                 className={`w-9 h-9 rounded-lg text-sm font-medium transition-all tabular-nums ${
                   page === pageNum
                     ? "bg-gradient-to-r from-accent-savanna to-accent-gold text-white shadow-sm shadow-accent-savanna/20"
-                    : "glass border border-ev-sand/30 text-ev-elephant hover:text-ev-charcoal"
+                    : "bg-dark-surface border border-white/[0.06] text-dark-text-secondary hover:text-dark-text-primary"
                 }`}
               >
                 {pageNum + 1}
@@ -411,7 +411,7 @@ export default function DatabasePage() {
             }
             disabled={page >= totalPages - 1}
             aria-label="Next page"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 glass border border-ev-sand/30 rounded-lg text-ev-elephant hover:text-ev-charcoal transition-all text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-dark-surface border border-white/[0.06] rounded-lg text-dark-text-secondary hover:text-dark-text-primary transition-all text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <span>Next</span>
             <ChevronRight className="w-3.5 h-3.5" />

@@ -37,8 +37,8 @@ export default function ResultsPage() {
         className="flex items-end justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold text-ev-charcoal">Results</h1>
-          <p className="text-sm text-ev-warm-gray mt-1">
+          <h1 className="text-2xl font-bold text-dark-text-primary">Results</h1>
+          <p className="text-sm text-dark-text-secondary mt-1">
             Browse processed recordings and their analysis results.
           </p>
         </div>
@@ -47,7 +47,7 @@ export default function ResultsPage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.15 }}
-            className="text-xs text-ev-warm-gray glass border border-ev-sand/30 px-3 py-1.5 rounded-xl font-medium"
+            className="text-xs text-dark-text-secondary bg-dark-surface border border-white/[0.06] px-3 py-1.5 rounded-xl font-medium"
           >
             {recordings.length} processed
           </motion.p>
@@ -59,13 +59,13 @@ export default function ResultsPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="rounded-2xl glass border border-ev-sand/30 overflow-hidden animate-pulse"
+              className="rounded-2xl bg-dark-surface border border-white/[0.06] overflow-hidden animate-pulse"
               style={{ animationDelay: `${i * 0.1}s` }}
             >
-              <div className="h-36 bg-ev-cream" />
+              <div className="h-36 bg-dark-surface-elevated" />
               <div className="p-4 space-y-2">
-                <div className="h-4 w-3/4 bg-ev-cream rounded" />
-                <div className="h-3 w-1/2 bg-ev-cream rounded" />
+                <div className="h-4 w-3/4 bg-dark-surface-elevated rounded" />
+                <div className="h-3 w-1/2 bg-dark-surface-elevated rounded" />
               </div>
             </div>
           ))}
@@ -74,15 +74,15 @@ export default function ResultsPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-16 rounded-2xl glass border border-dashed border-ev-sand/60 text-center"
+          className="p-16 rounded-2xl bg-dark-surface border border-dashed border-white/[0.08] text-center"
         >
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-savanna/10 to-accent-gold/5 flex items-center justify-center mx-auto mb-4">
             <Music className="w-7 h-7 text-accent-savanna/50" />
           </div>
-          <p className="text-ev-elephant font-medium mb-1">
+          <p className="text-dark-text-secondary font-medium mb-1">
             No processed recordings yet
           </p>
-          <p className="text-ev-warm-gray text-sm">
+          <p className="text-dark-text-muted text-sm">
             Upload and process a recording to see results here.
           </p>
         </motion.div>
@@ -103,10 +103,10 @@ export default function ResultsPage() {
                 variants={fadeUp}
                 onClick={() => router.push(`/processing/${rec.id}`)}
                 aria-label={`View ${rec.filename} results`}
-                className="text-left rounded-2xl glass border border-ev-sand/30 overflow-hidden group card-hover flex flex-col"
+                className="text-left rounded-2xl bg-dark-surface border border-white/[0.06] overflow-hidden group card-hover hover:shadow-spectrogram-glow hover:border-white/[0.12] flex flex-col"
               >
                 {/* Spectrogram Thumbnail */}
-                <div className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
+                <div className="relative h-48 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
                   <img
                     src={spectrogramUrl}
                     alt={`Spectrogram for ${rec.filename}`}
@@ -117,7 +117,7 @@ export default function ResultsPage() {
 
                   {quality?.quality_score != null && (
                     <div className="absolute top-3 right-3">
-                      <div className="glass-strong rounded-lg px-2 py-1 border border-white/20">
+                      <div className="bg-dark-surface-elevated/80 backdrop-blur-sm border border-white/[0.1] rounded-lg px-2 py-1">
                         <span
                           className={`text-xs font-bold ${
                             quality.quality_score >= 0.8
@@ -136,11 +136,11 @@ export default function ResultsPage() {
 
                 {/* Card Content */}
                 <div className="p-4 space-y-2.5 flex-1 flex flex-col">
-                  <p className="font-medium text-ev-charcoal truncate text-sm group-hover:text-accent-savanna transition-colors">
+                  <p className="font-medium text-dark-text-primary truncate text-sm group-hover:text-accent-savanna transition-colors">
                     {rec.filename}
                   </p>
 
-                  <div className="flex items-center justify-between text-xs text-ev-warm-gray">
+                  <div className="flex items-center justify-between text-xs text-dark-text-secondary">
                     <div className="flex items-center gap-1.5 min-w-0">
                       {quality?.snr_before_db != null &&
                         quality?.snr_after_db != null && (
