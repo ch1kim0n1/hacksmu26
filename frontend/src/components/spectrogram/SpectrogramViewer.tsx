@@ -6,6 +6,16 @@ import TimeAxis from "./TimeAxis";
 import HarmonicOverlay from "./HarmonicOverlay";
 import { cn } from "@/lib/utils";
 
+export type SpectrogramColormap = "viridis" | "magma" | "inferno" | "plasma" | "gray";
+
+export const COLORMAPS: { id: SpectrogramColormap; label: string; gradient: string }[] = [
+  { id: "viridis", label: "Viridis", gradient: "linear-gradient(to right, #440154, #31688e, #35b779, #fde725)" },
+  { id: "magma",   label: "Magma",   gradient: "linear-gradient(to right, #000004, #3b0f70, #8c2981, #de4968, #fde0dd)" },
+  { id: "inferno", label: "Inferno", gradient: "linear-gradient(to right, #000004, #420a68, #932567, #dd513a, #fcffa4)" },
+  { id: "plasma",  label: "Plasma",  gradient: "linear-gradient(to right, #0d0887, #7e03a8, #cc4778, #f89540, #f0f921)" },
+  { id: "gray",    label: "Gray",    gradient: "linear-gradient(to right, #000000, #ffffff)" },
+];
+
 export interface SpectrogramViewerProps {
   src: string;
   title?: string;
@@ -18,6 +28,9 @@ export interface SpectrogramViewerProps {
   showHarmonicToggle?: boolean;
   highContrast?: boolean;
   className?: string;
+  colormap?: SpectrogramColormap;
+  onColormapChange?: (colormap: SpectrogramColormap) => void;
+  showColormapPicker?: boolean;
 }
 
 export default function SpectrogramViewer({
@@ -32,6 +45,9 @@ export default function SpectrogramViewer({
   showHarmonicToggle = true,
   highContrast = false,
   className,
+  colormap = "viridis",
+  onColormapChange,
+  showColormapPicker = false,
 }: SpectrogramViewerProps) {
   const hasHarmonics = (harmonicFrequenciesHz?.length || 0) > 0;
   const [showHarmonics, setShowHarmonics] = React.useState(hasHarmonics);
@@ -76,11 +92,34 @@ export default function SpectrogramViewer({
               </button>
             )}
           </div>
-          {/* Spectrogram color scale legend */}
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-ev-warm-gray font-mono">Quiet</span>
-            <div className="w-24 h-2 rounded-full bg-gradient-spectrogram" />
-            <span className="text-[10px] text-ev-warm-gray font-mono">Loud</span>
+          <div className="flex items-center gap-3">
+            {/* Colormap picker */}
+            {showColormapPicker && (
+              <div className="flex items-center gap-1.5" aria-label="Select colormap" role="group">
+                {COLORMAPS.map((cm) => (
+                  <button
+                    key={cm.id}
+                    type="button"
+                    title={cm.label}
+                    aria-pressed={colormap === cm.id}
+                    onClick={() => onColormapChange?.(cm.id)}
+                    className={cn(
+                      "w-8 h-3 rounded-sm border transition-all",
+                      colormap === cm.id
+                        ? "border-ev-charcoal ring-1 ring-ev-charcoal scale-110"
+                        : "border-ev-sand/60 hover:border-ev-warm-gray"
+                    )}
+                    style={{ background: cm.gradient }}
+                  />
+                ))}
+              </div>
+            )}
+            {/* Spectrogram color scale legend */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-ev-warm-gray font-mono">Quiet</span>
+              <div className="w-24 h-2 rounded-full bg-gradient-spectrogram" />
+              <span className="text-[10px] text-ev-warm-gray font-mono">Loud</span>
+            </div>
           </div>
         </div>
       )}

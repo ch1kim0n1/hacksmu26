@@ -133,6 +133,17 @@ def compute_cqt(
     }
 
 
+SUPPORTED_COLORMAPS: frozenset[str] = frozenset({"viridis", "magma", "inferno", "plasma", "gray"})
+
+
+def _validate_cmap(cmap: str) -> str:
+    if cmap not in SUPPORTED_COLORMAPS:
+        raise ValueError(
+            f"Unsupported colormap '{cmap}'. Supported: {sorted(SUPPORTED_COLORMAPS)}"
+        )
+    return cmap
+
+
 def generate_spectrogram_png(
     magnitude_db: np.ndarray,
     sr: int,
@@ -142,7 +153,9 @@ def generate_spectrogram_png(
     title: str = "Spectrogram",
     freq_max: float = 1000.0,
     size: tuple[int, int] = (256, 256),
+    cmap: str = "viridis",
 ) -> str:
+    _validate_cmap(cmap)
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
     dpi = 128
@@ -153,7 +166,7 @@ def generate_spectrogram_png(
         hop_length=hop_length,
         x_axis="time",
         y_axis="hz",
-        cmap="viridis",
+        cmap=cmap,
         ax=ax,
     )
     ax.set_ylim(0, freq_max)
@@ -174,7 +187,9 @@ def generate_comparison_png(
     output_path: str | Path,
     *,
     freq_max: float = 1000.0,
+    cmap: str = "viridis",
 ) -> str:
+    _validate_cmap(cmap)
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
     fig, axes = plt.subplots(1, 2, figsize=(10, 4), dpi=150)
@@ -188,7 +203,7 @@ def generate_comparison_png(
             hop_length=hop_length,
             x_axis="time",
             y_axis="hz",
-            cmap="viridis",
+            cmap=cmap,
             ax=axis,
         )
         axis.set_ylim(0, freq_max)
@@ -210,8 +225,10 @@ def build_spectrogram_artifacts(
     n_mels: int = 128,
     freq_max: float = 1000.0,
     spectrogram_type: str = "stft",
+    cmap: str = "viridis",
     progress_callback: Callable[[str, int], None] | None = None,
 ) -> tuple[Spectrogram, SpectrogramViz]:
+    _validate_cmap(cmap)
     output_root = Path(output_dir)
     output_root.mkdir(parents=True, exist_ok=True)
     npy_path = output_root / f"{recording_id}_spectrogram.npy"
@@ -279,6 +296,7 @@ def build_spectrogram_artifacts(
         png_path,
         title="Spectrogram",
         freq_max=freq_max,
+        cmap=cmap,
     )
 
     spectrogram = Spectrogram(
