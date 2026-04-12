@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import ABPlayer from "@/components/audio/ABPlayer";
 
 // Mock HTMLMediaElement methods
@@ -137,7 +137,7 @@ describe("ABPlayer", () => {
   });
 
   it("before spectrogram is visible in original mode", () => {
-    const { container } = render(<ABPlayer {...defaultProps} />);
+    render(<ABPlayer {...defaultProps} />);
     const beforeImg = screen.getByAltText(/before|original/i);
     // In original mode, before image should have opacity-100 (or similar visible class)
     // We check via computed style or class presence
