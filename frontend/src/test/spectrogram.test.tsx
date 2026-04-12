@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import SpectrogramViewer from "@/components/spectrogram/SpectrogramViewer";
 import FrequencyAxis from "@/components/spectrogram/FrequencyAxis";
@@ -166,6 +166,78 @@ describe("TimeAxis", () => {
     labels.forEach((label) => {
       expect(label.className).toContain("text-xs");
     });
+  });
+});
+
+// ── Colormap picker ──
+
+describe("SpectrogramViewer colormap picker", () => {
+  it("does not render colormap picker by default", () => {
+    render(<SpectrogramViewer src="/test.png" title="Test" />);
+    expect(screen.queryByLabelText("Select colormap")).not.toBeInTheDocument();
+  });
+
+  it("renders colormap picker when showColormapPicker is true", () => {
+    render(
+      <SpectrogramViewer
+        src="/test.png"
+        title="Test"
+        showColormapPicker={true}
+      />
+    );
+    expect(screen.getByLabelText("Select colormap")).toBeInTheDocument();
+  });
+
+  it("renders all 5 supported colormaps", () => {
+    render(
+      <SpectrogramViewer
+        src="/test.png"
+        title="Test"
+        showColormapPicker={true}
+      />
+    );
+    for (const label of ["Viridis", "Magma", "Inferno", "Plasma", "Gray"]) {
+      expect(screen.getByTitle(label)).toBeInTheDocument();
+    }
+  });
+
+  it("calls onColormapChange when a colormap button is clicked", () => {
+    const onChange = vi.fn();
+    render(
+      <SpectrogramViewer
+        src="/test.png"
+        title="Test"
+        showColormapPicker={true}
+        onColormapChange={onChange}
+      />
+    );
+    fireEvent.click(screen.getByTitle("Magma"));
+    expect(onChange).toHaveBeenCalledWith("magma");
+  });
+
+  it("highlights the active colormap", () => {
+    render(
+      <SpectrogramViewer
+        src="/test.png"
+        title="Test"
+        showColormapPicker={true}
+        colormap="magma"
+      />
+    );
+    const magmaBtn = screen.getByTitle("Magma");
+    expect(magmaBtn.getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("defaults to viridis when no colormap prop provided", () => {
+    render(
+      <SpectrogramViewer
+        src="/test.png"
+        title="Test"
+        showColormapPicker={true}
+      />
+    );
+    const viridisBtn = screen.getByTitle("Viridis");
+    expect(viridisBtn.getAttribute("aria-pressed")).toBe("true");
   });
 });
 

@@ -2,6 +2,49 @@
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
 
+const BAR_COUNT = 80;
+
+/** Decode audio via Web Audio API and return normalised per-bar amplitudes [0,1]. */
+async function decodeWaveformBars(src: string, bars: number): Promise<number[]> {
+  try {
+    const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!Ctx) throw new Error("No AudioContext");
+    const ctx = new Ctx();
+    const response = await fetch(src);
+    if (!response.ok) throw new Error("Fetch failed");
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+    ctx.close();
+
+    // Mix all channels down to mono and sample into `bars` buckets
+    const channelCount = audioBuffer.numberOfChannels;
+    const frameCount = audioBuffer.length;
+    const frameStep = Math.max(1, Math.floor(frameCount / bars));
+    const result: number[] = [];
+
+    for (let b = 0; b < bars; b++) {
+      const start = b * frameStep;
+      const end = Math.min(start + frameStep, frameCount);
+      let sum = 0;
+      for (let ch = 0; ch < channelCount; ch++) {
+        const data = audioBuffer.getChannelData(ch);
+        for (let i = start; i < end; i++) {
+          sum += Math.abs(data[i]);
+        }
+      }
+      result.push(sum / ((end - start) * channelCount));
+    }
+
+    const peak = Math.max(...result, 1e-6);
+    return result.map((v) => v / peak);
+  } catch {
+    // Fallback: deterministic pseudo-random bars (no Math.random so they're stable)
+    return Array.from({ length: bars }, (_, i) =>
+      0.15 + 0.7 * Math.abs(Math.sin(i * 1.3) * Math.cos(i * 0.7))
+    );
+  }
+}
+
 interface WaveformPlayerProps {
   src: string;
   label?: string;
@@ -25,6 +68,11 @@ export default function WaveformPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
+  const [waveformBars, setWaveformBars] = useState<number[]>(() =>
+    Array.from({ length: BAR_COUNT }, (_, i) =>
+      0.15 + 0.7 * Math.abs(Math.sin(i * 1.3) * Math.cos(i * 0.7))
+    )
+  );
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -44,6 +92,15 @@ export default function WaveformPlayer({
       audio.removeEventListener("ended", onEnded);
     };
   }, []);
+
+  // Decode real audio waveform on mount / src change
+  useEffect(() => {
+    let cancelled = false;
+    decodeWaveformBars(src, BAR_COUNT).then((bars) => {
+      if (!cancelled) setWaveformBars(bars);
+    });
+    return () => { cancelled = true; };
+  }, [src]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -96,27 +153,40 @@ export default function WaveformPlayer({
         </div>
       )}
 
-      {/* Waveform placeholder bar */}
-      <div className="relative h-12 bg-background-elevated rounded overflow-hidden">
-        {/* Background wave pattern */}
-        <div className="absolute inset-0 flex items-center justify-center gap-px px-1">
-          {Array.from({ length: 60 }, (_, i) => {
-            const height = 20 + Math.sin(i * 0.5) * 30 + Math.random() * 20;
+      {/* Waveform — real amplitude bars decoded from audio */}
+      <div className="relative h-16 bg-background-elevated rounded-lg overflow-hidden">
+        <div
+          data-testid="waveform-bars"
+          className="absolute inset-0 flex items-center gap-px px-1"
+        >
+          {waveformBars.map((amplitude, i) => {
+            const played = (i / BAR_COUNT) * 100 < progress;
+            const barH = Math.max(4, amplitude * 100);
             return (
               <div
                 key={i}
-                className="flex-1 rounded-sm transition-colors duration-150"
+                className="flex-1 rounded-sm transition-colors duration-75"
                 style={{
-                  height: `${height}%`,
-                  backgroundColor:
-                    (i / 60) * 100 < progress
-                      ? accentColor
-                      : "rgba(138, 155, 165, 0.25)",
+                  height: `${barH}%`,
+                  backgroundColor: played
+                    ? accentColor
+                    : "rgba(138, 155, 165, 0.3)",
                 }}
               />
             );
           })}
         </div>
+        {/* Hover-seekable overlay */}
+        <input
+          type="range"
+          min={0}
+          max={duration || 0}
+          step={0.01}
+          value={currentTime}
+          onChange={handleSeek}
+          className="absolute inset-0 w-full opacity-0 cursor-pointer"
+          aria-label="Seek audio"
+        />
       </div>
 
       {/* Controls row */}
@@ -166,22 +236,13 @@ export default function WaveformPlayer({
           )}
         </button>
 
-        {/* Seek bar */}
-        <input
-          type="range"
-          min={0}
-          max={duration || 0}
-          step={0.1}
-          value={currentTime}
-          onChange={handleSeek}
-          className="flex-1 h-1 rounded-full appearance-none cursor-pointer"
-          style={
-            {
-              background: `linear-gradient(to right, ${accentColor} ${progress}%, #D4CCC3 ${progress}%)`,
-              "--thumb-color": accentColor,
-            } as React.CSSProperties
-          }
-        />
+        {/* Progress indicator (read-only — seek via waveform) */}
+        <div className="flex-1 h-1 rounded-full overflow-hidden bg-ev-sand/50">
+          <div
+            className="h-full rounded-full transition-none"
+            style={{ width: `${progress}%`, backgroundColor: accentColor }}
+          />
+        </div>
 
         {/* Time display */}
         <span className="text-xs text-ev-elephant font-mono whitespace-nowrap min-w-[70px] text-right">

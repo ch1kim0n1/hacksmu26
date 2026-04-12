@@ -26,6 +26,21 @@ const CALL_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
   mating: { bg: "bg-[#A78BFA]/15", text: "text-[#A78BFA]" },
 };
 
+const CALL_TYPE_DESCRIPTIONS: Record<string, string> = {
+  contact:
+    "Low-frequency rumble used to maintain social bond and locate herd members across distances up to 10 km.",
+  alarm:
+    "Sharp, broadband call signaling predator or threat — triggers immediate herd response and coordinated escape.",
+  song:
+    "Sustained harmonic vocalization rich in overtones; often associated with musth males or greeting ceremonies.",
+  social:
+    "Short exchange calls for group coordination, close-range communication, and reinforcing herd hierarchy.",
+  feeding:
+    "Soft rumbles and contact calls associated with foraging behavior and resource-sharing within the group.",
+  mating:
+    "Estrus rumbles and male musth roars that signal reproductive status across the savanna landscape.",
+};
+
 function formatDuration(ms: number): string {
   if (ms < 1000) return `${ms}ms`;
   const seconds = ms / 1000;
@@ -40,6 +55,8 @@ export default function CallCard({ call, onClick }: CallCardProps) {
     bg: "bg-background-elevated",
     text: "text-ev-elephant",
   };
+
+  const description = CALL_TYPE_DESCRIPTIONS[call.call_type];
 
   const confidencePercent = Math.round(call.confidence * 100);
 
@@ -59,6 +76,13 @@ export default function CallCard({ call, onClick }: CallCardProps) {
           #{call.id.slice(0, 8)}
         </span>
       </div>
+
+      {/* Scientific context */}
+      {description && (
+        <p className="text-[11px] text-ev-elephant leading-relaxed italic border-l-2 border-ev-sand pl-2">
+          {description}
+        </p>
+      )}
 
       {/* Metrics */}
       <div className="grid grid-cols-2 gap-2">
