@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
+import { SceneTransitionProvider } from "@/components/transition/SceneTransitionProvider";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -32,7 +33,9 @@ export default function RootLayout({
     <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`}>
       <body className="bg-ev-ivory text-ev-charcoal font-sans antialiased">
         <div className="flex min-h-screen flex-col">
-          <AppShell>{children}</AppShell>
+          <SceneTransitionProvider>
+            <AppShell>{children}</AppShell>
+          </SceneTransitionProvider>
         </div>
       </body>
     </html>
