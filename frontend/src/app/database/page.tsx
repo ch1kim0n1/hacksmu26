@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft,
   Search,
   ChevronRight,
   ChevronLeft,
@@ -146,13 +145,6 @@ export default function DatabasePage() {
         className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
       >
         <div>
-          <Link
-            href="/upload"
-            className="mb-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-ev-sand/40 bg-white/80 px-4 py-2.5 text-sm font-medium text-ev-elephant shadow-sm transition-all hover:border-ev-warm-gray/30 hover:bg-white"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Upload
-          </Link>
           <h1 className="text-2xl font-bold text-ev-charcoal">
             Call Database
           </h1>

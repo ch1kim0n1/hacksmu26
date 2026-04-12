@@ -92,13 +92,13 @@ export default function ExportPage() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
         <div className="mb-10">
           <Link
-            href="/"
+            href="/results"
             className="inline-flex items-center gap-2 text-ev-warm-gray hover:text-ev-elephant transition-colors mb-4"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            Back to Results
           </Link>
           <h1 className="text-4xl font-bold text-ev-charcoal">Export Research Data</h1>
           <p className="text-ev-elephant mt-2">

@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music, TrendingUp, ArrowLeft, ArrowRight, Clock, Keyboard } from "lucide-react";
+import { Music, TrendingUp, ArrowRight, Clock, Keyboard } from "lucide-react";
 import { getRecordings, API_BASE, type Recording, type Call } from "@/lib/audio-api";
 import { staggerContainer, fadeUp } from "@/components/ui/motion-primitives";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -165,13 +164,6 @@ export default function ResultsPage() {
           className="flex items-end justify-between gap-4"
         >
           <div>
-            <Link
-              href="/upload"
-              className="mb-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-ev-sand/40 bg-white/80 px-4 py-2.5 text-sm font-medium text-ev-elephant shadow-sm transition-all hover:border-ev-warm-gray/30 hover:bg-white"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Upload
-            </Link>
             <h1 className="text-2xl font-bold text-ev-charcoal">Results</h1>
             <p className="text-sm text-ev-warm-gray mt-1">
               Browse processed recordings and their analysis results.
