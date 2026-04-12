@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { getRecordings, exportResearch, type Recording } from "@/lib/audio-api";
 
 const FORMATS = [
@@ -89,8 +90,18 @@ export default function ExportPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
-        <div className="mb-10">
+    <motion.div
+      className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6"
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+        <motion.div
+          className="mb-10"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.05 }}
+        >
           <Link
             href="/results"
             className="inline-flex items-center gap-2 text-ev-warm-gray hover:text-ev-elephant transition-colors mb-4"
@@ -100,14 +111,19 @@ export default function ExportPage() {
             </svg>
             Back to Results
           </Link>
-          <h1 className="text-4xl font-bold text-ev-charcoal">Export Research Data</h1>
+          <h1 className="text-2xl font-bold text-ev-charcoal">Export Research Data</h1>
           <p className="text-ev-elephant mt-2">
             Select recordings and export format for research analysis.
           </p>
-        </div>
+        </motion.div>
 
         {/* Format selector */}
-        <div className="mb-8">
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
           <h2 className="text-sm font-medium text-ev-charcoal mb-3">Format</h2>
           <div className="flex gap-3">
             {FORMATS.map((f) => (
@@ -117,7 +133,7 @@ export default function ExportPage() {
                 className={`flex-1 p-4 rounded-xl border text-left transition-all ${
                   format === f.key
                     ? "border-accent-savanna bg-accent-savanna/5"
-                    : "border-ev-sand bg-ev-cream hover:border-ev-warm-gray"
+                    : "border-ev-sand/30 glass hover:border-ev-warm-gray"
                 }`}
               >
                 <span className={`text-sm font-semibold ${format === f.key ? "text-accent-savanna" : "text-ev-charcoal"}`}>
@@ -127,10 +143,15 @@ export default function ExportPage() {
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Recording selection */}
-        <div className="mb-8">
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+        >
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-medium text-ev-charcoal">Recordings</h2>
             <label className="flex items-center gap-2 text-sm text-ev-elephant cursor-pointer">
@@ -147,13 +168,13 @@ export default function ExportPage() {
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="p-4 rounded-lg bg-ev-cream border border-ev-sand animate-pulse">
-                  <div className="h-4 w-48 bg-background-elevated rounded" />
+                <div key={i} className="p-4 rounded-xl glass border border-ev-sand/30 animate-pulse">
+                  <div className="h-4 w-48 glass rounded" />
                 </div>
               ))}
             </div>
           ) : recordings.length === 0 ? (
-            <div className="p-8 rounded-xl bg-ev-cream border border-ev-sand text-center">
+            <div className="rounded-2xl border border-dashed border-ev-sand/60 p-12 text-center glass">
               <p className="text-ev-elephant">No processed recordings available for export.</p>
             </div>
           ) : (
@@ -161,10 +182,10 @@ export default function ExportPage() {
               {recordings.map((rec) => (
                 <label
                   key={rec.id}
-                  className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
                     selectedIds.has(rec.id)
                       ? "border-accent-savanna bg-accent-savanna/5"
-                      : "border-ev-sand bg-ev-cream hover:border-ev-warm-gray"
+                      : "border-ev-sand/30 glass hover:border-ev-warm-gray"
                   }`}
                 >
                   <input
@@ -181,10 +202,15 @@ export default function ExportPage() {
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Export options */}
-        <div className="mb-8 grid gap-4 md:grid-cols-2">
+        <motion.div
+          className="mb-8 grid gap-4 md:grid-cols-2"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-ev-charcoal">
               Call types
@@ -193,7 +219,7 @@ export default function ExportPage() {
               value={callTypes}
               onChange={(event) => setCallTypes(event.target.value)}
               placeholder="rumble, trumpet"
-              className="w-full rounded-lg border border-ev-sand bg-ev-cream px-4 py-2.5 text-sm text-ev-charcoal placeholder:text-ev-warm-gray focus:border-accent-savanna/50 focus:outline-none"
+              className="w-full rounded-xl glass border border-ev-sand/40 px-4 py-2.5 text-sm text-ev-charcoal placeholder:text-ev-warm-gray focus:border-accent-savanna/50 focus:outline-none"
             />
           </label>
           <label className="block">
@@ -208,7 +234,7 @@ export default function ExportPage() {
               value={minConfidence}
               onChange={(event) => setMinConfidence(event.target.value)}
               placeholder="0.5"
-              className="w-full rounded-lg border border-ev-sand bg-ev-cream px-4 py-2.5 text-sm text-ev-charcoal placeholder:text-ev-warm-gray focus:border-accent-savanna/50 focus:outline-none"
+              className="w-full rounded-xl glass border border-ev-sand/40 px-4 py-2.5 text-sm text-ev-charcoal placeholder:text-ev-warm-gray focus:border-accent-savanna/50 focus:outline-none"
             />
           </label>
           {[
@@ -217,7 +243,7 @@ export default function ExportPage() {
             ["Fingerprint matrix", includeFingerprints, setIncludeFingerprints],
             ["Per-call WAV clips", includeAudioClips, setIncludeAudioClips],
           ].map(([label, value, setter]) => (
-            <label key={String(label)} className="flex items-center gap-3 rounded-lg border border-ev-sand bg-ev-cream px-4 py-3 text-sm text-ev-elephant">
+            <label key={String(label)} className="flex items-center gap-3 rounded-xl glass border border-ev-sand/30 px-4 py-3 text-sm text-ev-elephant">
               <input
                 type="checkbox"
                 checked={Boolean(value)}
@@ -227,23 +253,28 @@ export default function ExportPage() {
               {String(label)}
             </label>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="mb-8 rounded-lg border border-accent-savanna/20 bg-accent-savanna/5 p-4 text-sm text-ev-elephant">
+        <motion.div
+          className="mb-8 rounded-xl glass border border-accent-savanna/20 bg-accent-savanna/5 p-4 text-sm text-ev-elephant"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.25 }}
+        >
           This export will include {selectedIds.size} recording{selectedIds.size === 1 ? "" : "s"}
           {callTypes ? ` filtered to ${callTypes}` : ""}. ZIP exports include the data dictionary and can include fingerprint matrices.
-        </div>
+        </motion.div>
 
         {/* Export button */}
         <button
           onClick={handleExport}
           disabled={selectedIds.size === 0 || exporting}
-          className="w-full py-3 bg-accent-savanna text-ev-ivory font-semibold rounded-xl hover:bg-accent-savanna/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 bg-gradient-to-r from-accent-savanna to-accent-savanna/90 text-ev-ivory font-semibold rounded-xl hover:from-accent-savanna/95 hover:to-accent-savanna/85 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {exporting
             ? "Exporting..."
             : `Export ${selectedIds.size} recording${selectedIds.size !== 1 ? "s" : ""} as ${format.toUpperCase()}`}
         </button>
-    </div>
+    </motion.div>
   );
 }
