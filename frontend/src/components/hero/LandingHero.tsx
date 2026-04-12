@@ -47,9 +47,15 @@ export default function LandingHero() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#e9dfcf_0%,#d9c7ac_38%,#ccb08a_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_26%,rgba(255,250,240,0.68),transparent_24%),radial-gradient(circle_at_78%_36%,rgba(255,240,204,0.26),transparent_20%),radial-gradient(circle_at_18%_18%,rgba(128,95,52,0.16),transparent_18%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_20%,rgba(123,89,49,0.08)_62%,rgba(88,61,32,0.14)_100%)]" />
-        <div className="absolute inset-0 opacity-[0.3] [background-image:radial-gradient(circle_at_12%_18%,rgba(255,255,255,0.86)_0,rgba(255,255,255,0)_18%),radial-gradient(circle_at_78%_24%,rgba(255,255,255,0.62)_0,rgba(255,255,255,0)_16%),radial-gradient(circle_at_22%_72%,rgba(196,156,92,0.3)_0,rgba(196,156,92,0)_20%),radial-gradient(circle_at_68%_66%,rgba(255,255,255,0.56)_0,rgba(255,255,255,0)_22%),radial-gradient(circle_at_88%_78%,rgba(201,161,98,0.26)_0,rgba(201,161,98,0)_18%)]" />
-        <div className="absolute inset-0 opacity-[0.16] [background-image:radial-gradient(circle_at_15%_25%,rgba(255,255,255,0.55)_0,rgba(255,255,255,0)_30%),radial-gradient(circle_at_72%_38%,rgba(255,255,255,0.46)_0,rgba(255,255,255,0)_28%),radial-gradient(circle_at_38%_70%,rgba(241,216,159,0.42)_0,rgba(241,216,159,0)_30%),radial-gradient(circle_at_84%_82%,rgba(214,180,114,0.34)_0,rgba(214,180,114,0)_26%)] blur-[2px]" />
-        <div className="absolute inset-0 mix-blend-multiply opacity-[0.11] [background-image:radial-gradient(circle_at_20%_20%,rgba(120,85,42,0.72)_0,rgba(120,85,42,0)_24%),radial-gradient(circle_at_70%_30%,rgba(120,85,42,0.58)_0,rgba(120,85,42,0)_20%),radial-gradient(circle_at_35%_75%,rgba(120,85,42,0.62)_0,rgba(120,85,42,0)_22%),radial-gradient(circle_at_82%_68%,rgba(120,85,42,0.55)_0,rgba(120,85,42,0)_18%),radial-gradient(circle_at_52%_48%,rgba(142,106,58,0.44)_0,rgba(142,106,58,0)_28%)]" />
+        <Image
+          src="/background_texture.jpg"
+          alt=""
+          fill
+          priority
+          className="pointer-events-none object-cover opacity-[0.3] mix-blend-multiply"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_24%,rgba(255,255,255,0.22),transparent_22%),radial-gradient(circle_at_72%_32%,rgba(255,255,255,0.16),transparent_18%),radial-gradient(circle_at_48%_68%,rgba(196,156,92,0.14),transparent_24%)]" />
       </div>
 
       <div
