@@ -47,6 +47,9 @@ export default function LandingHero() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#e9dfcf_0%,#d9c7ac_38%,#ccb08a_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_26%,rgba(255,250,240,0.68),transparent_24%),radial-gradient(circle_at_78%_36%,rgba(255,240,204,0.26),transparent_20%),radial-gradient(circle_at_18%_18%,rgba(128,95,52,0.16),transparent_18%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_20%,rgba(123,89,49,0.08)_62%,rgba(88,61,32,0.14)_100%)]" />
+        <div className="absolute inset-0 opacity-[0.3] [background-image:radial-gradient(circle_at_12%_18%,rgba(255,255,255,0.86)_0,rgba(255,255,255,0)_18%),radial-gradient(circle_at_78%_24%,rgba(255,255,255,0.62)_0,rgba(255,255,255,0)_16%),radial-gradient(circle_at_22%_72%,rgba(196,156,92,0.3)_0,rgba(196,156,92,0)_20%),radial-gradient(circle_at_68%_66%,rgba(255,255,255,0.56)_0,rgba(255,255,255,0)_22%),radial-gradient(circle_at_88%_78%,rgba(201,161,98,0.26)_0,rgba(201,161,98,0)_18%)]" />
+        <div className="absolute inset-0 opacity-[0.16] [background-image:radial-gradient(circle_at_15%_25%,rgba(255,255,255,0.55)_0,rgba(255,255,255,0)_30%),radial-gradient(circle_at_72%_38%,rgba(255,255,255,0.46)_0,rgba(255,255,255,0)_28%),radial-gradient(circle_at_38%_70%,rgba(241,216,159,0.42)_0,rgba(241,216,159,0)_30%),radial-gradient(circle_at_84%_82%,rgba(214,180,114,0.34)_0,rgba(214,180,114,0)_26%)] blur-[2px]" />
+        <div className="absolute inset-0 mix-blend-multiply opacity-[0.11] [background-image:radial-gradient(circle_at_20%_20%,rgba(120,85,42,0.72)_0,rgba(120,85,42,0)_24%),radial-gradient(circle_at_70%_30%,rgba(120,85,42,0.58)_0,rgba(120,85,42,0)_20%),radial-gradient(circle_at_35%_75%,rgba(120,85,42,0.62)_0,rgba(120,85,42,0)_22%),radial-gradient(circle_at_82%_68%,rgba(120,85,42,0.55)_0,rgba(120,85,42,0)_18%),radial-gradient(circle_at_52%_48%,rgba(142,106,58,0.44)_0,rgba(142,106,58,0)_28%)]" />
       </div>
 
       <div
@@ -65,7 +68,7 @@ export default function LandingHero() {
           isTransitioning ? "scale-[1.02] opacity-70 blur-[2px]" : "scale-100 opacity-100 blur-0"
         }`}
       >
-        <div className="absolute bottom-[-1vh] left-[-2vw] h-[58vh] w-[44vw] min-w-[420px] max-w-[760px] sm:bottom-[-1vh] sm:left-[-1vw] sm:h-[60vh] sm:w-[42vw] lg:bottom-0 lg:left-[0vw] lg:h-[62vh] lg:w-[40vw] lg:max-w-[780px]">
+        <div className="absolute bottom-[-1vh] left-[-3vw] h-[68vh] w-[50vw] min-w-[520px] max-w-[900px] sm:bottom-[-1vh] sm:left-[-2vw] sm:h-[70vh] sm:w-[48vw] lg:bottom-0 lg:left-[-1vw] lg:h-[72vh] lg:w-[46vw] lg:max-w-[940px]">
           <Image
             src="/elephant-background.png"
             alt="Elephant holding the globe on its trunk"
@@ -81,14 +84,12 @@ export default function LandingHero() {
           onClick={handleGlobeClick}
           disabled={isTransitioning}
           aria-label="Enter EchoField dashboard"
-          className={`pointer-events-auto absolute left-[49%] top-[38%] h-[clamp(220px,28vw,420px)] w-[clamp(220px,28vw,420px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-all duration-[1250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`pointer-events-auto absolute left-[49%] top-[41%] h-[clamp(280px,34vw,500px)] w-[clamp(280px,34vw,500px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-all duration-[1250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               isTransitioning
                 ? "z-[20] scale-[3.4] opacity-0"
                 : "z-[10] scale-100 opacity-100 hover:scale-[1.03]"
             } ${isTransitioning ? "cursor-default" : "cursor-pointer"}`}
         >
-          <div className="absolute inset-[-8%] rounded-full bg-[radial-gradient(circle,rgba(82,138,238,0.18)_0%,rgba(82,138,238,0.08)_36%,rgba(82,138,238,0)_72%)] blur-xl" />
-          <div className="absolute inset-0 rounded-full shadow-[0_18px_34px_rgba(40,48,71,0.16)]" />
           <HeroGlobe
             wrapperClassName="absolute inset-0 z-[1] overflow-visible"
             globeClassName="absolute inset-0"
@@ -101,18 +102,18 @@ export default function LandingHero() {
               atmosphereColor: "#4f7fc4",
               atmosphereAltitude: 0.1,
               idleRotationSpeed: 0.03,
-              cameraPosition: { x: 0, y: 8, z: 242 },
+              cameraPosition: { x: 0, y: 8, z: 248 },
               controls: { minDistance: 180, maxDistance: 280 },
             }}
           />
         </button>
       </div>
 
-      <div className="pointer-events-none absolute right-[4vw] top-[31%] z-[8] hidden max-w-[28rem] rounded-[2rem] border border-[#b59a76]/26 bg-white/24 px-7 py-7 text-[#4e3b28] shadow-[0_24px_50px_rgba(125,98,63,0.12)] backdrop-blur-md lg:block">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#7b6246]">
+      <div className="pointer-events-none absolute right-[4vw] top-[31%] z-[8] hidden max-w-[28rem] px-7 py-7 text-[#4e3b28] lg:block">
+        <p className="font-[Arial] text-sm font-semibold uppercase tracking-[0.28em] text-[#7b6246] underline underline-offset-[6px]">
           Mission Statement
         </p>
-        <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-[-0.04em] text-[#3f3121]">
+        <h2 className="mt-4 text-[2.15rem] font-bold leading-tight tracking-[-0.04em] text-[#3f3121]">
           Reveal the intelligence hidden inside every field recording.
         </h2>
         <p className="mt-4 text-sm leading-7 text-[#5d4a34]">
@@ -132,10 +133,6 @@ export default function LandingHero() {
           isTransitioning ? "opacity-100" : "opacity-0"
         }`}
       />
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] flex justify-end px-5 pb-5 sm:px-8 md:px-12 lg:px-16">
-        <div className="h-7 w-7 rotate-45 rounded-[0.4rem] border border-white/28 bg-white/14 backdrop-blur-sm" />
-      </div>
     </section>
   );
 }
