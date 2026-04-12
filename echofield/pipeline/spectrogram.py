@@ -9,6 +9,7 @@ from typing import Callable
 import librosa
 import librosa.display
 import matplotlib
+import matplotlib.ticker
 import numpy as np
 
 matplotlib.use("Agg")
@@ -133,6 +134,17 @@ def compute_cqt(
     }
 
 
+SUPPORTED_COLORMAPS: frozenset[str] = frozenset({"viridis", "magma", "inferno", "plasma", "gray"})
+
+
+def _validate_cmap(cmap: str) -> str:
+    if cmap not in SUPPORTED_COLORMAPS:
+        raise ValueError(
+            f"Unsupported colormap '{cmap}'. Supported: {sorted(SUPPORTED_COLORMAPS)}"
+        )
+    return cmap
+
+
 def generate_spectrogram_png(
     magnitude_db: np.ndarray,
     sr: int,
@@ -141,11 +153,13 @@ def generate_spectrogram_png(
     *,
     title: str = "Spectrogram",
     freq_max: float = 1000.0,
-    size: tuple[int, int] = (256, 256),
+    size: tuple[int, int] = (600, 400),
+    cmap: str = "viridis",
 ) -> str:
+    _validate_cmap(cmap)
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
-    dpi = 128
+    dpi = 100
     fig, ax = plt.subplots(figsize=(size[0] / dpi, size[1] / dpi), dpi=dpi)
     librosa.display.specshow(
         magnitude_db,
@@ -153,15 +167,19 @@ def generate_spectrogram_png(
         hop_length=hop_length,
         x_axis="time",
         y_axis="hz",
-        cmap="viridis",
+        cmap=cmap,
         ax=ax,
     )
     ax.set_ylim(0, freq_max)
-    ax.set_title(title)
-    ax.set_xlabel("Time (s)")
-    ax.set_ylabel("Frequency (Hz)")
-    fig.tight_layout(pad=0.2)
-    fig.savefig(output, dpi=dpi)
+    ax.set_title(title, fontsize=11, pad=6)
+    ax.set_xlabel("Time (s)", fontsize=9)
+    ax.set_ylabel("Frequency (Hz)", fontsize=9)
+    # Limit x-axis ticks so labels never overlap on short recordings
+    ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(nbins=6, prune="both"))
+    ax.tick_params(axis="x", labelsize=8)
+    ax.tick_params(axis="y", labelsize=8)
+    fig.tight_layout(pad=0.5)
+    fig.savefig(output, dpi=dpi, bbox_inches="tight")
     plt.close(fig)
     return str(output)
 
@@ -174,10 +192,12 @@ def generate_comparison_png(
     output_path: str | Path,
     *,
     freq_max: float = 1000.0,
+    cmap: str = "viridis",
 ) -> str:
+    _validate_cmap(cmap)
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4), dpi=150)
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4), dpi=120)
     for axis, data, title in (
         (axes[0], mag_before, "Before"),
         (axes[1], mag_after, "After"),
@@ -188,11 +208,14 @@ def generate_comparison_png(
             hop_length=hop_length,
             x_axis="time",
             y_axis="hz",
-            cmap="viridis",
+            cmap=cmap,
             ax=axis,
         )
         axis.set_ylim(0, freq_max)
         axis.set_title(title)
+        axis.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(nbins=6, prune="both"))
+        axis.tick_params(axis="x", labelsize=8)
+        axis.tick_params(axis="y", labelsize=8)
     fig.tight_layout()
     fig.savefig(output)
     plt.close(fig)
@@ -210,8 +233,10 @@ def build_spectrogram_artifacts(
     n_mels: int = 128,
     freq_max: float = 1000.0,
     spectrogram_type: str = "stft",
+    cmap: str = "viridis",
     progress_callback: Callable[[str, int], None] | None = None,
 ) -> tuple[Spectrogram, SpectrogramViz]:
+    _validate_cmap(cmap)
     output_root = Path(output_dir)
     output_root.mkdir(parents=True, exist_ok=True)
     npy_path = output_root / f"{recording_id}_spectrogram.npy"
@@ -279,6 +304,7 @@ def build_spectrogram_artifacts(
         png_path,
         title="Spectrogram",
         freq_max=freq_max,
+        cmap=cmap,
     )
 
     spectrogram = Spectrogram(

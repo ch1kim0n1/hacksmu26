@@ -15,6 +15,11 @@ import {
 } from "lucide-react";
 import useProcessingJob from "@/hooks/useProcessingJob";
 import { getRecording, API_BASE, type Recording } from "@/lib/audio-api";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import {
+  COLORMAPS,
+  type SpectrogramColormap,
+} from "@/components/spectrogram/SpectrogramViewer";
 import {
   AnalysisLabels,
   AnalysisWindow,
@@ -156,8 +161,9 @@ export default function ProcessingPage() {
   const isProcessing = !isComplete && (recording?.status === "processing" || processing.status === "processing" || processing.status === "connecting");
   const isFailed = recording?.status === "failed" || processing.status === "error";
 
-  const spectrogramBefore = `${API_BASE}/api/recordings/${jobId}/spectrogram?type=before`;
-  const spectrogramAfter = `${API_BASE}/api/recordings/${jobId}/spectrogram?type=after`;
+  const [colormap, setColormap] = useLocalStorage<SpectrogramColormap>("echofield.colormap", "viridis");
+  const spectrogramBefore = `${API_BASE}/api/recordings/${jobId}/spectrogram?type=before&colormap=${colormap}`;
+  const spectrogramAfter = `${API_BASE}/api/recordings/${jobId}/spectrogram?type=after&colormap=${colormap}`;
   const audioOriginal = `${API_BASE}/api/recordings/${jobId}/audio?type=original`;
   const audioCleaned = `${API_BASE}/api/recordings/${jobId}/audio?type=cleaned`;
 
@@ -242,7 +248,27 @@ export default function ProcessingPage() {
         <div className="space-y-6">
           {/* Spectrograms */}
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="p-5 rounded-xl glass border border-ev-sand/30">
-            <h2 className="text-sm font-semibold text-ev-charcoal mb-4">Spectrograms</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-semibold text-ev-charcoal">Spectrograms</h2>
+              <div className="flex items-center gap-1.5" aria-label="Select colormap" role="group">
+                {COLORMAPS.map((cm) => (
+                  <button
+                    key={cm.id}
+                    type="button"
+                    title={cm.label}
+                    aria-pressed={colormap === cm.id}
+                    onClick={() => setColormap(cm.id)}
+                    className={[
+                      "w-8 h-3 rounded-sm border transition-all",
+                      colormap === cm.id
+                        ? "border-ev-charcoal ring-1 ring-ev-charcoal scale-110"
+                        : "border-ev-sand/60 hover:border-ev-warm-gray",
+                    ].join(" ")}
+                    style={{ background: cm.gradient }}
+                  />
+                ))}
+              </div>
+            </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2 font-medium">Original</p>
