@@ -25,7 +25,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
     <header
       className={
         isOverlay
-          ? "absolute inset-x-0 top-0 z-[12] w-full border-b border-[#b59a76]/30 bg-[#f4ebdf]/55 backdrop-blur-md"
+          ? "absolute inset-x-0 top-0 z-[12] w-full border-b border-[#b59a76]/18 bg-transparent"
           : "sticky top-0 z-50 w-full border-b border-ev-sand bg-ev-ivory/95 backdrop-blur-sm"
       }
     >
@@ -42,7 +42,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-accent-savanna min-h-[44px] flex items-center ${
+                className={`text-base font-medium transition-colors hover:text-accent-savanna min-h-[44px] flex items-center ${
                   isActive
                     ? "text-accent-savanna"
                     : isOverlay

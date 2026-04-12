@@ -122,11 +122,6 @@ export default function LandingHero() {
         <h2 className="mt-4 text-[2.15rem] font-bold leading-tight tracking-[-0.04em] text-[#3f3121]">
           Reveal the intelligence hidden inside every field recording.
         </h2>
-        <p className="mt-4 text-sm leading-7 text-[#5d4a34]">
-          EchoField helps researchers isolate elephant vocalizations, reduce
-          environmental noise, and move from raw capture to meaningful acoustic
-          insight with clarity, speed, and confidence.
-        </p>
       </div>
 
       <div
