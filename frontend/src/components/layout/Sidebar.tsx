@@ -13,6 +13,12 @@ import {
   BookOpen,
   Network,
   Monitor,
+  PieChart,
+  GitBranch,
+  MapPin,
+  Brain,
+  Box,
+  Webhook,
 } from "lucide-react";
 import { useMobileSidebar } from "@/hooks/useSidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
