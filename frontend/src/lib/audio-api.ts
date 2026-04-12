@@ -267,6 +267,51 @@ export async function getCall(id: string): Promise<Call> {
   };
 }
 
+export interface EmotionTimelineBin {
+  time_ms: number;
+  state: string;
+  arousal: number;
+  valence: number;
+  color: string;
+}
+
+export interface CallEmotion {
+  call_id: string;
+  call_type: string;
+  state: string;
+  arousal: number;
+  valence: number;
+  confidence: number;
+  color: string;
+  description: string;
+}
+
+export interface EmotionTimelineResponse {
+  recording_id: string;
+  duration_ms: number;
+  resolution_ms: number;
+  timeline: EmotionTimelineBin[];
+  call_emotions: CallEmotion[];
+  summary: {
+    dominant_state: string;
+    arousal_avg: number;
+    valence_avg: number;
+    state_distribution: Record<string, number>;
+  };
+}
+
+export async function getEmotionTimeline(
+  recordingId: string,
+  resolutionMs?: number
+): Promise<EmotionTimelineResponse> {
+  const params = new URLSearchParams();
+  if (resolutionMs) params.set("resolution_ms", String(resolutionMs));
+  const query = params.toString();
+  return fetchAPI<EmotionTimelineResponse>(
+    `/api/recordings/${recordingId}/emotion-timeline${query ? `?${query}` : ""}`
+  );
+}
+
 export async function exportResearch(params: {
   format: string;
   recording_ids: string[];

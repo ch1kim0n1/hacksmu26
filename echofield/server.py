@@ -81,6 +81,7 @@ from echofield.research.acoustic_analysis import (
     SimilarityMatrixCache,
     track_frequency_contour,
 )
+from echofield.research.emotion_classifier import build_emotion_timeline
 from echofield.research.exporter import export_csv, export_json, export_pdf, export_zip
 from echofield.research.individual_id import IndividualIdentifier
 from echofield.utils.audio_utils import get_duration, load_audio
@@ -845,6 +846,34 @@ async def get_harmonics(recording_id: str) -> HarmonicOverlayResponse:
         harmonic_to_noise_ratio_db=hnr,
         harmonicity=features["harmonicity"],
     )
+
+
+@app.get("/api/recordings/{recording_id}/emotion-timeline")
+async def get_emotion_timeline(
+    recording_id: str,
+    resolution_ms: float = Query(default=500, ge=100, le=5000),
+):
+    store = _get_store()
+    recording = store.get(recording_id)
+    if not recording:
+        raise HTTPException(status_code=404, detail="Recording not found")
+
+    result = recording.get("result") or {}
+    calls = result.get("calls", [])
+    duration_s = float(recording.get("duration_s", 0))
+    duration_ms = duration_s * 1000
+
+    if duration_ms <= 0:
+        raise HTTPException(status_code=400, detail="Recording has no duration")
+
+    timeline = await asyncio.to_thread(
+        build_emotion_timeline, calls, duration_ms, resolution_ms
+    )
+
+    return {
+        "recording_id": recording_id,
+        **timeline,
+    }
 
 
 @app.get("/api/stats", response_model=StatsResponse)
