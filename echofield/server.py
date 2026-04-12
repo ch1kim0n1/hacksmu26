@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import aiofiles
 from fastapi import BackgroundTasks, FastAPI, File, Header, HTTPException, Query, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -81,6 +82,7 @@ from echofield.research.acoustic_analysis import (
     SimilarityMatrixCache,
     track_frequency_contour,
 )
+from echofield.research.cross_species import REFERENCE_SPECIES, compare_calls
 from echofield.research.exporter import export_csv, export_json, export_pdf, export_zip
 from echofield.research.individual_id import IndividualIdentifier
 from echofield.utils.audio_utils import get_duration, load_audio
@@ -1171,6 +1173,76 @@ async def delete_webhook(webhook_id: str) -> dict[str, Any]:
     if not _get_webhooks().delete(webhook_id):
         raise HTTPException(status_code=404, detail="Webhook not found")
     return {"id": webhook_id, "deleted": True}
+
+
+@app.get("/api/reference-calls")
+async def list_reference_calls():
+    """List available reference species for comparison."""
+    return {
+        "references": [
+            {
+                "id": ref_id,
+                "species": spec["species"],
+                "call_type": spec["call_type"],
+                "description": spec["description"],
+                "frequency_range_hz": spec["frequency_range_hz"],
+            }
+            for ref_id, spec in REFERENCE_SPECIES.items()
+        ]
+    }
+
+
+@app.post("/api/compare/cross-species")
+async def cross_species_compare(
+    call_id: str = Query(...),
+    reference_id: str = Query(...),
+):
+    """Compare an elephant call against a reference species."""
+    db = _get_call_database()
+    call = db.get_call(call_id)
+    if not call:
+        raise HTTPException(status_code=404, detail="Call not found")
+
+    # Try to load actual call audio from processed recording
+    recording_id = call.get("recording_id", "")
+    store = _get_store()
+    recording = store.get(recording_id) if recording_id else None
+
+    if recording:
+        result = recording.get("result") or {}
+        audio_path = result.get("output_audio_path")
+        if not audio_path or not Path(audio_path).exists():
+            audio_path = str(_get_recording_path(recording))
+
+        y, sr = await asyncio.to_thread(load_audio, audio_path)
+
+        # Extract the specific call segment
+        start_sample = int(float(call.get("start_ms", 0)) / 1000 * sr)
+        duration_samples = int(float(call.get("duration_ms", 1000)) / 1000 * sr)
+        end_sample = min(start_sample + duration_samples, len(y))
+        call_audio = y[start_sample:end_sample]
+
+        if len(call_audio) == 0:
+            call_audio = y  # Fallback to full recording
+    else:
+        # Generate synthetic elephant call based on stored features
+        features = call.get("acoustic_features", {})
+        f0 = float(features.get("fundamental_frequency_hz", 20))
+        duration = float(call.get("duration_ms", 2000)) / 1000
+        sr = 22050
+        t = np.linspace(0, duration, int(sr * duration), endpoint=False)
+        call_audio = np.sin(2 * np.pi * f0 * t).astype(np.float32)
+
+    comparison = await asyncio.to_thread(compare_calls, call_audio, sr, reference_id)
+
+    return {
+        "elephant_call": {
+            "call_id": call_id,
+            "call_type": call.get("call_type", "unknown"),
+            "recording_id": recording_id,
+        },
+        **comparison,
+    }
 
 
 @app.websocket("/ws/live")

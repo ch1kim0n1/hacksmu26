@@ -267,6 +267,55 @@ export async function getCall(id: string): Promise<Call> {
   };
 }
 
+export interface ReferenceSpecies {
+  id: string;
+  species: string;
+  call_type: string;
+  description: string;
+  frequency_range_hz: [number, number];
+}
+
+export interface CrossSpeciesComparison {
+  elephant_call: {
+    call_id: string;
+    call_type: string;
+    recording_id: string;
+  };
+  reference: {
+    id: string;
+    species: string;
+    call_type: string;
+    description: string;
+  };
+  comparison: {
+    frequency_overlap_pct: number;
+    spectral_similarity: number;
+    harmonic_similarity: number;
+    temporal_similarity: number;
+    shared_frequency_range_hz: [number, number] | null;
+    insight: string;
+  };
+  feature_comparison: Record<string, {
+    elephant: number;
+    reference: number;
+    difference_pct: number;
+  }>;
+}
+
+export async function getReferenceSpecies(): Promise<{ references: ReferenceSpecies[] }> {
+  return fetchAPI<{ references: ReferenceSpecies[] }>("/api/reference-calls");
+}
+
+export async function compareCrossSpecies(
+  callId: string,
+  referenceId: string
+): Promise<CrossSpeciesComparison> {
+  return fetchAPI<CrossSpeciesComparison>(
+    `/api/compare/cross-species?call_id=${encodeURIComponent(callId)}&reference_id=${encodeURIComponent(referenceId)}`,
+    { method: "POST" }
+  );
+}
+
 export async function exportResearch(params: {
   format: string;
   recording_ids: string[];

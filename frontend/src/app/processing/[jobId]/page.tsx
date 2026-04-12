@@ -6,6 +6,7 @@ import Link from "next/link";
 import useProcessingJob from "@/hooks/useProcessingJob";
 import { getRecording, API_BASE, type Recording } from "@/lib/audio-api";
 import { AnalysisLabels, AnalysisWindow } from "@/components/research/AnalysisLabels";
+import CrossSpeciesCompare from "@/components/research/CrossSpeciesCompare";
 
 interface ProcessingMetrics {
   snr_before?: number;
@@ -442,6 +443,9 @@ export default function ProcessingPage() {
                 </div>
               </div>
             </div>
+
+            {/* Cross-Species Comparison */}
+            <CrossSpeciesCompare recordingId={jobId} isComplete={isComplete} />
           </div>
 
           {/* Right Sidebar - Metrics */}
