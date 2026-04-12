@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   API_BASE,
@@ -87,10 +88,13 @@ export default function ComparePage() {
               <h2 className="mb-4 text-xl font-semibold text-ev-charcoal">
                 Elephant vs. {String(comparison.reference.species)}
               </h2>
-              <img
+              <Image
                 src={`${API_BASE}${comparison.visualizations?.overlay_url ?? ""}`}
                 alt="Cross-species frequency overlay"
-                className="w-full rounded-lg border border-ev-sand"
+                width={1600}
+                height={900}
+                unoptimized
+                className="h-auto w-full rounded-lg border border-ev-sand"
               />
               <p className="mt-4 rounded-lg bg-background-elevated p-4 text-sm leading-relaxed text-ev-elephant">
                 {String(comparison.comparison.insight)}

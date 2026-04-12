@@ -1,0 +1,26 @@
+{
+  "total": 44,
+  "correct": 19,
+  "accuracy": 0.432,
+  "per_class_recall": {
+    "car": 0.0,
+    "airplane": 0.905,
+    "generator": 0.0,
+    "other": 0.0
+  },
+  "confusion": {
+    "car": {
+      "airplane": 17
+    },
+    "airplane": {
+      "airplane": 19,
+      "generator": 2
+    },
+    "generator": {
+      "airplane": 5
+    },
+    "other": {
+      "airplane": 1
+    }
+  }
+}

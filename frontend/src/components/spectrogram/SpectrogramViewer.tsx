@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import FrequencyAxis from "./FrequencyAxis";
 import TimeAxis from "./TimeAxis";
 import HarmonicOverlay from "./HarmonicOverlay";
@@ -261,10 +262,13 @@ export default function SpectrogramViewer({
             <div className="absolute inset-0 skeleton" />
           ) : (
             <>
-              <img
+              <Image
                 src={src}
                 alt={title ?? "Spectrogram"}
-                className="w-full h-auto object-contain block"
+                width={1600}
+                height={800}
+                unoptimized
+                className="block h-auto w-full object-contain"
                 draggable={false}
               />
               {/* Grid overlay for visual reference */}
