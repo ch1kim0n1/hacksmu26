@@ -42,8 +42,7 @@ export default function ComparePage() {
   };
 
   return (
-    <main className="min-h-screen bg-ev-ivory">
-      <div className="mx-auto max-w-6xl px-6 py-12">
+    <main className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
         <Link href="/database" className="mb-4 inline-flex text-sm text-ev-warm-gray hover:text-ev-elephant">
           Back to database
         </Link>
@@ -116,7 +115,6 @@ export default function ComparePage() {
             </aside>
           </div>
         )}
-      </div>
     </main>
   );
 }

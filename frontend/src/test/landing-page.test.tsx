@@ -81,7 +81,6 @@ describe("Landing Page", () => {
 
   it("renders hero navbar links", () => {
     render(<LandingPage />);
-    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/about");
     expect(screen.getAllByRole("link", { name: "Upload" })[0]).toHaveAttribute("href", "/upload");
     expect(screen.getByRole("link", { name: "Database" })).toHaveAttribute("href", "/database");
     expect(screen.getByRole("link", { name: "Get Started" })).toHaveAttribute("href", "#get-started");

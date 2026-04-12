@@ -169,8 +169,8 @@ export default function useProcessingJob(
                   ...s,
                   status:
                     stageStatus === "complete" && shouldAdvanceStage
-                      ? "complete"
-                      : "active",
+                      ? ("complete" as const)
+                      : ("active" as const),
                 };
               }
             }

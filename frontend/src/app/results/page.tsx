@@ -211,6 +211,7 @@ export default function ResultsPage() {
           {abSelectedId && (() => {
             const rec = recordings.find((r) => r.id === abSelectedId);
             if (!rec) return null;
+            const spectrogramUrl = `${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`;
             return (
               <motion.div
                 key={abSelectedId}

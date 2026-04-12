@@ -113,6 +113,14 @@ const config: Config = {
             boxShadow: "0 0 24px 4px rgba(196, 164, 108, 0.12)",
           },
         },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
       },
       animation: {
         shimmer: "shimmer 2s ease-in-out infinite",
@@ -121,10 +129,12 @@ const config: Config = {
         "slide-up": "slide-up 0.5s ease-out",
         "scale-in": "scale-in 0.4s ease-out",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 };
 
 export default config;

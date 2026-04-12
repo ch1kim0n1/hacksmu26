@@ -89,8 +89,7 @@ export default function ExportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-ev-ivory">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
         <div className="mb-10">
           <Link
             href="/"
@@ -245,7 +244,6 @@ export default function ExportPage() {
             ? "Exporting..."
             : `Export ${selectedIds.size} recording${selectedIds.size !== 1 ? "s" : ""} as ${format.toUpperCase()}`}
         </button>
-      </div>
     </div>
   );
 }

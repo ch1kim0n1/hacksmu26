@@ -12,6 +12,10 @@ const SEGMENT_LABELS: Record<string, string> = {
   processing: "Processing",
   results: "Results",
   analysis: "Analysis",
+  realtime: "Real-Time",
+  compare: "Compare",
+  review: "Review",
+  batch: "Batch",
 };
 
 export default function Breadcrumb() {
@@ -19,8 +23,8 @@ export default function Breadcrumb() {
   const segments = pathname.split("/").filter(Boolean);
 
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-ev-warm-gray">
-      <Link href="/" className="hover:text-ev-charcoal transition-colors">
+    <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-ev-dust/60">
+      <Link href="/" className="hover:text-ev-cream transition-colors">
         Home
       </Link>
       {segments.map((segment, i) => {
@@ -32,11 +36,11 @@ export default function Breadcrumb() {
 
         return (
           <span key={href} className="flex items-center gap-1.5">
-            <span className="text-ev-dust">/</span>
+            <span className="text-ev-dust/30">/</span>
             {isLast ? (
-              <span className="text-ev-charcoal font-medium">{label}</span>
+              <span className="text-ev-dust">{label}</span>
             ) : (
-              <Link href={href} className="hover:text-ev-charcoal transition-colors">
+              <Link href={href} className="hover:text-ev-cream transition-colors">
                 {label}
               </Link>
             )}

@@ -9,7 +9,6 @@ import HeroGlobe from "@/components/hero/HeroGlobe";
 import { useSceneTransition } from "@/components/transition/SceneTransitionProvider";
 
 const landingNavItems = [
-  { href: "/about", label: "About" },
   { href: "/upload", label: "Upload" },
   { href: "/recordings", label: "Recordings" },
   { href: "/database", label: "Database" },
@@ -111,6 +110,7 @@ export default function LandingPage() {
   const solutionRef = useRef<HTMLElement>(null);
   const stepsRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
+  const teamRef = useRef<HTMLElement>(null);
 
 
   /* ── GSAP orchestration ── */
@@ -1261,6 +1261,49 @@ export default function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════
+          ABOUT — Team & Hackathon
+         ═══════════════════════════════════════════ */}
+      <section className="relative bg-ev-charcoal py-16 md:py-20 border-t border-white/[0.04]">
+        <div className="relative max-w-5xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[#d5b171] mb-3 block">
+              The Team
+            </span>
+            <p className="text-sm text-ev-dust/50 max-w-lg mx-auto leading-relaxed">
+              Built in 36 hours at HackSMU 2026 — April 2026, Dallas, TX.
+              In partnership with{" "}
+              <span className="text-accent-savanna/70">ElephantVoices</span>, a
+              nonprofit dedicated to elephant cognition, communication, and
+              conservation.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+            {[
+              { name: "Dmitry Moiseenko", initials: "DM" },
+              { name: "Vladislav Kondratyev", initials: "VK" },
+              { name: "Arnav Kumar", initials: "AK" },
+              { name: "Tanish Murali", initials: "TM" },
+            ].map((member, i) => (
+              <div
+                key={i}
+                className="rounded-xl p-4 text-center border border-white/[0.06] bg-white/[0.02]"
+              >
+                <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-accent-savanna/10">
+                  <span className="text-xs font-bold text-accent-savanna">
+                    {member.initials}
+                  </span>
+                </div>
+                <p className="text-sm font-medium text-ev-cream/80">
+                  {member.name}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════
           FOOTER
          ═══════════════════════════════════════════ */}
       <footer className="bg-ev-charcoal border-t border-ev-charcoal-light/20 py-8 px-6">
@@ -1272,7 +1315,7 @@ export default function LandingPage() {
             EchoField
           </Link>
           <div className="flex items-center gap-6">
-            {["About", "Upload", "Database"].map((item) => (
+            {["Upload", "Database"].map((item) => (
               <Link
                 key={item}
                 href={`/${item.toLowerCase()}`}
