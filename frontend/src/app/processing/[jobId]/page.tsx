@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -245,11 +246,33 @@ export default function ProcessingPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2 font-medium">Original</p>
-                {isComplete ? <img src={spectrogramBefore} alt="Original spectrogram" className="w-full rounded-lg border border-ev-sand/30" /> : <SkeletonBlock />}
+                {isComplete ? (
+                  <Image
+                    src={spectrogramBefore}
+                    alt="Original spectrogram"
+                    width={1600}
+                    height={800}
+                    unoptimized
+                    className="h-auto w-full rounded-lg border border-ev-sand/30"
+                  />
+                ) : (
+                  <SkeletonBlock />
+                )}
               </div>
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2 font-medium">Cleaned</p>
-                {isComplete ? <img src={spectrogramAfter} alt="Cleaned spectrogram" className="w-full rounded-lg border border-ev-sand/30" /> : <SkeletonBlock />}
+                {isComplete ? (
+                  <Image
+                    src={spectrogramAfter}
+                    alt="Cleaned spectrogram"
+                    width={1600}
+                    height={800}
+                    unoptimized
+                    className="h-auto w-full rounded-lg border border-ev-sand/30"
+                  />
+                ) : (
+                  <SkeletonBlock />
+                )}
               </div>
             </div>
           </motion.div>
@@ -259,9 +282,25 @@ export default function ProcessingPage() {
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="p-5 rounded-xl glass border border-ev-sand/30">
               <h2 className="text-sm font-semibold text-ev-charcoal mb-4">Before / After Comparison</h2>
               <div ref={sliderRef} className="relative w-full aspect-[2/1] rounded-xl overflow-hidden cursor-col-resize select-none" role="slider" aria-label="Before/After comparison slider" aria-valuenow={Math.round(sliderPosition)} aria-valuemin={0} aria-valuemax={100} onMouseDown={() => { isDraggingSlider.current = true; }} onTouchStart={() => { isDraggingSlider.current = true; }}>
-                <img src={spectrogramAfter} alt="Cleaned spectrogram" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+                <Image
+                  src={spectrogramAfter}
+                  alt="Cleaned spectrogram"
+                  fill
+                  sizes="(min-width: 1024px) 60vw, 92vw"
+                  unoptimized
+                  className="absolute inset-0 h-full w-full object-cover"
+                  draggable={false}
+                />
                 <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}>
-                  <img src={spectrogramBefore} alt="Original spectrogram" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+                  <Image
+                    src={spectrogramBefore}
+                    alt="Original spectrogram"
+                    fill
+                    sizes="(min-width: 1024px) 60vw, 92vw"
+                    unoptimized
+                    className="absolute inset-0 h-full w-full object-cover"
+                    draggable={false}
+                  />
                 </div>
                 <div className="absolute top-0 bottom-0 w-0.5 bg-white/80 z-10 pointer-events-none" style={{ left: `${sliderPosition}%` }}>
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center border border-ev-sand/20">

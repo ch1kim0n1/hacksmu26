@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Music, TrendingUp, ArrowRight, Clock } from "lucide-react";
@@ -107,11 +108,13 @@ export default function ResultsPage() {
               >
                 {/* Spectrogram Thumbnail */}
                 <div className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
-                  <img
+                  <Image
                     src={spectrogramUrl}
                     alt={`Spectrogram for ${rec.filename}`}
-                    className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
-                    loading="lazy"
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    unoptimized
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                   <div className="absolute inset-0 spec-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
