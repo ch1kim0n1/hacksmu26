@@ -54,10 +54,20 @@ models/
 !models/README.md
 !models/*/model_card.md
 
-# Data Processing
+# Data — runtime cache, processed output, spectrograms
+data/cache/*.png
+data/cache/*.wav
+data/cache/*.sqlite
+data/cache/index.json
+data/cache/review_labels.json
 data/processed/
 data/spectrograms/
 *.log
+
+# Claude Code local skill/agent definitions (auto-generated, not project code)
+.claude/skills/
+.claude/agents/
+.impeccable.md
 
 # Docker
 .docker/
