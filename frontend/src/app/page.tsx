@@ -116,31 +116,15 @@ export default function LandingPage() {
         .from("[data-nav]", { y: -50, opacity: 0, duration: 0.8 })
         .from("[data-scroll-ind]", { opacity: 0, y: -10, duration: 0.4 }, "-=0.2");
 
-      /* nav blur + solidify on scroll */
-      ScrollTrigger.create({
-        trigger: heroRef.current,
-        start: "5% top",
-        onEnter: () => {
-          gsap.to("[data-nav]", {
-            backgroundColor: "rgba(44,41,38,0.85)",
-            backdropFilter: "blur(16px)",
-            duration: 0.3,
-          });
-          gsap.to("[data-nav-edge-path]", {
-            attr: { fill: "rgba(44,41,38,0.85)" },
-            duration: 0.3,
-          });
-        },
-        onLeaveBack: () => {
-          gsap.to("[data-nav]", {
-            backgroundColor: "transparent",
-            backdropFilter: "none",
-            duration: 0.3,
-          });
-          gsap.to("[data-nav-edge-path]", {
-            attr: { fill: "rgba(44,41,38,0)" },
-            duration: 0.3,
-          });
+      /* nav always solid */
+      gsap.set("[data-nav]", {
+        backgroundColor: "rgba(44,41,38,0.92)",
+        backdropFilter: "blur(16px)",
+      });
+      gsap.set("[data-nav-edge-path]", {
+        attr: { fill: "rgba(44,41,38,0.92)" },
+      });
+      if (false) {
         },
       });
 
@@ -394,8 +378,8 @@ export default function LandingPage() {
             href="/"
             className="flex items-center gap-2"
           >
-            <Image src="/logo.png" alt="EchoField logo" width={36} height={36} className="object-contain" />
-            <span className="text-2xl font-display font-semibold text-accent-savanna">EchoField</span>
+            <Image src="/logo.png" alt="EchoField logo" width={52} height={52} className="object-contain" />
+            <span className="text-4xl font-display font-semibold text-accent-savanna">EchoField</span>
           </Link>
 
         </div>
