@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import csv
+import io
+import zipfile
 from pathlib import Path
 
-from echofield.research.exporter import export_csv, export_json, export_pdf, export_zip
+import pytest
+
+from echofield.research.exporter import export_csv, export_json, export_pdf, export_raven, export_zip
 
 
 def _recordings_fixture() -> list[dict]:
@@ -38,6 +43,107 @@ def _recordings_fixture() -> list[dict]:
             },
         }
     ]
+
+
+def test_export_raven_produces_tsv_with_required_columns() -> None:
+    recordings = _recordings_fixture()
+    tsv_content = export_raven(recordings)
+
+    reader = csv.DictReader(io.StringIO(tsv_content), delimiter="\t")
+    rows = list(reader)
+
+    assert len(rows) == 1
+    row = rows[0]
+    assert "Selection" in row
+    assert "Begin Time (s)" in row
+    assert "End Time (s)" in row
+    assert "Low Freq (Hz)" in row
+    assert "High Freq (Hz)" in row
+    assert "Begin File" in row
+
+
+def test_export_raven_maps_call_timing_correctly() -> None:
+    recordings = _recordings_fixture()
+    tsv_content = export_raven(recordings)
+
+    reader = csv.DictReader(io.StringIO(tsv_content), delimiter="\t")
+    rows = list(reader)
+    row = rows[0]
+
+    # call starts at 0ms, duration 1200ms → end at 1.2s
+    assert float(row["Begin Time (s)"]) == 0.0
+    assert float(row["End Time (s)"]) == pytest.approx(1.2, abs=0.01)
+
+
+def test_export_raven_maps_frequency_range() -> None:
+    recordings = _recordings_fixture()
+    tsv_content = export_raven(recordings)
+
+    reader = csv.DictReader(io.StringIO(tsv_content), delimiter="\t")
+    row = next(reader)
+
+    assert float(row["Low Freq (Hz)"]) == 8.0
+    assert float(row["High Freq (Hz)"]) == 200.0
+
+
+def test_export_raven_includes_call_type_and_confidence() -> None:
+    recordings = _recordings_fixture()
+    tsv_content = export_raven(recordings)
+
+    reader = csv.DictReader(io.StringIO(tsv_content), delimiter="\t")
+    row = next(reader)
+
+    assert row["Tags"] == "rumble"
+    assert float(row["Score"]) == pytest.approx(0.9, abs=0.001)
+
+
+def test_export_raven_includes_begin_file() -> None:
+    recordings = _recordings_fixture()
+    tsv_content = export_raven(recordings)
+
+    reader = csv.DictReader(io.StringIO(tsv_content), delimiter="\t")
+    row = next(reader)
+
+    assert row["Begin File"] == "rec-1.wav"
+
+
+def test_export_raven_multiple_calls_are_numbered_sequentially() -> None:
+    recordings = [
+        {
+            "id": "rec-2",
+            "filename": "rec-2.wav",
+            "metadata": {},
+            "result": {
+                "calls": [
+                    {"id": "c1", "start_ms": 0, "duration_ms": 500, "frequency_min_hz": 10, "frequency_max_hz": 80, "call_type": "rumble", "confidence": 0.8},
+                    {"id": "c2", "start_ms": 1000, "duration_ms": 300, "frequency_min_hz": 20, "frequency_max_hz": 100, "call_type": "bark", "confidence": 0.6},
+                ]
+            },
+        }
+    ]
+    tsv_content = export_raven(recordings)
+    reader = csv.DictReader(io.StringIO(tsv_content), delimiter="\t")
+    rows = list(reader)
+
+    assert len(rows) == 2
+    assert rows[0]["Selection"] == "1"
+    assert rows[1]["Selection"] == "2"
+
+
+def test_export_raven_empty_recordings_returns_header_only() -> None:
+    tsv_content = export_raven([])
+    reader = csv.DictReader(io.StringIO(tsv_content), delimiter="\t")
+    rows = list(reader)
+    assert rows == []
+    assert "Selection" in (reader.fieldnames or [])
+
+
+def test_export_zip_includes_raven_file() -> None:
+    recordings = _recordings_fixture()
+    buf = export_zip(recordings)
+    with zipfile.ZipFile(buf) as zf:
+        names = zf.namelist()
+    assert "selections.txt" in names
 
 
 def test_exporter_outputs_all_formats(tmp_path: Path) -> None:

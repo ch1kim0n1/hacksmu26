@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getRecordings, API_BASE, type Recording } from "@/lib/audio-api";
+import { exportResearch, getRecordings, API_BASE, type Recording } from "@/lib/audio-api";
 
 function QualityBadge({ score }: { score: number }) {
   const pct = Math.round(score * 100);
@@ -41,6 +41,24 @@ export default function ResultsPage() {
   useEffect(() => {
     fetchResults();
   }, [fetchResults]);
+
+  const handleQuickExport = async (recordingId: string, format: "csv" | "zip") => {
+    const blob = await exportResearch({
+      format,
+      recording_ids: [recordingId],
+      include_audio: false,
+      include_spectrograms: false,
+      include_fingerprints: true,
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `echofield-${recordingId}.${format}`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="min-h-screen bg-ev-ivory">
@@ -85,10 +103,10 @@ export default function ResultsPage() {
               const spectrogramUrl = `${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`;
 
               return (
-                <button
+                <article
                   key={rec.id}
                   onClick={() => router.push(`/processing/${rec.id}`)}
-                  className="text-left rounded-xl bg-ev-cream border border-ev-sand hover:border-ev-warm-gray transition-all overflow-hidden group"
+                  className="cursor-pointer overflow-hidden rounded-xl border border-ev-sand bg-ev-cream text-left transition-all hover:border-ev-warm-gray group"
                 >
                   <div className="h-36 bg-background-elevated overflow-hidden">
                     <img
@@ -119,8 +137,28 @@ export default function ResultsPage() {
                         </span>
                       )}
                     </div>
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleQuickExport(rec.id, "csv").catch(() => undefined);
+                        }}
+                        className="rounded-lg bg-background-elevated px-3 py-1.5 text-xs font-medium text-ev-charcoal hover:bg-ev-sand"
+                      >
+                        Download CSV
+                      </button>
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleQuickExport(rec.id, "zip").catch(() => undefined);
+                        }}
+                        className="rounded-lg bg-accent-savanna px-3 py-1.5 text-xs font-semibold text-ev-ivory hover:bg-accent-savanna/90"
+                      >
+                        Download ZIP
+                      </button>
+                    </div>
                   </div>
-                </button>
+                </article>
               );
             })}
           </div>

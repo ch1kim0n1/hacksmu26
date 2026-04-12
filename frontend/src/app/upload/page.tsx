@@ -7,6 +7,7 @@ import {
   uploadFiles,
   getRecordings,
   processRecording,
+  processBatch,
   downloadRecording,
   type Recording,
 } from "@/lib/audio-api";
@@ -69,6 +70,8 @@ export default function UploadPage() {
 
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
   const [enhanceWithAI, setEnhanceWithAI] = useState(true);
+  const [demoMode, setDemoMode] = useState(false);
+  const [batchProcessing, setBatchProcessing] = useState(false);
 
   const fetchRecordings = useCallback(async () => {
     try {
@@ -175,6 +178,7 @@ export default function UploadPage() {
     try {
       await processRecording(id, {
         method: enhanceWithAI ? "hybrid" : "spectral",
+        preset: demoMode ? "demo" : undefined,
       });
       await fetchRecordings();
       router.push(`/processing/${id}`);
@@ -186,6 +190,28 @@ export default function UploadPage() {
         next.delete(id);
         return next;
       });
+    }
+  };
+
+  const handleProcessAll = async () => {
+    const ids = recordings
+      .filter((rec) => rec.status === "pending" || rec.status === "failed")
+      .map((rec) => rec.id);
+    if (ids.length === 0) return;
+    setBatchProcessing(true);
+    setError(null);
+    try {
+      const batch = await processBatch({
+        recording_ids: ids,
+        method: enhanceWithAI ? "hybrid" : "spectral",
+        aggressiveness: demoMode ? 1.0 : 1.5,
+      });
+      await fetchRecordings();
+      router.push(`/batch/${batch.batch_id}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Batch processing failed");
+    } finally {
+      setBatchProcessing(false);
     }
   };
 
@@ -346,6 +372,31 @@ export default function UploadPage() {
             </button>
             <span className="text-xs text-ev-warm-gray">
               {enhanceWithAI ? "Hybrid (spectral + AI)" : "Spectral only"}
+            </span>
+          </div>
+          <div className="mb-6 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setDemoMode((prev) => !prev)}
+              className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                demoMode
+                  ? "border-accent-savanna bg-accent-savanna text-ev-ivory"
+                  : "border-ev-sand bg-ev-cream text-ev-elephant hover:text-ev-charcoal"
+              }`}
+              aria-pressed={demoMode}
+            >
+              Demo preset
+            </button>
+            <button
+              type="button"
+              onClick={handleProcessAll}
+              disabled={batchProcessing || recordings.every((rec) => rec.status !== "pending" && rec.status !== "failed")}
+              className="rounded-lg bg-accent-savanna px-4 py-2 text-sm font-semibold text-ev-ivory transition-colors hover:bg-accent-savanna/90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {batchProcessing ? "Starting batch..." : "Process All"}
+            </button>
+            <span className="text-xs text-ev-warm-gray">
+              Starts every pending recording and opens the batch dashboard.
             </span>
           </div>
 

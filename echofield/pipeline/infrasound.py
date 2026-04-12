@@ -1,190 +1,165 @@
-"""Infrasound detection and pitch-shifting for elephant vocalizations."""
+"""Infrasound detection and pitch-shift reveal helpers."""
+
 from __future__ import annotations
 
-import logging
+from typing import Any
 
-import numpy as np
 import librosa
-from scipy.signal import butter, sosfilt
-from dataclasses import dataclass
-
-logger = logging.getLogger(__name__)
+import numpy as np
+from scipy import signal
 
 
-@dataclass
-class InfrasoundRegion:
-    start_ms: float
-    end_ms: float
-    estimated_f0_hz: float
-    energy_db: float
+def _safe_float(value: Any, default: float = 0.0) -> float:
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return default
+    return result if np.isfinite(result) else default
+
+
+def _lowpass(y: np.ndarray, sr: int, cutoff_hz: float) -> np.ndarray:
+    signal_in = np.asarray(y, dtype=np.float32)
+    if signal_in.size == 0 or sr <= 0:
+        return signal_in
+    cutoff = min(max(cutoff_hz, 1.0), sr / 2 * 0.95)
+    sos = signal.butter(4, cutoff, btype="lowpass", fs=sr, output="sos")
+    return signal.sosfiltfilt(sos, signal_in).astype(np.float32)
+
+
+def _highpass(y: np.ndarray, sr: int, cutoff_hz: float) -> np.ndarray:
+    signal_in = np.asarray(y, dtype=np.float32)
+    if signal_in.size == 0 or sr <= 0:
+        return signal_in
+    cutoff = min(max(cutoff_hz, 1.0), sr / 2 * 0.95)
+    sos = signal.butter(4, cutoff, btype="highpass", fs=sr, output="sos")
+    return signal.sosfiltfilt(sos, signal_in).astype(np.float32)
+
+
+def _merge_regions(frames: list[tuple[int, int]], sr: int, hop: int) -> list[tuple[int, int]]:
+    if not frames:
+        return []
+    merged = [frames[0]]
+    max_gap = int(0.25 * sr)
+    for start_frame, end_frame in frames[1:]:
+        start = start_frame * hop
+        end = end_frame * hop
+        prev_start, prev_end = merged[-1]
+        prev_end_sample = prev_end * hop
+        if start - prev_end_sample <= max_gap:
+            merged[-1] = (prev_start, end_frame)
+        else:
+            merged.append((start_frame, end_frame))
+    return merged
 
 
 def detect_infrasound_regions(
     y: np.ndarray,
     sr: int,
+    *,
     upper_bound_hz: float = 20.0,
     min_energy_db: float = -40.0,
-    min_duration_ms: float = 200.0,
-) -> list[InfrasoundRegion]:
-    """Detect time regions with significant infrasonic content (<20Hz)."""
-    # Low-pass filter at upper_bound_hz
-    sos = butter(4, upper_bound_hz, btype="low", fs=sr, output="sos")
-    y_infra = sosfilt(sos, y)
+) -> list[dict[str, Any]]:
+    """Detect time regions with meaningful sub-20Hz energy."""
+    signal_in = np.asarray(y, dtype=np.float32)
+    if signal_in.size == 0 or sr <= 0:
+        return []
+    infra = _lowpass(signal_in, sr, upper_bound_hz)
+    hop = max(int(0.05 * sr), 1)
+    frame = max(int(0.25 * sr), hop * 2)
+    rms = librosa.feature.rms(y=infra, frame_length=frame, hop_length=hop, center=True)[0]
+    rms_db = librosa.amplitude_to_db(rms, ref=max(float(np.max(rms)), 1e-8))
+    active = np.where(rms_db >= min_energy_db)[0].tolist()
+    if not active:
+        return []
 
-    # Frame-wise RMS energy
-    frame_length = 2048
-    hop_length = 512
-    rms = librosa.feature.rms(
-        y=y_infra, frame_length=frame_length, hop_length=hop_length
-    )[0]
-    rms_db = librosa.amplitude_to_db(
-        rms, ref=np.max(rms) if np.max(rms) > 0 else 1.0
-    )
+    spans: list[tuple[int, int]] = []
+    start = active[0]
+    prev = active[0]
+    for index in active[1:]:
+        if index == prev + 1:
+            prev = index
+            continue
+        spans.append((start, prev + 1))
+        start = index
+        prev = index
+    spans.append((start, prev + 1))
 
-    # Find regions above threshold
-    active = rms_db > min_energy_db
-    regions: list[InfrasoundRegion] = []
-    in_region = False
-    start_frame = 0
-
-    for i, is_active in enumerate(active):
-        if is_active and not in_region:
-            start_frame = i
-            in_region = True
-        elif not is_active and in_region:
-            start_ms = (start_frame * hop_length / sr) * 1000
-            end_ms = (i * hop_length / sr) * 1000
-            if end_ms - start_ms >= min_duration_ms:
-                start_sample = start_frame * hop_length
-                end_sample = min(i * hop_length, len(y_infra))
-                segment = y_infra[start_sample:end_sample]
-                if len(segment) > 0:
-                    # Use a frame_length large enough for low fmin
-                    yin_fmin = max(5.0, sr / 8191)
-                    yin_frame = int(np.ceil(sr / yin_fmin)) + 1
-                    f0 = librosa.yin(
-                        segment,
-                        fmin=yin_fmin,
-                        fmax=upper_bound_hz,
-                        sr=sr,
-                        frame_length=yin_frame,
-                    )
-                    valid_f0 = f0[(f0 > 0) & np.isfinite(f0)]
-                    est_f0 = (
-                        float(np.median(valid_f0)) if len(valid_f0) > 0 else 0.0
-                    )
-                    energy = float(np.mean(rms_db[start_frame:i]))
-                    regions.append(
-                        InfrasoundRegion(
-                            start_ms=round(start_ms, 1),
-                            end_ms=round(end_ms, 1),
-                            estimated_f0_hz=round(est_f0, 1),
-                            energy_db=round(energy, 1),
-                        )
-                    )
-            in_region = False
-
-    # Handle region extending to end
-    if in_region:
-        start_ms = (start_frame * hop_length / sr) * 1000
-        end_ms = (len(active) * hop_length / sr) * 1000
-        if end_ms - start_ms >= min_duration_ms:
-            start_sample = start_frame * hop_length
-            segment = y_infra[start_sample:]
-            if len(segment) > 0:
-                yin_fmin = max(5.0, sr / 8191)
-                yin_frame = int(np.ceil(sr / yin_fmin)) + 1
-                f0 = librosa.yin(
-                    segment,
-                    fmin=yin_fmin,
-                    fmax=upper_bound_hz,
-                    sr=sr,
-                    frame_length=yin_frame,
-                )
-                valid_f0 = f0[(f0 > 0) & np.isfinite(f0)]
-                est_f0 = (
-                    float(np.median(valid_f0)) if len(valid_f0) > 0 else 0.0
-                )
-                energy = float(np.mean(rms_db[start_frame:]))
-                regions.append(
-                    InfrasoundRegion(
-                        start_ms=round(start_ms, 1),
-                        end_ms=round(end_ms, 1),
-                        estimated_f0_hz=round(est_f0, 1),
-                        energy_db=round(energy, 1),
-                    )
-                )
-
+    regions = []
+    for start_frame, end_frame in _merge_regions(spans, sr, hop):
+        start_sample = max(start_frame * hop - frame // 2, 0)
+        end_sample = min(end_frame * hop + frame // 2, signal_in.size)
+        duration_ms = (end_sample - start_sample) / sr * 1000.0
+        if duration_ms < 150:
+            continue
+        segment = infra[start_sample:end_sample]
+        try:
+            f0 = librosa.yin(segment, fmin=8.0, fmax=min(upper_bound_hz, sr / 2 - 1), sr=sr)
+            valid = f0[np.isfinite(f0)]
+            estimated_f0 = float(np.median(valid)) if valid.size else 0.0
+        except Exception:
+            estimated_f0 = 0.0
+        energy = float(np.mean(librosa.amplitude_to_db(np.abs(segment) + 1e-8, ref=np.max)))
+        regions.append({
+            "start_ms": round(start_sample / sr * 1000.0, 2),
+            "end_ms": round(end_sample / sr * 1000.0, 2),
+            "estimated_f0_hz": round(estimated_f0, 2),
+            "energy_db": round(energy, 2),
+        })
     return regions
 
 
 def pitch_shift_infrasound(
     y: np.ndarray,
     sr: int,
+    *,
     shift_octaves: int = 3,
+    method: str = "phase_vocoder",
     preserve_duration: bool = True,
-) -> np.ndarray:
-    """Pitch-shift infrasonic content into audible range."""
-    if preserve_duration:
-        return librosa.effects.pitch_shift(y, sr=sr, n_steps=shift_octaves * 12)
-    else:
-        # Resample method — faster, no artifacts, but changes duration
-        factor = 2**shift_octaves
-        return librosa.resample(y, orig_sr=sr, target_sr=sr * factor)
+) -> tuple[np.ndarray, int]:
+    """Pitch-shift infrasonic content into the audible range."""
+    signal_in = np.asarray(y, dtype=np.float32)
+    if signal_in.size == 0:
+        return signal_in, sr
+    if method == "resample" or not preserve_duration:
+        factor = 2 ** int(shift_octaves)
+        shifted = librosa.resample(signal_in, orig_sr=sr, target_sr=sr * factor)
+        return shifted.astype(np.float32), sr
+    shifted = librosa.effects.pitch_shift(signal_in, sr=sr, n_steps=int(shift_octaves) * 12)
+    return shifted.astype(np.float32), sr
 
 
 def create_infrasound_reveal(
     y: np.ndarray,
     sr: int,
+    *,
     shift_octaves: int = 3,
+    method: str = "phase_vocoder",
     mix_mode: str = "shifted_only",
-) -> dict:
-    """Create the reveal audio for infrasound playback.
-
-    mix_mode: 'shifted_only', 'blended', or 'side_by_side'
-    """
-    # Split into infrasound and audible bands
-    crossover_hz = 25.0
-    sos_low = butter(4, crossover_hz, btype="low", fs=sr, output="sos")
-    sos_high = butter(4, crossover_hz, btype="high", fs=sr, output="sos")
-
-    y_infra = sosfilt(sos_low, y)
-    y_audible = sosfilt(sos_high, y)
-
-    # Check if there's meaningful infrasound energy
-    infra_energy = float(np.sum(y_infra**2))
-    total_energy = float(np.sum(y**2))
-    infra_pct = (infra_energy / total_energy * 100) if total_energy > 0 else 0.0
-
-    # Pitch-shift the infrasound band
-    y_shifted = pitch_shift_infrasound(
-        y_infra, sr, shift_octaves=shift_octaves
-    )
-
-    # Normalize shifted audio
-    max_val = np.max(np.abs(y_shifted))
-    if max_val > 0:
-        y_shifted = y_shifted * (0.8 / max_val)
-
+) -> dict[str, Any]:
+    signal_in = np.asarray(y, dtype=np.float32)
+    infra = _lowpass(signal_in, sr, 20.0)
+    audible = _highpass(signal_in, sr, 20.0)
+    shifted, out_sr = pitch_shift_infrasound(infra, sr, shift_octaves=shift_octaves, method=method)
     if mix_mode == "blended":
-        # Mix shifted infrasound with original audible content
-        min_len = min(len(y_shifted), len(y_audible))
-        output = y_audible[:min_len] + y_shifted[:min_len] * 0.7
-        max_val = np.max(np.abs(output))
-        if max_val > 0:
-            output = output * (0.9 / max_val)
+        if shifted.size != audible.size:
+            shifted = librosa.util.fix_length(shifted, size=audible.size)
+        audio = (audible + shifted).astype(np.float32)
     elif mix_mode == "side_by_side":
-        output = y_shifted  # Return just shifted; frontend handles side-by-side
+        audio = np.concatenate([signal_in, shifted]).astype(np.float32)
     else:
-        output = y_shifted
-
+        audio = shifted.astype(np.float32)
+    peak = float(np.max(np.abs(audio))) if audio.size else 0.0
+    if peak > 1e-8:
+        audio = (audio / peak * 0.9).astype(np.float32)
+    total = max(float(np.sum(signal_in ** 2)), 1e-8)
+    infra_pct = float(np.sum(infra ** 2) / total * 100.0)
+    regions = detect_infrasound_regions(signal_in, sr)
     return {
-        "audio": output,
-        "infrasound_energy_pct": round(infra_pct, 1),
-        "shift_octaves": shift_octaves,
-        "original_range_hz": [5, crossover_hz],
-        "shifted_range_hz": [
-            5 * (2**shift_octaves),
-            crossover_hz * (2**shift_octaves),
-        ],
+        "audio": audio,
+        "sr": out_sr,
+        "regions": regions,
+        "infrasound_detected": bool(regions),
+        "infrasound_energy_pct": round(infra_pct, 2),
+        "frequency_range_original_hz": (8.0, 20.0),
+        "frequency_range_shifted_hz": (8.0 * (2 ** shift_octaves), 20.0 * (2 ** shift_octaves)),
     }

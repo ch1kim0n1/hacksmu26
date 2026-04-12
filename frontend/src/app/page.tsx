@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { processRecording, uploadFiles } from "@/lib/audio-api";
 
 function AnimatedCounter({
   target,
@@ -48,10 +49,29 @@ function AnimatedCounter({
 
 export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
+  const demoInputRef = useRef<HTMLInputElement>(null);
+  const [demoBusy, setDemoBusy] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleDemoFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setDemoBusy(true);
+    try {
+      const upload = await uploadFiles([file]);
+      const id = upload.recording_ids[0];
+      if (id) {
+        await processRecording(id, { method: "spectral", preset: "demo", aggressiveness: 1.0 });
+        window.location.href = `/processing/${id}`;
+      }
+    } finally {
+      setDemoBusy(false);
+      if (demoInputRef.current) demoInputRef.current.value = "";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-ev-ivory">
@@ -99,9 +119,27 @@ export default function LandingPage() {
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
+            <input
+              ref={demoInputRef}
+              type="file"
+              accept=".wav,.mp3,audio/wav,audio/mpeg"
+              className="hidden"
+              onChange={handleDemoFile}
+            />
+            <button
+              type="button"
+              onClick={() => demoInputRef.current?.click()}
+              disabled={demoBusy}
+              className="inline-flex items-center gap-2 rounded-lg bg-success px-8 py-4 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-success/90 hover:shadow-lg hover:shadow-success/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              {demoBusy ? "Starting Demo..." : "Try Live Demo"}
+            </button>
             <Link
               href="/upload"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-success text-white font-semibold rounded-xl hover:bg-success/90 transition-all hover:shadow-lg hover:shadow-success/20 hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-background-elevated text-ev-charcoal font-semibold rounded-lg hover:bg-ev-sand transition-all hover:-translate-y-0.5"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -110,7 +148,7 @@ export default function LandingPage() {
             </Link>
             <a
               href="#how-it-works"
-              className="inline-flex items-center gap-2 px-8 py-4 border border-accent-savanna text-accent-savanna font-semibold rounded-xl hover:bg-accent-savanna/10 transition-all hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-8 py-4 border border-accent-savanna text-accent-savanna font-semibold rounded-lg hover:bg-accent-savanna/10 transition-all hover:-translate-y-0.5"
             >
               How It Works
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
