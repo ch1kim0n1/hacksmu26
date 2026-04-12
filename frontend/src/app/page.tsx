@@ -16,7 +16,7 @@ type ParticleFieldProps = {
 };
 
 function LazyParticleField(props: ParticleFieldProps) {
-  const [Comp, setComp] = useState<ComponentType<LazyParticleFieldProps> | null>(
+  const [Comp, setComp] = useState<ComponentType<ParticleFieldProps> | null>(
     null,
   );
   useEffect(() => {
