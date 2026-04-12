@@ -38,6 +38,114 @@ class EchoBaseModel(BaseModel):
     )
 
 
+class Auth0Response(EchoBaseModel):
+    model_config = ConfigDict(
+        use_enum_values=True,
+        json_schema_extra={"examples": []},
+        extra="allow",
+    )
+
+
+class AuthConfigResponse(EchoBaseModel):
+    enabled: bool
+    domain: str | None = None
+    audience: str | None = None
+    issuer: str | None = None
+    algorithms: list[str] = Field(default_factory=list)
+    client_id: str | None = None
+    default_scope: str
+    social_connections: list[str] = Field(default_factory=list)
+    enterprise_connections: list[str] = Field(default_factory=list)
+
+
+class AuthLoginUrlRequest(EchoBaseModel):
+    redirect_uri: str | None = None
+    connection: str | None = None
+    organization: str | None = None
+    screen_hint: str | None = None
+    prompt: str | None = None
+    state: str | None = None
+    scope: str | None = None
+    code_challenge: str | None = None
+    code_challenge_method: str | None = None
+
+
+class AuthLoginUrlResponse(EchoBaseModel):
+    url: str
+    connection: str | None = None
+    organization: str | None = None
+
+
+class AuthTokenExchangeRequest(EchoBaseModel):
+    code: str
+    redirect_uri: str | None = None
+    code_verifier: str | None = None
+
+
+class AuthTokenResponse(Auth0Response):
+    access_token: str | None = None
+    id_token: str | None = None
+    refresh_token: str | None = None
+    token_type: str | None = None
+    expires_in: int | None = None
+    scope: str | None = None
+    mfa_token: str | None = None
+
+
+class PasswordlessStartRequest(EchoBaseModel):
+    connection: str = Field(pattern="^(email|sms)$")
+    email: str | None = None
+    phone_number: str | None = None
+    send: str = Field(default="code", pattern="^(code|link)$")
+    redirect_uri: str | None = None
+    scope: str | None = None
+
+
+class PasswordlessVerifyRequest(EchoBaseModel):
+    connection: str = Field(pattern="^(email|sms)$")
+    username: str
+    otp: str
+    scope: str | None = None
+
+
+class MfaChallengeRequest(EchoBaseModel):
+    mfa_token: str
+    challenge_type: str = "otp"
+    authenticator_id: str | None = None
+
+
+class MfaOtpVerifyRequest(EchoBaseModel):
+    mfa_token: str
+    otp: str
+
+
+class AuthenticatedUserResponse(EchoBaseModel):
+    sub: str
+    scopes: list[str] = Field(default_factory=list)
+    permissions: list[str] = Field(default_factory=list)
+    roles: list[str] = Field(default_factory=list)
+    claims: dict[str, Any] = Field(default_factory=dict)
+
+
+class Auth0UserProfileResponse(EchoBaseModel):
+    user_id: str
+    email: str | None = None
+    name: str | None = None
+    picture: str | None = None
+    user_metadata: dict[str, Any] = Field(default_factory=dict)
+    app_metadata: dict[str, Any] = Field(default_factory=dict)
+    raw: dict[str, Any] = Field(default_factory=dict)
+
+
+class AuthUserMetadataPatchRequest(EchoBaseModel):
+    user_metadata: dict[str, Any] = Field(default_factory=dict)
+    app_metadata: dict[str, Any] | None = None
+
+
+class AuthRoleAssignmentRequest(EchoBaseModel):
+    roles: list[str] = Field(min_length=1)
+
+
 class RecordingMetadata(EchoBaseModel):
     location: str | None = Field(default=None, examples=["Amboseli, Kenya"])
     date: str | None = Field(default=None, examples=["2026-04-11"])

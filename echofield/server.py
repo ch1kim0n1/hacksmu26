@@ -17,11 +17,20 @@ from typing import Any
 import numpy as np
 import aiofiles
 import numpy as np
-from fastapi import BackgroundTasks, FastAPI, File, Header, HTTPException, Query, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import BackgroundTasks, Depends, FastAPI, File, Header, HTTPException, Query, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+from echofield.auth import (
+    Auth0Client,
+    Auth0TokenVerifier,
+    AuthenticatedUser,
+    authenticated_user_from_request,
+    auth0_middleware,
+    auth_config_payload,
+    require_permissions,
+)
 from echofield.batch_store import BatchStore
 from echofield.config import get_settings
 from echofield.ml.active_learning import ActiveLearningManager
@@ -34,6 +43,16 @@ from echofield.model_registry import ModelRegistry
 from echofield.models import (
     AnnotationRequest,
     ActivityHeatmapResponse,
+    Auth0Response,
+    Auth0UserProfileResponse,
+    AuthConfigResponse,
+    AuthLoginUrlRequest,
+    AuthLoginUrlResponse,
+    AuthRoleAssignmentRequest,
+    AuthTokenExchangeRequest,
+    AuthTokenResponse,
+    AuthUserMetadataPatchRequest,
+    AuthenticatedUserResponse,
     BatchRecordingSummary,
     BatchSummaryResponse,
     BatchStatusResponse,
@@ -63,8 +82,12 @@ from echofield.models import (
     MetadataPatchRequest,
     ModelVersionInfo,
     PatternModel,
+    MfaChallengeRequest,
+    MfaOtpVerifyRequest,
     ProcessingResult,
     ProcessingStatusModel,
+    PasswordlessStartRequest,
+    PasswordlessVerifyRequest,
     RecordingDetail,
     RecordingListResponse,
     RecordingMetadata,
@@ -179,6 +202,8 @@ app = FastAPI(
 )
 
 settings = get_settings()
+auth0_verifier = Auth0TokenVerifier(settings)
+auth0_client = Auth0Client(settings)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -188,6 +213,11 @@ app.add_middleware(
 )
 app.mount("/spectrograms", StaticFiles(directory=str(settings.spectrogram_dir)), name="spectrograms")
 app.mount("/processed", StaticFiles(directory=str(settings.processed_dir)), name="processed")
+
+
+@app.middleware("http")
+async def require_auth0_access_token(request: Request, call_next):
+    return await auth0_middleware(request, call_next, settings, auth0_verifier)
 
 
 @app.middleware("http")
@@ -840,6 +870,149 @@ async def health_check() -> HealthResponse:
         overall = "degraded"
 
     return HealthResponse(status=overall, version=str(app.version), components=components)
+
+
+def _auth_user_response(user: AuthenticatedUser) -> AuthenticatedUserResponse:
+    return AuthenticatedUserResponse(
+        sub=user.sub,
+        scopes=sorted(user.scopes),
+        permissions=sorted(user.permissions),
+        roles=sorted(user.roles),
+        claims=user.claims,
+    )
+
+
+def _auth_profile_response(profile: dict[str, Any]) -> Auth0UserProfileResponse:
+    return Auth0UserProfileResponse(
+        user_id=str(profile.get("user_id") or profile.get("sub") or ""),
+        email=profile.get("email"),
+        name=profile.get("name"),
+        picture=profile.get("picture"),
+        user_metadata=profile.get("user_metadata") or {},
+        app_metadata=profile.get("app_metadata") or {},
+        raw=profile,
+    )
+
+
+@app.get("/api/auth/config", response_model=AuthConfigResponse)
+async def get_auth_config() -> dict[str, Any]:
+    return auth_config_payload(settings)
+
+
+@app.post("/api/auth/login-url", response_model=AuthLoginUrlResponse)
+async def create_auth_login_url(payload: AuthLoginUrlRequest) -> AuthLoginUrlResponse:
+    url = auth0_client.authorize_url(
+        redirect_uri=payload.redirect_uri,
+        connection=payload.connection,
+        organization=payload.organization,
+        screen_hint=payload.screen_hint,
+        prompt=payload.prompt,
+        state=payload.state,
+        scope=payload.scope,
+        code_challenge=payload.code_challenge,
+        code_challenge_method=payload.code_challenge_method,
+    )
+    return AuthLoginUrlResponse(url=url, connection=payload.connection, organization=payload.organization)
+
+
+@app.post("/api/auth/token/exchange", response_model=AuthTokenResponse)
+async def exchange_auth_code(payload: AuthTokenExchangeRequest) -> dict[str, Any]:
+    return await auth0_client.exchange_authorization_code(
+        code=payload.code,
+        redirect_uri=payload.redirect_uri,
+        code_verifier=payload.code_verifier,
+    )
+
+
+@app.post("/api/auth/passwordless/start", response_model=Auth0Response)
+async def start_passwordless_login(payload: PasswordlessStartRequest) -> dict[str, Any]:
+    return await auth0_client.passwordless_start(
+        connection=payload.connection,
+        email=payload.email,
+        phone_number=payload.phone_number,
+        send=payload.send,
+        redirect_uri=payload.redirect_uri,
+        scope=payload.scope,
+    )
+
+
+@app.post("/api/auth/passwordless/verify", response_model=AuthTokenResponse)
+async def verify_passwordless_login(payload: PasswordlessVerifyRequest) -> dict[str, Any]:
+    return await auth0_client.passwordless_verify(
+        connection=payload.connection,
+        username=payload.username,
+        otp=payload.otp,
+        scope=payload.scope,
+    )
+
+
+@app.post("/api/auth/mfa/challenge", response_model=Auth0Response)
+async def start_mfa_challenge(payload: MfaChallengeRequest) -> dict[str, Any]:
+    return await auth0_client.mfa_challenge(
+        mfa_token=payload.mfa_token,
+        challenge_type=payload.challenge_type,
+        authenticator_id=payload.authenticator_id,
+    )
+
+
+@app.post("/api/auth/mfa/verify-otp", response_model=AuthTokenResponse)
+async def verify_mfa_otp(payload: MfaOtpVerifyRequest) -> dict[str, Any]:
+    return await auth0_client.mfa_verify_otp(mfa_token=payload.mfa_token, otp=payload.otp)
+
+
+@app.get("/api/auth/me", response_model=AuthenticatedUserResponse)
+async def get_authenticated_user(request: Request) -> AuthenticatedUserResponse:
+    user = authenticated_user_from_request(request, settings)
+    return _auth_user_response(user)
+
+
+@app.get("/api/auth/users/{user_id}/profile", response_model=Auth0UserProfileResponse)
+async def get_auth0_user_profile(
+    user_id: str,
+    _user: AuthenticatedUser = Depends(require_permissions(settings, "read:users")),
+) -> Auth0UserProfileResponse:
+    profile = await auth0_client.get_user_profile(user_id)
+    return _auth_profile_response(profile)
+
+
+@app.patch("/api/auth/users/{user_id}/metadata", response_model=Auth0UserProfileResponse)
+async def update_auth0_user_metadata(
+    user_id: str,
+    payload: AuthUserMetadataPatchRequest,
+    _user: AuthenticatedUser = Depends(require_permissions(settings, "manage:users")),
+) -> Auth0UserProfileResponse:
+    profile = await auth0_client.patch_user_metadata(
+        user_id,
+        user_metadata=payload.user_metadata,
+        app_metadata=payload.app_metadata,
+    )
+    return _auth_profile_response(profile)
+
+
+@app.get("/api/auth/users/{user_id}/roles", response_model=list[dict[str, Any]])
+async def list_auth0_user_roles(
+    user_id: str,
+    _user: AuthenticatedUser = Depends(require_permissions(settings, "read:roles")),
+) -> list[dict[str, Any]]:
+    return await auth0_client.list_user_roles(user_id)
+
+
+@app.post("/api/auth/users/{user_id}/roles", response_model=dict)
+async def assign_auth0_user_roles(
+    user_id: str,
+    payload: AuthRoleAssignmentRequest,
+    _user: AuthenticatedUser = Depends(require_permissions(settings, "manage:users")),
+) -> dict[str, Any]:
+    return await auth0_client.assign_user_roles(user_id, payload.roles)
+
+
+@app.delete("/api/auth/users/{user_id}/roles", response_model=dict)
+async def remove_auth0_user_roles(
+    user_id: str,
+    payload: AuthRoleAssignmentRequest,
+    _user: AuthenticatedUser = Depends(require_permissions(settings, "manage:users")),
+) -> dict[str, Any]:
+    return await auth0_client.remove_user_roles(user_id, payload.roles)
 
 
 @app.post("/api/upload", response_model=UploadResponse, status_code=201)
