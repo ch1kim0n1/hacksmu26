@@ -14,6 +14,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { getCall, getRecording, API_BASE, type Recording, type Call } from "@/lib/audio-api";
+import { MetricCard } from "@/components/ui/metric-card";
 import WaveformPlayer from "@/components/audio/WaveformPlayer";
 import { QualityRing } from "@/components/ui/motion-primitives";
 import CallResearchPanel from "@/components/research/CallResearchPanel";
@@ -60,15 +61,6 @@ function CallBadge({ call }: { call: Call }) {
           <p className="text-[11px] text-ev-warm-gray mt-0.5 leading-snug">{description}</p>
         )}
       </div>
-    </div>
-  );
-}
-
-function MetricCard({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="p-4 rounded-xl glass border border-ev-sand/30">
-      <h3 className="text-[11px] font-medium text-ev-warm-gray mb-3 uppercase tracking-wider">{label}</h3>
-      {children}
     </div>
   );
 }

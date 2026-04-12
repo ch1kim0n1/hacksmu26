@@ -13,7 +13,6 @@ import {
   ACCEPTED_FORMATS,
   MAX_FILE_SIZE,
 } from "@/lib/validation";
-import { API_ENDPOINTS, PROCESSING_STAGES, PROCESSING_STAGE_MAP } from "@/lib/constants";
 
 // ── fetchAPI ──
 
@@ -128,38 +127,6 @@ describe("fetchAPI", () => {
 describe("API_BASE", () => {
   it("defaults to localhost:8000", () => {
     expect(API_BASE).toBe("http://localhost:8000");
-  });
-});
-
-// ── API_ENDPOINTS ──
-
-describe("API_ENDPOINTS", () => {
-  it("has all required endpoints", () => {
-    expect(API_ENDPOINTS.RECORDINGS).toBe("/api/recordings");
-    expect(API_ENDPOINTS.RECORDING("abc")).toBe("/api/recordings/abc");
-    expect(API_ENDPOINTS.RECORDING_PROCESS("abc")).toBe("/api/recordings/abc/process");
-    expect(API_ENDPOINTS.RECORDING_SPECTROGRAM("abc")).toBe("/api/recordings/abc/spectrogram");
-    expect(API_ENDPOINTS.RECORDING_DOWNLOAD("abc")).toBe("/api/recordings/abc/download");
-    expect(API_ENDPOINTS.CALLS).toBe("/api/calls");
-    expect(API_ENDPOINTS.CALL("xyz")).toBe("/api/calls/xyz");
-    expect(API_ENDPOINTS.STATS).toBe("/api/stats");
-    expect(API_ENDPOINTS.EXPORT).toBe("/api/export");
-  });
-});
-
-// ── PROCESSING_STAGES ──
-
-describe("PROCESSING_STAGES", () => {
-  it("has at least uploaded, completed, and failed stages", () => {
-    const keys = PROCESSING_STAGES.map((s) => s.key);
-    expect(keys).toContain("uploaded");
-    expect(keys).toContain("completed");
-    expect(keys).toContain("failed");
-  });
-
-  it("PROCESSING_STAGE_MAP maps keys to stages", () => {
-    expect(PROCESSING_STAGE_MAP["uploaded"]?.label).toBe("Uploaded");
-    expect(PROCESSING_STAGE_MAP["completed"]?.label).toBe("Completed");
   });
 });
 

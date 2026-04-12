@@ -23,6 +23,7 @@ import {
   processRecording,
   type Recording,
 } from "@/lib/audio-api";
+import { formatDuration, formatFileSize } from "@/lib/format";
 import { AnalysisLabelsBadge } from "@/components/research/AnalysisLabels";
 import {
   fadeUp,
@@ -65,20 +66,6 @@ function StatusBadge({ status }: { status: string }) {
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
-}
-
-function formatDuration(seconds?: number): string {
-  if (!seconds) return "--:--";
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-function formatFileSize(bytes?: number): string {
-  if (!bytes) return "--";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 const FILTERS = [
@@ -333,11 +320,11 @@ function RecordingsPageContent() {
                     </div>
                     <div className="mt-1 flex flex-wrap items-center gap-2.5 text-xs text-ev-warm-gray">
                       <span className="tabular-nums">
-                        {formatDuration(rec.duration ?? rec.duration_s)}
+                        {formatDuration(rec.duration ?? rec.duration_s ?? 0)}
                       </span>
                       <span className="text-ev-sand">·</span>
                       <span className="tabular-nums">
-                        {formatFileSize(rec.file_size)}
+                        {formatFileSize(rec.file_size ?? 0)}
                       </span>
                       {rec.sample_rate && (
                         <>

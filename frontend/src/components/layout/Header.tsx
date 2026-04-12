@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PanelLeft, Waves, Bell, Search, HelpCircle } from "lucide-react";
+import { PanelLeft, Waves } from "lucide-react";
 import { useMobileSidebar } from "@/hooks/useSidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -78,37 +78,6 @@ export default function Header() {
 
         {/* Right-side actions */}
         <div className="flex items-center gap-1">
-          {/* Search */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden sm:flex h-9 w-9 text-ev-dust hover:text-ev-cream hover:bg-white/[0.06]"
-            aria-label="Search"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-
-          {/* Help */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden sm:flex h-9 w-9 text-ev-dust hover:text-ev-cream hover:bg-white/[0.06]"
-            aria-label="Help"
-          >
-            <HelpCircle className="h-4 w-4" />
-          </Button>
-
-          {/* Notifications */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative h-9 w-9 text-ev-dust hover:text-ev-cream hover:bg-white/[0.06]"
-            aria-label="Notifications"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-accent-savanna" />
-          </Button>
-
           {/* User dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -131,14 +100,8 @@ export default function Header() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>
                 <Link href="/export" className="w-full">Export Data</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-ev-dust/60">
-                Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

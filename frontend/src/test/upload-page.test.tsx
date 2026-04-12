@@ -46,7 +46,7 @@ describe("Upload Page", () => {
 
   it("renders drag-drop zone", () => {
     render(<UploadPage />);
-    expect(screen.getByText(/Drop .wav or .mp3 files here/)).toBeInTheDocument();
+    expect(screen.getByText(/Drop \.wav, \.mp3, or \.flac files here/)).toBeInTheDocument();
   });
 
   it("renders browse files button", () => {
