@@ -116,11 +116,25 @@ export default function LandingPage() {
         .from("[data-nav]", { y: -50, opacity: 0, duration: 0.8 })
         .from("[data-scroll-ind]", { opacity: 0, y: -10, duration: 0.4 }, "-=0.2");
 
-      /* nav always solid */
+      /* nav fades from transparent to solid as the hero scrolls away */
       gsap.set("[data-nav]", {
+        backgroundColor: "rgba(44,41,38,0)",
+        backdropFilter: "blur(0px)",
+        borderBottomColor: "rgba(255,255,255,0)",
+      });
+      gsap.to("[data-nav]", {
         backgroundColor: "rgba(44,41,38,0.92)",
         backdropFilter: "blur(16px)",
+        borderBottomColor: "rgba(255,255,255,0.1)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "+=180",
+          scrub: true,
+        },
       });
+
       /* scroll indicator bounce */
       gsap.to("[data-scroll-ind]", {
         y: 10,
@@ -364,7 +378,7 @@ export default function LandingPage() {
          ═══════════════════════════════════════════ */}
       <nav
         data-nav
-        className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 transition-colors"
+        className="fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link
