@@ -19,7 +19,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "EchoField",
+  title: "Project Tusk",
   description:
     "Elephant vocalization analysis platform for field researchers — HackSMU 2026",
 };

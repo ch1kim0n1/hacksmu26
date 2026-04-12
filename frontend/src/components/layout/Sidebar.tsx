@@ -169,7 +169,7 @@ function SidebarLogo({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
       <div className="flex flex-col min-w-0">
         <span className="text-sm font-semibold text-ev-cream truncate">
-          EchoField
+          Project Tusk
         </span>
         <span className="text-[10px] text-ev-dust/60 truncate">
           Vocalization Platform
