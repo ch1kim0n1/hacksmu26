@@ -209,11 +209,31 @@ export interface EmotionTimelineResponse {
 }
 
 export interface CrossSpeciesComparison {
-  elephant_call: Record<string, unknown>;
-  reference: Record<string, unknown>;
-  comparison: Record<string, unknown>;
-  visualizations: Record<string, string>;
-  feature_comparison: Record<string, unknown>;
+  elephant_call: {
+    call_id: string;
+    call_type: string;
+    recording_id: string;
+  };
+  reference: {
+    id: string;
+    species: string;
+    call_type: string;
+    description: string;
+  };
+  comparison: {
+    frequency_overlap_pct: number;
+    spectral_similarity: number;
+    harmonic_similarity: number;
+    temporal_similarity: number;
+    shared_frequency_range_hz: [number, number] | null;
+    insight: string;
+  };
+  visualizations?: Record<string, string>;
+  feature_comparison: Record<string, {
+    elephant: number;
+    reference: number;
+    difference_pct: number;
+  }>;
 }
 
 function normalizeRecording(recording: Recording): Recording {
@@ -358,14 +378,16 @@ export async function getReferenceCalls(): Promise<Array<Record<string, unknown>
   return fetchAPI<Array<Record<string, unknown>>>("/api/reference-calls");
 }
 
-export async function compareCrossSpecies(params: {
-  elephant_call_id: string;
-  reference_id: string;
-}): Promise<CrossSpeciesComparison> {
-  return fetchAPI<CrossSpeciesComparison>("/api/compare/cross-species", {
-    method: "POST",
-    body: JSON.stringify(params),
-  });
+export async function compareCrossSpecies(
+  callIdOrParams: string | { elephant_call_id: string; reference_id: string },
+  referenceId?: string
+): Promise<CrossSpeciesComparison> {
+  const callId = typeof callIdOrParams === "string" ? callIdOrParams : callIdOrParams.elephant_call_id;
+  const refId = typeof callIdOrParams === "string" ? referenceId! : callIdOrParams.reference_id;
+  return fetchAPI<CrossSpeciesComparison>(
+    `/api/compare/cross-species?call_id=${encodeURIComponent(callId)}&reference_id=${encodeURIComponent(refId)}`,
+    { method: "POST" }
+  );
 }
 
 export function getRecordingSpectrogram(id: string, type: "before" | "after" | "comparison" = "after"): string {
@@ -426,6 +448,18 @@ export async function getCall(id: string): Promise<Call> {
     frequency_low: call.frequency_min_hz,
     frequency_high: call.frequency_max_hz,
   };
+}
+
+export interface ReferenceSpecies {
+  id: string;
+  species: string;
+  call_type: string;
+  description: string;
+  frequency_range_hz: [number, number];
+}
+
+export async function getReferenceSpecies(): Promise<{ references: ReferenceSpecies[] }> {
+  return fetchAPI<{ references: ReferenceSpecies[] }>("/api/reference-calls");
 }
 
 export interface SpectrogramData {

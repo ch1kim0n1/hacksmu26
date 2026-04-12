@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import aiofiles
 import numpy as np
 from fastapi import BackgroundTasks, FastAPI, File, Header, HTTPException, Query, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
@@ -1990,6 +1991,46 @@ async def delete_webhook(webhook_id: str) -> dict[str, Any]:
     if not _get_webhooks().delete(webhook_id):
         raise HTTPException(status_code=404, detail="Webhook not found")
     return {"id": webhook_id, "deleted": True}
+
+
+@app.get("/api/reference-calls")
+async def list_reference_calls():
+    """List available reference species for comparison."""
+    return {
+        "references": [
+            {
+                "id": ref_id,
+                "species": spec["species"],
+                "call_type": spec["call_type"],
+                "description": spec["description"],
+                "frequency_range_hz": spec["frequency_range_hz"],
+            }
+            for ref_id, spec in REFERENCE_CALLS.items()
+        ]
+    }
+
+
+@app.post("/api/compare/cross-species")
+async def cross_species_compare(
+    call_id: str = Query(...),
+    reference_id: str = Query(...),
+):
+    """Compare an elephant call against a reference species."""
+    db = _get_call_database()
+    call = db.get_call(call_id)
+    if not call:
+        raise HTTPException(status_code=404, detail="Call not found")
+
+    comparison = await asyncio.to_thread(compare_call_to_reference, call, reference_id)
+
+    return {
+        "elephant_call": {
+            "call_id": call_id,
+            "call_type": call.get("call_type", "unknown"),
+            "recording_id": call.get("recording_id", ""),
+        },
+        **comparison,
+    }
 
 
 # --- ML Labeling ---
