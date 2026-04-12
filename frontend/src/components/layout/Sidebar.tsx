@@ -19,6 +19,7 @@ import {
   GitBranch,
   Box,
   Webhook,
+  Blocks,
 } from "lucide-react";
 import { useMobileSidebar } from "@/hooks/useSidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,6 +48,7 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
       { href: "/elephants", label: "Elephants", icon: Users },
       { href: "/research/ethology", label: "Call Guide", icon: BookOpen },
       { href: "/research/social-network", label: "Social Network", icon: Network },
+      { href: "/research/sound-vectors", label: "Sound Vectors", icon: Blocks },
       { href: "/field-monitor", label: "Field Monitor", icon: Monitor },
       { href: "/realtime", label: "Real-Time Filter", icon: Radio },
     ],
