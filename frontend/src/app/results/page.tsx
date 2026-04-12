@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Music, TrendingUp, ArrowRight, Clock, Keyboard } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Music, TrendingUp, ArrowRight, Clock, Keyboard, X } from "lucide-react";
 import { getRecordings, API_BASE, type Recording, type Call } from "@/lib/audio-api";
 import { staggerContainer, fadeUp } from "@/components/ui/motion-primitives";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import ShortcutHelp from "@/components/layout/ShortcutHelp";
+import ABPlayer from "@/components/audio/ABPlayer";
 
 const CALL_TYPES = ["rumble", "trumpet", "roar", "bark", "cry"] as const;
 
@@ -18,6 +19,7 @@ export default function ResultsPage() {
   const [currentCallIndex, setCurrentCallIndex] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showShortcutHelp, setShowShortcutHelp] = useState(false);
+  const [abSelectedId, setAbSelectedId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Flatten all calls across all recordings for keyboard navigation
@@ -42,7 +44,7 @@ export default function ResultsPage() {
     fetchResults();
   }, [fetchResults]);
 
-  // ── Keyboard shortcut handlers ──────────────────────────────────────────────
+  // ── Keyboard shortcut handlers ─────────────────────────────────────────────
 
   const handlePlayPause = useCallback(() => {
     const audio = audioRef.current;
@@ -76,7 +78,24 @@ export default function ResultsPage() {
 
   const handleDeselect = useCallback(() => {
     setCurrentCallIndex(null);
+    setAbSelectedId(null);
   }, []);
+
+  const handleToggleAB = useCallback(() => {
+    if (currentCallIndex === null) {
+      setAbSelectedId((id) => (id ? null : (recordings[0]?.id ?? null)));
+      return;
+    }
+    let offset = 0;
+    for (const rec of recordings) {
+      const callCount = rec.result?.calls?.length ?? 0;
+      if (currentCallIndex < offset + callCount) {
+        setAbSelectedId((id) => (id === rec.id ? null : rec.id));
+        return;
+      }
+      offset += callCount;
+    }
+  }, [currentCallIndex, recordings]);
 
   const handleReclassify = useCallback(
     (callTypeIndex: number) => {
@@ -93,10 +112,7 @@ export default function ResultsPage() {
                 calls: rec.result.calls?.map((call, localIdx) => {
                   const recCallsOffset = prev
                     .slice(0, prev.indexOf(rec))
-                    .reduce(
-                      (sum, r) => sum + (r.result?.calls?.length ?? 0),
-                      0
-                    );
+                    .reduce((sum, r) => sum + (r.result?.calls?.length ?? 0), 0);
                   if (localIdx === currentCallIndex - recCallsOffset) {
                     return { ...call, call_type: callType };
                   }
@@ -124,12 +140,8 @@ export default function ResultsPage() {
         e.preventDefault();
         handlePrevCall();
       },
-      a: () => {
-        /* A/B toggle — no-op until #131 is implemented */
-      },
-      A: () => {
-        /* A/B toggle — no-op until #131 is implemented */
-      },
+      a: () => handleToggleAB(),
+      A: () => handleToggleAB(),
       "1": () => handleReclassify(0),
       "2": () => handleReclassify(1),
       "3": () => handleReclassify(2),
@@ -138,14 +150,14 @@ export default function ResultsPage() {
       Escape: () => handleDeselect(),
       "?": () => setShowShortcutHelp((v) => !v),
     }),
-    [handlePlayPause, handleNextCall, handlePrevCall, handleReclassify, handleDeselect]
+    [handlePlayPause, handleNextCall, handlePrevCall, handleToggleAB, handleReclassify, handleDeselect]
   );
 
-  // Disable global shortcuts while the ShortcutHelp overlay is open
-  // (Esc is handled internally by ShortcutHelp)
+  // Disable global shortcuts while the ShortcutHelp overlay is open (Esc is
+  // handled internally by ShortcutHelp) — except allow "?" to still close it.
   useKeyboardShortcuts(keyMap, !showShortcutHelp);
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <>
@@ -195,6 +207,69 @@ export default function ResultsPage() {
             )}
           </div>
         </motion.div>
+
+        {/* A/B Player panel — expands when a recording card is clicked */}
+        <AnimatePresence>
+          {abSelectedId && (() => {
+            const rec = recordings.find((r) => r.id === abSelectedId);
+            if (!rec) return null;
+            return (
+              <motion.div
+                key={abSelectedId}
+                initial={{ opacity: 0, y: -12, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                className="rounded-2xl glass border border-ev-sand/40 overflow-hidden"
+              >
+                {/* Panel header */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-ev-sand/30 bg-ev-cream/40">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-ev-charcoal truncate">
+                      {rec.filename}
+                    </p>
+                    <p className="text-[10px] text-ev-warm-gray mt-0.5">
+                      A/B comparison ·{" "}
+                      <kbd className="px-1 rounded border border-ev-sand bg-white font-mono text-[9px] text-ev-elephant">
+                        A
+                      </kbd>{" "}
+                      to toggle ·{" "}
+                      <kbd className="px-1 rounded border border-ev-sand bg-white font-mono text-[9px] text-ev-elephant">
+                        Esc
+                      </kbd>{" "}
+                      to close
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => router.push(`/processing/${rec.id}`)}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-accent-savanna border border-accent-savanna/30 hover:bg-accent-savanna/5 transition-colors"
+                    >
+                      Details
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => setAbSelectedId(null)}
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-ev-warm-gray hover:text-ev-charcoal hover:bg-ev-sand/40 transition-colors"
+                      aria-label="Close A/B player"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                {/* ABPlayer */}
+                <div className="p-4">
+                  <ABPlayer
+                    originalSrc={`${API_BASE}/api/recordings/${rec.id}/audio?type=original`}
+                    cleanedSrc={`${API_BASE}/api/recordings/${rec.id}/audio?type=cleaned`}
+                    beforeSpectrogramSrc={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=before`}
+                    afterSpectrogramSrc={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`}
+                  />
+                </div>
+              </motion.div>
+            );
+          })()}
+        </AnimatePresence>
 
         {/* Current call navigation indicator */}
         {allCalls.length > 0 && (
@@ -266,115 +341,136 @@ export default function ResultsPage() {
               // Determine if any call in this recording is currently selected
               const recCallOffset = recordings
                 .slice(0, recordings.indexOf(rec))
-                .reduce(
-                  (sum, r) => sum + (r.result?.calls?.length ?? 0),
-                  0
-                );
+                .reduce((sum, r) => sum + (r.result?.calls?.length ?? 0), 0);
               const isRecordingActive =
                 currentCallIndex !== null &&
                 currentCallIndex >= recCallOffset &&
                 currentCallIndex < recCallOffset + recCalls.length;
 
+              const isAbActive = abSelectedId === rec.id;
+
               return (
-                <motion.button
-                  key={rec.id}
-                  variants={fadeUp}
-                  onClick={() => router.push(`/processing/${rec.id}`)}
-                  aria-label={`View ${rec.filename} results`}
-                  className={`text-left rounded-2xl glass border overflow-hidden group card-hover flex flex-col transition-all ${
-                    isRecordingActive
-                      ? "border-accent-savanna ring-2 ring-accent-savanna/30"
-                      : "border-ev-sand/30"
-                  }`}
-                >
-                  {/* Spectrogram Thumbnail */}
-                  <div className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
-                    <img
-                      src={spectrogramUrl}
-                      alt={`Spectrogram for ${rec.filename}`}
-                      className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 spec-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <motion.div key={rec.id} variants={fadeUp} className="flex flex-col">
+                  <div
+                    className={`text-left rounded-2xl glass border overflow-hidden group flex flex-col transition-all ${
+                      isRecordingActive
+                        ? "border-accent-savanna ring-2 ring-accent-savanna/30"
+                        : isAbActive
+                          ? "border-accent-savanna/50 ring-1 ring-accent-savanna/20"
+                          : "border-ev-sand/30"
+                    }`}
+                  >
+                    {/* Spectrogram Thumbnail — click navigates to details */}
+                    <button
+                      onClick={() => router.push(`/processing/${rec.id}`)}
+                      aria-label={`View ${rec.filename} results`}
+                      className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden w-full text-left"
+                    >
+                      <img
+                        src={spectrogramUrl}
+                        alt={`Spectrogram for ${rec.filename}`}
+                        className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 spec-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                    {quality?.quality_score != null && (
-                      <div className="absolute top-3 right-3">
-                        <div className="glass-strong rounded-lg px-2 py-1 border border-white/20">
-                          <span
-                            className={`text-xs font-bold ${
-                              quality.quality_score >= 0.8
-                                ? "text-success"
-                                : quality.quality_score >= 0.6
-                                  ? "text-accent-savanna"
-                                  : "text-danger"
-                            }`}
-                          >
-                            {Math.round(quality.quality_score * 100)}%
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Call count badge */}
-                    {recCalls.length > 0 && (
-                      <div className="absolute top-3 left-3">
-                        <div className="glass-strong rounded-lg px-2 py-1 border border-white/20">
-                          <span className="text-xs font-medium text-ev-ivory">
-                            {recCalls.length} call
-                            {recCalls.length !== 1 ? "s" : ""}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card Content */}
-                  <div className="p-4 space-y-2.5 flex-1 flex flex-col">
-                    <p className="font-medium text-ev-charcoal truncate text-sm group-hover:text-accent-savanna transition-colors">
-                      {rec.filename}
-                    </p>
-
-                    <div className="flex items-center justify-between text-xs text-ev-warm-gray">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        {quality?.snr_before_db != null &&
-                          quality?.snr_after_db != null && (
-                            <span className="inline-flex items-center gap-1">
-                              <span className="tabular-nums">
-                                {quality.snr_before_db.toFixed(1)}
-                              </span>
-                              <TrendingUp className="w-3 h-3 text-success shrink-0" />
-                              <span className="text-success font-semibold tabular-nums">
-                                {quality.snr_after_db.toFixed(1)} dB
-                              </span>
+                      {quality?.quality_score != null && (
+                        <div className="absolute top-3 right-3">
+                          <div className="glass-strong rounded-lg px-2 py-1 border border-white/20">
+                            <span
+                              className={`text-xs font-bold ${
+                                quality.quality_score >= 0.8
+                                  ? "text-success"
+                                  : quality.quality_score >= 0.6
+                                    ? "text-accent-savanna"
+                                    : "text-danger"
+                              }`}
+                            >
+                              {Math.round(quality.quality_score * 100)}%
                             </span>
-                          )}
-                      </div>
-                      {rec.duration != null && (
-                        <span className="tabular-nums inline-flex items-center gap-1 shrink-0">
-                          <Clock className="w-3 h-3" />
-                          {Math.floor(rec.duration / 60)}:
-                          {String(Math.floor(rec.duration % 60)).padStart(
-                            2,
-                            "0"
-                          )}
-                        </span>
+                          </div>
+                        </div>
                       )}
-                    </div>
 
-                    {/* Currently selected call indicator */}
-                    {isRecordingActive && currentCallIndex !== null && (
-                      <div className="text-xs text-accent-savanna font-medium flex items-center gap-1 pt-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent-savanna animate-pulse" />
-                        Call {currentCallIndex - recCallOffset + 1} selected
+                      {/* Call count badge */}
+                      {recCalls.length > 0 && (
+                        <div className="absolute top-3 left-3">
+                          <div className="glass-strong rounded-lg px-2 py-1 border border-white/20">
+                            <span className="text-xs font-medium text-ev-ivory">
+                              {recCalls.length} call{recCalls.length !== 1 ? "s" : ""}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Card Content */}
+                    <div className="p-4 space-y-2.5 flex-1 flex flex-col">
+                      <p className="font-medium text-ev-charcoal truncate text-sm">
+                        {rec.filename}
+                      </p>
+
+                      <div className="flex items-center justify-between text-xs text-ev-warm-gray">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          {quality?.snr_before_db != null &&
+                            quality?.snr_after_db != null && (
+                              <span className="inline-flex items-center gap-1">
+                                <span className="tabular-nums">
+                                  {quality.snr_before_db.toFixed(1)}
+                                </span>
+                                <TrendingUp className="w-3 h-3 text-success shrink-0" />
+                                <span className="text-success font-semibold tabular-nums">
+                                  {quality.snr_after_db.toFixed(1)} dB
+                                </span>
+                              </span>
+                            )}
+                        </div>
+                        {rec.duration != null && (
+                          <span className="tabular-nums inline-flex items-center gap-1 shrink-0">
+                            <Clock className="w-3 h-3" />
+                            {Math.floor(rec.duration / 60)}:
+                            {String(Math.floor(rec.duration % 60)).padStart(
+                              2,
+                              "0",
+                            )}
+                          </span>
+                        )}
                       </div>
-                    )}
 
-                    <div className="flex items-center gap-1 text-xs text-accent-savanna font-medium opacity-0 group-hover:opacity-100 transition-opacity pt-1 mt-auto">
-                      <span>View details</span>
-                      <ArrowRight className="w-3 h-3" />
+                      {/* Currently selected call indicator */}
+                      {isRecordingActive && currentCallIndex !== null && (
+                        <div className="text-xs text-accent-savanna font-medium flex items-center gap-1 pt-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent-savanna animate-pulse" />
+                          Call {currentCallIndex - recCallOffset + 1} selected
+                        </div>
+                      )}
+
+                      {/* Action row: A/B compare + details link */}
+                      <div className="flex items-center gap-2 pt-1 mt-auto">
+                        <button
+                          onClick={() => setAbSelectedId(isAbActive ? null : rec.id)}
+                          aria-label={`${isAbActive ? "Close" : "Open"} A/B player for ${rec.filename}`}
+                          className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all duration-150 ${
+                            isAbActive
+                              ? "bg-accent-savanna text-white"
+                              : "border border-ev-sand text-ev-elephant hover:border-accent-savanna/50 hover:text-accent-savanna"
+                          }`}
+                        >
+                          <span>A</span>
+                          <span className="opacity-40">/</span>
+                          <span>B</span>
+                        </button>
+                        <button
+                          onClick={() => router.push(`/processing/${rec.id}`)}
+                          className="flex items-center gap-1 text-xs text-ev-warm-gray hover:text-accent-savanna transition-colors ml-auto"
+                        >
+                          Details
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </motion.button>
+                </motion.div>
               );
             })}
           </motion.div>

@@ -128,6 +128,30 @@ export default function AboutPage() {
         </p>
       </motion.section>
 
+      {/* Mission Statement */}
+      <AnimatedSection className="rounded-2xl glass-strong border border-accent-savanna/20 bg-gradient-to-br from-accent-savanna/5 to-accent-gold/3 p-6 lg:p-8">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="w-1 self-stretch rounded-full bg-gradient-to-b from-accent-savanna to-accent-gold flex-shrink-0" />
+          <div>
+            <span className="text-xs font-semibold text-accent-savanna tracking-[0.18em] uppercase mb-2 block">
+              Our Mission
+            </span>
+            <h2 className="text-xl font-bold text-ev-charcoal mb-3">
+              The Rosetta Stone for Elephant Communication
+            </h2>
+            <p className="text-sm text-ev-elephant leading-relaxed">
+              EchoField reveals the hidden voice of elephants — decoding the
+              infrasonic rumbles, trumpets, and calls buried beneath layers of
+              environmental noise. Like the Rosetta Stone unlocked an ancient
+              language, EchoField translates the acoustic record of elephant
+              life into data researchers can act on. Every cleaned recording
+              brings us one step closer to understanding — and protecting —
+              these remarkable animals.
+            </p>
+          </div>
+        </div>
+      </AnimatedSection>
+
       {/* Why It Matters */}
       <AnimatedSection className="rounded-2xl glass-strong border border-ev-sand/30 p-6 lg:p-8">
         <h2 className="text-xl font-bold text-ev-charcoal mb-4">
@@ -151,7 +175,35 @@ export default function AboutPage() {
             Without clean recordings, researchers cannot reliably measure
             fundamental frequencies, harmonic richness, formant structures, or
             temporal patterns. EchoField changes that by making the hidden
-            voice visible and analyzable.
+            voice visible and analyzable, directly supporting elephant
+            conservation research worldwide.
+          </p>
+        </div>
+      </AnimatedSection>
+
+      {/* Technical Approach */}
+      <AnimatedSection className="rounded-2xl glass-strong border border-ev-sand/30 p-6 lg:p-8">
+        <h2 className="text-xl font-bold text-ev-charcoal mb-4">
+          Technical Approach
+        </h2>
+        <div className="space-y-3 text-sm text-ev-elephant leading-relaxed">
+          <p>
+            The pipeline uses spectral gating to isolate stationary noise
+            profiles, then applies hybrid denoising to surgically remove
+            airplane rumble, vehicle engines, generator hum, and wind — the
+            four primary noise sources in African field recordings.
+          </p>
+          <p>
+            Each processed recording yields 12 acoustic metrics per detected
+            call: fundamental frequency, harmonic richness, spectral centroid,
+            MFCCs, and temporal envelope features. Calls are classified into
+            six behaviorally meaningful types (contact, alarm, social, feeding,
+            mating, song) using heuristic frequency-band analysis.
+          </p>
+          <p>
+            All outputs — cleaned audio, spectrograms, and metric tables — are
+            exportable as CSV, JSON, or ZIP bundles ready for peer-review
+            workflows and long-term acoustic databases.
           </p>
         </div>
       </AnimatedSection>

@@ -12,7 +12,7 @@ from echofield.pipeline.cache_manager import CacheManager
 from echofield.pipeline.hybrid_pipeline import ProcessingPipeline
 from echofield.pipeline.quality_check import assess_quality, compute_snr
 from echofield.pipeline.spectral_gate import spectral_gate_denoise
-from echofield.pipeline.spectrogram import build_spectrogram_artifacts, compute_stft
+from echofield.pipeline.spectrogram import build_spectrogram_artifacts, compute_stft, generate_spectrogram_png
 
 
 class DummySettings:
@@ -133,3 +133,76 @@ def test_processing_pipeline_creates_outputs(tmp_path: Path) -> None:
     stats = cache.get_stats()
     assert stats["file_count"] >= 3
 
+
+# ── Colormap tests ──
+
+
+SUPPORTED_COLORMAPS = ["viridis", "magma", "inferno", "plasma", "gray"]
+
+
+def test_generate_spectrogram_png_default_cmap(tmp_path: Path) -> None:
+    """generate_spectrogram_png produces a PNG with the default viridis colormap."""
+    sr = 44_100
+    waveform = _make_waveform(sr=sr, seconds=1)
+    stft_data = compute_stft(waveform, sr)
+    output = tmp_path / "spec_viridis.png"
+    result = generate_spectrogram_png(stft_data["magnitude_db"], sr, 512, output)
+    assert Path(result).exists()
+    assert Path(result).stat().st_size > 0
+
+
+@pytest.mark.parametrize("cmap", SUPPORTED_COLORMAPS)
+def test_generate_spectrogram_png_custom_cmap(tmp_path: Path, cmap: str) -> None:
+    """generate_spectrogram_png accepts each supported colormap and produces a valid PNG."""
+    sr = 44_100
+    waveform = _make_waveform(sr=sr, seconds=1)
+    stft_data = compute_stft(waveform, sr)
+    output = tmp_path / f"spec_{cmap}.png"
+    result = generate_spectrogram_png(stft_data["magnitude_db"], sr, 512, output, cmap=cmap)
+    assert Path(result).exists()
+    assert Path(result).stat().st_size > 0
+
+
+def test_generate_spectrogram_png_different_colormaps_produce_different_files(tmp_path: Path) -> None:
+    """Two different colormaps produce visually distinct PNG files (different bytes)."""
+    sr = 44_100
+    waveform = _make_waveform(sr=sr, seconds=1)
+    stft_data = compute_stft(waveform, sr)
+
+    path_viridis = tmp_path / "viridis.png"
+    path_magma = tmp_path / "magma.png"
+    generate_spectrogram_png(stft_data["magnitude_db"], sr, 512, path_viridis, cmap="viridis")
+    generate_spectrogram_png(stft_data["magnitude_db"], sr, 512, path_magma, cmap="magma")
+
+    assert path_viridis.read_bytes() != path_magma.read_bytes()
+
+
+def test_build_spectrogram_artifacts_accepts_cmap(tmp_path: Path) -> None:
+    """build_spectrogram_artifacts passes the cmap through to PNG generation."""
+    sr = 44_100
+    waveform = _make_waveform(sr=sr, seconds=1)
+
+    _, viz = build_spectrogram_artifacts(
+        "cmap-test",
+        waveform,
+        sr,
+        tmp_path / "spectrograms",
+        cmap="magma",
+    )
+    assert Path(viz.url).exists()
+    assert Path(viz.url).stat().st_size > 0
+
+
+def test_build_spectrogram_artifacts_invalid_cmap_raises(tmp_path: Path) -> None:
+    """build_spectrogram_artifacts raises ValueError for unsupported colormaps."""
+    sr = 44_100
+    waveform = _make_waveform(sr=sr, seconds=1)
+
+    with pytest.raises(ValueError, match="colormap"):
+        build_spectrogram_artifacts(
+            "bad-cmap-test",
+            waveform,
+            sr,
+            tmp_path / "spectrograms",
+            cmap="rainbow",
+        )
