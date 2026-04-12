@@ -171,6 +171,12 @@ export default function DatabasePage() {
           >
             Social Network
           </Link>
+          <Link
+            href="/research/sound-vectors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-teal-400/30 bg-teal-400/5 text-xs font-medium text-teal-400 hover:bg-teal-400/10 transition-colors"
+          >
+            Sound Vectors
+          </Link>
           <motion.span
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

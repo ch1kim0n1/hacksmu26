@@ -882,6 +882,56 @@ export async function getResearchImpactStats(): Promise<ResearchImpactStats> {
   return fetchAPI<ResearchImpactStats>("/api/stats/research-impact");
 }
 
+// ─── Embedding & Similarity Graph ───
+
+export interface EmbeddingPoint {
+  call_id: string;
+  x: number;
+  y: number;
+  call_type: string;
+  confidence: number;
+}
+
+export interface EmbeddingData {
+  method: string;
+  points: EmbeddingPoint[];
+  total: number;
+}
+
+export async function getEmbedding(method: "pca" | "umap" = "pca"): Promise<EmbeddingData> {
+  return fetchAPI<EmbeddingData>(`/api/research/embedding?method=${method}`);
+}
+
+export interface SimilarityNode {
+  id: string;
+  label: string;
+  community_id: number | null;
+  degree_centrality: number | null;
+  betweenness_centrality: number | null;
+}
+
+export interface SimilarityEdge {
+  source: string;
+  target: string;
+  weight: number;
+}
+
+export interface SimilarityGraphData {
+  nodes: SimilarityNode[];
+  edges: SimilarityEdge[];
+  total_calls: number;
+  threshold: number;
+}
+
+export async function getSimilarityGraph(
+  threshold: number = 0.75,
+  limit: number = 500
+): Promise<SimilarityGraphData> {
+  return fetchAPI<SimilarityGraphData>(
+    `/api/calls/similarity?threshold=${threshold}&limit=${limit}`
+  );
+}
+
 // ─── ML Training & Active Learning ───
 
 export interface MLLabelingQueueItem {

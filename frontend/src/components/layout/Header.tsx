@@ -34,6 +34,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/patterns": "Behavioral Patterns",
   "/models": "Model Management",
   "/webhooks": "Webhooks",
+  "/research/sound-vectors": "Sound Vectors",
 };
 
 export default function Header() {
