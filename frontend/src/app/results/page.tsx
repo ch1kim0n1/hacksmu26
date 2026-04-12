@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music, TrendingUp, ArrowRight, Clock, Keyboard, X } from "lucide-react";
+import { Music, TrendingUp, ArrowRight, Clock, Keyboard } from "lucide-react";
 import { getRecordings, API_BASE, type Recording, type Call } from "@/lib/audio-api";
 import { staggerContainer, fadeUp } from "@/components/ui/motion-primitives";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -33,7 +33,13 @@ export default function ResultsPage() {
     try {
       setLoading(true);
       const data = await getRecordings({ status: "complete", limit: 50 });
-      setRecordings(data.recordings);
+      // Sort by quality score descending so best results appear first
+      const sorted = [...data.recordings].sort((a, b) => {
+        const aScore = a.result?.quality?.quality_score ?? 0;
+        const bScore = b.result?.quality?.quality_score ?? 0;
+        return bScore - aScore;
+      });
+      setRecordings(sorted);
     } catch {
       // silently fail — show empty state
     } finally {
@@ -212,17 +218,12 @@ export default function ResultsPage() {
                 transition={{ duration: 0.22, ease: "easeOut" }}
                 className="rounded-2xl glass border border-ev-sand/40 overflow-hidden"
               >
-                {/* Spectrogram Thumbnail */}
-                <div className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
-                  <Image
-                    src={spectrogramUrl}
-                    alt={`Spectrogram for ${rec.filename}`}
-                    fill
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    unoptimized
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-                  />
-                </div>
+                <ABPlayer
+                  originalSrc={`${API_BASE}/api/recordings/${rec.id}/audio?type=original`}
+                  cleanedSrc={`${API_BASE}/api/recordings/${rec.id}/audio?type=cleaned`}
+                  beforeSpectrogramSrc={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=before`}
+                  afterSpectrogramSrc={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`}
+                />
               </motion.div>
             );
           })()}
@@ -336,14 +337,14 @@ export default function ResultsPage() {
                           <div className="glass-strong rounded-lg px-2 py-1 border border-white/20">
                             <span
                               className={`text-xs font-bold ${
-                                quality.quality_score >= 0.8
+                                quality.quality_score >= 80
                                   ? "text-success"
-                                  : quality.quality_score >= 0.6
+                                  : quality.quality_score >= 60
                                     ? "text-accent-savanna"
                                     : "text-danger"
                               }`}
                             >
-                              {Math.round(quality.quality_score * 100)}%
+                              {Math.round(quality.quality_score)}%
                             </span>
                           </div>
                         </div>
@@ -382,11 +383,11 @@ export default function ResultsPage() {
                               </span>
                             )}
                         </div>
-                        {rec.duration != null && (
+                        {(rec.duration ?? rec.duration_s) != null && (
                           <span className="tabular-nums inline-flex items-center gap-1 shrink-0">
                             <Clock className="w-3 h-3" />
-                            {Math.floor(rec.duration / 60)}:
-                            {String(Math.floor(rec.duration % 60)).padStart(
+                            {Math.floor((rec.duration ?? rec.duration_s) / 60)}:
+                            {String(Math.floor((rec.duration ?? rec.duration_s) % 60)).padStart(
                               2,
                               "0",
                             )}

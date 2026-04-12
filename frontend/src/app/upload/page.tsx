@@ -81,11 +81,13 @@ function formatDuration(seconds?: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-function formatFileSize(bytes?: number): string {
-  if (!bytes) return "--";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+function formatFileSize(value?: number): string {
+  if (!value) return "--";
+  // API returns filesize_mb — if the value is small, treat as MB from the API
+  if (value < 1024) return `${value.toFixed(1)} MB`;
+  // For raw bytes from File.size
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 /* ── Stat Card ── */
@@ -147,8 +149,12 @@ export default function UploadPage() {
   const fetchRecordings = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getRecordings({ limit: 50 });
-      setRecordings(data.recordings);
+      const data = await getRecordings({ limit: 200 });
+      // Filter out demo artifacts (processed.wav, original.wav from demo dirs)
+      const filtered = data.recordings.filter(
+        (r) => !["processed.wav", "original.wav"].includes(r.filename)
+      );
+      setRecordings(filtered);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to load recordings",
@@ -564,7 +570,7 @@ export default function UploadPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-12 rounded-2xl glass border border-dashed border-ev-sand/60 text-center"
+            className="p-16 rounded-2xl glass border border-dashed border-ev-sand/60 text-center"
           >
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-savanna/10 to-accent-gold/5 flex items-center justify-center mx-auto mb-4">
               <Music className="w-7 h-7 text-accent-savanna/60" />

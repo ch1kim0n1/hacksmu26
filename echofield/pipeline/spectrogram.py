@@ -153,13 +153,13 @@ def generate_spectrogram_png(
     *,
     title: str = "Spectrogram",
     freq_max: float = 1000.0,
-    size: tuple[int, int] = (600, 400),
+    size: tuple[int, int] = (800, 300),
     cmap: str = "viridis",
 ) -> str:
     _validate_cmap(cmap)
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
-    dpi = 100
+    dpi = 120
     fig, ax = plt.subplots(figsize=(size[0] / dpi, size[1] / dpi), dpi=dpi)
     librosa.display.specshow(
         magnitude_db,
@@ -171,14 +171,21 @@ def generate_spectrogram_png(
         ax=ax,
     )
     ax.set_ylim(0, freq_max)
-    ax.set_title(title, fontsize=11, pad=6)
-    ax.set_xlabel("Time (s)", fontsize=9)
-    ax.set_ylabel("Frequency (Hz)", fontsize=9)
-    # Limit x-axis ticks so labels never overlap on short recordings
-    ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(nbins=6, prune="both"))
-    ax.tick_params(axis="x", labelsize=8)
-    ax.tick_params(axis="y", labelsize=8)
-    fig.tight_layout(pad=0.5)
+    ax.set_xlabel("")
+    ax.set_ylabel("")
+    # Use clean integer-second labels that never overlap
+    duration_s = magnitude_db.shape[1] * hop_length / sr if sr else 0
+    if duration_s > 120:
+        step = max(30, int(duration_s / 5 / 30) * 30)  # Round to nearest 30s
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(step))
+        ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(
+            lambda x, _: f"{int(x // 60)}:{int(x % 60):02d}" if x >= 60 else f"{int(x)}s"
+        ))
+    else:
+        ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(nbins=6, prune="both"))
+    ax.tick_params(axis="x", labelsize=7, pad=2)
+    ax.tick_params(axis="y", labelsize=7, pad=2)
+    fig.tight_layout(pad=0.4)
     fig.savefig(output, dpi=dpi, bbox_inches="tight")
     plt.close(fig)
     return str(output)

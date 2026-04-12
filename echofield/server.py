@@ -28,7 +28,7 @@ from echofield.ml.active_learning import ActiveLearningManager
 from echofield.ml.classifier import CallClassifier
 from echofield.ml.narrative import generate_narrative
 from echofield.ml.taxonomy import validate_call_type, validate_social_function, CALL_TYPES, SOCIAL_FUNCTIONS
-from echofield.data_loader import RecordingStore, list_recordings_with_metadata
+from echofield.data_loader import RecordingStore, list_recordings_with_metadata, sync_processed_results
 from echofield.metrics import metrics
 from echofield.model_registry import ModelRegistry
 from echofield.models import (
@@ -143,12 +143,20 @@ async def lifespan(application: FastAPI):
     store = RecordingStore(persist_path=settings.catalog_file, db_path=settings.db_path)
     preload = list_recordings_with_metadata(settings.audio_dir, settings.metadata_file)
     store.load_many(preload)
-    application.state.call_database = CallDatabase.from_metadata(
+    call_db = CallDatabase.from_metadata(
         settings.metadata_file,
         review_label_path=settings.cache_dir / "review_labels.json",
         db_path=settings.db_path,
     )
+    application.state.call_database = call_db
     application.state.store = store
+    sync_processed_results(
+        store,
+        processed_dir=settings.processed_dir,
+        spectrogram_dir=settings.spectrogram_dir,
+        cache_dir=settings.cache_dir,
+        call_database=call_db,
+    )
     application.state.cache = CacheManager(str(settings.cache_dir))
     application.state.pipeline = ProcessingPipeline(settings, application.state.cache)
     application.state.processing_tasks = {}
@@ -324,6 +332,11 @@ def _to_summary(recording: dict[str, Any]) -> RecordingSummary:
 
 def _to_detail(recording: dict[str, Any]) -> RecordingDetail:
     result = recording.get("result")
+    if result:
+        result = dict(result)
+        result.setdefault("recording_id", recording["id"])
+        result.setdefault("stages_completed", [])
+        result.setdefault("processing_time_s", 0.0)
     return RecordingDetail(
         **_to_summary(recording).model_dump(),
         result=ProcessingResult(**result) if result else None,
@@ -803,16 +816,22 @@ async def upload_recording(
     )
 
 
-@app.get("/api/recordings", response_model=RecordingListResponse)
+@app.get("/api/recordings")
 async def list_recordings(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     status: str | None = Query(default=None),
     location: str | None = Query(default=None),
-) -> RecordingListResponse:
+) -> dict[str, Any]:
     items, total = _get_store().list(limit=limit, offset=offset, status=status, location=location)
-    summaries = [_to_summary(item) for item in items]
-    return RecordingListResponse(total=total, returned=len(summaries), recordings=summaries)
+    details = []
+    for item in items:
+        summary = _to_summary(item).model_dump()
+        result = item.get("result")
+        if result:
+            summary["result"] = result
+        details.append(summary)
+    return {"total": total, "returned": len(details), "recordings": details}
 
 
 @app.get("/api/recordings/{recording_id}", response_model=RecordingDetail)

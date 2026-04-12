@@ -188,7 +188,7 @@ export default function DatabasePage() {
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="p-4 rounded-xl glass border border-ev-sand/30 animate-pulse"
+              className="p-4 rounded-2xl glass border border-ev-sand/30 animate-pulse"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
               <div className="flex items-center justify-between mb-3">
@@ -203,7 +203,7 @@ export default function DatabasePage() {
           ))}
         </div>
       ) : error ? (
-        <div className="p-8 rounded-xl glass border border-ev-sand/30 text-center">
+        <div className="p-8 rounded-2xl glass border border-ev-sand/30 text-center">
           <AlertCircle className="w-8 h-8 text-danger mx-auto mb-3" />
           <p className="text-danger mb-4">{error}</p>
           <motion.button
@@ -243,7 +243,7 @@ export default function DatabasePage() {
               variants={fadeUp}
               onClick={() => router.push(`/results/${call.id}`)}
               aria-label={`View call ${call.call_type} ${call.id.slice(0, 8)}`}
-              className="group p-4 rounded-xl glass border border-ev-sand/30 card-hover text-left flex flex-col"
+              className="group p-4 rounded-2xl glass border border-ev-sand/30 card-hover text-left flex flex-col"
             >
               {/* Top row */}
               <div className="flex items-start justify-between gap-2 mb-3">
