@@ -2,8 +2,7 @@
 from __future__ import annotations
 
 from echofield.research.emotion_classifier import (
-    EmotionEstimate,
-    EMOTION_COLORS,
+    STATE_COLORS,
     classify_emotion,
     compute_arousal,
     compute_valence,
@@ -72,24 +71,24 @@ def test_valence_low_for_roar():
 # --- classify_emotion ---
 
 def test_classify_calm():
-    est = classify_emotion(_calm_features(), "rumble")
-    assert isinstance(est, EmotionEstimate)
-    assert est.state == "calm"
-    assert est.color == EMOTION_COLORS["calm"]
-    assert 0.0 <= est.arousal <= 1.0
-    assert 0.0 <= est.valence <= 1.0
-    assert 0.3 <= est.confidence <= 1.0
+    est = classify_emotion(_calm_features(), "rumble", 0.85)
+    assert isinstance(est, dict)
+    assert est["state"] == "calm"
+    assert est["color"] == STATE_COLORS["calm"]
+    assert 0.0 <= est["arousal"] <= 1.0
+    assert 0.0 <= est["valence"] <= 1.0
+    assert 0.3 <= est["confidence"] <= 1.0
 
 
 def test_classify_distressed():
-    est = classify_emotion(_agitated_features(), "cry")
-    assert est.state in ("distressed", "aggressive"), f"Expected distressed/aggressive, got {est.state}"
-    assert est.arousal > 0.5
+    est = classify_emotion(_agitated_features(), "cry", 0.7)
+    assert est["state"] in ("distressed", "aggressive"), f"Expected distressed/aggressive, got {est['state']}"
+    assert est["arousal"] > 0.5
 
 
 def test_classify_unknown_call_type():
-    est = classify_emotion({}, "unknown")
-    assert est.state in EMOTION_COLORS
+    est = classify_emotion({}, "unknown", 0.5)
+    assert est["state"] in STATE_COLORS
 
 
 # --- build_emotion_timeline ---
@@ -119,11 +118,11 @@ def test_timeline_structure():
     result = build_emotion_timeline(_make_calls(), 3000, resolution_ms=500)
     assert "timeline" in result
     assert "call_emotions" in result
-    assert "summary" in result
+    assert "recording_summary" in result
     assert result["duration_ms"] == 3000
     assert result["resolution_ms"] == 500
-    # 3000 / 500 = 6 bins
-    assert len(result["timeline"]) == 6
+    # 0, 500, 1000, 1500, 2000, 2500, 3000 = 7 bins (inclusive of endpoint)
+    assert len(result["timeline"]) == 7
 
 
 def test_timeline_bins_have_required_keys():
@@ -147,15 +146,15 @@ def test_call_emotions_match_calls():
 def test_timeline_neutral_bins():
     """Bins with no overlapping calls should be neutral."""
     result = build_emotion_timeline(_make_calls(), 5000, resolution_ms=500)
-    # Bin at time_ms=3000..3500 has no calls
+    # Bin at time_ms=3000 (index 6) has no calls
     bin_6 = result["timeline"][6]
     assert bin_6["state"] == "neutral"
-    assert bin_6["color"] == EMOTION_COLORS["neutral"]
+    assert bin_6["color"] == STATE_COLORS["neutral"]
 
 
 def test_summary_dominant_state():
     result = build_emotion_timeline(_make_calls(), 3000)
-    summary = result["summary"]
+    summary = result["recording_summary"]
     assert "dominant_state" in summary
     assert "arousal_avg" in summary
     assert "valence_avg" in summary
@@ -164,11 +163,13 @@ def test_summary_dominant_state():
 
 def test_empty_calls_timeline():
     result = build_emotion_timeline([], 2000, resolution_ms=500)
-    assert len(result["timeline"]) == 4
+    # 0, 500, 1000, 1500, 2000 = 5 bins
+    assert len(result["timeline"]) == 5
     assert all(b["state"] == "neutral" for b in result["timeline"])
-    assert result["summary"]["dominant_state"] == "neutral"
+    assert result["recording_summary"]["dominant_state"] == "neutral"
 
 
 def test_single_bin_minimum():
+    # duration=100 with min resolution=100 gives bins at 0 and 100
     result = build_emotion_timeline([], 100, resolution_ms=500)
-    assert len(result["timeline"]) == 1
+    assert len(result["timeline"]) == 2
