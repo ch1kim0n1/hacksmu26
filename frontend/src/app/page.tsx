@@ -888,7 +888,7 @@ export default function LandingPage() {
             {/* Spectrogram mockup */}
             <div
               data-sol-left
-              className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-ev-charcoal p-1"
+              className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-ev-charcoal p-1 shadow-[0_18px_40px_rgba(16,24,40,0.22),0_42px_80px_rgba(10,37,64,0.18),0_3px_0_rgba(255,255,255,0.06)_inset]"
             >
               <div className="w-full h-full rounded-xl overflow-hidden relative bg-gradient-to-br from-spectrogram-low via-[#0a2540] to-spectrogram-low">
                 {/* Noise bands */}

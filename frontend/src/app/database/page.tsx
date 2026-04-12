@@ -7,6 +7,7 @@ import {
   Search,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   MapPin,
   Database as DatabaseIcon,
   RefreshCw,
@@ -153,22 +154,27 @@ export default function DatabasePage() {
           />
         </div>
 
-        <select
-          value={callTypeFilter}
-          onChange={(e) => {
-            setCallTypeFilter(e.target.value);
-            setPage(0);
-          }}
-          aria-label="Filter by call type"
-          className="px-3.5 py-2.5 glass border border-ev-sand/40 rounded-xl text-sm text-ev-charcoal focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all appearance-none bg-[right_0.75rem_center] bg-[length:16px_16px] bg-no-repeat pr-9"
-          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238A837B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")` }}
-        >
-          {CALL_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={callTypeFilter}
+            onChange={(e) => {
+              setCallTypeFilter(e.target.value);
+              setPage(0);
+            }}
+            aria-label="Filter by call type"
+            className="min-w-[11rem] px-3.5 py-2.5 pr-10 glass border border-ev-sand/40 rounded-xl text-sm text-ev-charcoal focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all appearance-none"
+          >
+            {CALL_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ev-warm-gray"
+            aria-hidden="true"
+          />
+        </div>
 
         <div className="relative sm:w-44">
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ev-warm-gray" />
