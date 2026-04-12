@@ -824,6 +824,69 @@ async def download_cleaned(
     return StreamingResponse(_range_iter(), status_code=206, media_type=media_type, headers=headers)
 
 
+@app.get("/api/recordings/{recording_id}/spectrogram-data")
+async def get_spectrogram_data(
+    recording_id: str,
+    width: int = Query(default=256, ge=32, le=1024),
+    height: int = Query(default=128, ge=32, le=512),
+):
+    """Return downsampled spectrogram magnitude data as JSON for 3D rendering."""
+    import numpy as np
+
+    store = _get_store()
+    recording = store.get(recording_id)
+    if not recording:
+        raise HTTPException(status_code=404, detail="Recording not found")
+
+    result = recording.get("result") or {}
+    audio_path = result.get("output_audio_path")
+    if not audio_path or not Path(audio_path).exists():
+        audio_path = str(_get_recording_path(recording))
+
+    y, sr = await asyncio.to_thread(load_audio, audio_path)
+    duration_s = len(y) / sr
+
+    import librosa
+    from scipy.ndimage import zoom
+
+    n_fft = 2048
+    hop_length = 512
+    S = np.abs(librosa.stft(y, n_fft=n_fft, hop_length=hop_length))
+    S_db = librosa.amplitude_to_db(S, ref=np.max(S) if np.max(S) > 0 else 1.0)
+
+    # Normalize to 0-1 range
+    s_min = float(S_db.min())
+    s_max = float(S_db.max())
+    if s_max > s_min:
+        S_norm = (S_db - s_min) / (s_max - s_min)
+    else:
+        S_norm = np.zeros_like(S_db)
+
+    # Downsample to requested resolution
+    zoom_factors = (height / S_norm.shape[0], width / S_norm.shape[1])
+    S_downsampled = zoom(S_norm, zoom_factors, order=1)
+
+    freq_max = sr / 2
+    # Only keep up to 1000Hz for elephant vocalization focus
+    freq_limit = min(1000, freq_max)
+    freq_bins = int(S_norm.shape[0] * (freq_limit / freq_max))
+    if freq_bins < S_norm.shape[0]:
+        S_cropped = S_norm[:freq_bins, :]
+        zoom_factors = (height / S_cropped.shape[0], width / S_cropped.shape[1])
+        S_downsampled = zoom(S_cropped, zoom_factors, order=1)
+        freq_max = freq_limit
+
+    return {
+        "recording_id": recording_id,
+        "width": int(S_downsampled.shape[1]),
+        "height": int(S_downsampled.shape[0]),
+        "duration_s": round(duration_s, 2),
+        "freq_max_hz": round(freq_max, 1),
+        "sample_rate": sr,
+        "magnitudes": S_downsampled.tolist(),
+    }
+
+
 @app.get("/api/recordings/{recording_id}/harmonics", response_model=HarmonicOverlayResponse)
 async def get_harmonics(recording_id: str) -> HarmonicOverlayResponse:
     recording = _get_store().get(recording_id)

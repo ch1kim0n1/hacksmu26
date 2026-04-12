@@ -3,9 +3,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import useProcessingJob from "@/hooks/useProcessingJob";
 import { getRecording, API_BASE, type Recording } from "@/lib/audio-api";
 import { AnalysisLabels, AnalysisWindow } from "@/components/research/AnalysisLabels";
+
+const Spectrogram3D = dynamic(() => import("@/components/spectrogram/Spectrogram3D"), { ssr: false });
 
 interface ProcessingMetrics {
   snr_before?: number;
@@ -124,6 +127,7 @@ export default function ProcessingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [show3D, setShow3D] = useState(false);
   const [sliderPosition, setSliderPosition] = useState(50);
   const sliderRef = useRef<HTMLDivElement>(null);
   const isDraggingSlider = useRef(false);
@@ -355,6 +359,25 @@ export default function ProcessingPage() {
                 </div>
               </div>
             </div>
+
+            {/* 3D Spectrogram */}
+            {isComplete && (
+              show3D ? (
+                <Spectrogram3D recordingId={jobId} onClose={() => setShow3D(false)} />
+              ) : (
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => setShow3D(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0C1A2A] text-white text-sm font-medium rounded-xl hover:bg-[#1a3a4a] transition-colors shadow-lg"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />
+                    </svg>
+                    View in 3D
+                  </button>
+                </div>
+              )
+            )}
 
             {/* Before/After Slider */}
             {isComplete && (
