@@ -33,8 +33,8 @@ const SceneTransitionContext = createContext<SceneTransitionContextValue | null>
 
 const DASHBOARD_ROUTE = "/dashboard";
 const ZOOM_MS = 620;
-const CLOUD_MS = 1050;
-const REVEAL_MS = 520;
+const CLOUD_MS = 260;
+const REVEAL_MS = 380;
 
 export function SceneTransitionProvider({
   children,
@@ -79,7 +79,7 @@ export function SceneTransitionProvider({
 
     cloudRevealScheduledRef.current = true;
     const elapsed = performance.now() - startTimeRef.current;
-    const remainingCloudTime = Math.max(220, ZOOM_MS + CLOUD_MS - elapsed);
+    const remainingCloudTime = Math.max(80, ZOOM_MS + CLOUD_MS - elapsed);
 
     timeoutsRef.current.push(
       window.setTimeout(() => {
