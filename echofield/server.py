@@ -23,6 +23,10 @@ from fastapi.staticfiles import StaticFiles
 
 from echofield.batch_store import BatchStore
 from echofield.config import get_settings
+from echofield.ml.active_learning import ActiveLearningManager
+from echofield.ml.classifier import CallClassifier
+from echofield.ml.narrative import generate_narrative
+from echofield.ml.taxonomy import validate_call_type, validate_social_function, CALL_TYPES, SOCIAL_FUNCTIONS
 from echofield.data_loader import RecordingStore, list_recordings_with_metadata
 from echofield.metrics import metrics
 from echofield.model_registry import ModelRegistry
@@ -152,6 +156,8 @@ async def lifespan(application: FastAPI):
     application.state.webhook_manager = WebhookManager(settings.cache_dir / "webhooks.json")
     application.state.individual_identifier = IndividualIdentifier()
     application.state.batch_webhooks_emitted = set()
+    application.state.ml_classifier = CallClassifier()
+    application.state.al_manager = ActiveLearningManager()
     active_model = application.state.model_registry.active_model_path()
     load_classifier(active_model or settings.classifier_model_path)
     try:
@@ -236,6 +242,14 @@ def _get_webhooks() -> WebhookManager:
 
 def _get_individual_identifier() -> IndividualIdentifier:
     return app.state.individual_identifier  # type: ignore[return-value]
+
+
+def _get_ml_classifier() -> CallClassifier:
+    return app.state.ml_classifier  # type: ignore[return-value]
+
+
+def _get_al_manager() -> ActiveLearningManager:
+    return app.state.al_manager  # type: ignore[return-value]
 
 
 async def _emit_webhook(event_type: str, payload: dict[str, Any]) -> None:
@@ -1835,6 +1849,246 @@ async def delete_webhook(webhook_id: str) -> dict[str, Any]:
     if not _get_webhooks().delete(webhook_id):
         raise HTTPException(status_code=404, detail="Webhook not found")
     return {"id": webhook_id, "deleted": True}
+
+
+# --- ML Labeling ---
+
+@app.get("/api/ml/labeling-queue")
+async def ml_labeling_queue(limit: int = Query(10, ge=1, le=100)):
+    db = _get_call_database()
+    mgr = _get_al_manager()
+    queue = mgr.get_labeling_queue(db._calls, limit=limit)
+    return queue
+
+
+@app.post("/api/ml/label/{call_id}")
+async def ml_label_call(call_id: str, body: dict):
+    ct = body.get("call_type_refined", "")
+    sf = body.get("social_function", "")
+    if not validate_call_type(ct):
+        raise HTTPException(status_code=422, detail=f"Invalid call_type_refined: {ct}. Must be one of {CALL_TYPES}")
+    if not validate_social_function(sf):
+        raise HTTPException(status_code=422, detail=f"Invalid social_function: {sf}. Must be one of {SOCIAL_FUNCTIONS}")
+    mgr = _get_al_manager()
+    mgr.save_label(call_id, ct, sf)
+    db = _get_call_database()
+    call = db._calls.get(call_id)
+    if call:
+        call["call_type_refined"] = ct
+        call["social_function"] = sf
+    return {
+        "status": "labeled",
+        "labels_since_last_train": mgr.labels_since_last_train,
+        "retrain_threshold": mgr._retrain_threshold,
+        "should_retrain": mgr.should_retrain(),
+    }
+
+
+# --- ML Training & Prediction ---
+
+@app.post("/api/ml/train")
+async def ml_train():
+    mgr = _get_al_manager()
+    clf = _get_ml_classifier()
+    db = _get_call_database()
+    labels = mgr.get_all_labels()
+    if len(labels) < 5:
+        raise HTTPException(status_code=400, detail=f"Need at least 5 labels, have {len(labels)}")
+    training_data = []
+    for call_id, label in labels.items():
+        call = db._calls.get(call_id)
+        features = (call or {}).get("acoustic_features", {})
+        training_data.append({
+            "acoustic_features": features,
+            "call_type_refined": label["call_type_refined"],
+            "social_function": label["social_function"],
+        })
+    result = clf.train(training_data)
+    mgr.mark_retrained()
+    return result
+
+
+@app.get("/api/ml/predict/{call_id}")
+async def ml_predict(call_id: str):
+    db = _get_call_database()
+    call = db._calls.get(call_id)
+    if call is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    clf = _get_ml_classifier()
+    features = call.get("acoustic_features", {})
+    prediction = clf.predict(features)
+    if prediction is None:
+        return {"error": "No trained model available", "call_id": call_id}
+    top_features = sorted(
+        [(k, v) for k, v in features.items() if isinstance(v, (int, float)) and v is not None],
+        key=lambda x: abs(x[1]),
+        reverse=True,
+    )[:5]
+    narrative = call.get("narrative_text")
+    if not narrative:
+        narrative = generate_narrative(
+            call_type=prediction["call_type"],
+            social_function=prediction["social_function"],
+            confidence=prediction["confidence"],
+            top_features=top_features,
+        )
+        call["narrative_text"] = narrative
+    prediction["narrative_text"] = narrative
+    prediction["call_id"] = call_id
+    return prediction
+
+
+# --- ML Benchmarks ---
+
+@app.get("/api/ml/benchmarks")
+async def ml_benchmarks():
+    clf = _get_ml_classifier()
+    mgr = _get_al_manager()
+    registry = clf._registry
+    ct_history = registry.get_benchmark_history("call_type")
+    sf_history = registry.get_benchmark_history("social_fn")
+    accuracy_over_time = []
+    for entry in ct_history:
+        accuracy_over_time.append([
+            entry.get("label_count", 0),
+            entry.get("metrics", {}).get("accuracy", 0),
+        ])
+    return {
+        "training_runs": {"call_type": ct_history, "social_function": sf_history},
+        "active_learning": {
+            "total_labels": len(mgr.get_all_labels()),
+            "labels_since_last_train": mgr.labels_since_last_train,
+            "retrain_threshold": mgr._retrain_threshold,
+            "accuracy_over_time": accuracy_over_time,
+        },
+    }
+
+
+@app.get("/api/ml/benchmarks/latest")
+async def ml_benchmarks_latest():
+    clf = _get_ml_classifier()
+    registry = clf._registry
+    ct_history = registry.get_benchmark_history("call_type")
+    sf_history = registry.get_benchmark_history("social_fn")
+    return {
+        "call_type": ct_history[-1] if ct_history else None,
+        "social_function": sf_history[-1] if sf_history else None,
+    }
+
+
+# --- Analytics ---
+
+@app.get("/api/analytics/population")
+async def analytics_population():
+    db = _get_call_database()
+    calls = [c for cid, c in db._calls.items() if cid != "__meta__"]
+    ct_dist: dict[str, int] = {}
+    sf_dist: dict[str, int] = {}
+    by_site: dict[str, dict] = {}
+    for call in calls:
+        ct = call.get("call_type_refined") or call.get("call_type") or "unknown"
+        sf = call.get("social_function") or "unknown"
+        ct_dist[ct] = ct_dist.get(ct, 0) + 1
+        sf_dist[sf] = sf_dist.get(sf, 0) + 1
+        location = call.get("location") or "unknown"
+        if location not in by_site:
+            by_site[location] = {"call_count": 0, "dominant_type": ""}
+        by_site[location]["call_count"] += 1
+    for site, info in by_site.items():
+        site_calls = [c for c in calls if (c.get("location") or "unknown") == site]
+        types = {}
+        for c in site_calls:
+            t = c.get("call_type_refined") or c.get("call_type") or "unknown"
+            types[t] = types.get(t, 0) + 1
+        info["dominant_type"] = max(types, key=types.get) if types else "unknown"
+    return {
+        "call_type_distribution": ct_dist,
+        "social_function_distribution": sf_dist,
+        "by_site": by_site,
+        "temporal_patterns": {"hourly_distribution": [0] * 24, "call_rate_per_recording": []},
+    }
+
+
+@app.get("/api/analytics/social-graph")
+async def analytics_social_graph():
+    db = _get_call_database()
+    calls = sorted(
+        [c for cid, c in db._calls.items() if cid != "__meta__"],
+        key=lambda c: (c.get("recording_id", ""), float(c.get("start_ms") or 0)),
+    )
+    nodes: dict[str, dict] = {}
+    edges: dict[str, dict] = {}
+    for call in calls:
+        cluster = call.get("cluster_id") or call.get("individual_id") or call.get("id", "unknown")
+        if cluster not in nodes:
+            nodes[cluster] = {"id": cluster, "call_count": 0, "dominant_type": "unknown"}
+        nodes[cluster]["call_count"] += 1
+    prev = None
+    for call in calls:
+        if prev and prev.get("recording_id") == call.get("recording_id"):
+            prev_end = float(prev.get("start_ms") or 0) + float(prev.get("duration_ms") or 0)
+            curr_start = float(call.get("start_ms") or 0)
+            ici = curr_start - prev_end
+            if 0 < ici < 5000:
+                from_id = prev.get("cluster_id") or prev.get("individual_id") or prev.get("id", "")
+                to_id = call.get("cluster_id") or call.get("individual_id") or call.get("id", "")
+                if from_id != to_id:
+                    edge_key = f"{from_id}->{to_id}"
+                    if edge_key not in edges:
+                        edges[edge_key] = {"from": from_id, "to": to_id, "response_count": 0, "ici_sum": 0.0}
+                    edges[edge_key]["response_count"] += 1
+                    edges[edge_key]["ici_sum"] += ici
+        prev = call
+    edge_list = []
+    for e in edges.values():
+        e["avg_ici_ms"] = round(e["ici_sum"] / e["response_count"], 1) if e["response_count"] > 0 else 0
+        del e["ici_sum"]
+        edge_list.append(e)
+    return {"nodes": list(nodes.values()), "edges": edge_list}
+
+
+@app.get("/api/analytics/recording/{recording_id}/features")
+async def analytics_recording_features(recording_id: str):
+    import numpy as np
+    db = _get_call_database()
+    calls = [
+        c for cid, c in db._calls.items()
+        if c.get("recording_id") == recording_id and cid != "__meta__"
+    ]
+    if not calls:
+        raise HTTPException(status_code=404, detail="Recording not found or has no calls")
+    ct_dist: dict[str, int] = {}
+    f0_values: list[float] = []
+    snr_values: list[float] = []
+    duration_values: list[float] = []
+    for call in calls:
+        ct = call.get("call_type_refined") or call.get("call_type") or "unknown"
+        ct_dist[ct] = ct_dist.get(ct, 0) + 1
+        features = call.get("acoustic_features") or {}
+        f0 = features.get("fundamental_frequency_hz")
+        if f0 is not None:
+            f0_values.append(float(f0))
+        snr = features.get("snr_db")
+        if snr is not None:
+            snr_values.append(float(snr))
+        dur = call.get("duration_ms")
+        if dur is not None:
+            duration_values.append(float(dur))
+    def _stats(values):
+        if not values:
+            return {"min": 0, "max": 0, "mean": 0}
+        arr = np.array(values)
+        return {"min": round(float(np.min(arr)), 2), "max": round(float(np.max(arr)), 2), "mean": round(float(np.mean(arr)), 2)}
+    return {
+        "recording_id": recording_id,
+        "call_count": len(calls),
+        "call_types": ct_dist,
+        "feature_distributions": {
+            "fundamental_frequency_hz": _stats(f0_values),
+            "snr_db": _stats(snr_values),
+            "duration_ms": _stats(duration_values),
+        },
+    }
 
 
 @app.websocket("/ws/live")
