@@ -2278,14 +2278,19 @@ async def filter_chunk(
     request: Request,
     sr: int = Query(default=44100, ge=8000, le=192000),
     preserve_harmonics: bool = Query(default=True),
+    aggressiveness: float = Query(default=1.0, ge=0.1, le=3.0),
+    high_hz: float = Query(default=1200.0, ge=100.0, le=20000.0),
 ) -> Response:
     """Filter a raw PCM chunk using the spectral-gate pipeline.
 
     Request body: little-endian float32 PCM samples (mono).
     Response body: filtered float32 PCM samples (same length).
     Extra headers: X-Noise-Type, X-Noise-Confidence, X-SNR-Before-DB, X-SNR-After-DB.
+
+    For phone/speaker playback use aggressiveness=0.5 and high_hz=4000 to avoid
+    treating the signal itself as noise and to capture the phone's wider output range.
     """
-    from echofield.pipeline.spectral_gate import spectral_gate_denoise
+    from echofield.pipeline.spectral_gate import spectral_gate_denoise, apply_bandpass_filter
     from echofield.pipeline.noise_classifier import classify_noise
     from echofield.pipeline.quality_check import compute_snr
 
@@ -2301,15 +2306,20 @@ async def filter_chunk(
 
     snr_before = float(compute_snr(y, sr))
 
+    # Run spectral gate with caller-supplied aggressiveness, then apply the
+    # requested bandpass so phone-mode (high_hz=4000) passes more of the signal.
     result = spectral_gate_denoise(
         y,
         sr,
-        aggressiveness=1.0,
+        aggressiveness=aggressiveness,
         noise_type=noise_type,
         preserve_harmonics=preserve_harmonics,
         post_process=True,
     )
     cleaned: np.ndarray = result["cleaned_audio"]
+    # Re-apply bandpass with the requested high_hz (default pipeline uses 1200 Hz)
+    if high_hz != 1200.0:
+        cleaned = apply_bandpass_filter(cleaned, sr, low_hz=8.0, high_hz=high_hz)
 
     snr_after = float(compute_snr(cleaned, sr))
 

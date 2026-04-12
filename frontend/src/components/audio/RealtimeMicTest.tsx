@@ -13,6 +13,7 @@ import {
   VolumeX,
   TrendingUp,
   ArrowRight,
+  Smartphone,
 } from "lucide-react";
 import { uploadFiles, processRecording, API_BASE } from "@/lib/audio-api";
 
@@ -140,6 +141,7 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
   const isActiveRef       = useRef(false);
   const nextPlayTimeRef   = useRef(0);
   const monitorEnabledRef = useRef(false);
+  const phoneModeRef      = useRef(false);
   const sampleRateRef     = useRef(44100);
 
   /* refs — timers */
@@ -163,6 +165,7 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
   const [isSendingToQueue, setIsSendingToQueue] = useState(false);
   const [queuedId,         setQueuedId]         = useState<string | null>(null);
   const [queueError,       setQueueError]       = useState<string | null>(null);
+  const [phoneMode,        setPhoneMode]        = useState(false);
 
   /* derived from chunk history */
   const latestStat   = chunkStats.at(-1) ?? null;
@@ -171,6 +174,7 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
   const avgImprovement = avgSnrBefore !== null && avgSnrAfter !== null ? avgSnrAfter - avgSnrBefore : null;
 
   useEffect(() => { monitorEnabledRef.current = monitorEnabled; }, [monitorEnabled]);
+  useEffect(() => { phoneModeRef.current = phoneMode; }, [phoneMode]);
 
   /* ── Cleanup helpers ───────────────────────────────────────── */
 
@@ -205,8 +209,15 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
     const ctx = contextRef.current;
     setIsFiltering(true);
     try {
+      const phone = phoneModeRef.current;
+      const params = new URLSearchParams({
+        sr: String(sr),
+        preserve_harmonics: "true",
+        aggressiveness: phone ? "0.45" : "1.0",
+        high_hz: phone ? "4000" : "1200",
+      });
       const resp = await fetch(
-        `${API_BASE}/api/filter-chunk?sr=${sr}&preserve_harmonics=true`,
+        `${API_BASE}/api/filter-chunk?${params}`,
         { method: "POST", body: chunk.buffer, headers: { "Content-Type": "application/octet-stream" } }
       );
       if (!resp.ok) return;
@@ -425,7 +436,7 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
       </div>
 
       {/* Controls */}
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-4">
         <button type="button" onClick={() => void startRecording()} disabled={isRecording || isStopping}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-success px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
           {isRecording ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mic className="h-4 w-4" />}
@@ -442,6 +453,15 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
           }`}>
           {monitorEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           {monitorEnabled ? "Monitor on" : "Monitor off"}
+        </button>
+
+        <button type="button" onClick={() => setPhoneMode((v) => !v)}
+          title="Use when playing audio through a phone or speaker near the mic"
+          className={`inline-flex items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition-colors ${
+            phoneMode ? "border-blue-300 bg-blue-50 text-blue-600" : "border-ev-sand/60 bg-white text-ev-elephant"
+          }`}>
+          <Smartphone className="h-4 w-4" />
+          {phoneMode ? "Phone mode on" : "Phone mode"}
         </button>
       </div>
 
@@ -468,6 +488,11 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
           </div>
         </div>
 
+        {phoneMode && (
+          <p className="text-[10px] text-blue-500/80">
+            Phone mode — lower aggressiveness (0.45×), wider band (up to 4 kHz) to preserve signal played through a speaker.
+          </p>
+        )}
         {monitorEnabled && isRecording && (
           <p className="text-[10px] text-ev-warm-gray/70">
             Live preview has ~{CHUNK_SECONDS}s lag — use headphones to avoid feedback.
