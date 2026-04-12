@@ -392,9 +392,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link
             href="/"
-            className="text-2xl font-display font-semibold text-accent-savanna"
+            className="flex items-center gap-2"
           >
-            EchoField
+            <Image src="/logo.png" alt="EchoField logo" width={36} height={36} className="object-contain" />
+            <span className="text-2xl font-display font-semibold text-accent-savanna">EchoField</span>
           </Link>
 
         </div>
