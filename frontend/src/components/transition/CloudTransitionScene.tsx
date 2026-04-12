@@ -41,8 +41,9 @@ export default function CloudTransitionScene({ active, reveal }: CloudTransition
   return (
     <motion.div
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      animate={{ opacity: active ? 1 : 0 }}
-      transition={{ duration: active ? 0.22 : 0.55, ease: "easeOut" }}
+      initial={{ opacity: 0, scale: 1.08 }}
+      animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 1.08 }}
+      transition={{ duration: active ? 0.55 : 0.45, ease: [0.22, 1, 0.36, 1] }}
       aria-hidden="true"
     >
       {/* Clear blue sky — strong contrast for white clouds */}
