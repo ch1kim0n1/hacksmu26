@@ -94,6 +94,7 @@ function WaveDivider({
    ──────────────────────────────────────────── */
 export default function LandingPage() {
   const { isTransitioning, startDashboardTransition } = useSceneTransition();
+  const [isGlobeActivated, setIsGlobeActivated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const crisisRef = useRef<HTMLElement>(null);
@@ -441,16 +442,17 @@ export default function LandingPage() {
           </div>
 
           {/* Interactive globe */}
-          <button
-            id="landing-globe-trigger"
-            type="button"
-            onClick={() => {
-              if (isTransitioning) return;
-              const el = document.getElementById("landing-globe-trigger");
-              const rect = el?.getBoundingClientRect();
-              if (!rect) return;
-              startDashboardTransition({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
-            }}
+            <button
+              id="landing-globe-trigger"
+              type="button"
+              onClick={() => {
+                if (isTransitioning) return;
+                setIsGlobeActivated(true);
+                const el = document.getElementById("landing-globe-trigger");
+                const rect = el?.getBoundingClientRect();
+                if (!rect) return;
+                startDashboardTransition({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+              }}
             disabled={isTransitioning}
             aria-label="Enter EchoField dashboard"
             className={`pointer-events-auto absolute left-[49%] top-[41%] h-[clamp(280px,34vw,500px)] w-[clamp(280px,34vw,500px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-transform ease-[cubic-bezier(0.2,0,0.8,1)] ${
@@ -476,13 +478,17 @@ export default function LandingPage() {
               }}
             />
           </button>
-        </div>
+          </div>
 
-        {/* Mission text */}
-        <div className="pointer-events-none absolute right-[4vw] top-[31%] z-[8] hidden max-w-[28rem] px-7 py-7 text-[#4e3b28] lg:block">
-          <p className="font-[Arial] text-sm font-semibold uppercase tracking-[0.28em] text-[#7b6246] underline underline-offset-[6px]">
-            Mission Statement
-          </p>
+          {/* Mission text */}
+          <div
+            className={`pointer-events-none absolute right-[4vw] top-[31%] z-[8] hidden max-w-[28rem] px-7 py-7 text-[#4e3b28] lg:block ${
+              isGlobeActivated ? "invisible opacity-0" : "visible opacity-100"
+            }`}
+          >
+            <p className="font-[Arial] text-sm font-semibold uppercase tracking-[0.28em] text-[#7b6246] underline underline-offset-[6px]">
+              Mission Statement
+            </p>
           <h2 className="mt-4 text-[2.15rem] font-bold leading-tight tracking-[-0.04em] text-[#3f3121]">
             Reveal the intelligence hidden inside every field recording.
           </h2>
