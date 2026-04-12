@@ -1,0 +1,1782 @@
+{
+  "entries": {
+    "04-040920-03_vehicle_noise_1-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-03_vehicle_noise_1-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "04-040920-03_vehicle_noise_1-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954976.276878
+    },
+    "04-040920-03_vehicle_noise_1-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-03_vehicle_noise_1-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "04-040920-03_vehicle_noise_1-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954976.278246
+    },
+    "04-040920-03_vehicle_noise_1:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-03_vehicle_noise_1_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "04-040920-03_vehicle_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954976.2790852
+    },
+    "04-061218-25_vehicle_noise_1-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-061218-25_vehicle_noise_1-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "04-061218-25_vehicle_noise_1-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955008.0164201
+    },
+    "04-061218-25_vehicle_noise_1-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-061218-25_vehicle_noise_1-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "04-061218-25_vehicle_noise_1-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955008.017697
+    },
+    "04-061218-25_vehicle_noise_1:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-061218-25_vehicle_noise_1_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "04-061218-25_vehicle_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955008.018666
+    },
+    "090224-09_generator_01-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/090224-09_generator_01-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "090224-09_generator_01-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955097.4409301
+    },
+    "090224-09_generator_01-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/090224-09_generator_01-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "090224-09_generator_01-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955097.44299
+    },
+    "090224-09_generator_01:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/090224-09_generator_01_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "090224-09_generator_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955097.445377
+    },
+    "1989-08_airplane_03-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/1989-08_airplane_03-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "1989-08_airplane_03-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953022.35972
+    },
+    "1989-08_airplane_03-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/1989-08_airplane_03-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "1989-08_airplane_03-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953022.360841
+    },
+    "1989-08_airplane_03:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/1989-08_airplane_03_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "1989-08_airplane_03",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953022.361326
+    },
+    "2000-23_background_and_vehicle_noise_2:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_and_vehicle_noise_2_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-23_background_and_vehicle_noise_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953029.55149
+    },
+    "2000-23_background_and_vehicle_noise_2-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_and_vehicle_noise_2-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_background_and_vehicle_noise_2-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953029.552192
+    },
+    "2000-23_background_and_vehicle_noise_2-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_and_vehicle_noise_2-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_background_and_vehicle_noise_2-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953029.552701
+    },
+    "2000-23_background_and_vehicle_noise_2:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_and_vehicle_noise_2_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-23_background_and_vehicle_noise_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953029.553153
+    },
+    "2000-23_background_noise_1:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_noise_1_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-23_background_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953033.6827579
+    },
+    "2000-23_background_noise_1-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_noise_1-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_background_noise_1-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953033.6834738
+    },
+    "2000-23_background_noise_1-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_noise_1-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_background_noise_1-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953033.684412
+    },
+    "2000-23_background_noise_1:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_noise_1_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-23_background_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953033.684893
+    },
+    "2000-23_background_vehicle_noise:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_vehicle_noise_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-23_background_vehicle_noise",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953039.6099992
+    },
+    "2000-23_background_vehicle_noise-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_vehicle_noise-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_background_vehicle_noise-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953039.610794
+    },
+    "2000-23_background_vehicle_noise-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_vehicle_noise-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_background_vehicle_noise-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953039.6147032
+    },
+    "2000-23_background_vehicle_noise:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_background_vehicle_noise_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-23_background_vehicle_noise",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953039.615628
+    },
+    "2000-23_vehicle_noise_1:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_1_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-23_vehicle_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953085.393044
+    },
+    "2000-23_vehicle_noise_1-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_1-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_vehicle_noise_1-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953085.398268
+    },
+    "2000-23_vehicle_noise_1-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_1-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_vehicle_noise_1-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953085.399908
+    },
+    "2000-23_vehicle_noise_1:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_1_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-23_vehicle_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953085.4006631
+    },
+    "2000-23_vehicle_noise_2:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_2_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-23_vehicle_noise_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953087.998475
+    },
+    "2000-23_vehicle_noise_2-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_2-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_vehicle_noise_2-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953088.0022862
+    },
+    "2000-23_vehicle_noise_2-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_2-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_vehicle_noise_2-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953088.003499
+    },
+    "2000-23_vehicle_noise_2:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_2_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-23_vehicle_noise_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953088.004013
+    },
+    "2000-23_vehicle_noise_3:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_3_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-23_vehicle_noise_3",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953091.770303
+    },
+    "2000-23_vehicle_noise_3-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_3-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_vehicle_noise_3-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953091.7710981
+    },
+    "2000-23_vehicle_noise_3-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_3-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_vehicle_noise_3-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953091.771803
+    },
+    "2000-23_vehicle_noise_3:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_3_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-23_vehicle_noise_3",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953091.772477
+    },
+    "2000-23_vehicle_noise_4:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_4_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-23_vehicle_noise_4",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953099.060649
+    },
+    "2000-23_vehicle_noise_4-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_4-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_vehicle_noise_4-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953099.0615308
+    },
+    "2000-23_vehicle_noise_4-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_4-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-23_vehicle_noise_4-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953099.062165
+    },
+    "2000-23_vehicle_noise_4:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-23_vehicle_noise_4_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-23_vehicle_noise_4",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953099.0627341
+    },
+    "2000-24_generator_noise_1:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_1_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-24_generator_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953109.6148329
+    },
+    "2000-24_generator_noise_1-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_1-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_generator_noise_1-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953109.6211379
+    },
+    "2000-24_generator_noise_1-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_1-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_generator_noise_1-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953109.6226401
+    },
+    "2000-24_generator_noise_1:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_1_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-24_generator_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953109.623347
+    },
+    "2000-24_generator_noise_2:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_2_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-24_generator_noise_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953201.732515
+    },
+    "2000-24_generator_noise_2-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_2-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_generator_noise_2-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953201.7679412
+    },
+    "2000-24_generator_noise_2-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_2-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_generator_noise_2-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953201.769131
+    },
+    "2000-24_generator_noise_2:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_2_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-24_generator_noise_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953201.7708879
+    },
+    "2000-24_generator_noise_3:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_3_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-24_generator_noise_3",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953205.976369
+    },
+    "2000-24_generator_noise_3-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_3-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_generator_noise_3-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953205.9806342
+    },
+    "2000-24_generator_noise_3-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_3-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_generator_noise_3-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953205.9849799
+    },
+    "2000-24_generator_noise_3:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_3_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-24_generator_noise_3",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953205.987732
+    },
+    "2000-24_generator_noise_4:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_4_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-24_generator_noise_4",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953253.37311
+    },
+    "2000-24_generator_noise_4-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_4-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_generator_noise_4-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953253.3809621
+    },
+    "2000-24_generator_noise_4-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_4-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_generator_noise_4-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953253.38638
+    },
+    "2000-24_generator_noise_4:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_generator_noise_4_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-24_generator_noise_4",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953253.387156
+    },
+    "2000-24_vehicle_and_generator_noise_1:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_and_generator_noise_1_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-24_vehicle_and_generator_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953265.3101099
+    },
+    "2000-24_vehicle_and_generator_noise_1-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_and_generator_noise_1-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_vehicle_and_generator_noise_1-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953265.313677
+    },
+    "2000-24_vehicle_and_generator_noise_1-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_and_generator_noise_1-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_vehicle_and_generator_noise_1-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953265.315082
+    },
+    "2000-24_vehicle_and_generator_noise_1:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_and_generator_noise_1_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-24_vehicle_and_generator_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953265.32232
+    },
+    "2000-24_vehicle_noise_1:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_noise_1_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-24_vehicle_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953338.892143
+    },
+    "2000-24_vehicle_noise_1-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_noise_1-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_vehicle_noise_1-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953338.901209
+    },
+    "2000-24_vehicle_noise_1-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_noise_1-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_vehicle_noise_1-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953338.9024441
+    },
+    "2000-24_vehicle_noise_1:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_noise_1_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-24_vehicle_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953338.9091241
+    },
+    "2000-24_vehicle_noise_2:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_noise_2_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-24_vehicle_noise_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953345.4572532
+    },
+    "2000-24_vehicle_noise_2-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_noise_2-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_vehicle_noise_2-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953345.4630148
+    },
+    "2000-24_vehicle_noise_2-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_noise_2-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-24_vehicle_noise_2-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953345.468642
+    },
+    "2000-24_vehicle_noise_2:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-24_vehicle_noise_2_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-24_vehicle_noise_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953345.471115
+    },
+    "2000-27_airplane_01:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-27_airplane_01_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-27_airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953438.627807
+    },
+    "2000-27_airplane_01-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-27_airplane_01-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-27_airplane_01-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953438.6455948
+    },
+    "2000-27_airplane_01-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-27_airplane_01-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-27_airplane_01-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953438.650862
+    },
+    "2000-27_airplane_01:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-27_airplane_01_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-27_airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953438.6518269
+    },
+    "2000-3_airplane_01:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_01_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-3_airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953472.346548
+    },
+    "2000-3_airplane_01-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_01-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-3_airplane_01-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953472.352449
+    },
+    "2000-3_airplane_01-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_01-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-3_airplane_01-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953472.355836
+    },
+    "2000-3_airplane_01:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_01_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-3_airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953472.356937
+    },
+    "2000-3_airplane_02:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_02_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-3_airplane_02",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953484.37203
+    },
+    "2000-3_airplane_02-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_02-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-3_airplane_02-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953484.378252
+    },
+    "2000-3_airplane_02-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_02-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-3_airplane_02-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953484.3809888
+    },
+    "2000-3_airplane_02:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_02_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-3_airplane_02",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953484.384696
+    },
+    "2000-3_airplane_03:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_03_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-3_airplane_03",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953540.457449
+    },
+    "2000-3_airplane_03-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_03-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-3_airplane_03-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953540.464329
+    },
+    "2000-3_airplane_03-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_03-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-3_airplane_03-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953540.468062
+    },
+    "2000-3_airplane_03:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_airplane_03_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-3_airplane_03",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953540.472787
+    },
+    "2000-3_vehicle_01:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_vehicle_01_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-3_vehicle_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953578.1230779
+    },
+    "2000-3_vehicle_01-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_vehicle_01-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-3_vehicle_01-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953578.146753
+    },
+    "2000-3_vehicle_01-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_vehicle_01-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-3_vehicle_01-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953578.152246
+    },
+    "2000-3_vehicle_01:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-3_vehicle_01_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-3_vehicle_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953578.1545558
+    },
+    "2000-4__airplane_01:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-4__airplane_01_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "2000-4__airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953588.123713
+    },
+    "2000-4__airplane_01-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-4__airplane_01-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-4__airplane_01-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953588.125531
+    },
+    "2000-4__airplane_01-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-4__airplane_01-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "2000-4__airplane_01-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953588.1269891
+    },
+    "2000-4__airplane_01:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/2000-4__airplane_01_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "2000-4__airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775953588.128342
+    },
+    "04-040920-02_vehicle_1:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-02_vehicle_1_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "04-040920-02_vehicle_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954939.03542
+    },
+    "04-040920-02_vehicle_1-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-02_vehicle_1-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "04-040920-02_vehicle_1-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954939.036661
+    },
+    "04-040920-02_vehicle_1-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-02_vehicle_1-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "04-040920-02_vehicle_1-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954939.037623
+    },
+    "04-040920-02_vehicle_1:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-02_vehicle_1_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "04-040920-02_vehicle_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954939.038361
+    },
+    "04-040920-02_vehicle_2:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-02_vehicle_2_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "04-040920-02_vehicle_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954944.3785338
+    },
+    "04-040920-02_vehicle_2-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-02_vehicle_2-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "04-040920-02_vehicle_2-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954944.38015
+    },
+    "04-040920-02_vehicle_2-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-02_vehicle_2-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "04-040920-02_vehicle_2-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954944.381251
+    },
+    "04-040920-02_vehicle_2:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-02_vehicle_2_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "04-040920-02_vehicle_2",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954944.382137
+    },
+    "04-040920-03_vehicle_noise_1:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-040920-03_vehicle_noise_1_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "04-040920-03_vehicle_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775954976.274163
+    },
+    "04-061218-25_vehicle_noise_1:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/04-061218-25_vehicle_noise_1_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "04-061218-25_vehicle_noise_1",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955008.008095
+    },
+    "061220-24_airplane_01:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/061220-24_airplane_01_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "061220-24_airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955012.7079701
+    },
+    "061220-24_airplane_01-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/061220-24_airplane_01-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "061220-24_airplane_01-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955012.709017
+    },
+    "061220-24_airplane_01-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/061220-24_airplane_01-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "061220-24_airplane_01-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955012.7098958
+    },
+    "061220-24_airplane_01:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/061220-24_airplane_01_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "061220-24_airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955012.710691
+    },
+    "090224-09_generator_01:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/090224-09_generator_01_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "090224-09_generator_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955097.4200032
+    },
+    "1989-06_airplane_01:processed_audio:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/1989-06_airplane_01_processed_audio_d83a9e62bb05a2d6.wav",
+      "kind": "processed_audio",
+      "recording_id": "1989-06_airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955106.359875
+    },
+    "1989-06_airplane_01-before:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/1989-06_airplane_01-before_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "1989-06_airplane_01-before",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955106.383584
+    },
+    "1989-06_airplane_01-after:spectrogram:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/1989-06_airplane_01-after_spectrogram_d83a9e62bb05a2d6.png",
+      "kind": "spectrogram",
+      "recording_id": "1989-06_airplane_01-after",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955106.384747
+    },
+    "1989-06_airplane_01:quality_metrics:d83a9e62bb05a2d6": {
+      "path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/results/cache/1989-06_airplane_01_quality_metrics_d83a9e62bb05a2d6.json",
+      "kind": "quality_metrics",
+      "recording_id": "1989-06_airplane_01",
+      "params": {
+        "method": "spectral",
+        "aggressiveness": 1.0,
+        "sample_rate": 44100,
+        "n_fft": 2048,
+        "hop_length": 512,
+        "spectrogram_type": "stft",
+        "post_process": false,
+        "preserve_harmonics": false
+      },
+      "last_access": 1775955106.385535
+    }
+  },
+  "hits": 9,
+  "misses": 183
+}
