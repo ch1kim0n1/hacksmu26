@@ -42,11 +42,11 @@ describe("Header", () => {
     expect(screen.getByText("Upload Recordings")).toBeInTheDocument();
   });
 
-  it("renders right-side action buttons", () => {
+  it("does not render non-functional action buttons", () => {
     render(<Header />);
-    expect(screen.getByLabelText("Search")).toBeInTheDocument();
-    expect(screen.getByLabelText("Help")).toBeInTheDocument();
-    expect(screen.getByLabelText("Notifications")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Search")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Help")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Notifications")).not.toBeInTheDocument();
   });
 
   it("has a mobile sidebar trigger", () => {
