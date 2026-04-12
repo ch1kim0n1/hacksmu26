@@ -61,6 +61,7 @@ from echofield.models import (
     WebhookConfig,
 )
 from echofield.pipeline.cache_manager import CacheManager
+from echofield.pipeline.infrasound import detect_infrasound_regions, create_infrasound_reveal
 from echofield.pipeline.circuit_breaker import get_circuit_breaker_registry
 from echofield.pipeline.hybrid_pipeline import ProcessingPipeline
 from echofield.pipeline.ingestion import validate_audio, validate_magic_bytes
@@ -1148,6 +1149,84 @@ async def label_review_call(call_id: str, payload: ReviewLabelRequest) -> CallRe
     app.state.embedding_cache = {}
     metrics.inc("echofield_review_labels_total")
     return CallRecord(**_enrich_call(call))
+
+
+@app.post("/api/recordings/{recording_id}/infrasound-reveal")
+async def infrasound_reveal(
+    recording_id: str,
+    shift_octaves: int = Query(default=3, ge=1, le=5),
+    mix_mode: str = Query(default="shifted_only"),
+):
+    store = _get_store()
+    recording = store.get(recording_id)
+    if not recording:
+        raise HTTPException(status_code=404, detail="Recording not found")
+
+    # Load cleaned audio if available, otherwise original
+    result = recording.get("result") or {}
+    audio_path = result.get("output_audio_path")
+    if not audio_path or not Path(audio_path).exists():
+        audio_path = str(_get_recording_path(recording))
+
+    y, sr = await asyncio.to_thread(load_audio, audio_path)
+
+    # Detect infrasound regions
+    regions = await asyncio.to_thread(detect_infrasound_regions, y, sr)
+
+    # Create pitch-shifted audio
+    reveal = await asyncio.to_thread(
+        create_infrasound_reveal,
+        y,
+        sr,
+        shift_octaves=shift_octaves,
+        mix_mode=mix_mode,
+    )
+
+    # Save shifted audio
+    output_dir = Path(settings.processed_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    shifted_path = output_dir / f"{recording_id}_infrasound_shifted.wav"
+
+    import soundfile as sf
+
+    await asyncio.to_thread(sf.write, str(shifted_path), reveal["audio"], sr)
+
+    return {
+        "recording_id": recording_id,
+        "infrasound_detected": len(regions) > 0,
+        "infrasound_regions": [
+            {
+                "start_ms": r.start_ms,
+                "end_ms": r.end_ms,
+                "estimated_f0_hz": r.estimated_f0_hz,
+                "shifted_f0_hz": round(
+                    r.estimated_f0_hz * (2**shift_octaves), 1
+                ),
+                "energy_db": r.energy_db,
+            }
+            for r in regions
+        ],
+        "shifted_audio_url": f"/api/recordings/{recording_id}/audio/infrasound-shifted",
+        "shift_octaves": shift_octaves,
+        "frequency_range_original_hz": reveal["original_range_hz"],
+        "frequency_range_shifted_hz": reveal["shifted_range_hz"],
+        "infrasound_energy_pct": reveal["infrasound_energy_pct"],
+        "mix_mode": mix_mode,
+    }
+
+
+@app.get("/api/recordings/{recording_id}/audio/infrasound-shifted")
+async def get_infrasound_shifted_audio(recording_id: str):
+    shifted_path = (
+        Path(settings.processed_dir)
+        / f"{recording_id}_infrasound_shifted.wav"
+    )
+    if not shifted_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="Shifted audio not found. Call /infrasound-reveal first.",
+        )
+    return FileResponse(str(shifted_path), media_type="audio/wav")
 
 
 @app.get("/metrics")
