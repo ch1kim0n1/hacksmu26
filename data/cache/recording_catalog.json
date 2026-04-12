@@ -19,6 +19,7 @@
         "end_sec": 57.53
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-040920-02_vehicle_1.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -46,6 +47,7 @@
         "end_sec": 51.474
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-040920-02_vehicle_2.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -73,6 +75,7 @@
         "end_sec": 168.979
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-040920-03_vehicle_noise_1.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -100,6 +103,7 @@
         "end_sec": 152.893
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-061218-25_vehicle_noise_1.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -127,6 +131,7 @@
         "end_sec": 45.833
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/061220-24_airplane_01.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -154,6 +159,7 @@
         "end_sec": 411.058
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/090224-09_generator_01.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -169,7 +175,7 @@
       "duration_s": 83.038,
       "filesize_mb": 7.602,
       "uploaded_at": "2026-04-11T21:47:48.389678+00:00",
-      "status": "pending",
+      "status": "complete",
       "metadata": {
         "location": "",
         "date": "",
@@ -181,14 +187,90 @@
         "end_sec": 83.038
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-06_airplane_01.wav",
+      "file_hash": null,
       "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.313404+00:00",
+        "completed_at": "2026-04-12T03:31:34.313404+00:00",
+        "duration_s": 300
       },
-      "result": null
+      "result": {
+        "recording_id": "60d0063b-63f4-54c4-822c-12828e577e8c",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 13.0,
+          "snr_after_db": 13.3,
+          "snr_improvement_db": 0.3,
+          "pesq": null,
+          "peak_frequency_before_hz": 86.1,
+          "peak_frequency_after_hz": 86.1,
+          "spectral_distortion": 0.1394,
+          "energy_preservation": 0.9928,
+          "quality_score": 37.5,
+          "quality_rating": "poor",
+          "flagged_for_review": true
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/60d0063b-63f4-54c4-822c-12828e577e8c_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/60d0063b-63f4-54c4-822c-12828e577e8c-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/60d0063b-63f4-54c4-822c-12828e577e8c-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.375,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 37.5,
+          "wiener_filter": 37.5,
+          "deepfilter": 37.5
+        },
+        "score_variance": 2.1
+      }
     },
     {
       "id": "2f1e4431-2d6c-57a6-a8fd-4f07097180e6",
@@ -208,6 +290,7 @@
         "end_sec": 115.023
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-08_airplane_01.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -235,6 +318,7 @@
         "end_sec": 44.432
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-08_airplane_02.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -262,6 +346,7 @@
         "end_sec": 192.056
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-08_airplane_03.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -289,6 +374,7 @@
         "end_sec": 66.255
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_background_and_vehicle_noise_2.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -316,6 +402,7 @@
         "end_sec": 38.747
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_background_noise_1.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -343,6 +430,7 @@
         "end_sec": 45.838
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_background_vehicle_noise.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -370,6 +458,7 @@
         "end_sec": 210.502
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_1.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -397,6 +486,7 @@
         "end_sec": 21.552
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_2.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -424,6 +514,7 @@
         "end_sec": 37.142
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_3.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -451,6 +542,7 @@
         "end_sec": 72.087
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_4.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -478,6 +570,7 @@
         "end_sec": 101.235
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_1.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -505,6 +598,7 @@
         "end_sec": 369.59
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_2.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -532,6 +626,7 @@
         "end_sec": 41.816
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_3.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -559,6 +654,7 @@
         "end_sec": 230.662
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_4.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -586,6 +682,7 @@
         "end_sec": 107.642
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_vehicle_and_generator_noise_1.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -613,6 +710,7 @@
         "end_sec": 302.702
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_vehicle_noise_1.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -640,6 +738,7 @@
         "end_sec": 50.756
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_vehicle_noise_2.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -667,6 +766,7 @@
         "end_sec": 308.157
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-27_airplane_01.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -694,6 +794,7 @@
         "end_sec": 136.238
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_01.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -721,249 +822,7 @@
         "end_sec": 66.028
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_02.wav",
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "29f76859-7fcf-5688-9026-70197d3e7b0c",
-      "filename": "2000-3_airplane_03.wav",
-      "duration_s": 197.032,
-      "filesize_mb": 18.039,
-      "uploaded_at": "2026-04-11T21:47:48.391288+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2000-3",
-        "call_id": "2000-3_airplane_03",
-        "start_sec": 0.0,
-        "end_sec": 197.032
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_03.wav",
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "8127e458-71d3-5a02-8b0d-8e4b252a5ffb",
-      "filename": "2000-3_vehicle_01.wav",
-      "duration_s": 145.321,
-      "filesize_mb": 13.305,
-      "uploaded_at": "2026-04-11T21:47:48.391354+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-3",
-        "call_id": "2000-3_vehicle_01",
-        "start_sec": 0.0,
-        "end_sec": 145.321
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_vehicle_01.wav",
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "d25d33ac-cde7-50bd-84f9-a76d68146315",
-      "filename": "2000-4 _airplane_01.wav",
-      "duration_s": 80.827,
-      "filesize_mb": 7.4,
-      "uploaded_at": "2026-04-11T21:47:48.391563+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2000-4",
-        "call_id": "2000-4 _airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 80.827
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-4 _airplane_01.wav",
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "e0a5df28-4bab-5e8e-b164-a0a0519fef3c",
-      "filename": "2000-4_airplane_02.wav",
-      "duration_s": 143.317,
-      "filesize_mb": 13.121,
-      "uploaded_at": "2026-04-11T21:47:48.391697+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2000-4",
-        "call_id": "2000-4_airplane_02",
-        "start_sec": 0.0,
-        "end_sec": 143.317
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-4_airplane_02.wav",
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "5d19c945-d834-51bc-a57b-77da16b34a81",
-      "filename": "2002-2_airplane_01.wav",
-      "duration_s": 207.858,
-      "filesize_mb": 19.03,
-      "uploaded_at": "2026-04-11T21:47:48.391820+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2002-2",
-        "call_id": "2002-2_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 207.858
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2002-2_airplane_01.wav",
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "a8c5e2bf-6db9-5fad-bfcf-a3433e328d2f",
-      "filename": "2003-7_airplane_01.wav",
-      "duration_s": 109.405,
-      "filesize_mb": 10.016,
-      "uploaded_at": "2026-04-11T21:47:48.392047+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2003-7",
-        "call_id": "2003-7_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 109.405
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2003-7_airplane_01.wav",
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "534662a5-b10c-514f-ba0b-a476626d5b5d",
-      "filename": "99-22A_airplane_01.wav",
-      "duration_s": 288.332,
-      "filesize_mb": 26.398,
-      "uploaded_at": "2026-04-11T21:47:48.392189+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "99-22A",
-        "call_id": "99-22A_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 288.332
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-22A_airplane_01.wav",
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "5850793e-c742-5049-8aa3-623544556134",
-      "filename": "99-24_airplane_01.wav",
-      "duration_s": 68.98,
-      "filesize_mb": 6.315,
-      "uploaded_at": "2026-04-11T21:47:48.392342+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "99-24",
-        "call_id": "99-24_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 68.98
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-24_airplane_01.wav",
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "3f37f0ed-6680-52a3-a996-1885a255945f",
-      "filename": "99-37_airplane_02.wav",
-      "duration_s": 41.129,
-      "filesize_mb": 3.766,
-      "uploaded_at": "2026-04-11T21:47:48.392541+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "99-37",
-        "call_id": "99-37_airplane_02",
-        "start_sec": 0.0,
-        "end_sec": 41.129
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_airplane_02.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
         "current_stage": null,
@@ -979,7 +838,7 @@
       "duration_s": 229.434,
       "filesize_mb": 21.005,
       "uploaded_at": "2026-04-11T21:47:48.392793+00:00",
-      "status": "pending",
+      "status": "processing",
       "metadata": {
         "location": "",
         "date": "",
@@ -991,10 +850,11 @@
         "end_sec": 229.434
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_airplane_and_vehicle_01.wav",
+      "file_hash": null,
       "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
+        "progress": 50.0,
+        "current_stage": "denoising:started",
+        "started_at": "2026-04-12T04:20:58.113888+00:00",
         "completed_at": null,
         "duration_s": null
       },
@@ -1006,7 +866,7 @@
       "duration_s": 38.664,
       "filesize_mb": 3.54,
       "uploaded_at": "2026-04-11T21:47:48.392991+00:00",
-      "status": "pending",
+      "status": "complete",
       "metadata": {
         "location": "",
         "date": "",
@@ -1018,14 +878,90 @@
         "end_sec": 38.664
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_vehicle_01.wav",
+      "file_hash": null,
       "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.313761+00:00",
+        "completed_at": "2026-04-12T03:31:34.313761+00:00",
+        "duration_s": 300
       },
-      "result": null
+      "result": {
+        "recording_id": "2e0478de-3bba-5336-a055-9d2075b68d33",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 5.44,
+          "snr_after_db": 8.44,
+          "snr_improvement_db": 3.0,
+          "pesq": null,
+          "peak_frequency_before_hz": 21.5,
+          "peak_frequency_after_hz": 64.6,
+          "spectral_distortion": 0.2277,
+          "energy_preservation": 0.5906,
+          "quality_score": 44.3,
+          "quality_rating": "poor",
+          "flagged_for_review": false
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/2e0478de-3bba-5336-a055-9d2075b68d33_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/2e0478de-3bba-5336-a055-9d2075b68d33-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/2e0478de-3bba-5336-a055-9d2075b68d33-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.44299999999999995,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 44.3,
+          "wiener_filter": 44.3,
+          "deepfilter": 44.3
+        },
+        "score_variance": 2.1
+      }
     },
     {
       "id": "1ae637f5-be9b-5e04-88f3-e86bb16cbc85",
@@ -1033,7 +969,7 @@
       "duration_s": 239.413,
       "filesize_mb": 21.919,
       "uploaded_at": "2026-04-11T21:47:48.393099+00:00",
-      "status": "pending",
+      "status": "processing",
       "metadata": {
         "location": "",
         "date": "",
@@ -1045,10 +981,11 @@
         "end_sec": 239.413
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_airplane_01.wav",
+      "file_hash": null,
       "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
+        "progress": 50.0,
+        "current_stage": "denoising:started",
+        "started_at": "2026-04-12T04:18:47.865549+00:00",
         "completed_at": null,
         "duration_s": null
       },
@@ -1060,7 +997,7 @@
       "duration_s": 262.077,
       "filesize_mb": 23.994,
       "uploaded_at": "2026-04-11T21:47:48.393199+00:00",
-      "status": "pending",
+      "status": "processing",
       "metadata": {
         "location": "",
         "date": "",
@@ -1072,10 +1009,11 @@
         "end_sec": 262.077
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_airplane_03.wav",
+      "file_hash": null,
       "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
+        "progress": 95.0,
+        "current_stage": "quality_assessment",
+        "started_at": "2026-04-12T04:17:41.878297+00:00",
         "completed_at": null,
         "duration_s": null
       },
@@ -1087,7 +1025,7 @@
       "duration_s": 378.943,
       "filesize_mb": 34.693,
       "uploaded_at": "2026-04-11T21:47:48.393319+00:00",
-      "status": "pending",
+      "status": "processing",
       "metadata": {
         "location": "",
         "date": "",
@@ -1099,10 +1037,11 @@
         "end_sec": 378.943
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_vehicle_01.wav",
+      "file_hash": null,
       "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
+        "progress": 50.0,
+        "current_stage": "denoising:started",
+        "started_at": "2026-04-12T04:16:44.941874+00:00",
         "completed_at": null,
         "duration_s": null
       },
@@ -1114,7 +1053,7 @@
       "duration_s": 148.963,
       "filesize_mb": 13.638,
       "uploaded_at": "2026-04-11T21:47:48.393481+00:00",
-      "status": "pending",
+      "status": "complete",
       "metadata": {
         "location": "",
         "date": "",
@@ -1126,14 +1065,90 @@
         "end_sec": 148.963
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_vehicle_02.wav",
+      "file_hash": null,
       "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.315969+00:00",
+        "completed_at": "2026-04-12T03:31:34.315969+00:00",
+        "duration_s": 300
       },
-      "result": null
+      "result": {
+        "recording_id": "bbb14c55-299c-5fec-9c86-2cf4003820be",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 17.48,
+          "snr_after_db": 22.68,
+          "snr_improvement_db": 5.2,
+          "pesq": null,
+          "peak_frequency_before_hz": 0.0,
+          "peak_frequency_after_hz": 0.0,
+          "spectral_distortion": 0.1165,
+          "energy_preservation": 0.9007,
+          "quality_score": 54.4,
+          "quality_rating": "poor",
+          "flagged_for_review": false
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/bbb14c55-299c-5fec-9c86-2cf4003820be_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/bbb14c55-299c-5fec-9c86-2cf4003820be-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/bbb14c55-299c-5fec-9c86-2cf4003820be-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.544,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 54.4,
+          "wiener_filter": 54.4,
+          "deepfilter": 54.4
+        },
+        "score_variance": 2.1
+      }
     },
     {
       "id": "c076e14e-e9a0-5082-9539-9cc06521785c",
@@ -1141,7 +1156,7 @@
       "duration_s": 215.452,
       "filesize_mb": 19.725,
       "uploaded_at": "2026-04-11T21:47:48.393652+00:00",
-      "status": "pending",
+      "status": "complete",
       "metadata": {
         "location": "",
         "date": "",
@@ -1153,14 +1168,90 @@
         "end_sec": 215.452
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/J86-1_airplane_01.wav",
+      "file_hash": null,
       "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.314090+00:00",
+        "completed_at": "2026-04-12T03:31:34.314090+00:00",
+        "duration_s": 300
       },
-      "result": null
+      "result": {
+        "recording_id": "c076e14e-e9a0-5082-9539-9cc06521785c",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 9.3,
+          "snr_after_db": 10.91,
+          "snr_improvement_db": 1.61,
+          "pesq": null,
+          "peak_frequency_before_hz": 86.1,
+          "peak_frequency_after_hz": 86.1,
+          "spectral_distortion": 0.1287,
+          "energy_preservation": 0.8983,
+          "quality_score": 42.1,
+          "quality_rating": "poor",
+          "flagged_for_review": true
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/c076e14e-e9a0-5082-9539-9cc06521785c_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/c076e14e-e9a0-5082-9539-9cc06521785c-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/c076e14e-e9a0-5082-9539-9cc06521785c-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.42100000000000004,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 42.1,
+          "wiener_filter": 42.1,
+          "deepfilter": 42.1
+        },
+        "score_variance": 2.1
+      }
     },
     {
       "id": "68527b6c-7e61-5234-be56-8bc0e88c1b99",
@@ -1168,7 +1259,7 @@
       "duration_s": 97.277,
       "filesize_mb": 8.906,
       "uploaded_at": "2026-04-11T21:47:48.393816+00:00",
-      "status": "pending",
+      "status": "complete",
       "metadata": {
         "location": "",
         "date": "",
@@ -1180,11 +1271,789 @@
         "end_sec": 97.277
       },
       "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/J87-27_airplane_01.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.316843+00:00",
+        "completed_at": "2026-04-12T03:31:34.316843+00:00",
+        "duration_s": 300
+      },
+      "result": {
+        "recording_id": "68527b6c-7e61-5234-be56-8bc0e88c1b99",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 5.58,
+          "snr_after_db": 9.45,
+          "snr_improvement_db": 3.87,
+          "pesq": null,
+          "peak_frequency_before_hz": 17032.8,
+          "peak_frequency_after_hz": 86.1,
+          "spectral_distortion": 0.1796,
+          "energy_preservation": 0.5203,
+          "quality_score": 48.4,
+          "quality_rating": "poor",
+          "flagged_for_review": false
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/68527b6c-7e61-5234-be56-8bc0e88c1b99_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/68527b6c-7e61-5234-be56-8bc0e88c1b99-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/68527b6c-7e61-5234-be56-8bc0e88c1b99-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.484,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 48.4,
+          "wiener_filter": 48.4,
+          "deepfilter": 48.4
+        },
+        "score_variance": 2.1
+      }
+    },
+    {
+      "id": "3f37f0ed-6680-52a3-a996-1885a255945f",
+      "filename": "99-37_airplane_02.wav",
+      "duration_s": 41.129,
+      "filesize_mb": 3.766,
+      "uploaded_at": "2026-04-11T21:47:48.392541+00:00",
+      "status": "complete",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "99-37",
+        "call_id": "99-37_airplane_02",
+        "start_sec": 0.0,
+        "end_sec": 41.129
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_airplane_02.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.313027+00:00",
+        "completed_at": "2026-04-12T03:31:34.313027+00:00",
+        "duration_s": 300
+      },
+      "result": {
+        "recording_id": "3f37f0ed-6680-52a3-a996-1885a255945f",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 16.75,
+          "snr_after_db": 28.26,
+          "snr_improvement_db": 11.51,
+          "pesq": null,
+          "peak_frequency_before_hz": 0.0,
+          "peak_frequency_after_hz": 0.0,
+          "spectral_distortion": 0.3032,
+          "energy_preservation": 0.3222,
+          "quality_score": 70.8,
+          "quality_rating": "good",
+          "flagged_for_review": false
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/3f37f0ed-6680-52a3-a996-1885a255945f_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/3f37f0ed-6680-52a3-a996-1885a255945f-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/3f37f0ed-6680-52a3-a996-1885a255945f-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.708,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 70.8,
+          "wiener_filter": 70.8,
+          "deepfilter": 70.8
+        },
+        "score_variance": 2.1
+      }
+    },
+    {
+      "id": "5850793e-c742-5049-8aa3-623544556134",
+      "filename": "99-24_airplane_01.wav",
+      "duration_s": 68.98,
+      "filesize_mb": 6.315,
+      "uploaded_at": "2026-04-11T21:47:48.392342+00:00",
+      "status": "complete",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "99-24",
+        "call_id": "99-24_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 68.98
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-24_airplane_01.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.316452+00:00",
+        "completed_at": "2026-04-12T03:31:34.316452+00:00",
+        "duration_s": 300
+      },
+      "result": {
+        "recording_id": "5850793e-c742-5049-8aa3-623544556134",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 8.34,
+          "snr_after_db": 12.31,
+          "snr_improvement_db": 3.97,
+          "pesq": null,
+          "peak_frequency_before_hz": 0.0,
+          "peak_frequency_after_hz": 107.7,
+          "spectral_distortion": 0.1765,
+          "energy_preservation": 0.77,
+          "quality_score": 48.8,
+          "quality_rating": "poor",
+          "flagged_for_review": false
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/5850793e-c742-5049-8aa3-623544556134_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/5850793e-c742-5049-8aa3-623544556134-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/5850793e-c742-5049-8aa3-623544556134-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.488,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 48.8,
+          "wiener_filter": 48.8,
+          "deepfilter": 48.8
+        },
+        "score_variance": 2.1
+      }
+    },
+    {
+      "id": "a8c5e2bf-6db9-5fad-bfcf-a3433e328d2f",
+      "filename": "2003-7_airplane_01.wav",
+      "duration_s": 109.405,
+      "filesize_mb": 10.016,
+      "uploaded_at": "2026-04-11T21:47:48.392047+00:00",
+      "status": "complete",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2003-7",
+        "call_id": "2003-7_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 109.405
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2003-7_airplane_01.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.317217+00:00",
+        "completed_at": "2026-04-12T03:31:34.317217+00:00",
+        "duration_s": 300
+      },
+      "result": {
+        "recording_id": "a8c5e2bf-6db9-5fad-bfcf-a3433e328d2f",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 13.04,
+          "snr_after_db": 20.78,
+          "snr_improvement_db": 7.74,
+          "pesq": null,
+          "peak_frequency_before_hz": 0.0,
+          "peak_frequency_after_hz": 0.0,
+          "spectral_distortion": 0.1959,
+          "energy_preservation": 0.8672,
+          "quality_score": 60.9,
+          "quality_rating": "fair",
+          "flagged_for_review": false
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/a8c5e2bf-6db9-5fad-bfcf-a3433e328d2f_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/a8c5e2bf-6db9-5fad-bfcf-a3433e328d2f-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/a8c5e2bf-6db9-5fad-bfcf-a3433e328d2f-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.609,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 60.9,
+          "wiener_filter": 60.9,
+          "deepfilter": 60.9
+        },
+        "score_variance": 2.1
+      }
+    },
+    {
+      "id": "e0a5df28-4bab-5e8e-b164-a0a0519fef3c",
+      "filename": "2000-4_airplane_02.wav",
+      "duration_s": 143.317,
+      "filesize_mb": 13.121,
+      "uploaded_at": "2026-04-11T21:47:48.391697+00:00",
+      "status": "complete",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2000-4",
+        "call_id": "2000-4_airplane_02",
+        "start_sec": 0.0,
+        "end_sec": 143.317
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-4_airplane_02.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.315484+00:00",
+        "completed_at": "2026-04-12T03:31:34.315484+00:00",
+        "duration_s": 300
+      },
+      "result": {
+        "recording_id": "e0a5df28-4bab-5e8e-b164-a0a0519fef3c",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 12.29,
+          "snr_after_db": 13.88,
+          "snr_improvement_db": 1.59,
+          "pesq": null,
+          "peak_frequency_before_hz": 86.1,
+          "peak_frequency_after_hz": 86.1,
+          "spectral_distortion": 0.2464,
+          "energy_preservation": 0.962,
+          "quality_score": 39.1,
+          "quality_rating": "poor",
+          "flagged_for_review": true
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/e0a5df28-4bab-5e8e-b164-a0a0519fef3c_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/e0a5df28-4bab-5e8e-b164-a0a0519fef3c-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/e0a5df28-4bab-5e8e-b164-a0a0519fef3c-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.391,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 39.1,
+          "wiener_filter": 39.1,
+          "deepfilter": 39.1
+        },
+        "score_variance": 2.1
+      }
+    },
+    {
+      "id": "5d19c945-d834-51bc-a57b-77da16b34a81",
+      "filename": "2002-2_airplane_01.wav",
+      "duration_s": 207.858,
+      "filesize_mb": 19.03,
+      "uploaded_at": "2026-04-11T21:47:48.391820+00:00",
+      "status": "complete",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2002-2",
+        "call_id": "2002-2_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 207.858
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2002-2_airplane_01.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.311844+00:00",
+        "completed_at": "2026-04-12T03:31:34.311844+00:00",
+        "duration_s": 300
+      },
+      "result": {
+        "recording_id": "5d19c945-d834-51bc-a57b-77da16b34a81",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 13.91,
+          "snr_after_db": 15.42,
+          "snr_improvement_db": 1.51,
+          "pesq": null,
+          "peak_frequency_before_hz": 0.0,
+          "peak_frequency_after_hz": 0.0,
+          "spectral_distortion": 0.1913,
+          "energy_preservation": 0.8898,
+          "quality_score": 40.3,
+          "quality_rating": "poor",
+          "flagged_for_review": true
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/5d19c945-d834-51bc-a57b-77da16b34a81_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/5d19c945-d834-51bc-a57b-77da16b34a81-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/5d19c945-d834-51bc-a57b-77da16b34a81-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.40299999999999997,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 40.3,
+          "wiener_filter": 40.3,
+          "deepfilter": 40.3
+        },
+        "score_variance": 2.1
+      }
+    },
+    {
+      "id": "d25d33ac-cde7-50bd-84f9-a76d68146315",
+      "filename": "2000-4 _airplane_01.wav",
+      "duration_s": 80.827,
+      "filesize_mb": 7.4,
+      "uploaded_at": "2026-04-11T21:47:48.391563+00:00",
+      "status": "complete",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2000-4",
+        "call_id": "2000-4 _airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 80.827
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-4 _airplane_01.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 1.0,
+        "current_stage": "quality_check",
+        "started_at": "2026-04-12T03:26:34.315115+00:00",
+        "completed_at": "2026-04-12T03:31:34.315115+00:00",
+        "duration_s": 300
+      },
+      "result": {
+        "recording_id": "d25d33ac-cde7-50bd-84f9-a76d68146315",
+        "status": "complete",
+        "stages_completed": [
+          "ingestion",
+          "spectrogram",
+          "noise_classification",
+          "noise_removal",
+          "feature_extraction",
+          "quality_assessment",
+          "complete"
+        ],
+        "noise_types": [
+          {
+            "type": "airplane",
+            "percentage": 35.2,
+            "frequency_range": [
+              20.0,
+              500.0
+            ]
+          },
+          {
+            "type": "car",
+            "percentage": 40.1,
+            "frequency_range": [
+              20.0,
+              250.0
+            ]
+          },
+          {
+            "type": "generator",
+            "percentage": 24.7,
+            "frequency_range": [
+              50.0,
+              250.0
+            ]
+          }
+        ],
+        "quality": {
+          "snr_before_db": 9.55,
+          "snr_after_db": 13.99,
+          "snr_improvement_db": 4.44,
+          "pesq": null,
+          "peak_frequency_before_hz": 21.5,
+          "peak_frequency_after_hz": 107.7,
+          "spectral_distortion": 0.2618,
+          "energy_preservation": 0.7979,
+          "quality_score": 48.3,
+          "quality_rating": "poor",
+          "flagged_for_review": false
+        },
+        "calls": [],
+        "markers": [],
+        "sequences": [],
+        "recurring_patterns": [],
+        "processing_time_s": 300,
+        "output_audio_path": "data/cache/d25d33ac-cde7-50bd-84f9-a76d68146315_processed_audio_22f92e29bd772ab4.wav",
+        "spectrogram_before_path": "data/cache/d25d33ac-cde7-50bd-84f9-a76d68146315-before_spectrogram_22f92e29bd772ab4.png",
+        "spectrogram_after_path": "data/cache/d25d33ac-cde7-50bd-84f9-a76d68146315-after_spectrogram_22f92e29bd772ab4.png",
+        "comparison_spectrogram_path": null,
+        "export_metadata": {},
+        "validation_warnings": [],
+        "noise_summary": "Detected 3 noise types",
+        "ai_enhanced": false,
+        "demo_preset": false,
+        "denoising_method_selected": "spectral_gating",
+        "ensemble_score": 0.483,
+        "ensemble_confidence": 0.92,
+        "candidates_evaluated": 3,
+        "per_method_scores": {
+          "spectral_gating": 48.3,
+          "wiener_filter": 48.3,
+          "deepfilter": 48.3
+        },
+        "score_variance": 2.1
+      }
+    },
+    {
+      "id": "534662a5-b10c-514f-ba0b-a476626d5b5d",
+      "filename": "99-22A_airplane_01.wav",
+      "duration_s": 288.332,
+      "filesize_mb": 26.398,
+      "uploaded_at": "2026-04-11T21:47:48.392189+00:00",
+      "status": "cancelled",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "99-22A",
+        "call_id": "99-22A_airplane_01",
+        "start_sec": 0.0,
+        "end_sec": 288.332
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-22A_airplane_01.wav",
+      "file_hash": null,
       "processing": {
         "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
+        "current_stage": "cancelled",
+        "started_at": "2026-04-12T04:27:16.977230+00:00",
+        "completed_at": "2026-04-12T04:31:33.023530+00:00",
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "8127e458-71d3-5a02-8b0d-8e4b252a5ffb",
+      "filename": "2000-3_vehicle_01.wav",
+      "duration_s": 145.321,
+      "filesize_mb": 13.305,
+      "uploaded_at": "2026-04-11T21:47:48.391354+00:00",
+      "status": "cancelled",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "vehicle",
+        "animal_id": "2000-3",
+        "call_id": "2000-3_vehicle_01",
+        "start_sec": 0.0,
+        "end_sec": 145.321
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_vehicle_01.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 0.0,
+        "current_stage": "cancelled",
+        "started_at": "2026-04-12T04:30:53.306691+00:00",
+        "completed_at": "2026-04-12T04:31:33.161579+00:00",
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "29f76859-7fcf-5688-9026-70197d3e7b0c",
+      "filename": "2000-3_airplane_03.wav",
+      "duration_s": 197.032,
+      "filesize_mb": 18.039,
+      "uploaded_at": "2026-04-11T21:47:48.391288+00:00",
+      "status": "cancelled",
+      "metadata": {
+        "location": "",
+        "date": "",
+        "species": "African bush elephant",
+        "noise_type_ref": "airplane",
+        "animal_id": "2000-3",
+        "call_id": "2000-3_airplane_03",
+        "start_sec": 0.0,
+        "end_sec": 197.032
+      },
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_03.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 0.0,
+        "current_stage": "cancelled",
+        "started_at": "2026-04-12T04:31:18.129528+00:00",
+        "completed_at": "2026-04-12T04:31:33.248913+00:00",
         "duration_s": null
       },
       "result": null
