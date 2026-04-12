@@ -48,7 +48,7 @@ describe("WaveformPlayer", () => {
   it("renders waveform bars", () => {
     const { container } = render(<WaveformPlayer src="/audio.wav" />);
     const bars = container.querySelectorAll(".rounded-sm");
-    expect(bars.length).toBe(60);
+    expect(bars.length).toBe(80);
   });
 });
 

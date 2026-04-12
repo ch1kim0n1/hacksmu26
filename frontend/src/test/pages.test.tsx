@@ -7,6 +7,9 @@ vi.mock("next/link", () => ({
     <a href={href} {...props}>{children}</a>
   ),
 }));
+vi.mock("next/image", () => ({
+  default: ({ fill, priority, ...props }: Record<string, unknown>) => <img {...props} />,
+}));
 vi.mock("next/navigation", () => ({
   useParams: () => ({ jobId: "test-job-123" }),
   useRouter: () => ({ push: vi.fn(), back: vi.fn() }),
@@ -58,6 +61,17 @@ vi.mock("@/components/research/AnalysisLabels", () => ({
   AnalysisWindow: () => null,
 }));
 
+// Mock components that need browser APIs or heavy deps
+vi.mock("@/components/ui/motion-primitives", () => ({
+  QualityRing: () => null,
+}));
+vi.mock("@/components/spectrogram/SpeakerDiarizationView", () => ({
+  default: () => null,
+}));
+vi.mock("@/components/spectrogram/SpectrogramViewer", () => ({
+  COLORMAPS: [{ id: "viridis", label: "Viridis", gradient: "" }],
+}));
+
 import ProcessingPage from "@/app/processing/[jobId]/page";
 import DatabasePage from "@/app/database/page";
 
@@ -70,26 +84,26 @@ describe("Processing Page", () => {
 
   it("shows loading state initially", () => {
     render(<ProcessingPage />);
-    expect(screen.getByText("Loading recording...")).toBeInTheDocument();
+    expect(screen.getByText(/Loading recording/)).toBeInTheDocument();
   });
 
   it("renders the pipeline stages after loading", async () => {
     render(<ProcessingPage />);
-    const stage = await screen.findByText("Ingestion");
+    const stage = await screen.findByText("Ingest");
     expect(stage).toBeInTheDocument();
-    expect(screen.getByText("Spectrogram")).toBeInTheDocument();
-    expect(screen.getByText("Noise Removal")).toBeInTheDocument();
+    expect(screen.getByText("Spectro")).toBeInTheDocument();
+    expect(screen.getByText("Denoise")).toBeInTheDocument();
   });
 
-  it("renders back link to recordings after loading", async () => {
+  it("renders breadcrumb link to recordings after loading", async () => {
     render(<ProcessingPage />);
-    const link = await screen.findByText("Back to Recordings");
-    expect(link.closest("a")?.getAttribute("href")).toBe("/recordings");
+    const link = await screen.findByRole("link", { name: "Recordings" });
+    expect(link.getAttribute("href")).toBe("/recordings");
   });
 
   it("renders recording info section after loading", async () => {
     render(<ProcessingPage />);
-    const title = await screen.findByText("elephant_call.wav");
+    const title = await screen.findByRole("heading", { name: "elephant_call.wav" });
     expect(title).toBeInTheDocument();
   });
 });

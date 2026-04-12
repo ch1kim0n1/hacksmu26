@@ -1,13 +1,52 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
+// Mock next modules
 vi.mock("next/link", () => ({
   default: ({ children, href, ...props }: { children: React.ReactNode; href: string; [key: string]: unknown }) => (
     <a href={href} {...props}>{children}</a>
   ),
 }));
+vi.mock("next/image", () => ({
+  default: ({ fill, priority, ...props }: Record<string, unknown>) => <img {...props} />,
+}));
 
-// Mock IntersectionObserver for AnimatedCounter
+// Mock GSAP and ScrollTrigger — stub every method the landing page calls
+vi.mock("gsap", () => {
+  const tl = {
+    from: vi.fn().mockReturnThis(),
+    to: vi.fn().mockReturnThis(),
+    fromTo: vi.fn().mockReturnThis(),
+  };
+  return {
+    default: {
+      registerPlugin: vi.fn(),
+      context: (_fn: () => void) => ({ revert: vi.fn() }),
+      from: vi.fn(),
+      to: vi.fn(),
+      set: vi.fn(),
+      fromTo: vi.fn(),
+      timeline: () => tl,
+      utils: { toArray: () => [] },
+    },
+  };
+});
+vi.mock("gsap/ScrollTrigger", () => ({
+  ScrollTrigger: { refresh: vi.fn() },
+}));
+
+// Mock heavy components
+vi.mock("@/components/hero/HeroGlobe", () => ({
+  default: () => <div data-testid="hero-globe" />,
+}));
+vi.mock("@/components/transition/SceneTransitionProvider", () => ({
+  useSceneTransition: () => ({ isTransitioning: false, startDashboardTransition: vi.fn() }),
+}));
+vi.mock("@/components/research/ImpactDashboard", () => ({
+  default: () => <div data-testid="impact-dashboard" />,
+}));
+
+// Mock IntersectionObserver for Counter
 class MockIntersectionObserver {
   constructor(callback: IntersectionObserverCallback) {
     setTimeout(() => {
@@ -26,67 +65,71 @@ vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
 import LandingPage from "@/app/page";
 
 describe("Landing Page", () => {
-  it("renders hero headline", () => {
+  it("renders EchoField brand", () => {
     render(<LandingPage />);
-    expect(screen.getByText("Elephant Vocalization")).toBeInTheDocument();
+    const matches = screen.getAllByText("EchoField");
+    expect(matches.length).toBeGreaterThan(0);
   });
 
-  it("renders hero subheadline", () => {
+  it("renders nav links", () => {
     render(<LandingPage />);
-    expect(screen.getByText(/Hear what researchers hear/)).toBeInTheDocument();
+    const uploadLinks = screen.getAllByRole("link", { name: "Upload" });
+    expect(uploadLinks[0]).toHaveAttribute("href", "/upload");
+    const recordingsLinks = screen.getAllByRole("link", { name: "Recordings" });
+    expect(recordingsLinks[0]).toHaveAttribute("href", "/recordings");
+    const databaseLinks = screen.getAllByRole("link", { name: "Database" });
+    expect(databaseLinks[0]).toHaveAttribute("href", "/database");
+    const getStartedLinks = screen.getAllByRole("link", { name: "Get Started" });
+    expect(getStartedLinks[0]).toHaveAttribute("href", "#get-started");
   });
 
-  it("renders Upload Recording CTA", () => {
+  it("renders globe trigger button", () => {
     render(<LandingPage />);
-    const cta = screen.getByText("Upload Recording");
-    expect(cta).toBeInTheDocument();
-    expect(cta.closest("a")?.getAttribute("href")).toBe("/upload");
+    expect(screen.getByLabelText("Enter EchoField dashboard")).toBeInTheDocument();
   });
 
-  it("renders How It Works CTA and section", () => {
+  it("renders crisis section heading", () => {
     render(<LandingPage />);
-    const elements = screen.getAllByText("How It Works");
-    expect(elements.length).toBe(2); // CTA button + section heading
+    expect(screen.getByText(/They.*re Disappearing/)).toBeInTheDocument();
   });
 
-  it("renders stat counters", () => {
+  it("renders crisis stat labels", () => {
     render(<LandingPage />);
-    expect(screen.getByText("Recordings")).toBeInTheDocument();
-    expect(screen.getByText("Calls Detected")).toBeInTheDocument();
-    expect(screen.getByText("Success Rate")).toBeInTheDocument();
+    expect(screen.getByText("Elephants Remaining")).toBeInTheDocument();
+    expect(screen.getByText("Population Lost")).toBeInTheDocument();
+    expect(screen.getByText("Killed Each Year")).toBeInTheDocument();
+    expect(screen.getByText("Years to Act")).toBeInTheDocument();
   });
 
-  it("renders Why This Matters section", () => {
+  it("renders threats section", () => {
     render(<LandingPage />);
-    expect(screen.getByText("Why This Matters")).toBeInTheDocument();
-    expect(screen.getByText("Infrasound Below Human Hearing")).toBeInTheDocument();
-    expect(screen.getByText("Field Recordings Are Noisy")).toBeInTheDocument();
-    expect(screen.getByText("Conservation Depends on Data")).toBeInTheDocument();
-    expect(screen.getByText("Reproducible Research")).toBeInTheDocument();
+    expect(screen.getByText("Why This Happens")).toBeInTheDocument();
+    expect(screen.getByText("Poaching for Ivory")).toBeInTheDocument();
+    expect(screen.getByText("Human-Wildlife Conflict")).toBeInTheDocument();
+    expect(screen.getByText("Habitat Destruction")).toBeInTheDocument();
   });
 
   it("renders How It Works section with three steps", () => {
     render(<LandingPage />);
+    expect(screen.getByText("How It Works")).toBeInTheDocument();
     expect(screen.getAllByText("Upload").length).toBeGreaterThan(0);
-    expect(screen.getByText("AI Denoise")).toBeInTheDocument();
+    expect(screen.getByText("Process")).toBeInTheDocument();
     expect(screen.getByText("Analyze")).toBeInTheDocument();
   });
 
-  it("renders footer CTA to get started", () => {
+  it("renders CTA with link to upload", () => {
     render(<LandingPage />);
-    expect(screen.getByText("Get Started")).toBeInTheDocument();
-    const link = screen.getByText("Get Started").closest("a");
-    expect(link?.getAttribute("href")).toBe("/upload");
+    const links = screen.getAllByRole("link", { name: /Get Started/ });
+    const ctaLink = links.find((link) => link.getAttribute("href") === "/upload");
+    expect(ctaLink).toBeDefined();
   });
 
-  it("renders hero navbar links", () => {
+  it("renders impact dashboard", () => {
     render(<LandingPage />);
-    expect(screen.getAllByRole("link", { name: "Upload" })[0]).toHaveAttribute("href", "/upload");
-    expect(screen.getByRole("link", { name: "Database" })).toHaveAttribute("href", "/database");
-    expect(screen.getByRole("link", { name: "Get Started" })).toHaveAttribute("href", "#get-started");
+    expect(screen.getByTestId("impact-dashboard")).toBeInTheDocument();
   });
 
-  it("renders HackSMU badge", () => {
+  it("renders HackSMU 2026 mention", () => {
     render(<LandingPage />);
     expect(screen.getByText(/HackSMU 2026/)).toBeInTheDocument();
   });

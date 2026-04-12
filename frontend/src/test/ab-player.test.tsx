@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+
+// Mock next/image to render a plain <img> (avoids /_next/image URL rewriting)
+vi.mock("next/image", () => ({
+  default: ({ fill, priority, ...props }: Record<string, unknown>) => <img {...props} />,
+}));
+
 import ABPlayer from "@/components/audio/ABPlayer";
 
 // Mock HTMLMediaElement methods
