@@ -236,17 +236,7 @@ export default function UploadPage() {
   const processingCount = recordings.filter((r) => r.status === "processing").length;
 
   return (
-    <div className="relative min-h-screen">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-20"
-      >
-        <source src="/videos/Savanna.mp4" type="video/mp4" />
-      </video>
-      <div className="relative z-10 mx-auto max-w-6xl space-y-8 p-6 lg:p-8">
+    <div className="mx-auto max-w-6xl space-y-8 p-6 lg:p-8">
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -468,7 +458,6 @@ export default function UploadPage() {
           </Link>
         </div>
       </section>
-      </div>
     </div>
   );
 }

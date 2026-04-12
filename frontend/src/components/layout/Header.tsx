@@ -2,16 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Upload, BarChart3, Database, Menu, Music2, X, Waves } from "lucide-react";
-
-const MOBILE_NAV = [
-  { href: "/upload", label: "Upload", icon: Upload },
-  { href: "/recordings", label: "Recordings", icon: Music2 },
-  { href: "/results", label: "Results", icon: BarChart3 },
-  { href: "/database", label: "Database", icon: Database },
-];
+import { PanelLeft, Waves, Bell, Search, HelpCircle } from "lucide-react";
+import { useMobileSidebar } from "@/hooks/useSidebar";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Breadcrumb from "./Breadcrumb";
 
 const PAGE_TITLES: Record<string, string> = {
   "/upload": "Upload Recordings",
@@ -20,90 +23,120 @@ const PAGE_TITLES: Record<string, string> = {
   "/database": "Call Database",
   "/processing": "Processing",
   "/export": "Export",
+  "/realtime": "Real-Time Filter",
+  "/compare": "Compare",
+  "/review": "Review",
+  "/batch": "Batch Processing",
 };
 
 export default function Header() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { setMobileOpen } = useMobileSidebar();
 
   const title =
     Object.entries(PAGE_TITLES).find(
-      ([path]) => pathname === path || pathname.startsWith(path + "/"),
+      ([path]) => pathname === path || pathname.startsWith(path + "/")
     )?.[1] || "Dashboard";
 
   return (
-    <header className="sticky top-0 z-40 bg-ev-ivory/80 backdrop-blur-xl border-b border-ev-sand/40">
-      <div className="flex h-12 items-center justify-between px-4 sm:px-5 lg:px-8">
-        {/* Mobile logo + page title */}
-        <div className="flex items-center gap-3">
-          <Link href="/" className="sm:hidden">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-savanna to-accent-deep-gold flex items-center justify-center">
-              <Waves className="w-4 h-4 text-white" />
-            </div>
-          </Link>
+    <header className="sticky top-0 z-40 w-full bg-[#1E1B19] border-b border-[#3A3530]">
+      <div className="flex h-14 items-center gap-4 px-6">
+        {/* Mobile sidebar trigger */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden h-9 w-9 text-ev-dust hover:text-ev-cream hover:bg-white/[0.06]"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open navigation"
+        >
+          <PanelLeft className="h-4 w-4" />
+        </Button>
 
-          <motion.h1
-            key={title}
-            initial={{ opacity: 0, x: -6 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2 }}
-            className="text-sm font-semibold text-ev-charcoal"
-          >
+        {/* Mobile logo */}
+        <Link href="/" className="md:hidden shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-savanna to-accent-deep-gold flex items-center justify-center">
+            <Waves className="w-3.5 h-3.5 text-white" />
+          </div>
+        </Link>
+
+        {/* Page title + breadcrumb */}
+        <div className="flex-1 flex flex-col justify-center min-w-0">
+          <h1 className="text-sm font-semibold text-ev-cream truncate">
             {title}
-          </motion.h1>
+          </h1>
+          <div className="hidden sm:block">
+            <Breadcrumb />
+          </div>
         </div>
 
-        {/* Mobile hamburger */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="sm:hidden flex items-center justify-center w-8 h-8 rounded-lg text-ev-elephant hover:text-ev-charcoal hover:bg-ev-cream transition-all"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? (
-            <X className="w-5 h-5" />
-          ) : (
-            <Menu className="w-5 h-5" />
-          )}
-        </motion.button>
-      </div>
-
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.nav
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="sm:hidden border-t border-ev-sand/30 bg-ev-ivory/95 backdrop-blur-xl overflow-hidden"
+        {/* Right-side actions */}
+        <div className="flex items-center gap-1">
+          {/* Search */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden sm:flex h-9 w-9 text-ev-dust hover:text-ev-cream hover:bg-white/[0.06]"
+            aria-label="Search"
           >
-            <div className="px-4 py-2 space-y-0.5">
-              {MOBILE_NAV.map((link) => {
-                const isActive =
-                  pathname === link.href ||
-                  pathname.startsWith(link.href + "/");
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2.5 py-2.5 px-3 text-sm font-medium rounded-lg transition-all ${
-                      isActive
-                        ? "text-accent-savanna bg-accent-savanna/8"
-                        : "text-ev-elephant hover:bg-ev-cream"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+            <Search className="h-4 w-4" />
+          </Button>
+
+          {/* Help */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden sm:flex h-9 w-9 text-ev-dust hover:text-ev-cream hover:bg-white/[0.06]"
+            aria-label="Help"
+          >
+            <HelpCircle className="h-4 w-4" />
+          </Button>
+
+          {/* Notifications */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative h-9 w-9 text-ev-dust hover:text-ev-cream hover:bg-white/[0.06]"
+            aria-label="Notifications"
+          >
+            <Bell className="h-4 w-4" />
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-accent-savanna" />
+          </Button>
+
+          {/* User dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="relative h-9 gap-2 rounded-lg px-2 text-ev-dust hover:text-ev-cream hover:bg-white/[0.06]"
+              >
+                <Avatar className="h-7 w-7">
+                  <AvatarImage src="https://api.dicebear.com/9.x/avataaars/svg?seed=EchoField&backgroundColor=c4a46c" alt="Dr. Amara Osei" />
+                  <AvatarFallback>AO</AvatarFallback>
+                </Avatar>
+                <span className="hidden lg:inline text-sm font-medium">Dr. Osei</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Dr. Amara Osei</span>
+                  <span className="text-xs text-ev-dust/60">a.osei@elephantvoices.org</span>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/export" className="w-full">Export Data</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-ev-dust/60">
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
     </header>
   );
 }

@@ -130,7 +130,7 @@ export default function DatabasePage() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
       {/* Page Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}

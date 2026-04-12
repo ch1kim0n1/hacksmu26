@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${cormorant.variable} ${jakarta.variable}`}>
-      <body className="bg-ev-ivory text-ev-charcoal font-sans antialiased">
+      <body className="bg-ev-charcoal text-ev-cream font-sans antialiased">
         <div className="flex min-h-screen flex-col">
           <SceneTransitionProvider>
             <AppShell>{children}</AppShell>

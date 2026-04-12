@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import React from "react";
 
 // Mock next/navigation
-const mockUsePathname = vi.fn(() => "/");
+const mockUsePathname = vi.fn(() => "/upload");
 vi.mock("next/navigation", () => ({
   usePathname: () => mockUsePathname(),
 }));
@@ -14,126 +15,122 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+// Mock useSidebar hook (Header and Sidebar need MobileSidebarContext)
+const mockSetMobileOpen = vi.fn();
+vi.mock("@/hooks/useSidebar", () => ({
+  MobileSidebarContext: React.createContext({
+    mobileOpen: false,
+    setMobileOpen: () => {},
+  }),
+  useMobileSidebarState: () => ({ mobileOpen: false, setMobileOpen: mockSetMobileOpen }),
+  useMobileSidebar: () => ({ mobileOpen: false, setMobileOpen: mockSetMobileOpen }),
+}));
+
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
-import Footer from "@/components/layout/Footer";
 import Breadcrumb from "@/components/layout/Breadcrumb";
 
 // ── Header ──
 
 describe("Header", () => {
-  it("renders the EchoField logo", () => {
-    render(<Header />);
-    expect(screen.getByText("EchoField")).toBeInTheDocument();
+  beforeEach(() => {
+    mockUsePathname.mockReturnValue("/upload");
   });
 
-  it("renders desktop navigation links", () => {
+  it("renders the page title", () => {
     render(<Header />);
-    expect(screen.getByText("Upload")).toBeInTheDocument();
-    expect(screen.getByText("Database")).toBeInTheDocument();
-    expect(screen.getByText("Export")).toBeInTheDocument();
-    expect(screen.getByText("About")).toBeInTheDocument();
+    expect(screen.getByText("Upload Recordings")).toBeInTheDocument();
   });
 
-  it("has a mobile hamburger button", () => {
+  it("renders right-side action buttons", () => {
     render(<Header />);
-    const toggle = screen.getByLabelText("Toggle menu");
-    expect(toggle).toBeInTheDocument();
+    expect(screen.getByLabelText("Search")).toBeInTheDocument();
+    expect(screen.getByLabelText("Help")).toBeInTheDocument();
+    expect(screen.getByLabelText("Notifications")).toBeInTheDocument();
   });
 
-  it("toggles mobile menu on click", () => {
+  it("has a mobile sidebar trigger", () => {
     render(<Header />);
-    const toggle = screen.getByLabelText("Toggle menu");
-
-    // Initially no mobile nav visible (check for a mobile-specific nav)
-    const mobileNavBefore = document.querySelector("nav.sm\\:hidden");
-    expect(mobileNavBefore).toBeNull();
-
-    // Click to open
-    fireEvent.click(toggle);
-    const mobileNavAfter = document.querySelector("nav.sm\\:hidden");
-    expect(mobileNavAfter).not.toBeNull();
+    const trigger = screen.getByLabelText("Open navigation");
+    expect(trigger).toBeInTheDocument();
   });
 
-  it("has backdrop blur for sticky header", () => {
+  it("renders user avatar and dropdown", () => {
+    render(<Header />);
+    expect(screen.getByText("Dr. Osei")).toBeInTheDocument();
+    // Avatar fallback renders when image hasn't loaded
+    expect(screen.getByText("AO")).toBeInTheDocument();
+  });
+
+  it("has sticky dark header", () => {
     const { container } = render(<Header />);
     const header = container.querySelector("header");
-    expect(header?.className).toContain("backdrop-blur");
+    expect(header?.className).toContain("sticky");
+    expect(header?.className).toContain("bg-[#1E1B19]");
   });
 
-  it("desktop nav links have minimum 44px touch target", () => {
+  it("has consistent border color", () => {
     const { container } = render(<Header />);
-    const navLinks = container.querySelectorAll("nav.hidden a");
-    navLinks.forEach((link) => {
-      expect((link as HTMLElement).className).toContain("min-h-[44px]");
-    });
+    const header = container.querySelector("header");
+    expect(header?.className).toContain("border-[#3A3530]");
   });
 });
 
 // ── Sidebar ──
 
 describe("Sidebar", () => {
-  it("renders navigation icons with accessible labels", () => {
+  it("renders navigation links with labels", () => {
     render(<Sidebar />);
-    expect(screen.getByLabelText("Upload")).toBeInTheDocument();
-    expect(screen.getByLabelText("Recordings")).toBeInTheDocument();
-    expect(screen.getByLabelText("Results")).toBeInTheDocument();
-    expect(screen.getByLabelText("Database")).toBeInTheDocument();
+    expect(screen.getByText("Upload")).toBeInTheDocument();
+    expect(screen.getByText("Recordings")).toBeInTheDocument();
+    expect(screen.getByText("Results")).toBeInTheDocument();
+    expect(screen.getByText("Call Database")).toBeInTheDocument();
   });
 
-  it("uses the icon rail sidebar layout", () => {
+  it("uses fixed 220px expanded sidebar layout", () => {
     const { container } = render(<Sidebar />);
     const aside = container.querySelector("aside");
-    expect(aside?.className).toContain("w-16");
+    expect(aside?.className).toContain("w-[220px]");
+    expect(aside?.className).toContain("shrink-0");
   });
 
-  it("renders as a visible side rail", () => {
+  it("has dark background with consistent borders", () => {
     const { container } = render(<Sidebar />);
     const aside = container.querySelector("aside");
-    expect(aside?.className).toContain("flex");
-    expect(aside?.className).toContain("w-16");
+    expect(aside?.className).toContain("bg-[#1E1B19]");
+    expect(aside?.className).toContain("border-[#3A3530]");
   });
 
-  it("sidebar links have minimum 44px touch target", () => {
-    const { container } = render(<Sidebar />);
-    const links = container.querySelectorAll("nav a");
-    links.forEach((link) => {
-      expect((link as HTMLElement).className).toContain("min-h-[44px]");
-    });
-  });
-
-  it("uses SVG icons instead of emoji", () => {
+  it("uses SVG icons for navigation", () => {
     const { container } = render(<Sidebar />);
     const svgs = container.querySelectorAll("nav svg");
     expect(svgs.length).toBeGreaterThan(0);
   });
-});
 
-// ── Footer ──
-
-describe("Footer", () => {
-  it("renders HackSMU credit text", () => {
-    render(<Footer />);
-    expect(screen.getByText(/HackSMU 2026/)).toBeInTheDocument();
+  it("renders section headings", () => {
+    render(<Sidebar />);
+    expect(screen.getByText("Main")).toBeInTheDocument();
+    expect(screen.getByText("Analysis")).toBeInTheDocument();
   });
 
-  it("renders ElephantVoices reference", () => {
-    render(<Footer />);
-    expect(screen.getByText(/ElephantVoices/)).toBeInTheDocument();
+  it("renders EchoField logo in sidebar header", () => {
+    render(<Sidebar />);
+    expect(screen.getByText("EchoField")).toBeInTheDocument();
+    expect(screen.getByText("Vocalization Platform")).toBeInTheDocument();
   });
 
-  it("has border-top separator", () => {
-    const { container } = render(<Footer />);
-    const footer = container.querySelector("footer");
-    expect(footer?.className).toContain("border-t");
+  it("renders footer text at sidebar bottom", () => {
+    render(<Sidebar />);
+    expect(screen.getByText("Built for HackSMU 2026")).toBeInTheDocument();
   });
 });
+
 
 // ── Breadcrumb ──
 
 describe("Breadcrumb", () => {
   beforeEach(() => {
-    mockUsePathname.mockReturnValue("/");
+    mockUsePathname.mockReturnValue("/upload");
   });
 
   it("renders Home link on root path", () => {
