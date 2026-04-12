@@ -18,14 +18,14 @@ logger = get_logger(__name__)
 
 
 _NOISE_ADAPTIVE_PROFILES: dict[str, dict[str, Any]] = {
-    "airplane": {"aggressiveness_mult": 1.3, "low_hz": 15.0, "high_hz": 800.0, "multi_pass": True, "notch_freqs": None},
-    "car": {"aggressiveness_mult": 1.1, "low_hz": 12.0, "high_hz": 1000.0, "multi_pass": False, "notch_freqs": None},
-    "generator": {"aggressiveness_mult": 1.0, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": [50.0, 100.0, 150.0, 200.0]},
-    "wind": {"aggressiveness_mult": 0.8, "low_hz": 8.0, "high_hz": 600.0, "multi_pass": False, "notch_freqs": None},
+    "airplane": {"aggressiveness_mult": 1.1, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": None},
+    "car": {"aggressiveness_mult": 1.0, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": None},
+    "generator": {"aggressiveness_mult": 0.9, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": [50.0, 100.0, 150.0, 200.0]},
+    "wind": {"aggressiveness_mult": 0.7, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": None},
 }
 
 
-def get_noise_adaptive_params(noise_type: str, base_aggressiveness: float = 1.5) -> dict[str, Any]:
+def get_noise_adaptive_params(noise_type: str, base_aggressiveness: float = 1.0) -> dict[str, Any]:
     """Return denoising parameters adapted to the detected noise type."""
     profile = _NOISE_ADAPTIVE_PROFILES.get(noise_type)
     if profile is None:
@@ -68,10 +68,33 @@ def apply_notch_filter(
 
 
 def estimate_noise_profile(y: np.ndarray, sr: int, noise_duration_s: float = 0.5) -> np.ndarray:
+    """Select a representative noise-only segment for spectral gating.
+
+    Strategy: slide a window across the signal, compute per-window RMS, then
+    pick the window at the **25th percentile** of energy.  This avoids both
+    silent gaps (which give a too-low noise estimate) and elephant calls
+    (which contaminate the profile with signal energy).  The 25th percentile
+    reliably lands in a noise-only portion of field recordings.
+    """
     if y.size == 0:
         return y.astype(np.float32)
     n_samples = max(1, min(int(noise_duration_s * sr), len(y)))
-    return y[:n_samples].astype(np.float32)
+    if len(y) <= n_samples:
+        return y[:n_samples].astype(np.float32)
+    hop = max(n_samples // 4, 1)
+    starts: list[int] = []
+    energies: list[float] = []
+    for start in range(0, len(y) - n_samples + 1, hop):
+        chunk = y[start : start + n_samples]
+        energies.append(float(np.mean(chunk ** 2)))
+        starts.append(start)
+    if not energies:
+        return y[:n_samples].astype(np.float32)
+    # 25th percentile — below the median, above the quietest outliers.
+    target = float(np.percentile(energies, 25))
+    idx = int(np.argmin(np.abs(np.array(energies) - target)))
+    best_start = starts[idx]
+    return y[best_start : best_start + n_samples].astype(np.float32)
 
 
 def compute_bin_snr(y: np.ndarray, sr: int, noise_clip: np.ndarray) -> np.ndarray:
@@ -274,7 +297,7 @@ def spectral_gate_denoise(
     y: np.ndarray,
     sr: int,
     *,
-    aggressiveness: float = 1.5,
+    aggressiveness: float = 1.0,
     noise_type: str | None = None,
     preserve_harmonics: bool = False,
     post_process: bool = False,
@@ -307,13 +330,13 @@ def spectral_gate_denoise(
         y,
         sr,
         noise_clip=noise_clip,
-        prop_decrease=min(max(effective_aggressiveness / 2.0, 0.1), 1.0),
+        prop_decrease=min(max(effective_aggressiveness * 0.8, 0.1), 1.0),
     )
     if params["multi_pass"]:
         cleaned = apply_spectral_gate(
             cleaned,
             sr,
-            prop_decrease=min((effective_aggressiveness - 1.0) / 3.0, 1.0),
+            prop_decrease=min(max(effective_aggressiveness * 0.4, 0.1), 1.0),
         )
     cleaned = apply_bandpass_filter(cleaned, sr, low_hz=params["low_hz"], high_hz=params["high_hz"])
     if spectrogram_type.lower() == "cqt":

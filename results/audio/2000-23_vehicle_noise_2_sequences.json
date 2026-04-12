@@ -1,0 +1,65 @@
+{
+  "sequences": [
+    {
+      "id": "2000-23_vehicle_noise_2-seq-0",
+      "recording_id": "2000-23_vehicle_noise_2",
+      "calls": [
+        "2000-23_vehicle_noise_2-call-0",
+        "2000-23_vehicle_noise_2-call-1",
+        "2000-23_vehicle_noise_2-call-2"
+      ],
+      "pattern": "unknown -> unknown -> rumble",
+      "motif": [
+        "unknown",
+        "unknown",
+        "rumble"
+      ],
+      "total_duration_ms": 10750.0,
+      "inter_call_gaps_ms": [
+        4850.0,
+        550.0
+      ]
+    },
+    {
+      "id": "2000-23_vehicle_noise_2-seq-1",
+      "recording_id": "2000-23_vehicle_noise_2",
+      "calls": [
+        "2000-23_vehicle_noise_2-call-3",
+        "2000-23_vehicle_noise_2-call-4",
+        "2000-23_vehicle_noise_2-call-5"
+      ],
+      "pattern": "rumble -> rumble -> rumble",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "total_duration_ms": 3350.0,
+      "inter_call_gaps_ms": [
+        450.0,
+        1950.0
+      ]
+    }
+  ],
+  "recurring_patterns": [
+    {
+      "pattern_id": "pat-4cec18ae34",
+      "motif": [
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "2000-23_vehicle_noise_2"
+      ],
+      "avg_gap_ms": 1200.0,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble",
+          2
+        ]
+      ]
+    }
+  ]
+}

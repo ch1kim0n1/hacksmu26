@@ -1,0 +1,1653 @@
+{
+  "sequences": [
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-0",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-0"
+      ],
+      "pattern": "rumble",
+      "motif": [
+        "rumble"
+      ],
+      "total_duration_ms": 450.0,
+      "inter_call_gaps_ms": []
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-1",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-1",
+        "99-37_airplane_and_vehicle_01-call-2",
+        "99-37_airplane_and_vehicle_01-call-3",
+        "99-37_airplane_and_vehicle_01-call-4",
+        "99-37_airplane_and_vehicle_01-call-5",
+        "99-37_airplane_and_vehicle_01-call-6",
+        "99-37_airplane_and_vehicle_01-call-7",
+        "99-37_airplane_and_vehicle_01-call-8",
+        "99-37_airplane_and_vehicle_01-call-9",
+        "99-37_airplane_and_vehicle_01-call-10",
+        "99-37_airplane_and_vehicle_01-call-11",
+        "99-37_airplane_and_vehicle_01-call-12",
+        "99-37_airplane_and_vehicle_01-call-13",
+        "99-37_airplane_and_vehicle_01-call-14",
+        "99-37_airplane_and_vehicle_01-call-15"
+      ],
+      "pattern": "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+      "motif": [
+        "bark",
+        "unknown",
+        "unknown",
+        "bark",
+        "unknown",
+        "unknown",
+        "rumble",
+        "bark",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "bark",
+        "bark"
+      ],
+      "total_duration_ms": 46450.0,
+      "inter_call_gaps_ms": [
+        150.0,
+        450.0,
+        0.0,
+        0.0,
+        0.0,
+        50.0,
+        50.0,
+        150.0,
+        0.0,
+        650.0,
+        150.0,
+        50.0,
+        450.0,
+        4150.0
+      ]
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-2",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-16",
+        "99-37_airplane_and_vehicle_01-call-17",
+        "99-37_airplane_and_vehicle_01-call-18",
+        "99-37_airplane_and_vehicle_01-call-19",
+        "99-37_airplane_and_vehicle_01-call-20",
+        "99-37_airplane_and_vehicle_01-call-21",
+        "99-37_airplane_and_vehicle_01-call-22",
+        "99-37_airplane_and_vehicle_01-call-23",
+        "99-37_airplane_and_vehicle_01-call-24",
+        "99-37_airplane_and_vehicle_01-call-25",
+        "99-37_airplane_and_vehicle_01-call-26"
+      ],
+      "pattern": "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+      "motif": [
+        "unknown",
+        "unknown",
+        "rumble",
+        "bark",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "bark",
+        "bark"
+      ],
+      "total_duration_ms": 23650.0,
+      "inter_call_gaps_ms": [
+        0.0,
+        50.0,
+        50.0,
+        150.0,
+        0.0,
+        650.0,
+        150.0,
+        50.0,
+        450.0,
+        4150.0
+      ]
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-3",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-27"
+      ],
+      "pattern": "rumble",
+      "motif": [
+        "rumble"
+      ],
+      "total_duration_ms": 1950.0,
+      "inter_call_gaps_ms": []
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-4",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-28"
+      ],
+      "pattern": "rumble",
+      "motif": [
+        "rumble"
+      ],
+      "total_duration_ms": 1950.0,
+      "inter_call_gaps_ms": []
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-5",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-29",
+        "99-37_airplane_and_vehicle_01-call-30"
+      ],
+      "pattern": "unknown -> rumble",
+      "motif": [
+        "unknown",
+        "rumble"
+      ],
+      "total_duration_ms": 2950.0,
+      "inter_call_gaps_ms": [
+        1250.0
+      ]
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-6",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-31"
+      ],
+      "pattern": "bark",
+      "motif": [
+        "bark"
+      ],
+      "total_duration_ms": 250.0,
+      "inter_call_gaps_ms": []
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-7",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-32",
+        "99-37_airplane_and_vehicle_01-call-33"
+      ],
+      "pattern": "unknown -> rumble",
+      "motif": [
+        "unknown",
+        "rumble"
+      ],
+      "total_duration_ms": 2950.0,
+      "inter_call_gaps_ms": [
+        1350.0
+      ]
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-8",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-34",
+        "99-37_airplane_and_vehicle_01-call-35",
+        "99-37_airplane_and_vehicle_01-call-36",
+        "99-37_airplane_and_vehicle_01-call-37",
+        "99-37_airplane_and_vehicle_01-call-38",
+        "99-37_airplane_and_vehicle_01-call-39",
+        "99-37_airplane_and_vehicle_01-call-40",
+        "99-37_airplane_and_vehicle_01-call-41",
+        "99-37_airplane_and_vehicle_01-call-42",
+        "99-37_airplane_and_vehicle_01-call-43",
+        "99-37_airplane_and_vehicle_01-call-44",
+        "99-37_airplane_and_vehicle_01-call-45",
+        "99-37_airplane_and_vehicle_01-call-46",
+        "99-37_airplane_and_vehicle_01-call-47",
+        "99-37_airplane_and_vehicle_01-call-48",
+        "99-37_airplane_and_vehicle_01-call-49",
+        "99-37_airplane_and_vehicle_01-call-50",
+        "99-37_airplane_and_vehicle_01-call-51",
+        "99-37_airplane_and_vehicle_01-call-52",
+        "99-37_airplane_and_vehicle_01-call-53",
+        "99-37_airplane_and_vehicle_01-call-54",
+        "99-37_airplane_and_vehicle_01-call-55",
+        "99-37_airplane_and_vehicle_01-call-56",
+        "99-37_airplane_and_vehicle_01-call-57",
+        "99-37_airplane_and_vehicle_01-call-58",
+        "99-37_airplane_and_vehicle_01-call-59",
+        "99-37_airplane_and_vehicle_01-call-60",
+        "99-37_airplane_and_vehicle_01-call-61",
+        "99-37_airplane_and_vehicle_01-call-62",
+        "99-37_airplane_and_vehicle_01-call-63",
+        "99-37_airplane_and_vehicle_01-call-64",
+        "99-37_airplane_and_vehicle_01-call-65",
+        "99-37_airplane_and_vehicle_01-call-66",
+        "99-37_airplane_and_vehicle_01-call-67",
+        "99-37_airplane_and_vehicle_01-call-68",
+        "99-37_airplane_and_vehicle_01-call-69",
+        "99-37_airplane_and_vehicle_01-call-70",
+        "99-37_airplane_and_vehicle_01-call-71",
+        "99-37_airplane_and_vehicle_01-call-72",
+        "99-37_airplane_and_vehicle_01-call-73",
+        "99-37_airplane_and_vehicle_01-call-74",
+        "99-37_airplane_and_vehicle_01-call-75",
+        "99-37_airplane_and_vehicle_01-call-76",
+        "99-37_airplane_and_vehicle_01-call-77",
+        "99-37_airplane_and_vehicle_01-call-78",
+        "99-37_airplane_and_vehicle_01-call-79",
+        "99-37_airplane_and_vehicle_01-call-80",
+        "99-37_airplane_and_vehicle_01-call-81"
+      ],
+      "pattern": "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "bark",
+        "unknown",
+        "rumble",
+        "bark",
+        "bark",
+        "rumble",
+        "bark",
+        "bark",
+        "bark",
+        "bark",
+        "rumble",
+        "bark",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "bark",
+        "rumble",
+        "bark",
+        "unknown",
+        "rumble",
+        "bark",
+        "bark",
+        "rumble",
+        "bark",
+        "bark",
+        "bark",
+        "bark",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "unknown",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "unknown",
+        "unknown",
+        "bark",
+        "bark"
+      ],
+      "total_duration_ms": 78650.0,
+      "inter_call_gaps_ms": [
+        50.0,
+        850.0,
+        4050.0,
+        1750.0,
+        50.0,
+        550.0,
+        750.0,
+        3550.0,
+        150.0,
+        150.0,
+        1050.0,
+        0.0,
+        0.0,
+        0.0,
+        150.0,
+        250.0,
+        1250.0,
+        3350.0,
+        50.0,
+        850.0,
+        4050.0,
+        1250.0,
+        250.0,
+        0.0,
+        450.0,
+        750.0,
+        3550.0,
+        150.0,
+        150.0,
+        1050.0,
+        0.0,
+        0.0,
+        0.0,
+        150.0,
+        1750.0,
+        0.0,
+        650.0,
+        750.0,
+        1650.0,
+        1450.0,
+        850.0,
+        3250.0,
+        350.0,
+        450.0,
+        0.0,
+        950.0,
+        350.0
+      ]
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-9",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-82",
+        "99-37_airplane_and_vehicle_01-call-83",
+        "99-37_airplane_and_vehicle_01-call-84",
+        "99-37_airplane_and_vehicle_01-call-85",
+        "99-37_airplane_and_vehicle_01-call-86",
+        "99-37_airplane_and_vehicle_01-call-87",
+        "99-37_airplane_and_vehicle_01-call-88",
+        "99-37_airplane_and_vehicle_01-call-89",
+        "99-37_airplane_and_vehicle_01-call-90",
+        "99-37_airplane_and_vehicle_01-call-91",
+        "99-37_airplane_and_vehicle_01-call-92",
+        "99-37_airplane_and_vehicle_01-call-93",
+        "99-37_airplane_and_vehicle_01-call-94"
+      ],
+      "pattern": "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+      "motif": [
+        "unknown",
+        "rumble",
+        "rumble",
+        "rumble",
+        "unknown",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "unknown",
+        "unknown",
+        "bark",
+        "rumble"
+      ],
+      "total_duration_ms": 23050.0,
+      "inter_call_gaps_ms": [
+        750.0,
+        250.0,
+        250.0,
+        1650.0,
+        1450.0,
+        850.0,
+        3250.0,
+        350.0,
+        450.0,
+        0.0,
+        950.0,
+        550.0
+      ]
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-10",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-95",
+        "99-37_airplane_and_vehicle_01-call-96"
+      ],
+      "pattern": "unknown -> unknown",
+      "motif": [
+        "unknown",
+        "unknown"
+      ],
+      "total_duration_ms": 1350.0,
+      "inter_call_gaps_ms": [
+        350.0
+      ]
+    },
+    {
+      "id": "99-37_airplane_and_vehicle_01-seq-11",
+      "recording_id": "99-37_airplane_and_vehicle_01",
+      "calls": [
+        "99-37_airplane_and_vehicle_01-call-97",
+        "99-37_airplane_and_vehicle_01-call-98",
+        "99-37_airplane_and_vehicle_01-call-99",
+        "99-37_airplane_and_vehicle_01-call-100",
+        "99-37_airplane_and_vehicle_01-call-101"
+      ],
+      "pattern": "unknown -> rumble -> unknown -> unknown -> bark",
+      "motif": [
+        "unknown",
+        "rumble",
+        "unknown",
+        "unknown",
+        "bark"
+      ],
+      "total_duration_ms": 10850.0,
+      "inter_call_gaps_ms": [
+        4850.0,
+        2850.0,
+        450.0,
+        750.0
+      ]
+    }
+  ],
+  "recurring_patterns": [
+    {
+      "pattern_id": "pat-4cec18ae34",
+      "motif": [
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble",
+      "occurrences": 28,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 869.05,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          15
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          5
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          4
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-854dccdb4b",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble -> rumble",
+      "occurrences": 20,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 867.76,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          11
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          3
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          3
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-bd8ea08534",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble -> rumble -> rumble",
+      "occurrences": 12,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 864.91,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          7
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          2
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-2ddcbd636b",
+      "motif": [
+        "rumble",
+        "bark"
+      ],
+      "pattern": "rumble -> bark",
+      "occurrences": 12,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 869.81,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          8
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          2
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-a9c6310173",
+      "motif": [
+        "bark",
+        "bark"
+      ],
+      "pattern": "bark -> bark",
+      "occurrences": 11,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 894.63,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          9
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-80ec7e901e",
+      "motif": [
+        "unknown",
+        "rumble"
+      ],
+      "pattern": "unknown -> rumble",
+      "occurrences": 10,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 893.85,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          3
+        ],
+        [
+          "unknown -> rumble",
+          2
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-fbb6969772",
+      "motif": [
+        "bark",
+        "rumble"
+      ],
+      "pattern": "bark -> rumble",
+      "occurrences": 9,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 884.75,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          6
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-86b61bacc8",
+      "motif": [
+        "unknown",
+        "unknown"
+      ],
+      "pattern": "unknown -> unknown",
+      "occurrences": 7,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 798.04,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          2
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-6a25648f8a",
+      "motif": [
+        "rumble",
+        "bark",
+        "bark"
+      ],
+      "pattern": "rumble -> bark -> bark",
+      "occurrences": 6,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 869.81,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          4
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-fbebe15fab",
+      "motif": [
+        "rumble",
+        "unknown"
+      ],
+      "pattern": "rumble -> unknown",
+      "occurrences": 5,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 955.74,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          2
+        ],
+        [
+          "unknown -> rumble -> unknown -> unknown -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-e6d6194bf2",
+      "motif": [
+        "bark",
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "bark -> rumble -> rumble -> rumble",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 832.2,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-ae72bb811d",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble",
+        "bark"
+      ],
+      "pattern": "rumble -> rumble -> rumble -> bark",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 832.2,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-ca7558075e",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble",
+        "unknown"
+      ],
+      "pattern": "rumble -> rumble -> rumble -> unknown",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 912.71,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-a2763de4e7",
+      "motif": [
+        "unknown",
+        "unknown",
+        "bark"
+      ],
+      "pattern": "unknown -> unknown -> bark",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 896.75,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-68784c4c05",
+      "motif": [
+        "unknown",
+        "rumble",
+        "bark"
+      ],
+      "pattern": "unknown -> rumble -> bark",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 832.2,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-ea48eb68be",
+      "motif": [
+        "rumble",
+        "bark",
+        "rumble"
+      ],
+      "pattern": "rumble -> bark -> rumble",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 832.2,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-23591a9b96",
+      "motif": [
+        "bark",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "bark -> rumble -> rumble",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 832.2,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-6a0ce05099",
+      "motif": [
+        "rumble",
+        "rumble",
+        "bark"
+      ],
+      "pattern": "rumble -> rumble -> bark",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 832.2,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ],
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-b623cce20a",
+      "motif": [
+        "bark",
+        "bark",
+        "rumble"
+      ],
+      "pattern": "bark -> bark -> rumble",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          4
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-dde758fa51",
+      "motif": [
+        "bark",
+        "rumble",
+        "bark"
+      ],
+      "pattern": "bark -> rumble -> bark",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          4
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-08b1aaf42d",
+      "motif": [
+        "bark",
+        "bark",
+        "bark"
+      ],
+      "pattern": "bark -> bark -> bark",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          4
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-b6a6d544c4",
+      "motif": [
+        "rumble",
+        "rumble",
+        "unknown"
+      ],
+      "pattern": "rumble -> rumble -> unknown",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 912.71,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-94399cffa6",
+      "motif": [
+        "bark",
+        "unknown"
+      ],
+      "pattern": "bark -> unknown",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 809.84,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          2
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-ead199ae58",
+      "motif": [
+        "unknown",
+        "bark"
+      ],
+      "pattern": "unknown -> bark",
+      "occurrences": 4,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 896.75,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-83c6010964",
+      "motif": [
+        "rumble",
+        "bark",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> bark -> rumble -> rumble",
+      "occurrences": 3,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 776.06,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-d25a406885",
+      "motif": [
+        "bark",
+        "bark",
+        "rumble",
+        "bark"
+      ],
+      "pattern": "bark -> bark -> rumble -> bark",
+      "occurrences": 3,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          3
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-cf51f08930",
+      "motif": [
+        "unknown",
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "unknown -> rumble -> rumble -> rumble",
+      "occurrences": 3,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 909.86,
+      "contexts": [
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          2
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-239356cd71",
+      "motif": [
+        "rumble",
+        "unknown",
+        "unknown",
+        "bark"
+      ],
+      "pattern": "rumble -> unknown -> unknown -> bark",
+      "occurrences": 3,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 996.03,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          1
+        ],
+        [
+          "unknown -> rumble -> unknown -> unknown -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-8b47ba0504",
+      "motif": [
+        "unknown",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "unknown -> rumble -> rumble",
+      "occurrences": 3,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 909.86,
+      "contexts": [
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          2
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-a1ce71cedc",
+      "motif": [
+        "rumble",
+        "unknown",
+        "unknown"
+      ],
+      "pattern": "rumble -> unknown -> unknown",
+      "occurrences": 3,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 996.03,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          1
+        ],
+        [
+          "unknown -> rumble -> unknown -> unknown -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-79b0c42bca",
+      "motif": [
+        "unknown",
+        "unknown",
+        "rumble",
+        "bark"
+      ],
+      "pattern": "unknown -> unknown -> rumble -> bark",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 500.0,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-cbd1c750b8",
+      "motif": [
+        "unknown",
+        "rumble",
+        "bark",
+        "rumble"
+      ],
+      "pattern": "unknown -> rumble -> bark -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 500.0,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-e5bed5f26d",
+      "motif": [
+        "rumble",
+        "rumble",
+        "bark",
+        "bark"
+      ],
+      "pattern": "rumble -> rumble -> bark -> bark",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 500.0,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-55f4ad1b24",
+      "motif": [
+        "rumble",
+        "bark",
+        "unknown",
+        "rumble"
+      ],
+      "pattern": "rumble -> bark -> unknown -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-7c21bc9387",
+      "motif": [
+        "bark",
+        "unknown",
+        "rumble",
+        "bark"
+      ],
+      "pattern": "bark -> unknown -> rumble -> bark",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-1b2bf49123",
+      "motif": [
+        "unknown",
+        "rumble",
+        "bark",
+        "bark"
+      ],
+      "pattern": "unknown -> rumble -> bark -> bark",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-7534c3e8cf",
+      "motif": [
+        "rumble",
+        "bark",
+        "bark",
+        "rumble"
+      ],
+      "pattern": "rumble -> bark -> bark -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-0cd9d3ad30",
+      "motif": [
+        "bark",
+        "rumble",
+        "bark",
+        "bark"
+      ],
+      "pattern": "bark -> rumble -> bark -> bark",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-aea6eb4a28",
+      "motif": [
+        "rumble",
+        "bark",
+        "bark",
+        "bark"
+      ],
+      "pattern": "rumble -> bark -> bark -> bark",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-794404103c",
+      "motif": [
+        "bark",
+        "bark",
+        "bark",
+        "bark"
+      ],
+      "pattern": "bark -> bark -> bark -> bark",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-c744ffe287",
+      "motif": [
+        "bark",
+        "bark",
+        "bark",
+        "rumble"
+      ],
+      "pattern": "bark -> bark -> bark -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-2a9e8fbd6b",
+      "motif": [
+        "rumble",
+        "rumble",
+        "unknown",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble -> unknown -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 912.71,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-b8b1bc0716",
+      "motif": [
+        "rumble",
+        "unknown",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> unknown -> rumble -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 912.71,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-c02cb6c0ef",
+      "motif": [
+        "rumble",
+        "rumble",
+        "unknown",
+        "unknown"
+      ],
+      "pattern": "rumble -> rumble -> unknown -> unknown",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 912.71,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-9189dd89cf",
+      "motif": [
+        "bark",
+        "unknown",
+        "unknown"
+      ],
+      "pattern": "bark -> unknown -> unknown",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 450.0,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-46bb76e308",
+      "motif": [
+        "unknown",
+        "unknown",
+        "rumble"
+      ],
+      "pattern": "unknown -> unknown -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 500.0,
+      "contexts": [
+        [
+          "bark -> unknown -> unknown -> bark -> unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> unknown -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> bark",
+          1
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-24595f4c42",
+      "motif": [
+        "rumble",
+        "bark",
+        "unknown"
+      ],
+      "pattern": "rumble -> bark -> unknown",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-bc3858b50d",
+      "motif": [
+        "bark",
+        "unknown",
+        "rumble"
+      ],
+      "pattern": "bark -> unknown -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 917.02,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-e6b960d514",
+      "motif": [
+        "rumble",
+        "unknown",
+        "rumble"
+      ],
+      "pattern": "rumble -> unknown -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "99-37_airplane_and_vehicle_01"
+      ],
+      "avg_gap_ms": 912.71,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> bark -> unknown -> rumble -> bark -> bark -> rumble -> bark -> bark -> bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> bark",
+          1
+        ],
+        [
+          "unknown -> rumble -> rumble -> rumble -> unknown -> rumble -> rumble -> rumble -> rumble -> unknown -> unknown -> bark -> rumble",
+          1
+        ]
+      ]
+    }
+  ]
+}

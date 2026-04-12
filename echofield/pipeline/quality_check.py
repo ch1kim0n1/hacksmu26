@@ -83,8 +83,13 @@ def _compute_pesq(y_original: np.ndarray, y_cleaned: np.ndarray, sr: int) -> flo
     try:
         import librosa
         target_sr = 16000
-        ref = librosa.resample(y_original.astype(np.float64), orig_sr=sr, target_sr=target_sr)
-        deg = librosa.resample(y_cleaned.astype(np.float64), orig_sr=sr, target_sr=target_sr)
+        # Cap at 10s: PESQ is a speech metric designed for short segments;
+        # running it on 100+ second recordings hangs indefinitely.
+        max_samples_orig = int(sr * 10)
+        ref_src = y_original[:max_samples_orig].astype(np.float64)
+        deg_src = y_cleaned[:max_samples_orig].astype(np.float64)
+        ref = librosa.resample(ref_src, orig_sr=sr, target_sr=target_sr)
+        deg = librosa.resample(deg_src, orig_sr=sr, target_sr=target_sr)
         min_len = min(len(ref), len(deg))
         if min_len < target_sr * 0.1:
             return None
@@ -118,10 +123,18 @@ def assess_quality(y_original: np.ndarray, y_cleaned: np.ndarray, sr: int) -> di
     peak_after = round(_dominant_frequency(y_cleaned, sr), 1)
     pesq_score = _compute_pesq(y_original, y_cleaned, sr)
 
-    snr_component = np.clip(max(snr_improvement, 0.0) / 20.0, 0.0, 1.0) * 40.0
-    preservation_component = energy_preservation * 35.0
+    # Scoring: 50 pts SNR improvement, 25 pts low distortion, 15 pts energy
+    # preservation, 10 pts PESQ bonus.  Energy preservation is weighted
+    # lightly because noisy field recordings legitimately lose 90%+ of
+    # in-band energy when the noise is removed.
+    snr_component = np.clip(max(snr_improvement, 0.0) / 15.0, 0.0, 1.0) * 50.0
     distortion_component = max(1.0 - spectral_distortion, 0.0) * 25.0
-    quality_score = round(float(np.clip(snr_component + preservation_component + distortion_component, 0.0, 100.0)), 1)
+    preservation_component = min(energy_preservation / 0.3, 1.0) * 15.0  # full marks at >= 30 %
+    pesq_component = (min(max((pesq_score or 0.0) - 1.0, 0.0) / 3.5, 1.0)) * 10.0
+    quality_score = round(float(np.clip(
+        snr_component + distortion_component + preservation_component + pesq_component,
+        0.0, 100.0,
+    )), 1)
 
     if quality_score >= 85:
         rating = "excellent"

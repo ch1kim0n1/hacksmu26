@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import json
 import os
 import time
 from enum import Enum
@@ -28,6 +29,8 @@ from echofield.pipeline.spectrogram import (
     compute_stft,
     generate_comparison_png,
 )
+from echofield.research.call_fingerprint import FINGERPRINT_DIM, ensure_call_fingerprint
+from echofield.research.sequence_analyzer import extract_sequences, find_recurring_patterns
 from echofield.utils.audio_utils import save_audio
 from echofield.utils.logging_config import get_logger
 
@@ -105,6 +108,29 @@ class ProcessingPipeline:
         )
         return detector.detect(recording_id, y, sr, metadata)
 
+    def _annotate_calls(self, calls: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+        threshold = float(os.getenv("ECHOFIELD_REVIEW_THRESHOLD", "0.5"))
+        colors = {
+            "rumble": "#8B5CF6",
+            "trumpet": "#F59E0B",
+            "roar": "#EF4444",
+            "bark": "#10B981",
+            "cry": "#3B82F6",
+            "unknown": "#6B7280",
+            "novel": "#6B7280",
+        }
+        annotated = []
+        for call in calls:
+            item = ensure_call_fingerprint(dict(call))
+            item.setdefault("original_call_type", item.get("call_type"))
+            item.setdefault("review_status", "pending" if float(item.get("confidence") or 0.0) < threshold else "confirmed")
+            item.setdefault("color", colors.get(str(item.get("call_type") or "unknown").lower(), "#6B7280"))
+            item["end_ms"] = round(float(item.get("start_ms") or 0.0) + float(item.get("duration_ms") or 0.0), 2)
+            annotated.append(item)
+        sequences = extract_sequences(annotated)
+        patterns = find_recurring_patterns(sequences)
+        return annotated, sequences, patterns
+
     async def process_recording(
         self,
         recording_id: str,
@@ -113,11 +139,17 @@ class ProcessingPipeline:
         spectrogram_dir: str,
         *,
         method: str | None = None,
-        aggressiveness: float = 1.5,
+        aggressiveness: float = 1.0,
         progress_callback: ProgressCallback | None = None,
     ) -> dict[str, Any]:
         method = (method or getattr(self.settings, "DENOISE_METHOD", "hybrid")).lower()
+        demo_preset = method == "demo"
+        if demo_preset:
+            method = "spectral"
+            aggressiveness = min(aggressiveness, 1.0)
         params = self._cache_params(method, aggressiveness)
+        if demo_preset:
+            params["preset"] = "demo"
         start_time = time.perf_counter()
 
         cached_audio = self.cache.get_processed_audio(recording_id, params=params)
@@ -161,6 +193,7 @@ class ProcessingPipeline:
         sr = ingestion.sample_rate
 
         await self._notify(progress_callback, PipelineStage.SPECTROGRAM.value, "active", 20)
+        await self._notify(progress_callback, "spectrogram:rendering", "active", 22)
         stage_start = time.perf_counter()
         before_spec, before_viz = await asyncio.to_thread(
             build_spectrogram_artifacts,
@@ -176,7 +209,7 @@ class ProcessingPipeline:
         self._record_stage_duration(recording_id, PipelineStage.SPECTROGRAM, stage_start)
         await self._notify(
             progress_callback,
-            PipelineStage.SPECTROGRAM.value,
+            "spectrogram:before_complete",
             "active",
             30,
             {"spectrogram_url": before_viz.url, "variant": "before"},
@@ -200,6 +233,7 @@ class ProcessingPipeline:
         )
 
         await self._notify(progress_callback, PipelineStage.DENOISING.value, "active", 50)
+        await self._notify(progress_callback, "denoising:started", "active", 50)
         model_path = getattr(self.settings, "MODEL_PATH", None)
         ensemble_meta: dict[str, Any] = {}
         post_process = bool(getattr(self.settings, "DENOISE_POST_PROCESS", False))
@@ -270,6 +304,7 @@ class ProcessingPipeline:
                 spectrogram_type=spectrogram_type,
             )
             cleaned_audio = spectral["cleaned_audio"]
+        await self._notify(progress_callback, "denoising:complete", "complete", 62)
         self._record_stage_duration(recording_id, PipelineStage.DENOISING, stage_start)
 
         await self._notify(progress_callback, PipelineStage.SPECTROGRAM.value, "active", 65)
@@ -288,13 +323,14 @@ class ProcessingPipeline:
         self._record_stage_duration(recording_id, PipelineStage.SPECTROGRAM, stage_start)
         await self._notify(
             progress_callback,
-            PipelineStage.SPECTROGRAM.value,
+            "spectrogram:after_complete",
             "complete",
             70,
             {"spectrogram_url": after_viz.url, "variant": "after"},
         )
 
         await self._notify(progress_callback, PipelineStage.FEATURE_EXTRACTION.value, "active", 80)
+        await self._notify(progress_callback, "calls:detecting", "active", 80)
         stage_start = time.perf_counter()
         calls = await asyncio.to_thread(
             self._detect_calls,
@@ -303,8 +339,10 @@ class ProcessingPipeline:
             sr,
             ingestion.metadata,
         )
+        calls, sequences, recurring_patterns = self._annotate_calls(calls)
         self._record_stage_duration(recording_id, PipelineStage.FEATURE_EXTRACTION, stage_start)
         metrics.inc("echofield_calls_detected_total", len(calls))
+        await self._notify(progress_callback, "calls:detected", "complete", 88, {"call_count": len(calls)})
 
         await self._notify(progress_callback, PipelineStage.QUALITY_CHECK.value, "active", 90)
         stage_start = time.perf_counter()
@@ -317,6 +355,13 @@ class ProcessingPipeline:
             95,
             {"quality": quality},
         )
+
+        # Peak-normalise to match original loudness (denoised audio is often
+        # much quieter, which is correct metrically but unusable for playback).
+        peak_cleaned = float(np.max(np.abs(cleaned_audio))) if cleaned_audio.size else 0.0
+        if peak_cleaned > 1e-8:
+            target_peak = float(np.max(np.abs(y))) if y.size else 1.0
+            cleaned_audio = cleaned_audio * (target_peak / peak_cleaned) * 0.9
 
         output_root = Path(output_dir)
         output_root.mkdir(parents=True, exist_ok=True)
@@ -342,6 +387,37 @@ class ProcessingPipeline:
             getattr(self.settings, "SPECTROGRAM_HOP_LENGTH", 512),
             comparison_path,
             freq_max=getattr(self.settings, "SPECTROGRAM_FREQ_MAX", 1000),
+        )
+        markers_path = output_root / f"{recording_id}_markers.json"
+        sequences_path = output_root / f"{recording_id}_sequences.json"
+        fingerprints_path = output_root / f"{recording_id}_fingerprints.npy"
+        fingerprint_ids_path = output_root / f"{recording_id}_fingerprint_ids.json"
+        fingerprint_matrix = np.asarray(
+            [call.get("fingerprint") or [0.0] * FINGERPRINT_DIM for call in calls],
+            dtype=np.float32,
+        ).reshape((len(calls), FINGERPRINT_DIM))
+        await asyncio.to_thread(
+            markers_path.write_text,
+            json.dumps(calls, indent=2, default=str),
+            "utf-8",
+        )
+        await asyncio.to_thread(
+            sequences_path.write_text,
+            json.dumps(
+                {
+                    "sequences": sequences,
+                    "recurring_patterns": recurring_patterns,
+                },
+                indent=2,
+                default=str,
+            ),
+            "utf-8",
+        )
+        await asyncio.to_thread(np.save, fingerprints_path, fingerprint_matrix)
+        await asyncio.to_thread(
+            fingerprint_ids_path.write_text,
+            json.dumps([call.get("id") for call in calls], indent=2, default=str),
+            "utf-8",
         )
 
         self.cache.store_file(
@@ -387,14 +463,24 @@ class ProcessingPipeline:
             ],
             "quality": quality,
             "calls": calls,
+            "markers": calls,
+            "sequences": sequences,
+            "recurring_patterns": recurring_patterns,
             "processing_time_s": elapsed,
             "output_audio_path": str(cleaned_audio_path),
             "spectrogram_before_path": before_viz.url,
             "spectrogram_after_path": after_viz.url,
             "comparison_spectrogram_path": str(comparison_path),
+            "export_metadata": {
+                "markers_path": str(markers_path),
+                "sequences_path": str(sequences_path),
+                "fingerprints_path": str(fingerprints_path),
+                "fingerprint_ids_path": str(fingerprint_ids_path),
+            },
             "validation_warnings": ingestion.validation_warnings,
             "noise_summary": noise_info,
             "ai_enhanced": method in {"deep", "hybrid"},
+            "demo_preset": demo_preset,
             **ensemble_meta,
         }
         await self._notify(
@@ -413,7 +499,7 @@ class ProcessingPipeline:
         spectrogram_dir: str,
         *,
         method: str | None = None,
-        aggressiveness: float = 1.5,
+        aggressiveness: float = 1.0,
         progress_callback: ProgressCallback | None = None,
     ) -> list[dict[str, Any]]:
         results = []
