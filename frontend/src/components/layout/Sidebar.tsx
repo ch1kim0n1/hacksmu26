@@ -19,6 +19,9 @@ import {
   Brain,
   Box,
   Webhook,
+  Download,
+  GitCompareArrows,
+  CheckSquare,
 } from "lucide-react";
 import { useMobileSidebar } from "@/hooks/useSidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -59,6 +62,14 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
       { href: "/analytics", label: "Analytics", icon: PieChart },
       { href: "/patterns", label: "Patterns", icon: GitBranch },
       { href: "/sites", label: "Sites", icon: MapPin },
+    ],
+  },
+  {
+    title: "Research",
+    items: [
+      { href: "/export", label: "Export", icon: Download },
+      { href: "/compare", label: "Compare", icon: GitCompareArrows },
+      { href: "/review", label: "Review Queue", icon: CheckSquare },
     ],
   },
   {
