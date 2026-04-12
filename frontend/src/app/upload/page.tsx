@@ -85,7 +85,6 @@ export default function UploadPage() {
   const [uploadPhase, setUploadPhase] = useState<
     "idle" | "uploading" | "processing"
   >("idle");
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
 
@@ -114,12 +113,14 @@ export default function UploadPage() {
       "audio/x-wav",
       "audio/mpeg",
       "audio/mp3",
+      "audio/flac",
+      "audio/x-flac",
     ];
-    const validExtensions = [".wav", ".mp3"];
+    const validExtensions = [".wav", ".mp3", ".flac"];
     const maxSize = 500 * 1024 * 1024;
     const ext = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
     if (!validTypes.includes(file.type) && !validExtensions.includes(ext)) {
-      return `Invalid file type: ${file.name}. Only .wav and .mp3 files are accepted.`;
+      return `Invalid file type: ${file.name}. Only .wav, .mp3, and .flac files are accepted.`;
     }
     if (file.size > maxSize) {
       return `File too large: ${file.name} (${formatFileSize(file.size)}). Maximum size is 500 MB.`;
@@ -171,20 +172,11 @@ export default function UploadPage() {
 
     setUploading(true);
     setUploadPhase("uploading");
-    setUploadProgress(0);
-
-    const progressInterval = setInterval(() => {
-      setUploadProgress((prev) =>
-        prev >= 88 ? prev : prev + Math.random() * 15,
-      );
-    }, 300);
 
     try {
       const result = await uploadFiles(files);
       setUploadPhase("processing");
-      setUploadProgress(92);
       await startPipelineForUploads(result);
-      setUploadProgress(100);
       const count = result.recording_ids.length;
       setUploadSuccess(
         `Uploaded ${count} file${count === 1 ? "" : "s"} and started full EchoField analysis.`,
@@ -198,10 +190,8 @@ export default function UploadPage() {
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed");
     } finally {
-      clearInterval(progressInterval);
       setUploading(false);
       setUploadPhase("idle");
-      setTimeout(() => setUploadProgress(0), 2000);
     }
   };
 
@@ -315,7 +305,7 @@ export default function UploadPage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".wav,.mp3,audio/wav,audio/mpeg"
+            accept=".wav,.mp3,.flac,audio/wav,audio/mpeg,audio/flac"
             multiple
             className="hidden"
             onChange={handleFileSelect}
@@ -359,7 +349,7 @@ export default function UploadPage() {
 
             <div>
               <p className="text-base font-semibold text-ev-charcoal">
-                {isDragging ? "Drop files here" : "Drop .wav or .mp3 files here"}
+                {isDragging ? "Drop files here" : "Drop .wav, .mp3, or .flac files here"}
               </p>
               <p className="mt-1 text-sm text-ev-warm-gray">
                 or click to browse · Max 500 MB per file
@@ -394,17 +384,18 @@ export default function UploadPage() {
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       {uploadPhase === "processing" ? "Starting full pipeline..." : "Uploading..."}
                     </span>
-                    <span className="font-medium text-accent-savanna tabular-nums">
-                      {Math.round(uploadProgress)}%
-                    </span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-ev-cream">
-                    <motion.div
-                      className="h-full rounded-full bg-gradient-to-r from-accent-savanna to-accent-gold"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${uploadProgress}%` }}
-                      transition={{ duration: 0.3 }}
-                    />
+                    {uploadPhase === "uploading" ? (
+                      <div className="h-full w-full animate-pulse rounded-full bg-gradient-to-r from-accent-savanna to-accent-gold" />
+                    ) : (
+                      <motion.div
+                        className="h-full rounded-full bg-gradient-to-r from-accent-savanna to-accent-gold"
+                        initial={{ width: "90%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    )}
                   </div>
                 </div>
               </motion.div>
