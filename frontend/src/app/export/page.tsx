@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { getRecordings, exportResearch, type Recording } from "@/lib/audio-api";
 
@@ -23,14 +24,16 @@ export default function ExportPage() {
   const [includeFingerprints, setIncludeFingerprints] = useState(true);
   const [includeAudioClips, setIncludeAudioClips] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchRecordings = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await getRecordings({ status: "complete", limit: 100 });
       setRecordings(data.recordings);
-    } catch {
-      // show empty
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load recordings");
     } finally {
       setLoading(false);
     }
@@ -82,8 +85,8 @@ export default function ExportPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch {
-      // silently fail
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Export failed");
     } finally {
       setExporting(false);
     }
@@ -116,6 +119,13 @@ export default function ExportPage() {
             Select recordings and export format for research analysis.
           </p>
         </motion.div>
+
+        {error && (
+          <div className="flex items-center gap-3 rounded-xl border border-danger/15 bg-danger/5 p-4 text-sm text-danger">
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+            {error}
+          </div>
+        )}
 
         {/* Format selector */}
         <motion.div

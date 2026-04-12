@@ -25,11 +25,11 @@ export default function ComparePage() {
     getCalls({ limit: 100 }).then((data) => {
       setCalls(data.calls);
       setCallId(data.calls[0]?.id || "");
-    }).catch(() => undefined);
+    }).catch((err) => setError(err instanceof Error ? err.message : "Failed to load calls"));
     getReferenceCalls().then((data) => {
       setReferences(data);
       setReferenceId(String(data[0]?.id || ""));
-    }).catch(() => undefined);
+    }).catch((err) => setError(err instanceof Error ? err.message : "Failed to load reference calls"));
   }, []);
 
   const runComparison = async () => {

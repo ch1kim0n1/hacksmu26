@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music, TrendingUp, ArrowRight, Clock, Keyboard } from "lucide-react";
+import { Music, TrendingUp, ArrowRight, Clock, Keyboard, AlertCircle } from "lucide-react";
 import { getRecordings, API_BASE, type Recording, type Call } from "@/lib/audio-api";
 import { staggerContainer, fadeUp } from "@/components/ui/motion-primitives";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -20,6 +20,7 @@ export default function ResultsPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showShortcutHelp, setShowShortcutHelp] = useState(false);
   const [abSelectedId, setAbSelectedId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Flatten all calls across all recordings for keyboard navigation
@@ -32,10 +33,11 @@ export default function ResultsPage() {
   const fetchResults = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await getRecordings({ status: "complete", limit: 50 });
       setRecordings(data.recordings);
-    } catch {
-      // silently fail — show empty state
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load results");
     } finally {
       setLoading(false);
     }
@@ -227,6 +229,13 @@ export default function ResultsPage() {
             );
           })()}
         </AnimatePresence>
+
+        {error && (
+          <div className="flex items-center gap-3 rounded-xl border border-danger/15 bg-danger/5 p-4 text-sm text-danger">
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+            {error}
+          </div>
+        )}
 
         {/* Current call navigation indicator */}
         {allCalls.length > 0 && (
