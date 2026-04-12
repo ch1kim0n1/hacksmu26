@@ -120,10 +120,6 @@ export default function LandingPage() {
         backgroundColor: "rgba(44,41,38,0.92)",
         backdropFilter: "blur(16px)",
       });
-      gsap.set("[data-nav-edge-path]", {
-        attr: { fill: "rgba(44,41,38,0.92)" },
-      });
-  
       /* scroll indicator bounce */
       gsap.to("[data-scroll-ind]", {
         y: 10,
@@ -367,7 +363,7 @@ export default function LandingPage() {
          ═══════════════════════════════════════════ */}
       <nav
         data-nav
-        className="fixed top-0 left-0 right-0 z-50 transition-colors"
+        className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 transition-colors"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link
@@ -379,22 +375,6 @@ export default function LandingPage() {
           </Link>
 
         </div>
-
-
-        {/* Decorative bottom edge */}
-        <svg
-          className="absolute left-0 right-0 top-full w-full h-3 pointer-events-none"
-          viewBox="0 0 1440 12"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          data-nav-edge
-        >
-          <path
-            d="M0,0 C240,12 480,4 720,8 C960,12 1200,2 1440,6 L1440,0 L0,0 Z"
-            fill="rgba(44,41,38,0)"
-            data-nav-edge-path
-          />
-        </svg>
       </nav>
 
       {/* ═══════════════════════════════════════════
