@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import Image from "next/image";
 
 interface BeforeAfterSliderProps {
   beforeSrc: string;
@@ -85,18 +86,24 @@ export default function BeforeAfterSlider({
       onClick={handleContainerClick}
     >
       {/* Before image (full, underneath) */}
-      <img
+      <Image
         src={beforeSrc}
         alt={beforeLabel}
-        className="block w-full h-auto"
+        width={1600}
+        height={800}
+        unoptimized
+        className="block h-auto w-full"
         draggable={false}
       />
 
       {/* After image (clipped overlay) */}
-      <img
+      <Image
         src={afterSrc}
         alt={afterLabel}
-        className="absolute inset-0 w-full h-full object-cover"
+        fill
+        sizes="(min-width: 1024px) 60vw, 100vw"
+        unoptimized
+        className="absolute inset-0 h-full w-full object-cover"
         style={{
           clipPath: `inset(0 0 0 ${sliderPosition}%)`,
         }}

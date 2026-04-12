@@ -28,6 +28,7 @@ NOISE_LABEL_ALIASES = {
     "car": "car",
     "generator": "generator",
     "wind": "wind",
+    "background": "other",
     "rain": "other",
     "biological_interference": "other",
     "other": "other",
@@ -102,6 +103,12 @@ def get_noise_frequency_range(noise_type: str) -> tuple[float, float]:
 
 def normalize_noise_label(label: str) -> str:
     normalized = label.strip().lower().replace(" ", "_")
+
+    # Handle compound labels (e.g., "vehicle+generator", "airplane+vehicle")
+    # by taking the first component
+    if "+" in normalized:
+        normalized = normalized.split("+")[0]
+
     if normalized not in NOISE_LABEL_ALIASES:
         raise ValueError(f"Unsupported noise label: {label}")
     return NOISE_LABEL_ALIASES[normalized]
@@ -113,13 +120,31 @@ def _iter_labeled_audio(dataset_path: str | Path) -> list[tuple[Path, str]]:
         rows: list[tuple[Path, str]] = []
         with path.open("r", encoding="utf-8", newline="") as handle:
             for row in csv.DictReader(handle):
-                raw_label = row.get("label") or row.get("noise_type") or row.get("class")
+                # Support multiple label column names
+                raw_label = (
+                    row.get("label")
+                    or row.get("noise_type")
+                    or row.get("class")
+                    or row.get("noise_type_ref")
+                )
                 raw_path = row.get("path") or row.get("filename") or row.get("file")
                 if not raw_label or not raw_path:
                     continue
                 audio_path = Path(raw_path)
                 if not audio_path.is_absolute():
-                    audio_path = path.parent / audio_path
+                    # Try multiple resolution strategies
+                    candidate_paths = [
+                        path.parent / audio_path,  # Original: data/04-040920-02_vehicle_1.wav
+                        path.parent / "audio-files" / audio_path.name,  # New: data/audio-files/04-040920-02_vehicle_1.wav
+                    ]
+                    audio_path = None
+                    for candidate in candidate_paths:
+                        if candidate.exists():
+                            audio_path = candidate
+                            break
+                    if audio_path is None:
+                        # If still not found, use original path (will fail later)
+                        audio_path = candidate_paths[0]
                 rows.append((audio_path, normalize_noise_label(raw_label)))
         return rows
 

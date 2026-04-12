@@ -24,6 +24,8 @@ import {
   downloadRecording,
   type Recording,
 } from "@/lib/audio-api";
+import RealtimeFilterLab from "@/components/audio/RealtimeFilterLab";
+import RealtimeMicTest from "@/components/audio/RealtimeMicTest";
 import { AnalysisLabelsBadge } from "@/components/research/AnalysisLabels";
 import {
   staggerContainer,
@@ -325,128 +327,147 @@ export default function UploadPage() {
         />
       </div>
 
-      {/* Upload Zone */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.15, duration: 0.4 }}
-      >
-        <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`relative rounded-2xl p-10 text-center cursor-pointer group transition-all duration-300 overflow-hidden upload-zone-glow ${
-            isDragging
-              ? "active bg-accent-savanna/5 shadow-glow"
-              : "bg-white/40 hover:bg-white/60 border border-dashed border-ev-sand/60 hover:border-accent-savanna/30"
-          }`}
-          onClick={() => fileInputRef.current?.click()}
+      {/* Upload + Live Mic Test */}
+      <div className="grid items-start gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.15, duration: 0.4 }}
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".wav,.mp3,audio/wav,audio/mpeg"
-            multiple
-            className="hidden"
-            onChange={handleFileSelect}
-          />
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`relative rounded-2xl p-10 text-center cursor-pointer group transition-all duration-300 overflow-hidden upload-zone-glow ${
+              isDragging
+                ? "active bg-accent-savanna/5 shadow-glow"
+                : "bg-white/40 hover:bg-white/60 border border-dashed border-ev-sand/60 hover:border-accent-savanna/30"
+            }`}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".wav,.mp3,audio/wav,audio/mpeg"
+              multiple
+              className="hidden"
+              onChange={handleFileSelect}
+            />
 
-          {/* Sound wave decoration */}
-          <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-[3px] h-8 overflow-hidden opacity-[0.15] pointer-events-none">
-            {Array.from({ length: 24 }).map((_, i) => (
-              <div
-                key={i}
-                className="w-[2px] bg-accent-savanna rounded-full"
-                style={{
-                  animation: "sound-bar 1.2s ease-in-out infinite",
-                  animationDelay: `${i * 0.08}s`,
-                  transformOrigin: "bottom",
-                  height: "100%",
-                }}
-              />
-            ))}
-          </div>
-
-          <div className="flex flex-col items-center gap-4 relative z-10">
-            <motion.div
-              animate={
-                isDragging
-                  ? { scale: 1.1, rotate: 3 }
-                  : { scale: 1, rotate: 0 }
-              }
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${
-                isDragging
-                  ? "bg-accent-savanna/15"
-                  : "bg-ev-cream group-hover:bg-accent-savanna/10"
-              }`}
-            >
-              <CloudUpload
-                className={`w-7 h-7 transition-colors ${
-                  isDragging
-                    ? "text-accent-savanna"
-                    : "text-ev-warm-gray group-hover:text-accent-savanna"
-                }`}
-              />
-            </motion.div>
-
-            <div>
-              <p className="text-base font-semibold text-ev-charcoal">
-                {isDragging
-                  ? "Drop files here"
-                  : "Drop .wav or .mp3 files here"}
-              </p>
-              <p className="text-sm text-ev-warm-gray mt-1">
-                or click to browse &middot; Max 500 MB per file
-              </p>
+            {/* Sound wave decoration */}
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-[3px] h-8 overflow-hidden opacity-[0.15] pointer-events-none">
+              {Array.from({ length: 24 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-[2px] bg-accent-savanna rounded-full"
+                  style={{
+                    animation: "sound-bar 1.2s ease-in-out infinite",
+                    animationDelay: `${i * 0.08}s`,
+                    transformOrigin: "bottom",
+                    height: "100%",
+                  }}
+                />
+              ))}
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              type="button"
-              className="px-6 py-2.5 bg-gradient-to-r from-accent-savanna to-accent-gold text-white text-sm font-medium rounded-xl shadow-sm shadow-accent-savanna/20 hover:shadow-md hover:shadow-accent-savanna/25 transition-shadow"
-              onClick={(e) => {
-                e.stopPropagation();
-                fileInputRef.current?.click();
-              }}
-            >
-              Browse Files
-            </motion.button>
-          </div>
-
-          {/* Upload Progress */}
-          <AnimatePresence>
-            {uploading && (
+            <div className="flex flex-col items-center gap-4 relative z-10">
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mt-8 relative z-10"
+                animate={
+                  isDragging
+                    ? { scale: 1.1, rotate: 3 }
+                    : { scale: 1, rotate: 0 }
+                }
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-300 ${
+                  isDragging
+                    ? "bg-accent-savanna/15"
+                    : "bg-ev-cream group-hover:bg-accent-savanna/10"
+                }`}
               >
-                <div className="w-full max-w-sm mx-auto">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-ev-elephant flex items-center gap-1.5">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      Uploading&hellip;
-                    </span>
-                    <span className="text-accent-savanna font-medium tabular-nums">
-                      {Math.round(uploadProgress)}%
-                    </span>
-                  </div>
-                  <div className="h-2 bg-ev-cream rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-accent-savanna to-accent-gold rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${uploadProgress}%` }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </div>
-                </div>
+                <CloudUpload
+                  className={`w-7 h-7 transition-colors ${
+                    isDragging
+                      ? "text-accent-savanna"
+                      : "text-ev-warm-gray group-hover:text-accent-savanna"
+                  }`}
+                />
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+
+              <div>
+                <p className="text-base font-semibold text-ev-charcoal">
+                  {isDragging
+                    ? "Drop files here"
+                    : "Drop .wav or .mp3 files here"}
+                </p>
+                <p className="text-sm text-ev-warm-gray mt-1">
+                  or click to browse &middot; Max 500 MB per file
+                </p>
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                type="button"
+                className="px-6 py-2.5 bg-gradient-to-r from-accent-savanna to-accent-gold text-white text-sm font-medium rounded-xl shadow-sm shadow-accent-savanna/20 hover:shadow-md hover:shadow-accent-savanna/25 transition-shadow"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
+              >
+                Browse Files
+              </motion.button>
+            </div>
+
+            {/* Upload Progress */}
+            <AnimatePresence>
+              {uploading && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mt-8 relative z-10"
+                >
+                  <div className="w-full max-w-sm mx-auto">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-ev-elephant flex items-center gap-1.5">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Uploading&hellip;
+                      </span>
+                      <span className="text-accent-savanna font-medium tabular-nums">
+                        {Math.round(uploadProgress)}%
+                      </span>
+                    </div>
+                    <div className="h-2 bg-ev-cream rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-accent-savanna to-accent-gold rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${uploadProgress}%` }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22, duration: 0.4 }}
+        >
+          <RealtimeMicTest onUploaded={fetchRecordings} />
+        </motion.div>
+      </div>
+
+      {/* Real-time Filter Lab */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.4 }}
+      >
+        <RealtimeFilterLab />
       </motion.div>
 
       {/* Status Messages */}

@@ -212,48 +212,15 @@ export default function ResultsPage() {
                 transition={{ duration: 0.22, ease: "easeOut" }}
                 className="rounded-2xl glass border border-ev-sand/40 overflow-hidden"
               >
-                {/* Panel header */}
-                <div className="flex items-center justify-between px-5 py-3 border-b border-ev-sand/30 bg-ev-cream/40">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-ev-charcoal truncate">
-                      {rec.filename}
-                    </p>
-                    <p className="text-[10px] text-ev-warm-gray mt-0.5">
-                      A/B comparison ·{" "}
-                      <kbd className="px-1 rounded border border-ev-sand bg-white font-mono text-[9px] text-ev-elephant">
-                        A
-                      </kbd>{" "}
-                      to toggle ·{" "}
-                      <kbd className="px-1 rounded border border-ev-sand bg-white font-mono text-[9px] text-ev-elephant">
-                        Esc
-                      </kbd>{" "}
-                      to close
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => router.push(`/processing/${rec.id}`)}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-accent-savanna border border-accent-savanna/30 hover:bg-accent-savanna/5 transition-colors"
-                    >
-                      Details
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                    <button
-                      onClick={() => setAbSelectedId(null)}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-ev-warm-gray hover:text-ev-charcoal hover:bg-ev-sand/40 transition-colors"
-                      aria-label="Close A/B player"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                {/* ABPlayer */}
-                <div className="p-4">
-                  <ABPlayer
-                    originalSrc={`${API_BASE}/api/recordings/${rec.id}/audio?type=original`}
-                    cleanedSrc={`${API_BASE}/api/recordings/${rec.id}/audio?type=cleaned`}
-                    beforeSpectrogramSrc={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=before`}
-                    afterSpectrogramSrc={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`}
+                {/* Spectrogram Thumbnail */}
+                <div className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
+                  <Image
+                    src={spectrogramUrl}
+                    alt={`Spectrogram for ${rec.filename}`}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    unoptimized
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                 </div>
               </motion.div>

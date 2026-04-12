@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Upload, BarChart3, Database, Waves } from "lucide-react";
+import { Upload, BarChart3, Database, Waves, Radio } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/upload", label: "Upload", icon: Upload },
   { href: "/results", label: "Results", icon: BarChart3 },
   { href: "/database", label: "Database", icon: Database },
+  { href: "/realtime", label: "Real-Time Filter", icon: Radio },
 ];
 
 export default function Sidebar() {
