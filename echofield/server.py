@@ -343,7 +343,7 @@ def _elapsed_seconds(started_at: str | None) -> float | None:
 def _status_payload(recording: dict[str, Any]) -> dict[str, Any]:
     processing = recording.get("processing") or {}
     progress = float(processing.get("progress", 0.0))
-    stage = _canonical_processing_stage(processing.get("current_stage"))
+    stage = processing.get("current_stage")
     elapsed = _elapsed_seconds(processing.get("started_at"))
     estimated_remaining = None
     if elapsed is not None and progress > 0 and progress < 100:
@@ -368,37 +368,6 @@ def _status_payload(recording: dict[str, Any]) -> dict[str, Any]:
         "estimated_remaining_s": estimated_remaining,
         "message": message,
     }
-
-
-def _canonical_processing_stage(stage: str | None) -> str | None:
-    if not stage:
-        return stage
-    if stage.startswith("spectrogram:"):
-        return "spectrogram"
-    if stage.startswith("denoising:"):
-        return "noise_removal"
-    if stage.startswith("calls:"):
-        return "feature_extraction"
-    if stage.startswith("quality:"):
-        return "quality_assessment"
-    return stage
-
-
-_PROCESSING_STAGE_ORDER = [
-    "ingestion",
-    "spectrogram",
-    "noise_classification",
-    "noise_removal",
-    "feature_extraction",
-    "quality_assessment",
-    "complete",
-]
-
-
-def _stage_rank(stage: str | None) -> int:
-    if stage in _PROCESSING_STAGE_ORDER:
-        return _PROCESSING_STAGE_ORDER.index(stage)
-    return -1
 
 
 def _enrich_call(call: dict[str, Any], recording: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -580,35 +549,20 @@ async def _progress_callback(
     data: dict[str, Any] | None = None,
 ) -> None:
     store = _get_store()
-    canonical_stage = _canonical_processing_stage(stage)
-    previous_record = store.get(recording_id) or {}
-    previous_stage = _canonical_processing_stage(
-        ((previous_record.get("processing") or {}).get("current_stage"))
-    )
-    effective_stage = canonical_stage
-    if _stage_rank(previous_stage) > _stage_rank(canonical_stage):
-        effective_stage = previous_stage
     if status == "failed":
-        store.update_status(recording_id, "failed", progress=progress, current_stage=effective_stage)
+        store.update_status(recording_id, "failed", progress=progress, current_stage=stage)
         await manager.send_processing_failed(recording_id, (data or {}).get("error", "Processing failed"))
         return
 
-    store.update_status(
-        recording_id,
-        "processing" if effective_stage != "complete" else "complete",
-        progress=progress,
-        current_stage=effective_stage,
-    )
-    payload = dict(data or {})
-    payload.setdefault("raw_stage", stage)
-    await manager.send_stage_update(recording_id, effective_stage or stage, status, progress, payload)
+    store.update_status(recording_id, "processing" if stage != "complete" else "complete", progress=progress, current_stage=stage)
+    await manager.send_stage_update(recording_id, stage, status, progress, data)
     if data and data.get("spectrogram_url"):
         await manager.send_spectrogram_update(
             recording_id,
             str(data["spectrogram_url"]),
             str(data.get("variant", "default")),
         )
-    if effective_stage == "noise_classification" and data:
+    if stage == "noise_classification" and data:
         await manager.send_noise_classified(
             recording_id,
             str(data.get("noise_type", "other")),
@@ -2367,6 +2321,72 @@ async def analytics_recording_features(recording_id: str):
             "duration_ms": _stats(duration_values),
         },
     }
+
+
+@app.post("/api/filter-chunk")
+async def filter_chunk(
+    request: Request,
+    sr: int = Query(default=44100, ge=8000, le=192000),
+    preserve_harmonics: bool = Query(default=True),
+    aggressiveness: float = Query(default=1.0, ge=0.1, le=3.0),
+    high_hz: float = Query(default=1200.0, ge=100.0, le=20000.0),
+) -> Response:
+    """Filter a raw PCM chunk using the spectral-gate pipeline.
+
+    Request body: little-endian float32 PCM samples (mono).
+    Response body: filtered float32 PCM samples (same length).
+    Extra headers: X-Noise-Type, X-Noise-Confidence, X-SNR-Before-DB, X-SNR-After-DB.
+
+    For phone/speaker playback use aggressiveness=0.5 and high_hz=4000 to avoid
+    treating the signal itself as noise and to capture the phone's wider output range.
+    """
+    from echofield.pipeline.spectral_gate import spectral_gate_denoise, apply_bandpass_filter
+    from echofield.pipeline.noise_classifier import classify_noise
+    from echofield.pipeline.quality_check import compute_snr
+
+    body = await request.body()
+    if not body:
+        return Response(content=b"", media_type="application/octet-stream")
+
+    y = np.frombuffer(body, dtype="<f4").copy()
+
+    noise_info: dict[str, object] = classify_noise(y, sr)
+    noise_type = str(noise_info.get("noise_type") or "other")
+    confidence = float(noise_info.get("confidence", 0.0))
+
+    snr_before = float(compute_snr(y, sr))
+
+    # Run spectral gate with caller-supplied aggressiveness, then apply the
+    # requested bandpass so phone-mode (high_hz=4000) passes more of the signal.
+    result = spectral_gate_denoise(
+        y,
+        sr,
+        aggressiveness=aggressiveness,
+        noise_type=noise_type,
+        preserve_harmonics=preserve_harmonics,
+        post_process=True,
+    )
+    cleaned: np.ndarray = result["cleaned_audio"]
+    # Re-apply bandpass with the requested high_hz (default pipeline uses 1200 Hz)
+    if high_hz != 1200.0:
+        cleaned = apply_bandpass_filter(cleaned, sr, low_hz=8.0, high_hz=high_hz)
+
+    snr_after = float(compute_snr(cleaned, sr))
+
+    headers = {
+        "X-Noise-Type": noise_type,
+        "X-Noise-Confidence": f"{confidence:.4f}",
+        "X-SNR-Before-DB": f"{snr_before:.2f}",
+        "X-SNR-After-DB": f"{snr_after:.2f}",
+        "Access-Control-Expose-Headers": (
+            "X-Noise-Type, X-Noise-Confidence, X-SNR-Before-DB, X-SNR-After-DB"
+        ),
+    }
+    return Response(
+        content=cleaned.astype("<f4").tobytes(),
+        media_type="application/octet-stream",
+        headers=headers,
+    )
 
 
 @app.websocket("/ws/live")

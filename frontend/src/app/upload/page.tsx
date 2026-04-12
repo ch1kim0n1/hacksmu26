@@ -277,14 +277,14 @@ export default function UploadPage() {
             onChange={handleFileSelect}
           />
 
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex h-8 justify-center gap-[3px] overflow-hidden opacity-[0.15]">
-            {Array.from({ length: 24 }).map((_, i) => (
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex h-8 justify-center gap-[4px] overflow-hidden opacity-[0.28]">
+            {Array.from({ length: 55 }).map((_, i) => (
               <div
                 key={i}
-                className="w-[2px] rounded-full bg-accent-savanna"
+                className="w-[6px] shrink-0 rounded-full bg-accent-savanna"
                 style={{
-                  animation: "sound-bar 1.2s ease-in-out infinite",
-                  animationDelay: `${i * 0.08}s`,
+                  animation: `sound-bar ${0.9 + (i % 7) * 0.1}s ease-in-out infinite`,
+                  animationDelay: `${(i * 0.06 + Math.sin(i * 1.5) * 0.25).toFixed(2)}s`,
                   transformOrigin: "bottom",
                   height: "100%",
                 }}

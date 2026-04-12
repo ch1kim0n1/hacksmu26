@@ -11,6 +11,7 @@ import { useSceneTransition } from "@/components/transition/SceneTransitionProvi
 const landingNavItems = [
   { href: "/about", label: "About" },
   { href: "/upload", label: "Upload" },
+  { href: "/recordings", label: "Recordings" },
   { href: "/database", label: "Database" },
   { href: "#get-started", label: "Get Started" },
 ] as const;
@@ -230,16 +231,15 @@ export default function LandingPage() {
 
       gsap.utils.toArray<HTMLElement>("[data-threat-card]").forEach((card, i) => {
         gsap.from(card, {
-          y: 100,
+          y: 80,
           opacity: 0,
-          rotateX: -12,
-          scale: 0.9,
-          duration: 0.9,
-          delay: i * 0.15,
-          ease: "power3.out",
+          scale: 0.82,
+          duration: 0.75,
+          delay: i * 0.12,
+          ease: "back.out(1.8)",
           scrollTrigger: {
-            trigger: threatsRef.current,
-            start: "top 70%",
+            trigger: card,
+            start: "top 90%",
           },
         });
       });
@@ -540,7 +540,7 @@ export default function LandingPage() {
             />
             <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
               <span className="max-w-[9ch] text-center text-xl font-semibold italic leading-tight tracking-[0.02em] text-white/92 drop-shadow-[0_2px_12px_rgba(18,34,58,0.55)] sm:text-2xl">
-                Ready to Explore?
+                Ready to Listen?
               </span>
             </div>
           </button>
@@ -580,18 +580,12 @@ export default function LandingPage() {
       <section
         ref={crisisRef}
         id="crisis"
-        className="relative pt-0 pb-20 md:pb-28"
+        className="relative pt-16 pb-20 md:pt-24 md:pb-28"
         style={{
           background:
-            "linear-gradient(180deg, #8B5E3C 0%, #B0764E 15%, #C4785A 30%, #C48B5A 50%, #C89E60 70%, #C4A46C 100%)",
+            "linear-gradient(180deg, #a8875c 0%, #9e6e45 8%, #B0764E 22%, #C4785A 38%, #C48B5A 55%, #C89E60 75%, #C4A46C 100%)",
         }}
       >
-        {/* ── Wave: Hero → Crisis (inside section so no seam) ── */}
-        <div className="w-full" style={{ marginTop: "-1px", marginBottom: "-1px" }}>
-          <svg viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true" className="block w-full" style={{ height: "clamp(60px, 10vw, 140px)" }}>
-            <path d="M0,0 L1440,0 L1440,30 C1200,110 900,10 600,60 C300,110 120,40 0,80 L0,0 Z" fill="#c5b294" />
-          </svg>
-        </div>
         {/* Subtle texture overlay */}
         <div
           className="absolute inset-0 opacity-[0.03]"
@@ -691,13 +685,19 @@ export default function LandingPage() {
 
         <div className="relative max-w-7xl mx-auto px-6">
           <div data-threat-title className="text-center mb-16">
-            <span className="text-sm font-semibold text-accent-savanna tracking-[0.2em] uppercase mb-4 block">
+            <span className="text-xs font-semibold text-accent-savanna tracking-[0.28em] uppercase mb-8 block">
               Why This Happens
             </span>
-            <h2 className="text-4xl md:text-5xl font-display font-semibold text-ev-charcoal mb-4">
-              Three Forces of Extinction
+            <h2 className="font-display leading-[1.05] text-ev-charcoal mb-6">
+              <span className="block text-[clamp(3.2rem,7vw,6.5rem)] font-light">Three Forces</span>
+              <span
+                className="block text-[clamp(3rem,6.5vw,6rem)] font-light"
+                style={{ WebkitTextStroke: "2px #2C2926", color: "transparent" }}
+              >
+                of Extinction
+              </span>
             </h2>
-            <p className="text-ev-elephant max-w-xl mx-auto">
+            <p className="text-ev-elephant max-w-xl mx-auto text-lg leading-relaxed">
               Understanding the threats is the first step to protecting these
               incredible creatures.
             </p>
@@ -945,70 +945,100 @@ export default function LandingPage() {
             {/* Spectrogram mockup */}
             <div
               data-sol-left
-              className="relative aspect-[4/3] overflow-hidden rounded-[1.9rem] bg-[#0b1722] p-1.5 shadow-[0_22px_46px_rgba(16,24,40,0.24),0_48px_90px_rgba(12,33,61,0.14)]"
+              className="relative overflow-hidden rounded-[1.9rem] bg-[#0b1722] p-1.5 shadow-[0_22px_46px_rgba(16,24,40,0.24),0_48px_90px_rgba(12,33,61,0.14)]"
             >
-              <div className="relative h-full w-full overflow-hidden rounded-[1.55rem] bg-gradient-to-br from-[#11284e] via-[#10284a] to-[#112744]">
-                {/* Noise bands */}
-                {[12, 22, 35, 45, 58, 68, 78, 88].map((top, i) => (
-                  <div
-                    key={i}
-                    className="absolute left-[5%] right-[5%] h-[2px] bg-[#1d5583]/26"
-                    style={{ top: `${top}%`, opacity: 0.15 + (i % 3) * 0.08 }}
-                  />
-                ))}
-                {[24, 50, 76].map((left, i) => (
-                  <div
-                    key={`col-${i}`}
-                    className="absolute top-[4%] bottom-[4%] w-[1px] bg-[#285785]/18"
-                    style={{ left: `${left}%` }}
-                  />
-                ))}
-                {/* Elephant call signal */}
-                <div
-                  className="absolute h-3 rounded-full"
-                  style={{
-                    top: "52%",
-                    left: "18%",
-                    right: "28%",
-                    background:
-                      "linear-gradient(90deg,transparent,#FFD700,#C4A46C,#FFD700,transparent)",
-                    opacity: 0.55,
-                  }}
-                />
-                <div
-                  className="absolute h-2 rounded-full"
-                  style={{
-                    top: "58%",
-                    left: "22%",
-                    right: "34%",
-                    background:
-                      "linear-gradient(90deg,transparent,#C4A46C,transparent)",
-                    opacity: 0.35,
-                  }}
-                />
-                {/* Scanning line */}
-                <div
-                  data-scan-line
-                  className="absolute top-[3%] bottom-[3%] w-[2px] bg-gradient-to-b from-transparent via-accent-savanna to-transparent opacity-60"
-                  style={{ left: "5%" }}
-                />
-                {/* Label */}
-                <div className="absolute bottom-4 left-4 px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm">
-                  <span className="text-xs text-white/60">
-                    Raw Recording — Signal Buried in Noise
+              <div className="relative overflow-hidden rounded-[1.55rem] bg-gradient-to-br from-[#0d2245] via-[#0e2348] to-[#0d2140]" style={{ paddingBottom: "75%" }}>
+                <div className="absolute inset-0 flex">
+                  {/* Y-axis labels */}
+                  <div className="flex flex-col justify-between py-3 pl-2 pr-1 text-right" style={{ minWidth: "44px" }}>
+                    {["500Hz", "200Hz", "100Hz", "50Hz", "20Hz", "0Hz"].map((label) => (
+                      <span key={label} className="text-[9px] text-white/30 font-mono leading-none">{label}</span>
+                    ))}
+                  </div>
+
+                  {/* Main spectrogram area */}
+                  <div className="relative flex-1">
+                    {/* Legend top-right */}
+                    <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
+                      {[
+                        { label: "aircraft", color: "#3b7fcc" },
+                        { label: "wind", color: "#5593d4" },
+                        { label: "vocalization", color: "#FFD700" },
+                      ].map((item) => (
+                        <div key={item.label} className="flex items-center gap-1.5 rounded-md bg-black/40 px-2 py-1 backdrop-blur-sm">
+                          <div className="h-[3px] w-5 rounded-full" style={{ background: item.color }} />
+                          <span className="text-[9px] text-white/70 font-mono">{item.label}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Noise bands */}
+                    {[8, 18, 28, 38, 48, 62, 72, 82].map((top, i) => (
+                      <div
+                        key={i}
+                        className="absolute left-0 right-0 h-[2px] bg-[#1d5583]/20"
+                        style={{ top: `${top}%`, opacity: 0.12 + (i % 3) * 0.07 }}
+                      />
+                    ))}
+                    {[25, 50, 75].map((left, i) => (
+                      <div
+                        key={`col-${i}`}
+                        className="absolute top-0 bottom-[18%] w-[1px] bg-[#285785]/15"
+                        style={{ left: `${left}%` }}
+                      />
+                    ))}
+
+                    {/* Blurry noise blobs */}
+                    <div className="absolute rounded-full blur-2xl" style={{ top: "15%", left: "10%", width: "35%", height: "25%", background: "radial-gradient(circle, rgba(29,85,131,0.35) 0%, transparent 70%)" }} />
+                    <div className="absolute rounded-full blur-xl" style={{ top: "30%", left: "55%", width: "30%", height: "20%", background: "radial-gradient(circle, rgba(29,85,131,0.25) 0%, transparent 70%)" }} />
+
+                    {/* Elephant call signal */}
+                    <div
+                      className="absolute h-3 rounded-full blur-[2px]"
+                      style={{ top: "55%", left: "10%", right: "18%", background: "linear-gradient(90deg,transparent,#FFD700,#C4A46C,#FFD700,transparent)", opacity: 0.75 }}
+                    />
+                    <div
+                      className="absolute h-2 rounded-full blur-[1px]"
+                      style={{ top: "62%", left: "14%", right: "25%", background: "linear-gradient(90deg,transparent,#C4A46C,transparent)", opacity: 0.45 }}
+                    />
+
+                    {/* Scanning line */}
+                    <div
+                      data-scan-line
+                      className="absolute top-0 bottom-[18%] w-[2px] bg-gradient-to-b from-transparent via-accent-savanna to-transparent opacity-70"
+                      style={{ left: "5%" }}
+                    />
+
+                    {/* X-axis labels */}
+                    <div className="absolute bottom-0 left-0 right-0 flex justify-between px-1 pb-1">
+                      {["0s", "5s", "10s", "15s", "20s"].map((label) => (
+                        <span key={label} className="text-[9px] text-white/30 font-mono">{label}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom label */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-sm whitespace-nowrap">
+                  <span className="text-xs text-white/55">
+                    raw_recording.wav — signal buried in noise
                   </span>
                 </div>
               </div>
             </div>
 
             <div data-sol-right>
-              <span className="text-sm font-semibold text-accent-savanna tracking-[0.2em] uppercase mb-4 block">
+              <span className="text-xs font-semibold text-accent-savanna tracking-[0.2em] uppercase mb-5 block">
                 Our Solution
               </span>
-              <h2 className="text-4xl md:text-5xl font-display font-semibold text-ev-charcoal mb-6">
-                AI-Powered
-                <br />
-                Noise Removal
+              <h2 className="font-display leading-[1.1] text-ev-charcoal mb-6">
+                <span className="block text-4xl md:text-5xl font-normal">AI-Powered</span>
+                <span
+                  className="block text-4xl md:text-5xl font-light"
+                  style={{ WebkitTextStroke: "2px #2C2926", color: "transparent" }}
+                >
+                  Noise Removal
+                </span>
               </h2>
               <p className="text-ev-elephant mb-8 leading-relaxed">
                 EchoField uses spectral gating and AI classification to identify
@@ -1066,85 +1096,83 @@ export default function LandingPage() {
       </section>
 
       {/* ── Wave: Solution → Steps ── */}
-      <WaveDivider topColor="#F0EBE3" bottomColor="#F8F5F0" variant={1} />
+      <WaveDivider topColor="#F0EBE3" bottomColor="#1c1710" variant={1} />
 
       {/* ═══════════════════════════════════════════
           HOW IT WORKS
          ═══════════════════════════════════════════ */}
-      <section ref={stepsRef} className="py-20 md:py-28 bg-ev-ivory">
+      <section ref={stepsRef} className="py-20 md:py-28" style={{ background: "#1c1710" }}>
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <span className="text-sm font-semibold text-accent-savanna tracking-[0.2em] uppercase mb-4 block">
-              How It Works
-            </span>
-            <h2 className="text-4xl md:text-5xl font-display font-semibold text-ev-charcoal">
-              Three Steps to Clarity
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="h-px w-10 bg-[#d5b171]/35" />
+              <span className="text-xs font-semibold text-[#d5b171] tracking-[0.28em] uppercase">How It Works</span>
+              <div className="h-px w-10 bg-[#d5b171]/35" />
+            </div>
+            <h2 className="font-display font-bold leading-[0.95] text-white" style={{ fontSize: "clamp(3.5rem,9vw,8rem)" }}>
+              Three Steps
             </h2>
+            <h2
+              className="font-display font-light leading-[0.95] mb-6"
+              style={{ fontSize: "clamp(2.8rem,7vw,6.5rem)", WebkitTextStroke: "2px #C4A46C", color: "transparent" }}
+            >
+              to Clarity
+            </h2>
+            <p className="text-[#b7aca0] text-base max-w-md mx-auto leading-relaxed">
+              From raw field recording to publishable research data — automated end-to-end.
+            </p>
           </div>
 
-          <div className="relative grid md:grid-cols-3 gap-12">
-            {/* Connector lines */}
-            <div className="hidden md:block absolute top-[3.5rem] left-[33%] right-[33%] h-0.5">
+          {/* Icons row with connector line */}
+          <div className="relative flex justify-around mb-8 px-[10%]">
+            <div
+              data-step-line
+              className="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-px -translate-y-1/2"
+              style={{ background: "linear-gradient(90deg, #C4A46C, #C4A46C88, #5A6B4F)" }}
+            />
+            {[
+              { color: "bg-accent-savanna", icon: <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg> },
+              { color: "bg-accent-gold", icon: <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg> },
+              { color: "bg-nature-sage", icon: <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
+            ].map((s, i) => (
               <div
-                data-step-line
-                className="absolute left-0 right-[50%] h-full bg-gradient-to-r from-accent-savanna to-accent-gold"
-              />
-              <div
-                data-step-line
-                className="absolute left-[50%] right-0 h-full bg-gradient-to-r from-accent-gold to-nature-sage"
-              />
-            </div>
+                key={i}
+                data-step-num
+                className={`relative z-10 w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center shadow-lg`}
+              >
+                {s.icon}
+              </div>
+            ))}
+          </div>
 
+          {/* Step cards */}
+          <div className="grid md:grid-cols-3 gap-5">
             {[
               {
-                step: "01",
+                step: "STEP 01",
                 title: "Upload",
                 desc: "Drop your WAV, MP3, or FLAC field recordings. Any sample rate, any bit depth — we handle it all.",
-                color: "bg-accent-savanna",
-                icon: (
-                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                ),
               },
               {
-                step: "02",
+                step: "STEP 02",
                 title: "Process",
                 desc: "AI identifies noise types, applies spectral gating, and extracts clean elephant vocalizations in seconds.",
-                color: "bg-accent-gold",
-                icon: (
-                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                ),
               },
               {
-                step: "03",
+                step: "STEP 03",
                 title: "Analyze",
                 desc: "Compare spectrograms, listen to cleaned audio, review detected calls, and export research-grade data.",
-                color: "bg-nature-sage",
-                icon: (
-                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                ),
               },
             ].map((s, i) => (
-              <div key={i} data-step-card className="relative text-center" style={{ perspective: "600px" }}>
-                <div
-                  className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl transition-shadow`}
-                >
-                  {s.icon}
-                </div>
-                <div data-step-num className="text-5xl font-display font-bold text-ev-sand/30 mb-3">
-                  {s.step}
-                </div>
-                <h3 className="text-xl font-bold text-ev-charcoal mb-3">
-                  {s.title}
-                </h3>
-                <p className="text-ev-elephant text-sm leading-relaxed">
-                  {s.desc}
-                </p>
+              <div
+                key={i}
+                data-step-card
+                className="rounded-2xl p-6 text-center"
+                style={{ background: "#2a2318", border: "1px solid rgba(255,255,255,0.06)", perspective: "600px" }}
+              >
+                <p className="text-xs tracking-[0.22em] uppercase font-medium mb-3" style={{ color: "#d5b17166" }}>{s.step}</p>
+                <h3 className="text-2xl font-display text-white mb-3">{s.title}</h3>
+                <p className="text-[#b7aca0] text-sm leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -1152,7 +1180,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Wave: Steps → CTA ── */}
-      <WaveDivider topColor="#F8F5F0" bottomColor="#2C2926" variant={2} />
+      <WaveDivider topColor="#1c1710" bottomColor="#2C2926" variant={2} />
 
       {/* ═══════════════════════════════════════════
           CTA
