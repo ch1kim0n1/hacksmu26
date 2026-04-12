@@ -1,27 +1,168 @@
 {
-  "filename": "2000-4_airplane_02.wav",
-  "recording_id": "e0a5df28-4bab-5e8e-b164-a0a0519fef3c",
+  "recording_id": "07fd26ac-41a8-5c5c-b4f3-9c191c497c48",
+  "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/demo/2000-4_airplane_02/original.wav",
+  "method": "isolate",
+  "aggressiveness": 2.0,
   "quality": {
-    "snr_before_db": 11.4,
-    "snr_after_db": 16.1,
-    "snr_improvement_db": 4.673162842691161,
+    "snr_before_db": 60.0,
+    "snr_after_db": 60.0,
+    "snr_improvement_db": 0.0,
     "pesq": null,
-    "peak_frequency_before_hz": 37.3,
-    "peak_frequency_after_hz": 27.0,
-    "spectral_distortion": 0.1569,
-    "energy_preservation": 0.7073,
-    "quality_score": 53.5,
+    "peak_frequency_before_hz": 86.1,
+    "peak_frequency_after_hz": 86.1,
+    "spectral_distortion": 0.2046,
+    "energy_preservation": 0.0139,
+    "quality_score": 19.2,
     "quality_rating": "poor",
-    "flagged_for_review": false
+    "quality_mode": "call_isolation",
+    "flagged_for_review": true
   },
-  "metadata": {
-    "location": "",
-    "date": "",
-    "species": "African bush elephant",
-    "noise_type_ref": "airplane",
-    "animal_id": "2000-4",
-    "call_id": "2000-4_airplane_02",
-    "start_sec": 0.0,
-    "end_sec": 143.317
-  }
+  "noise_types": [
+    {
+      "type": "generator",
+      "percentage": 35.9,
+      "frequency_range": [
+        50.0,
+        250.0
+      ]
+    },
+    {
+      "type": "airplane",
+      "percentage": 33.5,
+      "frequency_range": [
+        20.0,
+        500.0
+      ]
+    },
+    {
+      "type": "car",
+      "percentage": 30.3,
+      "frequency_range": [
+        20.0,
+        250.0
+      ]
+    }
+  ],
+  "call_count": 20,
+  "call_gate": {
+    "enabled": true,
+    "skipped_reason": null,
+    "pre_detection_call_count": 46,
+    "regions_sample_index_pairs": [
+      [
+        1263024,
+        1310211
+      ],
+      [
+        2158254,
+        2280411
+      ],
+      [
+        2497824,
+        2549421
+      ],
+      [
+        2559564,
+        2659671
+      ],
+      [
+        3481254,
+        3603411
+      ],
+      [
+        3820824,
+        3872421
+      ],
+      [
+        3882564,
+        4017951
+      ],
+      [
+        4089834,
+        4159071
+      ],
+      [
+        4169214,
+        4322241
+      ],
+      [
+        4447044,
+        4736781
+      ],
+      [
+        5223204,
+        5274801
+      ],
+      [
+        5280534,
+        5340951
+      ],
+      [
+        5412834,
+        5482071
+      ],
+      [
+        5492214,
+        5645241
+      ],
+      [
+        5770044,
+        6059781
+      ],
+      [
+        6546204,
+        6597801
+      ],
+      [
+        7176834,
+        7206381
+      ],
+      [
+        7256214,
+        7281351
+      ],
+      [
+        7432614,
+        7475391
+      ],
+      [
+        7710444,
+        7748811
+      ],
+      [
+        8499834,
+        8529381
+      ],
+      [
+        8579214,
+        8604351
+      ],
+      [
+        8755614,
+        8798391
+      ],
+      [
+        9033444,
+        9071811
+      ],
+      [
+        9681714,
+        9715671
+      ]
+    ],
+    "fade_ms": 20.0,
+    "floor_linear": 0.0,
+    "min_confidence": 0.55,
+    "pad_ms": 160.0,
+    "merge_gap_ms": 80.0,
+    "coverage_ratio": 0.2064,
+    "mode": "isolate",
+    "bandpass_low_hz": 8.0,
+    "bandpass_high_hz": 2400.0,
+    "quality_mode": "call_isolation"
+  },
+  "output_audio_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/processed/07fd26ac-41a8-5c5c-b4f3-9c191c497c48_cleaned.wav",
+  "spectrogram_before_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/spectrograms/07fd26ac-41a8-5c5c-b4f3-9c191c497c48_before_spectrogram.png",
+  "spectrogram_after_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/spectrograms/07fd26ac-41a8-5c5c-b4f3-9c191c497c48_after_spectrogram.png",
+  "rebuilt_at": "2026-04-12T05:43:43.646868+00:00"
 }

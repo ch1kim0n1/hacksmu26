@@ -125,7 +125,7 @@ def _estimate_fundamental_frequency(y: np.ndarray, sr: int) -> float:
     """
     min_f0 = 8.0
     frame_length = max(8192, int(np.ceil(sr / min_f0)) + 2)
-    f0 = librosa.yin(y, fmin=min_f0, fmax=200, sr=sr, frame_length=frame_length)
+    f0 = librosa.yin(y, fmin=min_f0, fmax=500, sr=sr, frame_length=frame_length)
     # Filter out zero/NaN values
     valid = f0[(f0 > 0) & np.isfinite(f0)]
     if len(valid) == 0:
@@ -222,7 +222,13 @@ def _find_formant_peaks(y: np.ndarray, sr: int, max_formants: int = 5) -> list[f
 
     # Smooth the spectrum to find envelope peaks
     from scipy.ndimage import uniform_filter1d
-    smoothed = uniform_filter1d(mean_spectrum, size=15)
+    # Scale kernel to ~60 Hz width, adapting to frequency resolution
+    freq_resolution = freqs[1] - freqs[0] if len(freqs) > 1 else 1.0
+    kernel_size = max(3, int(60.0 / freq_resolution))
+    # Ensure kernel is odd for symmetric smoothing
+    if kernel_size % 2 == 0:
+        kernel_size += 1
+    smoothed = uniform_filter1d(mean_spectrum, size=kernel_size)
 
     threshold = np.max(smoothed) * 0.05
     freq_resolution = freqs[1] - freqs[0] if len(freqs) > 1 else 1.0
@@ -247,6 +253,9 @@ def _find_formant_peaks(y: np.ndarray, sr: int, max_formants: int = 5) -> list[f
 def _compute_bandwidth(y: np.ndarray, sr: int, energy_fraction: float = 0.9) -> float:
     """Compute the frequency bandwidth containing a fraction of total energy.
 
+    Uses percentile-based approach (P5 to P95 for 90% energy) which handles
+    bimodal spectra (e.g., elephant rumble + harmonics) correctly.
+
     Args:
         y: Audio time-series.
         sr: Sample rate.
@@ -265,11 +274,10 @@ def _compute_bandwidth(y: np.ndarray, sr: int, energy_fraction: float = 0.9) -> 
         return 0.0
 
     cumulative = np.cumsum(power_spectrum)
-    lower_threshold = total_energy * (1 - energy_fraction) / 2
-    upper_threshold = total_energy * (1 + energy_fraction) / 2
-
-    lower_idx = np.searchsorted(cumulative, lower_threshold)
-    upper_idx = np.searchsorted(cumulative, upper_threshold)
+    # Percentile-based: find P5 and P95 for 90% energy bandwidth
+    tail = (1.0 - energy_fraction) / 2.0
+    lower_idx = np.searchsorted(cumulative, total_energy * tail)
+    upper_idx = np.searchsorted(cumulative, total_energy * (1.0 - tail))
 
     lower_idx = min(lower_idx, len(freqs) - 1)
     upper_idx = min(upper_idx, len(freqs) - 1)
@@ -312,10 +320,10 @@ def _compute_energy_distribution(y: np.ndarray, sr: int,
 
 def _estimate_snr(y: np.ndarray, sr: int, frame_length: int = 2048,
                    hop_length: int = 512) -> float:
-    """Estimate signal-to-noise ratio in dB.
+    """Estimate signal-to-noise ratio using minimum statistics.
 
-    Uses a simple approach: segments the signal into frames, considers
-    the quietest frames as noise and the loudest as signal.
+    Uses sliding-window minimum RMS to estimate noise floor, which works
+    even when signal is present in most frames (e.g., continuous elephant calls).
 
     Args:
         y: Audio time-series.
@@ -326,25 +334,35 @@ def _estimate_snr(y: np.ndarray, sr: int, frame_length: int = 2048,
     Returns:
         Estimated SNR in dB.
     """
-    # Compute frame-wise RMS energy
     rms = librosa.feature.rms(y=y, frame_length=frame_length, hop_length=hop_length)[0]
 
     if len(rms) < 4:
         return 0.0
 
-    sorted_rms = np.sort(rms)
-    n = len(sorted_rms)
+    # Minimum statistics: estimate noise floor from sliding window minimums
+    # Window size covers ~0.5 seconds
+    window_frames = max(int(0.5 * sr / hop_length), 3)
 
-    # Bottom 10% as noise estimate
-    noise_end = max(int(n * 0.1), 1)
-    noise_rms = np.mean(sorted_rms[:noise_end])
+    noise_floor_estimates = []
+    for i in range(0, len(rms) - window_frames + 1, max(window_frames // 2, 1)):
+        window = rms[i:i + window_frames]
+        # 10th percentile within each window (robust to outliers)
+        noise_floor_estimates.append(float(np.percentile(window, 10)))
 
-    # Top 10% as signal estimate
-    signal_start = max(int(n * 0.9), n - 1)
-    signal_rms = np.mean(sorted_rms[signal_start:])
+    if not noise_floor_estimates:
+        return 0.0
 
-    if noise_rms == 0:
+    # Noise floor: median of per-window minimums
+    noise_rms = float(np.median(noise_floor_estimates))
+
+    if noise_rms <= 1e-10:
         return 60.0  # Effectively no noise
+
+    # Signal level: 90th percentile of RMS (robust to outliers)
+    signal_rms = float(np.percentile(rms, 90))
+
+    if signal_rms <= noise_rms:
+        return 0.0
 
     snr = 20 * np.log10(signal_rms / noise_rms)
     return round(float(snr), 1)
@@ -385,7 +403,7 @@ def _pitch_contour_slope(y: np.ndarray, sr: int) -> float:
         return 0.0
     try:
         frame_length = max(2048, int(np.ceil(sr / 8.0)) + 2)
-        f0 = librosa.yin(y, fmin=8, fmax=300, sr=sr, frame_length=frame_length)
+        f0 = librosa.yin(y, fmin=8, fmax=500, sr=sr, frame_length=frame_length)
         valid = f0[(f0 > 0) & np.isfinite(f0)]
         if len(valid) < 2:
             return 0.0
@@ -787,60 +805,71 @@ def _classify_call_type_rules(features: dict) -> dict:
     below_100 = energy_dist.get("below_100hz", 0)
     spectral_centroid = features.get("spectral_centroid_hz", 0)
     snr = features.get("snr_db", 0)
+    pitch_slope = features.get("pitch_contour_slope", 0)
+    energy_variance = features.get("temporal_energy_variance", 0)
 
-    # Rumble: very low fundamental, high harmonicity, long duration
-    # Elephant rumbles are typically 8-25 Hz with strong harmonic structure
-    if f0 > 0 and f0 < 25 and harmonicity > 0.4:
-        confidence = 0.5
+    # Low-frequency elephant family: rumble/contact/greeting/play.
+    # Use duration and contour cues to expose more elephant-specific subclasses.
+    if f0 > 0 and f0 < 35 and below_100 >= 35 and harmonicity >= 0.3:
+        confidence = 0.45
         if below_100 > 50:
-            confidence += 0.2
-        if duration > 2.0:
-            confidence += 0.15
-        if harmonicity > 0.6:
-            confidence += 0.15
-        return {"call_type": "rumble", "confidence": round(min(confidence, 1.0), 3)}
+            confidence += 0.1
+        if harmonicity > 0.55:
+            confidence += 0.1
+        if snr > 10:
+            confidence += 0.05
 
-    # Trumpet: high fundamental frequency, high energy, bright spectrum
-    if f0 > 200 or (spectral_centroid > 1500 and snr > 15):
+        if duration >= 2.8 and harmonicity >= 0.55:
+            return {"call_type": "greeting", "confidence": round(min(confidence + 0.2, 1.0), 3)}
+        if 1.2 <= duration < 2.8 and harmonicity >= 0.45:
+            return {"call_type": "contact call", "confidence": round(min(confidence + 0.15, 1.0), 3)}
+        if duration < 1.2 and (abs(pitch_slope) > 6.0 or energy_variance > 0.005):
+            return {"call_type": "play", "confidence": round(min(confidence + 0.12, 1.0), 3)}
+        return {"call_type": "rumble", "confidence": round(min(confidence + 0.1, 1.0), 3)}
+
+    # Trumpet: high frequency, bright spectrum, and/or broad harmonics.
+    if f0 > 150 or (spectral_centroid > 1200 and snr > 10 and bandwidth > 800):
         confidence = 0.5
-        if f0 > 300:
+        if f0 > 260:
             confidence += 0.15
-        if spectral_centroid > 2000:
+        if spectral_centroid > 1800:
             confidence += 0.15
         if snr > 20:
             confidence += 0.1
-        if bandwidth > 2000:
+        if bandwidth > 1600:
             confidence += 0.1
         return {"call_type": "trumpet", "confidence": round(min(confidence, 1.0), 3)}
 
-    # Roar: broad bandwidth, low harmonicity, loud
-    if bandwidth > 3000 and harmonicity < 0.4:
+    # Roar: broadband and rough texture.
+    if bandwidth > 1800 and harmonicity < 0.45 and duration >= 0.8:
         confidence = 0.5
-        if snr > 15:
+        if snr > 10:
             confidence += 0.15
-        if bandwidth > 5000:
+        if bandwidth > 3000:
             confidence += 0.15
-        if duration > 1.0:
+        if duration > 1.5:
             confidence += 0.1
         return {"call_type": "roar", "confidence": round(min(confidence, 1.0), 3)}
 
-    # Bark: short duration, mid frequency range
-    if duration < 1.0 and 25 <= f0 <= 200:
+    # Bark: short impulsive calls in low-mid band.
+    if duration < 1.0 and 20 <= f0 <= 280:
         confidence = 0.4
         if duration < 0.5:
             confidence += 0.15
-        if 50 <= f0 <= 150:
+        if 50 <= f0 <= 180:
             confidence += 0.15
         if snr > 10:
             confidence += 0.1
         return {"call_type": "bark", "confidence": round(min(confidence, 1.0), 3)}
 
-    # Cry: mid-high frequency, moderate harmonicity, moderate duration
-    if 100 <= f0 <= 500 and harmonicity > 0.3 and duration > 0.5:
+    # Cry: rising or sustained mid-high frequency with moderate harmonicity.
+    if 80 <= f0 <= 650 and harmonicity > 0.25 and duration > 0.4:
         confidence = 0.35
         if harmonicity > 0.5:
             confidence += 0.1
-        if 150 <= f0 <= 400:
+        if 120 <= f0 <= 450:
+            confidence += 0.1
+        if spectral_centroid > 700:
             confidence += 0.1
         return {"call_type": "cry", "confidence": round(min(confidence, 1.0), 3)}
 

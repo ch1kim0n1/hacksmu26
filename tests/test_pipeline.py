@@ -24,6 +24,12 @@ class DummySettings:
     SPECTROGRAM_FREQ_MAX = 1000
     DENOISE_METHOD = "hybrid"
     MODEL_PATH = ""
+    CALL_AWARE_GATE = False
+    CALL_GATE_MIN_CONFIDENCE = 0.45
+    CALL_GATE_PAD_MS = 250.0
+    CALL_GATE_MERGE_GAP_MS = 100.0
+    CALL_GATE_FADE_MS = 40.0
+    CALL_GATE_FLOOR_LINEAR = 0.0
 
 
 def _make_waveform(sr: int = 44_100, seconds: int = 2) -> np.ndarray:
@@ -130,6 +136,7 @@ def test_processing_pipeline_creates_outputs(tmp_path: Path) -> None:
     assert Path(result["spectrogram_after_path"]).exists()
     assert result["quality"]["quality_score"] >= 0
     assert result["calls"]
+    assert result.get("call_gate", {}).get("enabled") is False
     stats = cache.get_stats()
     assert stats["file_count"] >= 3
 

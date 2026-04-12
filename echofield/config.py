@@ -82,7 +82,7 @@ def _load_yaml(path: Path) -> dict[str, Any]:
 class Config:
     """Typed application configuration."""
 
-    AUDIO_DIR: str = "./data/recordings"
+    AUDIO_DIR: str = "./data/recordings/original"
     PROCESSED_DIR: str = "./data/processed"
     SPECTROGRAM_DIR: str = "./data/spectrograms"
     CACHE_DIR: str = "./data/cache"
@@ -112,6 +112,14 @@ class Config:
     DENOISE_CHUNK_S: float = 10.0
     DENOISE_POST_PROCESS: bool = False
     DENOISE_PRESERVE_HARMONICS: bool = False
+
+    # Call-aware time gate (Option B): attenuate audio outside detected call windows
+    CALL_AWARE_GATE: bool = True
+    CALL_GATE_MIN_CONFIDENCE: float = 0.45
+    CALL_GATE_PAD_MS: float = 250.0
+    CALL_GATE_MERGE_GAP_MS: float = 100.0
+    CALL_GATE_FADE_MS: float = 40.0
+    CALL_GATE_FLOOR_LINEAR: float = 0.0
 
     pipeline_config: dict[str, Any] = field(default_factory=dict)
 
@@ -188,6 +196,10 @@ class Config:
             raise ConfigError("Spectrogram FFT and hop length must be positive.")
         if self.SPECTROGRAM_TYPE.lower() not in {"stft", "cqt"}:
             raise ConfigError("ECHOFIELD_SPECTROGRAM_TYPE must be one of: stft, cqt.")
+        if not (0.0 <= self.CALL_GATE_MIN_CONFIDENCE <= 1.0):
+            raise ConfigError("ECHOFIELD_CALL_GATE_MIN_CONFIDENCE must be in [0, 1].")
+        if not (0.0 <= self.CALL_GATE_FLOOR_LINEAR <= 1.0):
+            raise ConfigError("ECHOFIELD_CALL_GATE_FLOOR_LINEAR must be in [0, 1].")
 
         self.ensure_directories()
 
@@ -301,6 +313,18 @@ def get_settings() -> Config:
         DENOISE_PRESERVE_HARMONICS=_env_bool(
             "DENOISE_PRESERVE_HARMONICS",
             default=bool(pipeline_defaults.get("denoise_preserve_harmonics", Config.DENOISE_PRESERVE_HARMONICS)),
+        ),
+        CALL_AWARE_GATE=_env_bool("CALL_AWARE_GATE", default=Config.CALL_AWARE_GATE),
+        CALL_GATE_MIN_CONFIDENCE=_env_float(
+            "CALL_GATE_MIN_CONFIDENCE",
+            default=Config.CALL_GATE_MIN_CONFIDENCE,
+        ),
+        CALL_GATE_PAD_MS=_env_float("CALL_GATE_PAD_MS", default=Config.CALL_GATE_PAD_MS),
+        CALL_GATE_MERGE_GAP_MS=_env_float("CALL_GATE_MERGE_GAP_MS", default=Config.CALL_GATE_MERGE_GAP_MS),
+        CALL_GATE_FADE_MS=_env_float("CALL_GATE_FADE_MS", default=Config.CALL_GATE_FADE_MS),
+        CALL_GATE_FLOOR_LINEAR=_env_float(
+            "CALL_GATE_FLOOR_LINEAR",
+            default=Config.CALL_GATE_FLOOR_LINEAR,
         ),
         pipeline_config=pipeline_config,
     )

@@ -98,11 +98,21 @@ def estimate_noise_profile(y: np.ndarray, sr: int, noise_duration_s: float = 0.5
 
 
 def compute_bin_snr(y: np.ndarray, sr: int, noise_clip: np.ndarray) -> np.ndarray:
+    """Compute per-bin SNR using noise mean and variance.
+
+    Accounts for noise variance per frequency bin for more accurate estimation.
+    """
     if y.size == 0:
         return np.array([], dtype=np.float32)
     signal_spec = np.abs(compute_stft(y, sr)["stft"])
     noise_spec = np.abs(compute_stft(noise_clip, sr)["stft"])
-    noise_floor = np.maximum(np.mean(noise_spec, axis=1, keepdims=True), 1e-8)
+
+    # Use both mean and std of noise for better floor estimation
+    noise_mean = np.mean(noise_spec, axis=1, keepdims=True)
+    noise_std = np.std(noise_spec, axis=1, keepdims=True)
+    # Noise floor = mean + 1 std (captures typical noise level)
+    noise_floor = np.maximum(noise_mean + noise_std, 1e-8)
+
     snr = 20.0 * np.log10(np.maximum(signal_spec, 1e-8) / noise_floor)
     return snr.astype(np.float32)
 
@@ -165,20 +175,44 @@ def _apply_harmonic_protection(
     hop_length: int = 512,
     gating_floor: float = 0.6,
 ) -> np.ndarray:
+    """Protect harmonics during denoising using SNR-weighted blending.
+
+    Instead of a hard floor threshold, blends original and cleaned magnitudes
+    in harmonic regions based on the local SNR — preserving harmonics that are
+    above the noise floor while still removing noise in weak harmonic regions.
+    """
     if original.size == 0 or cleaned.size == 0:
         return cleaned.astype(np.float32)
     min_len = min(len(original), len(cleaned))
     original = original[:min_len].astype(np.float32)
     cleaned = cleaned[:min_len].astype(np.float32)
     try:
-        f0 = librosa.yin(original, fmin=8, fmax=200, sr=sr, frame_length=max(n_fft, int(sr / 8) + 2), hop_length=hop_length)
+        f0 = librosa.yin(original, fmin=8, fmax=500, sr=sr, frame_length=max(n_fft, int(sr / 8) + 2), hop_length=hop_length)
         orig_stft = librosa.stft(original, n_fft=n_fft, hop_length=hop_length)
         clean_stft = librosa.stft(cleaned, n_fft=n_fft, hop_length=hop_length)
         orig_mag = np.abs(orig_stft)
         clean_mag = np.abs(clean_stft)
         mask = _build_harmonic_mask(clean_mag, f0, sr, n_fft)
         phase = np.exp(1j * np.angle(clean_stft))
-        protected_mag = np.where(mask, np.maximum(clean_mag, orig_mag * gating_floor), clean_mag)
+
+        # SNR-weighted blending in harmonic regions
+        # Estimate local SNR per bin: how much louder is this bin than the noise?
+        noise_estimate = np.median(clean_mag, axis=1, keepdims=True)
+        noise_estimate = np.maximum(noise_estimate, 1e-8)
+        local_snr = orig_mag / noise_estimate
+
+        # Blend weight: high SNR → keep more original, low SNR → keep cleaned
+        # Sigmoid mapping: weight = 1 / (1 + exp(-k*(snr - threshold)))
+        blend_weight = 1.0 / (1.0 + np.exp(-2.0 * (local_snr - 2.0)))
+        blend_weight = np.clip(blend_weight * gating_floor + (1.0 - gating_floor), gating_floor, 1.0)
+
+        # Apply only in harmonic regions
+        protected_mag = np.where(
+            mask,
+            blend_weight * orig_mag + (1.0 - blend_weight) * clean_mag,
+            clean_mag,
+        )
+
         protected = librosa.istft(protected_mag * phase, hop_length=hop_length, length=min_len)
         return protected.astype(np.float32)
     except Exception:
@@ -186,17 +220,39 @@ def _apply_harmonic_protection(
 
 
 def _remove_musical_noise(S_mag: np.ndarray, threshold_percentile: float = 90) -> np.ndarray:
-    """Smooth transient high-flux STFT magnitude bursts."""
+    """Smooth transient high-flux STFT magnitude bursts.
+
+    Uses adaptive kernel size based on spectrogram dimensions and
+    an adaptive flux threshold.
+    """
     if S_mag.size == 0:
         return S_mag
-    smoothed = median_filter(S_mag, size=(3, 3))
+
+    # Adaptive kernel: scale with spectrogram size, minimum 3x3, max 7x7
+    freq_kernel = min(max(3, S_mag.shape[0] // 64), 7)
+    time_kernel = min(max(3, S_mag.shape[1] // 32), 7)
+    # Ensure odd sizes
+    freq_kernel = freq_kernel if freq_kernel % 2 == 1 else freq_kernel + 1
+    time_kernel = time_kernel if time_kernel % 2 == 1 else time_kernel + 1
+
+    smoothed = median_filter(S_mag, size=(freq_kernel, time_kernel))
+
     if S_mag.shape[1] < 3:
         return smoothed.astype(np.float32)
+
+    # Adaptive threshold: use local energy level to scale
     flux = np.mean(np.diff(S_mag, axis=1) ** 2, axis=0)
+    mean_energy = float(np.mean(S_mag ** 2))
+    if mean_energy > 0:
+        # Normalize flux by mean energy
+        flux = flux / mean_energy
+
     threshold = np.percentile(flux, threshold_percentile)
     burst_frames = np.pad(flux >= threshold, (1, 0), constant_values=False)
+
     result = S_mag.copy()
-    result[:, burst_frames] = 0.7 * smoothed[:, burst_frames] + 0.3 * result[:, burst_frames]
+    # Gentler blending: 60% smoothed + 40% original in burst frames
+    result[:, burst_frames] = 0.6 * smoothed[:, burst_frames] + 0.4 * result[:, burst_frames]
     return result.astype(np.float32)
 
 

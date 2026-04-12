@@ -57,6 +57,8 @@ models/
 # Data Processing
 data/processed/
 data/spectrograms/
+data/recordings/processed/
+data/output/
 *.log
 
 # Docker

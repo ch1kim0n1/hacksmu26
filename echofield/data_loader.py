@@ -19,6 +19,14 @@ logger = get_logger(__name__)
 
 _AUDIO_EXTENSIONS = {".wav", ".mp3", ".flac"}
 _RECORDING_ID_NAMESPACE = uuid.uuid5(uuid.NAMESPACE_DNS, "echofield-recordings")
+_SKIP_AUDIO_DIRS = {
+    "processed",
+    "demo",
+    "archived",
+    "output",
+    "cache",
+    "spectrograms",
+}
 
 
 def stable_recording_id(source_path: str | None, filename: str, call_id: str | None = None) -> str:
@@ -87,6 +95,11 @@ def discover_audio_files(directory: str | Path) -> list[str]:
     discovered: list[str] = []
     for search_root in search_roots:
         for current_root, _dirnames, filenames in os.walk(search_root):
+            _dirnames[:] = [
+                dirname
+                for dirname in _dirnames
+                if dirname.lower() not in _SKIP_AUDIO_DIRS
+            ]
             for filename in filenames:
                 if Path(filename).suffix.lower() in _AUDIO_EXTENSIONS:
                     discovered.append(str((Path(current_root) / filename).resolve()))

@@ -150,6 +150,7 @@ async def process_one(
                 "call_id":        meta.get("call_id"),
             },
             "quality":       result.get("quality", {}),
+            "call_gate":     result.get("call_gate", {}),
             "calls":         result.get("calls", []),
             "stages_completed": result.get("stages_completed", []),
             "output_audio_path":      result.get("output_audio_path"),

@@ -607,7 +607,7 @@ async def _run_processing(
                 str(source_path),
                 str(settings.processed_dir),
                 str(settings.spectrogram_dir),
-                method="demo" if preset == "demo" else method,
+                method=preset if preset in {"demo", "isolate"} else method,
                 aggressiveness=aggressiveness,
                 progress_callback=lambda stage, status, progress, data=None: _progress_callback(
                     recording_id,
@@ -848,7 +848,7 @@ async def process_recording(
     background_tasks: BackgroundTasks,
     method: str = Query(default=settings.DENOISE_METHOD),
     aggressiveness: float = Query(default=1.0, ge=0.1, le=5.0),
-    preset: str | None = Query(default=None, pattern="^(demo)$"),
+    preset: str | None = Query(default=None, pattern="^(demo|isolate)$"),
 ) -> dict[str, Any]:
     recording = _get_store().get(recording_id)
     if recording is None:
@@ -858,6 +858,9 @@ async def process_recording(
     if preset == "demo":
         method = "demo"
         aggressiveness = min(aggressiveness, 1.0)
+    elif preset == "isolate":
+        method = "isolate"
+        aggressiveness = max(aggressiveness, 2.2)
     _get_store().update_status(recording_id, "processing", progress=0, current_stage="ingestion")
     task = asyncio.create_task(_run_processing(recording_id, method, aggressiveness, preset=preset))
     _get_tasks()[recording_id] = task
