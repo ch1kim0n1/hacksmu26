@@ -91,9 +91,10 @@ export default function DatabasePage() {
     try {
       setLoading(true);
       setError(null);
+      const hasTextFilter = search.trim() !== "" || locationFilter.trim() !== "";
       const data = await getCalls({
-        limit: PAGE_SIZE,
-        offset: page * PAGE_SIZE,
+        limit: hasTextFilter ? 1000 : PAGE_SIZE,
+        offset: hasTextFilter ? 0 : page * PAGE_SIZE,
         call_type:
           callTypeFilter !== "All Types" ? callTypeFilter : undefined,
       });
@@ -104,7 +105,7 @@ export default function DatabasePage() {
     } finally {
       setLoading(false);
     }
-  }, [page, callTypeFilter]);
+  }, [page, callTypeFilter, search, locationFilter]);
 
   useEffect(() => {
     fetchCalls();
@@ -127,7 +128,14 @@ export default function DatabasePage() {
     return true;
   });
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const hasTextFilter = search.trim() !== "" || locationFilter.trim() !== "";
+  const displayedCalls = hasTextFilter
+    ? filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+    : filtered;
+  const totalPages = Math.max(
+    1,
+    Math.ceil(hasTextFilter ? filtered.length / PAGE_SIZE : total / PAGE_SIZE),
+  );
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
@@ -195,7 +203,10 @@ export default function DatabasePage() {
             type="text"
             placeholder="Search by call ID, recording ID, or type..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(0);
+            }}
             className="w-full pl-10 pr-4 py-2.5 glass border border-ev-sand/40 rounded-xl text-sm text-ev-charcoal placeholder:text-ev-warm-gray/50 focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all"
           />
         </div>
@@ -228,7 +239,10 @@ export default function DatabasePage() {
             type="text"
             placeholder="Location..."
             value={locationFilter}
-            onChange={(e) => setLocationFilter(e.target.value)}
+            onChange={(e) => {
+              setLocationFilter(e.target.value);
+              setPage(0);
+            }}
             className="w-full pl-9 pr-3.5 py-2.5 glass border border-ev-sand/40 rounded-xl text-sm text-ev-charcoal placeholder:text-ev-warm-gray/50 focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all"
           />
         </div>
@@ -268,7 +282,7 @@ export default function DatabasePage() {
             Retry
           </motion.button>
         </div>
-      ) : filtered.length === 0 ? (
+      ) : displayedCalls.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -289,7 +303,7 @@ export default function DatabasePage() {
           animate="animate"
           className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
         >
-          {filtered.map((call) => (
+          {displayedCalls.map((call) => (
             <motion.button
               key={call.id}
               variants={fadeUp}
