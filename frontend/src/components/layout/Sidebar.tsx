@@ -196,9 +196,9 @@ export default function Sidebar() {
           <p className="text-[10px] text-ev-dust/40 text-center">
             Built for HackSMU 2026
           </p>
-          <p className="text-[10px] text-ev-dust/30 text-center">
+          <a href="https://www.elephantvoices.org" target="_blank" rel="noopener noreferrer" className="text-[10px] text-ev-dust/30 text-center hover:text-accent-savanna/40 transition-colors">
             ElephantVoices Track
-          </p>
+          </a>
         </div>
       </aside>
 
@@ -210,7 +210,10 @@ export default function Sidebar() {
           <SidebarNav onNavigate={() => setMobileOpen(false)} />
           <div className="border-t border-[#3A3530] px-4 py-3 shrink-0">
             <p className="text-[10px] text-ev-dust/40 text-center">
-              Built for HackSMU 2026 — ElephantVoices Track
+              Built for HackSMU 2026 —{" "}
+              <a href="https://www.elephantvoices.org" target="_blank" rel="noopener noreferrer" className="hover:text-accent-savanna/40 transition-colors">
+                ElephantVoices Track
+              </a>
             </p>
           </div>
         </SheetContent>
