@@ -17,6 +17,7 @@ import {
   type Recording,
 } from "@/lib/audio-api";
 import { AnalysisLabels, AnalysisWindow } from "@/components/research/AnalysisLabels";
+import InfrasoundReveal from "@/components/audio/InfrasoundReveal";
 import EmotionTimeline from "@/components/research/EmotionTimeline";
 
 const Spectrogram3D = dynamic(() => import("@/components/spectrogram/Spectrogram3D"), { ssr: false });
@@ -519,6 +520,9 @@ export default function ProcessingPage() {
                 </div>
               </div>
             </div>
+
+            {/* Infrasound Reveal */}
+            <InfrasoundReveal recordingId={jobId} isComplete={isComplete} />
 
             {markers && markers.markers.length > 0 && (
               <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
