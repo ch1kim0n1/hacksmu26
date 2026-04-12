@@ -523,7 +523,7 @@ export default function LandingPage() {
             aria-label="Enter EchoField dashboard"
             className={`pointer-events-auto absolute left-[49%] top-[41%] h-[clamp(280px,34vw,500px)] w-[clamp(280px,34vw,500px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-transform ease-[cubic-bezier(0.2,0,0.8,1)] ${
               isTransitioning
-                ? "z-[250] scale-[22] duration-[1400ms] cursor-default"
+                ? "z-[250] scale-[22] duration-[2200ms] cursor-default"
                 : "z-[10] scale-100 duration-[400ms] hover:scale-[1.03] cursor-pointer"
             }`}
           >
