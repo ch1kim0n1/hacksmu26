@@ -53,17 +53,24 @@ function concatFloat32(arrays: Float32Array[]): Float32Array {
 }
 
 function encodeWav(samples: Float32Array, sampleRate: number): Blob {
-  const buf = new ArrayBuffer(44 + samples.length * 4);
+  // 16-bit PCM — opens in every player/OS without codec issues
+  const pcm = new Int16Array(samples.length);
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  const buf = new ArrayBuffer(44 + pcm.byteLength);
   const v = new DataView(buf);
   const str = (o: number, s: string) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
-  str(0, "RIFF"); v.setUint32(4, 36 + samples.length * 4, true);
+  str(0, "RIFF"); v.setUint32(4, 36 + pcm.byteLength, true);
   str(8, "WAVE"); str(12, "fmt ");
-  v.setUint32(16, 16, true); v.setUint16(20, 3, true);
-  v.setUint16(22, 1, true);
-  v.setUint32(24, sampleRate, true); v.setUint32(28, sampleRate * 4, true);
-  v.setUint16(32, 4, true); v.setUint16(34, 32, true);
-  str(36, "data"); v.setUint32(40, samples.length * 4, true);
-  new Float32Array(buf, 44).set(samples);
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); // PCM integer
+  v.setUint16(22, 1, true);  // mono
+  v.setUint32(24, sampleRate, true);
+  v.setUint32(28, sampleRate * 2, true);
+  v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  str(36, "data"); v.setUint32(40, pcm.byteLength, true);
+  new Int16Array(buf, 44).set(pcm);
   return new Blob([buf], { type: "audio/wav" });
 }
 
@@ -130,6 +137,7 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
   const rawRecorderRef    = useRef<MediaRecorder | null>(null);
   const rawChunksRef      = useRef<BlobPart[]>([]);
   const rawBlobRef        = useRef<Blob | null>(null);
+  const filteredBlobRef   = useRef<Blob | null>(null);
   const rawUrlRef         = useRef<string | null>(null);
   const filteredUrlRef    = useRef<string | null>(null);
   const pendingStopsRef   = useRef(0);
@@ -265,6 +273,7 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
     revokeOutputUrls();
     closeAudioGraph();
     rawBlobRef.current = null;
+    filteredBlobRef.current = null;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -334,6 +343,7 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
           if (filteredBufsRef.current.length > 0) {
             const allFiltered = concatFloat32(filteredBufsRef.current);
             const wavBlob = encodeWav(allFiltered, sr);
+            filteredBlobRef.current = wavBlob;
             const fUrl = URL.createObjectURL(wavBlob);
             if (filteredUrlRef.current) URL.revokeObjectURL(filteredUrlRef.current);
             filteredUrlRef.current = fUrl;
@@ -390,14 +400,20 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
   /* ── Send to pipeline ──────────────────────────────────────── */
 
   const handleSendToPipeline = useCallback(async () => {
-    const blob = rawBlobRef.current;
+    // Prefer the filtered WAV (16-bit PCM, accepted by backend).
+    // Fall back to raw if no filtered audio was produced (backend was offline).
+    const blob = filteredBlobRef.current ?? rawBlobRef.current;
     if (!blob) return;
     setIsSendingToQueue(true);
     setQueueError(null);
     setQueuedId(null);
     try {
-      const ext = blob.type.includes("ogg") ? "ogg" : "webm";
-      const file = new File([blob], `${sessionLabel}.${ext}`, { type: blob.type });
+      const isWav = blob.type === "audio/wav";
+      if (!isWav) {
+        setQueueError("Backend was offline during recording — no filtered WAV available. Run the backend and record again.");
+        return;
+      }
+      const file = new File([blob], `${sessionLabel}.wav`, { type: "audio/wav" });
       const { recording_ids } = await uploadFiles([file]);
       const id = recording_ids[0];
       await processRecording(id, { method: "hybrid" });
@@ -607,7 +623,7 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
               <button
                 type="button"
                 onClick={() => void handleSendToPipeline()}
-                disabled={isSendingToQueue || !rawBlobRef.current}
+                disabled={isSendingToQueue || !filteredBlobRef.current}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent-savanna to-accent-gold px-4 py-2.5 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60 hover:shadow-md transition-shadow"
               >
                 {isSendingToQueue ? (
