@@ -48,7 +48,7 @@ export default function Sidebar() {
               {isActive && (
                 <motion.div
                   layoutId="sidebar-indicator"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-gradient-to-b from-accent-savanna to-accent-gold"
+                  className="absolute -left-2 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-gradient-to-b from-accent-savanna to-accent-gold"
                   transition={{
                     type: "spring",
                     stiffness: 350,
