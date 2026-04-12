@@ -172,3 +172,72 @@ def test_recordings_persist_across_restart(monkeypatch, tmp_path: Path) -> None:
     assert spectrogram.status_code == 200
     assert any(item["id"] == recording_id and item["status"] == "complete" for item in listing.json()["recordings"])
     assert detail.json()["result"]["quality"]["quality_score"] == 80.0
+
+
+# ── Colormap endpoint tests ──
+
+
+def _make_and_process_recording(client, tmp_path: Path) -> str:
+    """Upload and fully process a recording, returning its ID."""
+    import numpy as np
+    import soundfile as sf
+    sr = 44_100
+    t = np.linspace(0, 1, sr, endpoint=False)
+    waveform = (0.2 * np.sin(2 * np.pi * 18 * t)).astype(np.float32)
+    audio_path = tmp_path / "colormap_test.wav"
+    sf.write(audio_path, waveform, sr)
+
+    with audio_path.open("rb") as fh:
+        resp = client.post("/api/upload", files={"file": ("colormap_test.wav", fh, "audio/wav")})
+    assert resp.status_code == 201
+    recording_id = resp.json()["recording_ids"][0]
+    client.post(f"/api/recordings/{recording_id}/process")
+    # poll until complete
+    import time
+    for _ in range(30):
+        detail = client.get(f"/api/recordings/{recording_id}")
+        if detail.json().get("status") == "complete":
+            break
+        time.sleep(0.5)
+    return recording_id
+
+
+def test_spectrogram_endpoint_default_colormap(monkeypatch, tmp_path: Path) -> None:
+    """GET /api/recordings/{id}/spectrogram returns PNG for default colormap."""
+    server_module = _reload_server(monkeypatch, tmp_path)
+    with TestClient(server_module.app) as client:
+        recording_id = _make_and_process_recording(client, tmp_path)
+        resp = client.get(f"/api/recordings/{recording_id}/spectrogram?type=after")
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "image/png"
+
+
+def test_spectrogram_endpoint_valid_colormap(monkeypatch, tmp_path: Path) -> None:
+    """GET /api/recordings/{id}/spectrogram?colormap=magma returns a valid PNG."""
+    server_module = _reload_server(monkeypatch, tmp_path)
+    with TestClient(server_module.app) as client:
+        recording_id = _make_and_process_recording(client, tmp_path)
+        resp = client.get(f"/api/recordings/{recording_id}/spectrogram?type=after&colormap=magma")
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "image/png"
+    assert len(resp.content) > 0
+
+
+def test_spectrogram_endpoint_all_colormaps(monkeypatch, tmp_path: Path) -> None:
+    """All supported colormaps return valid PNGs from the endpoint."""
+    server_module = _reload_server(monkeypatch, tmp_path)
+    with TestClient(server_module.app) as client:
+        recording_id = _make_and_process_recording(client, tmp_path)
+        for cmap in ("viridis", "magma", "inferno", "plasma", "gray"):
+            resp = client.get(f"/api/recordings/{recording_id}/spectrogram?type=after&colormap={cmap}")
+            assert resp.status_code == 200, f"Failed for colormap={cmap}"
+            assert resp.headers["content-type"] == "image/png"
+
+
+def test_spectrogram_endpoint_invalid_colormap_returns_422(monkeypatch, tmp_path: Path) -> None:
+    """An unsupported colormap returns HTTP 422."""
+    server_module = _reload_server(monkeypatch, tmp_path)
+    with TestClient(server_module.app) as client:
+        recording_id = _make_and_process_recording(client, tmp_path)
+        resp = client.get(f"/api/recordings/{recording_id}/spectrogram?type=after&colormap=rainbow")
+    assert resp.status_code == 422
