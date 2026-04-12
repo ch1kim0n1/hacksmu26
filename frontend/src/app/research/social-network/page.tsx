@@ -181,7 +181,10 @@ function useForceSimulation(
       }
 
       iterCount++;
-      setTick((t) => t + 1);
+      // Only update state every 10 frames to reduce re-renders
+      if (iterCount % 10 === 0) {
+        setTick((t) => t + 1);
+      }
 
       if (iterCount < MAX_ITERS) {
         frameRef.current = requestAnimationFrame(step);
