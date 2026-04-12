@@ -118,7 +118,7 @@ export default function DatabasePage() {
         className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold text-dark-text-primary">
+          <h1 className="text-2xl font-bold text-dark-text-primary tracking-tight">
             Call Database
           </h1>
           <p className="text-sm text-dark-text-secondary mt-1">
@@ -149,7 +149,7 @@ export default function DatabasePage() {
             placeholder="Search by call ID, recording ID, or type..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-dark-surface border border-white/[0.06] rounded-xl text-sm text-dark-text-primary placeholder:text-dark-text-muted focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-dark-surface border border-white/[0.06] rounded-xl text-sm text-dark-text-primary placeholder:text-dark-text-muted focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all transition-colors"
           />
         </div>
 
@@ -188,7 +188,7 @@ export default function DatabasePage() {
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="p-4 rounded-xl bg-dark-surface border border-white/[0.06] animate-pulse"
+              className="p-4 rounded-xl bg-dark-surface border border-white/[0.04] animate-pulse"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
               <div className="flex items-center justify-between mb-3">
@@ -237,13 +237,14 @@ export default function DatabasePage() {
           animate="animate"
           className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
         >
-          {filtered.map((call) => (
+          {filtered.map((call, index) => (
             <motion.button
               key={call.id}
               variants={fadeUp}
               onClick={() => router.push(`/results/${call.id}`)}
               aria-label={`View call ${call.call_type} ${call.id.slice(0, 8)}`}
-              className="group p-4 rounded-xl bg-dark-surface border border-white/[0.06] card-hover hover:shadow-spectrogram-glow hover:border-white/[0.12] text-left flex flex-col"
+              className="group p-4 rounded-xl bg-dark-surface border border-white/[0.06] card-hover hover:shadow-spectrogram-glow hover:border-white/[0.12] text-left flex flex-col animate-card-rise"
+              style={{ animationDelay: `${index * 0.06}s` }}
             >
               {/* Top row */}
               <div className="flex items-start justify-between gap-2 mb-3">
@@ -394,7 +395,7 @@ export default function DatabasePage() {
                 aria-current={page === pageNum ? "page" : undefined}
                 className={`w-9 h-9 rounded-lg text-sm font-medium transition-all tabular-nums ${
                   page === pageNum
-                    ? "bg-gradient-to-r from-accent-savanna to-accent-gold text-white shadow-sm shadow-accent-savanna/20"
+                    ? "bg-accent-savanna text-white shadow-sm shadow-accent-savanna/20"
                     : "bg-dark-surface border border-white/[0.06] text-dark-text-secondary hover:text-dark-text-primary"
                 }`}
               >

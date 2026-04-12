@@ -34,19 +34,21 @@
   --spectrogram-peak: #EF4444;
 }
 
-/* ─── Dark Lab Theme ─── */
+/* ─── Dark Lab Theme — Observatory at Dusk ─── */
 .dark {
-  --ev-page-bg: #0B0D10;
-  --ev-surface: #141820;
-  --ev-surface-elevated: #1A1F2A;
-  --ev-surface-overlay: #232930;
-  --ev-border: rgba(255, 255, 255, 0.06);
-  --ev-border-bright: rgba(255, 255, 255, 0.12);
-  --ev-text-primary: #E8E4DF;
-  --ev-text-secondary: #9B9590;
-  --ev-text-muted: #6B6560;
-  --ev-accent: #C4A46C;
-  --ev-accent-glow: rgba(196, 164, 108, 0.15);
+  --ev-page-bg: #08090C;
+  --ev-surface: #0F1218;
+  --ev-surface-elevated: #161B24;
+  --ev-surface-overlay: #1D2330;
+  --ev-border: rgba(196, 164, 108, 0.06);
+  --ev-border-bright: rgba(196, 164, 108, 0.14);
+  --ev-text-primary: #ECE8E1;
+  --ev-text-secondary: #A09890;
+  --ev-text-muted: #605850;
+  --ev-accent: #D4AA5C;
+  --ev-accent-glow: rgba(212, 170, 92, 0.12);
+  --ev-accent-glow-strong: rgba(212, 170, 92, 0.25);
+  --ev-cyan-glow: rgba(0, 200, 240, 0.08);
 }
 
 body {
@@ -332,17 +334,19 @@ select {
 /* ─── Dark Theme Overrides ─── */
 
 .dark .glass {
-  background: rgba(20, 24, 32, 0.7);
-  backdrop-filter: blur(16px) saturate(1.2);
-  -webkit-backdrop-filter: blur(16px) saturate(1.2);
-  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(15, 18, 24, 0.65);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border-color: rgba(196, 164, 108, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .dark .glass-strong {
-  background: rgba(26, 31, 42, 0.85);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(22, 27, 36, 0.8);
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  border-color: rgba(196, 164, 108, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .dark ::-webkit-scrollbar-track { background: #141820; }
@@ -351,16 +355,16 @@ select {
 .dark * { scrollbar-color: #2C3238 #141820; }
 
 .dark .bg-orbs::before {
-  background: radial-gradient(circle, rgba(196, 164, 108, 0.04) 0%, transparent 70%);
+  background: radial-gradient(ellipse 600px 400px at 85% 15%, rgba(212, 170, 92, 0.05) 0%, transparent 70%);
 }
 
 .dark .bg-orbs::after {
-  background: radial-gradient(circle, rgba(0, 217, 255, 0.025) 0%, transparent 70%);
+  background: radial-gradient(ellipse 500px 500px at 10% 80%, rgba(0, 200, 240, 0.03) 0%, transparent 70%);
 }
 
 .dark .card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(196, 164, 108, 0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(196, 164, 108, 0.08), 0 0 30px rgba(212, 170, 92, 0.04);
 }
 
 .dark .skeleton { background: var(--ev-surface); }
@@ -377,12 +381,14 @@ select {
 .spectrogram-hero::after {
   content: '';
   position: absolute;
-  inset: -20px;
-  background: radial-gradient(ellipse at center, rgba(0, 217, 255, 0.06) 0%, rgba(196, 164, 108, 0.03) 40%, transparent 70%);
+  inset: -30px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0, 200, 240, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 80% at 30% 70%, rgba(212, 170, 92, 0.03) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
   border-radius: 24px;
-  filter: blur(20px);
+  filter: blur(30px);
 }
 
 /* Crosshair cursor for interactive spectrograms */
@@ -403,4 +409,87 @@ select {
 
 .animate-playhead-glow {
   animation: playhead-glow 2s ease-in-out infinite;
+}
+
+/* Subtle noise texture for depth */
+.noise-texture {
+  position: relative;
+}
+
+.noise-texture::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+  mix-blend-mode: overlay;
+}
+
+/* Scan line effect for spectrogram areas */
+.scan-lines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 2;
+  border-radius: inherit;
+}
+
+/* LED indicator dot */
+.led-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.led-indicator::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: inherit;
+  filter: blur(4px);
+  opacity: 0.5;
+}
+
+.led-green { background: #10C876; }
+.led-amber { background: #D4AA5C; }
+.led-red { background: #EF4444; }
+.led-cyan { background: #00C8F0; }
+
+/* Instrument border — subtle amber glow on borders */
+.instrument-border {
+  border: 1px solid rgba(196, 164, 108, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(196, 164, 108, 0.03);
+}
+
+/* Entrance animation for cards on dark pages */
+@keyframes card-rise {
+  0% { opacity: 0; transform: translateY(16px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-card-rise {
+  animation: card-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Glow pulse for active elements */
+@keyframes amber-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212, 170, 92, 0); }
+  50% { box-shadow: 0 0 20px 2px rgba(212, 170, 92, 0.08); }
+}
+
+.animate-amber-breathe {
+  animation: amber-breathe 4s ease-in-out infinite;
 }

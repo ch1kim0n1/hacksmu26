@@ -57,7 +57,7 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
                 initial={false}
                 animate={{
                   scale: isCurrent ? 1.1 : 1,
-                  backgroundColor: isComplete ? "#10C876" : isCurrent ? "#C4A46C" : "#141820",
+                  backgroundColor: isComplete ? "#10C876" : isCurrent ? "#C4A46C" : "#0F1218",
                 }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
                 className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold"
@@ -76,7 +76,7 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
             {i < STAGES.length - 1 && (
               <motion.div
                 initial={false}
-                animate={{ backgroundColor: isComplete ? "#10C876" : "#1A1F2A" }}
+                animate={{ backgroundColor: isComplete ? "#10C876" : "#161B24" }}
                 transition={{ duration: 0.4 }}
                 className="flex-1 h-0.5 mx-0.5 rounded-full min-w-[12px]"
               />
@@ -90,7 +90,7 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
 
 function MetricCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="p-4 rounded-xl glass border border-white/[0.06]">
+    <div className="p-4 rounded-xl glass border border-white/[0.06] instrument-border">
       <h3 className="text-[11px] font-medium text-dark-text-muted mb-3 uppercase tracking-wider leading-none">{label}</h3>
       <div className="min-h-0">{children}</div>
     </div>
@@ -99,9 +99,9 @@ function MetricCard({ label, children }: { label: string; children: React.ReactN
 
 function SkeletonBlock() {
   return (
-    <div className="w-full aspect-[2/1] bg-dark-surface rounded-xl animate-pulse flex items-center justify-center">
-      <svg className="w-10 h-10 text-dark-text-muted/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    <div className="w-full aspect-[2/1] bg-dark-surface rounded-xl flex items-center justify-center border border-white/[0.04]">
+      <svg className="w-10 h-10 text-dark-text-muted/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
       </svg>
     </div>
   );
@@ -205,12 +205,12 @@ export default function ProcessingPage() {
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-dark-text-secondary">{recording?.filename || "Processing"}</span>
           </div>
-          <h1 className="text-2xl font-bold text-dark-text-primary">{recording?.filename || "Processing"}</h1>
+          <h1 className="text-2xl font-bold text-dark-text-primary tracking-tight">{recording?.filename || "Processing"}</h1>
         </div>
         <div className="flex items-center gap-3">
           {(processing.status === "processing" || processing.status === "connecting") && (
-            <span className="inline-flex items-center gap-1.5 text-xs text-success bg-success/8 px-2.5 py-1 rounded-full font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />Live
+            <span className="inline-flex items-center gap-1.5 text-xs text-success bg-success/10 border border-success/20 px-2.5 py-1 rounded-full font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse led-indicator led-green" />Live
             </span>
           )}
           {isProcessing && <span className="text-sm text-dark-text-muted tabular-nums font-medium">{Math.round(progress)}%</span>}
@@ -222,7 +222,7 @@ export default function ProcessingPage() {
         <ProcessingTimeline currentStage={currentStage} />
         {isProcessing && (
           <div className="mt-4">
-            <div className="h-2 bg-dark-surface-elevated rounded-full overflow-hidden">
+            <div className="h-2 bg-dark-surface overflow-hidden rounded-full">
               <motion.div className="h-full bg-gradient-to-r from-accent-savanna to-accent-gold rounded-full" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.5 }} style={{ boxShadow: "0 0 12px rgba(196,164,108,0.3)" }} />
             </div>
             <p className="text-[11px] text-dark-text-secondary mt-1.5">{currentStageLabel}</p>

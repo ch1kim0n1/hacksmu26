@@ -144,7 +144,7 @@ export default function DarkAudioPlayer({
           whileTap={{ scale: 0.95 }}
           onClick={togglePlay}
           disabled={!isReady}
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-colors disabled:opacity-30"
+          className="w-9 h-9 rounded-full flex items-center justify-center transition-colors shadow-lg shadow-accent-savanna/20 disabled:opacity-30"
           style={{ backgroundColor: accentColor }}
           aria-label={isPlaying ? "Pause" : "Play"}
         >
@@ -163,7 +163,7 @@ export default function DarkAudioPlayer({
         <div className="flex-1" />
 
         {/* Volume */}
-        <button onClick={toggleMute} className="text-dark-text-muted hover:text-dark-text-secondary transition-colors" aria-label={isMuted ? "Unmute" : "Mute"}>
+        <button onClick={toggleMute} className="text-dark-text-muted hover:text-accent-savanna transition-colors" aria-label={isMuted ? "Unmute" : "Mute"}>
           {isMuted || volume === 0 ? (
             <VolumeX className="w-4 h-4" />
           ) : (
@@ -177,7 +177,7 @@ export default function DarkAudioPlayer({
           step={0.01}
           value={isMuted ? 0 : volume}
           onChange={(e) => { setVolume(parseFloat(e.target.value)); setIsMuted(false); }}
-          className="w-16 h-1 appearance-none bg-dark-surface-overlay rounded-full [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+          className="w-16 h-1 appearance-none bg-dark-surface-overlay rounded-full [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:bg-accent-savanna"
           style={{
             background: `linear-gradient(to right, ${accentColor} ${(isMuted ? 0 : volume) * 100}%, #232930 ${(isMuted ? 0 : volume) * 100}%)`,
           }}
@@ -188,7 +188,7 @@ export default function DarkAudioPlayer({
         <a
           href={src}
           download
-          className="text-dark-text-muted hover:text-dark-text-secondary transition-colors"
+          className="text-dark-text-muted hover:text-accent-savanna transition-colors"
           aria-label="Download"
         >
           <Download className="w-4 h-4" />

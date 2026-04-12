@@ -77,7 +77,7 @@ export default function InteractiveSpectrogram({
   const infrasoundLinePct = maxFrequency > 0 ? (1 - 20 / maxFrequency) * 100 : 100;
 
   return (
-    <div className={`rounded-xl overflow-hidden border border-white/[0.06] bg-[#0C1A2A] spectrogram-hero ${className}`}>
+    <div className={`rounded-xl overflow-hidden border border-white/[0.06] bg-[#060D18] spectrogram-hero ${className}`}>
       {/* Label */}
       {label && (
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
@@ -94,7 +94,7 @@ export default function InteractiveSpectrogram({
       {/* Spectrogram container */}
       <div
         ref={containerRef}
-        className="relative w-full aspect-[3/1] cursor-instrument select-none"
+        className="relative w-full aspect-[3/1] cursor-instrument select-none scan-lines"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
@@ -110,7 +110,7 @@ export default function InteractiveSpectrogram({
 
         {/* Loading skeleton */}
         {!imageLoaded && (
-          <div className="absolute inset-0 bg-dark-surface animate-pulse flex items-center justify-center">
+          <div className="absolute inset-0 bg-dark-surface-elevated animate-pulse flex items-center justify-center">
             <svg className="w-8 h-8 text-dark-text-muted/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
             </svg>
@@ -123,8 +123,8 @@ export default function InteractiveSpectrogram({
             className="absolute left-0 right-0 pointer-events-none z-10"
             style={{ top: `${infrasoundLinePct}%` }}
           >
-            <div className="w-full border-t border-dashed border-blue-400/30" />
-            <span className="absolute right-2 -top-4 text-[9px] text-blue-400/60 font-mono">
+            <div className="w-full border-t border-dashed border-cyan-400/20" />
+            <span className="absolute right-2 -top-4 text-[9px] text-cyan-400/50 font-mono">
               20 Hz — human hearing limit
             </span>
           </div>
@@ -133,7 +133,7 @@ export default function InteractiveSpectrogram({
         {/* Infrasound zone tint */}
         {maxFrequency >= 20 && (
           <div
-            className="absolute left-0 right-0 bottom-0 pointer-events-none bg-blue-500/[0.04] z-[1]"
+            className="absolute left-0 right-0 bottom-0 pointer-events-none bg-cyan-500/[0.03] z-[1]"
             style={{ top: `${infrasoundLinePct}%` }}
           />
         )}
@@ -171,7 +171,7 @@ export default function InteractiveSpectrogram({
         {/* Crosshair vertical line (time) */}
         {mousePos && (
           <div
-            className="absolute top-0 bottom-0 w-px bg-white/20 pointer-events-none z-20"
+            className="absolute top-0 bottom-0 w-px bg-accent-savanna/30 pointer-events-none z-20"
             style={{ left: `${mousePos.x}%` }}
           />
         )}
@@ -179,7 +179,7 @@ export default function InteractiveSpectrogram({
         {/* Crosshair horizontal line (frequency) */}
         {mousePos && (
           <div
-            className="absolute left-0 right-0 h-px bg-white/20 pointer-events-none z-20"
+            className="absolute left-0 right-0 h-px bg-accent-savanna/30 pointer-events-none z-20"
             style={{ top: `${mousePos.y}%` }}
           />
         )}
@@ -194,7 +194,7 @@ export default function InteractiveSpectrogram({
               transform: `translate(${mousePos.x > 80 ? "-110%" : "10%"}, ${mousePos.y > 80 ? "-110%" : "10%"})`,
             }}
           >
-            <div className="bg-black/80 backdrop-blur-sm rounded-md px-2 py-1 text-[10px] font-mono text-white whitespace-nowrap border border-white/10">
+            <div className="bg-dark-surface-elevated/95 backdrop-blur-md rounded-lg px-2.5 py-1.5 text-[10px] font-mono text-dark-text-primary whitespace-nowrap border border-white/[0.06] shadow-lg">
               {cursorTime.toFixed(2)}s / {Math.round(cursorFreq)} Hz
               {cursorFreq < 20 && (
                 <span className="text-blue-400 ml-1">infrasonique</span>

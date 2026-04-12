@@ -48,7 +48,7 @@ export default function NoiseDissolve({
   }, []);
 
   return (
-    <div className={`rounded-xl overflow-hidden border border-white/[0.06] bg-[#0C1A2A] ${className}`}>
+    <div className={`rounded-xl overflow-hidden border border-white/[0.06] bg-[#060D18] ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
         <div className="flex items-center gap-2">
@@ -88,7 +88,7 @@ export default function NoiseDissolve({
 
         {/* Before (noisy) — clipped away progressively */}
         <div
-          className="absolute inset-0 overflow-hidden transition-[clip-path] duration-300 ease-out"
+          className="absolute inset-0 overflow-hidden transition-[clip-path] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
           style={{
             clipPath: `inset(0 0 0 ${dissolveAmount}%)`,
           }}
@@ -107,20 +107,21 @@ export default function NoiseDissolve({
         {/* Dissolve edge glow */}
         {dissolveAmount > 0 && dissolveAmount < 100 && (
           <div
-            className="absolute top-0 bottom-0 w-8 pointer-events-none z-10"
+            className="absolute top-0 bottom-0 w-12 pointer-events-none z-10"
             style={{
               left: `${dissolveAmount}%`,
               transform: "translateX(-50%)",
-              background: `linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.15), rgba(196, 164, 108, 0.1), transparent)`,
+              background: `linear-gradient(90deg, transparent, rgba(0, 200, 240, 0.12), rgba(212, 170, 92, 0.08), transparent)`,
+              filter: "blur(2px)",
             }}
           />
         )}
 
         {/* Labels */}
-        <div className="absolute top-3 left-3 px-2 py-0.5 bg-danger/60 backdrop-blur-sm rounded text-[9px] text-white font-medium pointer-events-none z-20">
+        <div className="absolute top-3 left-3 px-2 py-0.5 bg-danger/50 border border-danger/20 backdrop-blur-sm rounded text-[9px] text-white font-medium pointer-events-none z-20">
           Noisy
         </div>
-        <div className="absolute top-3 right-3 px-2 py-0.5 bg-success/60 backdrop-blur-sm rounded text-[9px] text-white font-medium pointer-events-none z-20">
+        <div className="absolute top-3 right-3 px-2 py-0.5 bg-success/50 border border-success/20 backdrop-blur-sm rounded text-[9px] text-white font-medium pointer-events-none z-20">
           Clean
         </div>
       </div>

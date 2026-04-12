@@ -74,7 +74,7 @@ export default function ResultsPage() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="p-16 rounded-2xl bg-dark-surface border border-dashed border-white/[0.08] text-center"
+          className="p-16 rounded-2xl bg-dark-surface border border-dashed border-white/[0.06] noise-texture text-center"
         >
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-savanna/10 to-accent-gold/5 flex items-center justify-center mx-auto mb-4">
             <Music className="w-7 h-7 text-accent-savanna/50" />
@@ -91,9 +91,9 @@ export default function ResultsPage() {
           variants={staggerContainer}
           initial="initial"
           animate="animate"
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {recordings.map((rec) => {
+          {recordings.map((rec, index) => {
             const quality = rec.result?.quality;
             const spectrogramUrl = `${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`;
 
@@ -103,10 +103,11 @@ export default function ResultsPage() {
                 variants={fadeUp}
                 onClick={() => router.push(`/processing/${rec.id}`)}
                 aria-label={`View ${rec.filename} results`}
-                className="text-left rounded-2xl bg-dark-surface border border-white/[0.06] overflow-hidden group card-hover hover:shadow-spectrogram-glow hover:border-white/[0.12] flex flex-col"
+                className="text-left rounded-2xl bg-dark-surface border border-white/[0.06] overflow-hidden group card-hover hover:shadow-spectrogram-glow hover:border-white/[0.12] flex flex-col animate-card-rise"
+                style={{ animationDelay: `${index * 0.06}s` }}
               >
                 {/* Spectrogram Thumbnail */}
-                <div className="relative h-48 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
+                <div className="relative h-48 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden scan-lines">
                   <img
                     src={spectrogramUrl}
                     alt={`Spectrogram for ${rec.filename}`}
@@ -117,7 +118,7 @@ export default function ResultsPage() {
 
                   {quality?.quality_score != null && (
                     <div className="absolute top-3 right-3">
-                      <div className="bg-dark-surface-elevated/80 backdrop-blur-sm border border-white/[0.1] rounded-lg px-2 py-1">
+                      <div className="bg-dark-surface/90 backdrop-blur-md border border-white/[0.08] rounded-lg px-2 py-1">
                         <span
                           className={`text-xs font-bold ${
                             quality.quality_score >= 0.8
@@ -167,7 +168,7 @@ export default function ResultsPage() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-1 text-xs text-accent-savanna font-medium opacity-0 group-hover:opacity-100 transition-opacity pt-1 mt-auto">
+                  <div className="flex items-center gap-1 text-xs text-accent-savanna font-medium opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200 pt-1 mt-auto">
                     <span>View details</span>
                     <ArrowRight className="w-3 h-3" />
                   </div>
