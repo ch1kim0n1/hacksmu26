@@ -86,6 +86,8 @@ def discover_audio_files(directory: str | Path) -> list[str]:
         return []
 
     discovered: list[str] = []
+    # Skip output/demo files that are handled separately by discover_demo_recordings
+    _skip_names = {"processed.wav", "processed.mp3", "processed.flac", "original.wav", "original.mp3", "original.flac"}
     for search_root in search_roots:
         for current_root, _dirnames, filenames in os.walk(search_root):
             # Skip demo subdirectories — they contain pre-computed results
@@ -94,7 +96,7 @@ def discover_audio_files(directory: str | Path) -> list[str]:
             if rel.parts and rel.parts[0] == "demo":
                 continue
             for filename in filenames:
-                if Path(filename).suffix.lower() in _AUDIO_EXTENSIONS:
+                if Path(filename).suffix.lower() in _AUDIO_EXTENSIONS and filename.lower() not in _skip_names:
                     discovered.append(str((Path(current_root) / filename).resolve()))
     discovered.sort()
     logger.info("Discovered %d audio files in %s", len(discovered), ", ".join(str(path) for path in search_roots))
@@ -296,6 +298,132 @@ def discover_demo_results(
         logger.info("Loaded demo result for %s (id=%s)", demo_name, rec_id)
 
     logger.info("Discovered %d demo results in %s", len(results), demo_root)
+    return results
+
+
+def discover_existing_results(
+    processed_dir: str | Path,
+    spectrogram_dir: str | Path,
+    cache_dir: str | Path,
+) -> dict[str, dict[str, Any]]:
+    """Scan processed output directories to build result dicts for already-processed recordings.
+
+    Returns a mapping of recording_id -> result dict.
+    """
+    proc = Path(processed_dir)
+    spec = Path(spectrogram_dir)
+    cache = Path(cache_dir)
+    results: dict[str, dict[str, Any]] = {}
+
+    if not proc.is_dir():
+        return results
+
+    # Find all {uuid}_cleaned.wav files to identify processed recordings
+    for cleaned_file in sorted(proc.glob("*_cleaned.wav")):
+        recording_id = cleaned_file.name.removesuffix("_cleaned.wav")
+        if not recording_id:
+            continue
+
+        result: dict[str, Any] = {
+            "recording_id": recording_id,
+            "status": "complete",
+            "stages_completed": ["ingestion", "spectrogram", "noise_classification", "noise_removal", "feature_extraction", "quality_assessment"],
+            "output_audio_path": str(cleaned_file),
+            "processing_time_s": 0.0,
+        }
+
+        # Load basic metadata from {uuid}_cleaned.wav.json
+        meta_path = proc / f"{recording_id}_cleaned.wav.json"
+        if meta_path.exists():
+            try:
+                meta = json.loads(meta_path.read_text(encoding="utf-8"))
+                noise_type = meta.get("noise_type", "")
+                if noise_type:
+                    result["noise_types"] = [{"type": noise_type, "percentage": 100.0, "frequency_range": [20.0, 500.0]}]
+            except Exception:
+                logger.warning("Failed to read %s", meta_path)
+
+        # Load quality metrics from cache/{uuid}_quality_metrics_*.json
+        # Strip extra fields not in the QualityMetrics Pydantic model
+        _quality_fields = {
+            "snr_before_db", "snr_after_db", "snr_improvement_db", "pesq",
+            "peak_frequency_before_hz", "peak_frequency_after_hz",
+            "spectral_distortion", "energy_preservation",
+            "quality_score", "quality_rating", "flagged_for_review",
+        }
+        quality_files = sorted(cache.glob(f"{recording_id}_quality_metrics_*.json"))
+        if quality_files:
+            try:
+                raw_quality = json.loads(quality_files[-1].read_text(encoding="utf-8"))
+                result["quality"] = {k: v for k, v in raw_quality.items() if k in _quality_fields}
+            except Exception:
+                logger.warning("Failed to read quality metrics for %s", recording_id)
+
+        # Ensure quality always has minimum required fields
+        if "quality" not in result:
+            result["quality"] = {
+                "snr_before_db": 0.0,
+                "snr_after_db": 0.0,
+                "snr_improvement_db": 0.0,
+                "spectral_distortion": 0.0,
+                "energy_preservation": 0.0,
+                "quality_score": 0.0,
+                "quality_rating": "unknown",
+            }
+
+        # Load detected calls from {uuid}_markers.json
+        markers_path = proc / f"{recording_id}_markers.json"
+        if markers_path.exists():
+            try:
+                calls = json.loads(markers_path.read_text(encoding="utf-8"))
+                if isinstance(calls, list):
+                    result["calls"] = calls
+                    result["markers"] = calls
+            except Exception:
+                logger.warning("Failed to read markers for %s", recording_id)
+
+        # Load sequences from {uuid}_sequences.json
+        sequences_path = proc / f"{recording_id}_sequences.json"
+        if sequences_path.exists():
+            try:
+                seq_data = json.loads(sequences_path.read_text(encoding="utf-8"))
+                if isinstance(seq_data, dict):
+                    result["sequences"] = seq_data.get("sequences", [])
+                    result["recurring_patterns"] = seq_data.get("recurring_patterns", [])
+                elif isinstance(seq_data, list):
+                    result["sequences"] = seq_data
+            except Exception:
+                logger.warning("Failed to read sequences for %s", recording_id)
+
+        # Resolve spectrogram paths
+        before_spec = spec / f"{recording_id}_before_spectrogram.png"
+        after_spec = spec / f"{recording_id}_after_spectrogram.png"
+        comparison = proc / f"{recording_id}_comparison.png"
+        if before_spec.exists():
+            result["spectrogram_before_path"] = str(before_spec)
+        if after_spec.exists():
+            result["spectrogram_after_path"] = str(after_spec)
+        if comparison.exists():
+            result["comparison_spectrogram_path"] = str(comparison)
+
+        # Resolve fingerprint export metadata
+        fingerprints_path = proc / f"{recording_id}_fingerprints.npy"
+        fingerprint_ids_path = proc / f"{recording_id}_fingerprint_ids.json"
+        export_metadata: dict[str, str] = {}
+        if markers_path.exists():
+            export_metadata["markers_path"] = str(markers_path)
+        if sequences_path.exists():
+            export_metadata["sequences_path"] = str(sequences_path)
+        if fingerprints_path.exists():
+            export_metadata["fingerprints_path"] = str(fingerprints_path)
+        if fingerprint_ids_path.exists():
+            export_metadata["fingerprint_ids_path"] = str(fingerprint_ids_path)
+        if export_metadata:
+            result["export_metadata"] = export_metadata
+
+        results[recording_id] = result
+
+    logger.info("Discovered existing results for %d recordings in %s", len(results), proc)
     return results
 
 

@@ -37,7 +37,7 @@ from echofield.ml.active_learning import ActiveLearningManager
 from echofield.ml.classifier import CallClassifier
 from echofield.ml.narrative import generate_narrative
 from echofield.ml.taxonomy import validate_call_type, validate_social_function, CALL_TYPES, SOCIAL_FUNCTIONS
-from echofield.data_loader import RecordingStore, list_recordings_with_metadata
+from echofield.data_loader import RecordingStore, list_recordings_with_metadata, discover_existing_results, discover_demo_results
 from echofield.metrics import metrics
 from echofield.model_registry import ModelRegistry
 from echofield.models import (
@@ -166,11 +166,66 @@ async def lifespan(application: FastAPI):
     store = RecordingStore(persist_path=settings.catalog_file, db_path=settings.db_path)
     preload = list_recordings_with_metadata(settings.audio_dir, settings.metadata_file)
     store.load_many(preload)
+
+    # Load demo recordings (pre-built demo folders with metadata.json)
+    demo_results = discover_demo_results(settings.audio_dir, settings.spectrogram_dir, settings.processed_dir)
+    for demo_result in demo_results:
+        rec_id = demo_result.get("recording_id")
+        if rec_id:
+            recording = store.get(rec_id)
+            if recording and recording.get("result") is None:
+                store.update_result(rec_id, demo_result)
+                store.update_status(rec_id, "complete", progress=100, current_stage="complete")
+
+    # Hydrate results from already-processed files on disk
+    existing_results = discover_existing_results(
+        settings.processed_dir, settings.spectrogram_dir, settings.cache_dir,
+    )
+    for recording_id, result in existing_results.items():
+        recording = store.get(recording_id)
+        if recording is None:
+            continue
+        # Only hydrate if the recording doesn't already have a result
+        if recording.get("result") is not None:
+            continue
+        store.update_result(recording_id, result)
+        store.update_status(recording_id, "complete", progress=100, current_stage="complete")
+
     application.state.call_database = CallDatabase.from_metadata(
         settings.metadata_file,
         review_label_path=settings.cache_dir / "review_labels.json",
         db_path=settings.db_path,
     )
+
+    # Upsert hydrated calls into the call database
+    for recording_id, result in existing_results.items():
+        recording = store.get(recording_id)
+        if recording is None:
+            continue
+        calls = result.get("calls") or []
+        if calls:
+            application.state.call_database.upsert_processed_calls(
+                recording_id=recording_id,
+                calls=calls,
+                metadata={
+                    **(recording.get("metadata") or {}),
+                    "filename": recording.get("filename"),
+                },
+            )
+    for demo_result in demo_results:
+        rec_id = demo_result.get("recording_id")
+        if rec_id and demo_result.get("calls"):
+            recording = store.get(rec_id)
+            if recording:
+                application.state.call_database.upsert_processed_calls(
+                    recording_id=rec_id,
+                    calls=demo_result["calls"],
+                    metadata={
+                        **(recording.get("metadata") or {}),
+                        "filename": recording.get("filename"),
+                    },
+                )
+
     application.state.store = store
     application.state.cache = CacheManager(str(settings.cache_dir))
     application.state.pipeline = ProcessingPipeline(settings, application.state.cache)

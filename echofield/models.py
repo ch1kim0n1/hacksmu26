@@ -288,7 +288,7 @@ class ProcessingResult(EchoBaseModel):
     noise_types: list[NoiseType] = Field(default_factory=list)
     quality: QualityMetrics
     calls: list[CallDetail] = Field(default_factory=list)
-    processing_time_s: float = Field(ge=0.0)
+    processing_time_s: float = Field(default=0.0, ge=0.0)
     output_audio_path: str | None = None
     spectrogram_before_path: str | None = None
     spectrogram_after_path: str | None = None
