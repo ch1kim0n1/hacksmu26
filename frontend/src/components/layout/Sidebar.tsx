@@ -50,6 +50,17 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
     items: [
       { href: "/results", label: "Results", icon: BarChart3 },
       { href: "/database", label: "Call Database", icon: Database },
+      { href: "/analytics", label: "Analytics", icon: PieChart },
+      { href: "/patterns", label: "Patterns", icon: GitBranch },
+      { href: "/sites", label: "Sites", icon: MapPin },
+    ],
+  },
+  {
+    title: "Admin",
+    items: [
+      { href: "/ml-training", label: "ML Training", icon: Brain },
+      { href: "/models", label: "Models", icon: Box },
+      { href: "/webhooks", label: "Webhooks", icon: Webhook },
     ],
   },
 ];

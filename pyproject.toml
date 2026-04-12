@@ -27,6 +27,7 @@ dependencies = [
     "umap-learn>=0.5",
     "structlog>=24.0",
     "prometheus-fastapi-instrumentator>=0.9",
+    "PyJWT[crypto]>=2.8.0,<3.0.0",
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
 ]

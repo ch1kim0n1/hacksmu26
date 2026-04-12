@@ -28,6 +28,7 @@ import {
   type Recording,
   type RecordingSummary2,
 } from "@/lib/audio-api";
+import MetadataEditor from "@/components/research/MetadataEditor";
 
 /* ────────────────────────── helpers ────────────────────────── */
 
@@ -275,7 +276,7 @@ export default function RecordingSummaryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  function fetchData() {
     if (!id) return;
 
     setLoading(true);
@@ -292,6 +293,11 @@ export default function RecordingSummaryPage() {
         );
       })
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   /* ─── Loading state ─── */
@@ -429,6 +435,20 @@ export default function RecordingSummaryPage() {
           </div>
         ))}
       </motion.div>
+
+      {/* ── 3b. Metadata Editor ── */}
+      <MetadataEditor
+        recordingId={id}
+        currentMetadata={{
+          location: recording.metadata?.location ?? recording.location,
+          date: recording.metadata?.date,
+          recorded_at: recording.metadata?.recorded_at,
+          microphone_type: recording.metadata?.microphone_type,
+          notes: recording.metadata?.notes,
+          species: recording.metadata?.species,
+        }}
+        onSaved={() => fetchData()}
+      />
 
       {/* ── 4. Call Inventory ── */}
       <SectionCard title="Call Inventory" icon={BarChart3} delay={0.22}>
