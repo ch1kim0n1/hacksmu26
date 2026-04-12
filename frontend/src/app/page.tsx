@@ -6,6 +6,7 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroGlobe from "@/components/hero/HeroGlobe";
+import { useSceneTransition } from "@/components/transition/SceneTransitionProvider";
 
 /* ────────────────────────────────────────────
    Animated counter (counts up on scroll)
@@ -92,6 +93,7 @@ function WaveDivider({
    Main Landing Page
    ──────────────────────────────────────────── */
 export default function LandingPage() {
+  const { isTransitioning, startDashboardTransition } = useSceneTransition();
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const crisisRef = useRef<HTMLElement>(null);
@@ -101,7 +103,6 @@ export default function LandingPage() {
   const stepsRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
-  const [mobileNav, setMobileNav] = useState(false);
 
   /* ── GSAP orchestration ── */
   useEffect(() => {
@@ -114,34 +115,15 @@ export default function LandingPage() {
         .from("[data-nav]", { y: -50, opacity: 0, duration: 0.8 })
         .from("[data-scroll-ind]", { opacity: 0, y: -10, duration: 0.4 }, "-=0.2");
 
-      /* nav blur + solidify on scroll */
-      ScrollTrigger.create({
-        trigger: heroRef.current,
-        start: "5% top",
-        onEnter: () => {
-          gsap.to("[data-nav]", {
-            backgroundColor: "rgba(44,41,38,0.85)",
-            backdropFilter: "blur(16px)",
-            duration: 0.3,
-          });
-          gsap.to("[data-nav-edge-path]", {
-            attr: { fill: "rgba(44,41,38,0.85)" },
-            duration: 0.3,
-          });
-        },
-        onLeaveBack: () => {
-          gsap.to("[data-nav]", {
-            backgroundColor: "transparent",
-            backdropFilter: "none",
-            duration: 0.3,
-          });
-          gsap.to("[data-nav-edge-path]", {
-            attr: { fill: "rgba(44,41,38,0)" },
-            duration: 0.3,
-          });
-        },
+      /* nav always solid */
+      gsap.set("[data-nav]", {
+        backgroundColor: "rgba(44,41,38,0.92)",
+        backdropFilter: "blur(16px)",
       });
-
+      gsap.set("[data-nav-edge-path]", {
+        attr: { fill: "rgba(44,41,38,0.92)" },
+      });
+  
       /* scroll indicator bounce */
       gsap.to("[data-scroll-ind]", {
         y: 10,
@@ -390,64 +372,14 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link
             href="/"
-            className="text-2xl font-display font-semibold text-accent-savanna"
+            className="flex items-center gap-2"
           >
-            EchoField
+            <Image src="/logo.png" alt="EchoField logo" width={52} height={52} className="object-contain" />
+            <span className="text-4xl font-display font-semibold text-accent-savanna">EchoField</span>
           </Link>
 
-          {/* Desktop */}
-          <div className="hidden md:flex items-center gap-8">
-            {["About", "Upload", "Database"].map((item) => (
-              <Link
-                key={item}
-                href={`/${item.toLowerCase()}`}
-                className="text-sm font-medium text-[#3f3121] hover:text-accent-savanna transition-colors duration-300"
-              >
-                {item}
-              </Link>
-            ))}
-            <Link
-              href="/upload"
-              className="px-5 py-2 rounded-full bg-accent-savanna text-ev-ivory text-sm font-semibold hover:bg-accent-gold transition-colors duration-300"
-            >
-              Get Started
-            </Link>
-          </div>
-
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMobileNav(!mobileNav)}
-            className="md:hidden flex items-center justify-center w-10 h-10 text-[#3f3121]"
-            aria-label="Menu"
-            aria-expanded={mobileNav}
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              {mobileNav ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
         </div>
 
-        {/* Mobile menu */}
-        <div
-          className={`md:hidden bg-ev-charcoal/95 backdrop-blur-md border-t border-ev-charcoal-light/20 px-6 overflow-hidden transition-all duration-300 ease-out ${
-            mobileNav ? "max-h-60 py-4 opacity-100" : "max-h-0 py-0 opacity-0"
-          }`}
-        >
-          {["About", "Upload", "Database"].map((item) => (
-            <Link
-              key={item}
-              href={`/${item.toLowerCase()}`}
-              onClick={() => setMobileNav(false)}
-              className="block py-3 text-sm font-medium text-ev-dust hover:text-accent-savanna transition-colors"
-            >
-              {item}
-            </Link>
-          ))}
-        </div>
 
         {/* Decorative bottom edge */}
         <svg
@@ -470,7 +402,7 @@ export default function LandingPage() {
          ═══════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative min-h-screen overflow-hidden bg-[#c5b294] text-white"
+        className={`relative min-h-screen bg-[#c5b294] text-white ${isTransitioning ? "overflow-visible" : "overflow-hidden"}`}
       >
         {/* Background layers */}
         <div className="absolute inset-0 z-0">
@@ -506,12 +438,46 @@ export default function LandingPage() {
             />
           </div>
 
+          {/* Get started hint */}
+          <div className="pointer-events-none absolute left-[28%] top-[25%] z-[11] flex flex-col items-center gap-1">
+            <span className="text-sm font-medium italic text-[#5a3e22]/80 tracking-wide">get started</span>
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" className="-mt-1 -rotate-12">
+              <path
+                d="M18 4 C10 10, 6 20, 14 28"
+                stroke="#7b5a32"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M10 26 L14 29 L16 23"
+                stroke="#7b5a32"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </svg>
+          </div>
+
           {/* Interactive globe */}
           <button
+            id="landing-globe-trigger"
             type="button"
-            onClick={() => document.getElementById("crisis")?.scrollIntoView({ behavior: "smooth" })}
-            aria-label="Explore the elephant crisis"
-            className="pointer-events-auto absolute left-[49%] top-[41%] h-[clamp(280px,34vw,500px)] w-[clamp(280px,34vw,500px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full z-[10] cursor-pointer transition-transform duration-300 hover:scale-[1.03]"
+            onClick={() => {
+              if (isTransitioning) return;
+              const el = document.getElementById("landing-globe-trigger");
+              const rect = el?.getBoundingClientRect();
+              if (!rect) return;
+              startDashboardTransition({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+            }}
+            disabled={isTransitioning}
+            aria-label="Enter EchoField dashboard"
+            className={`pointer-events-auto absolute left-[49%] top-[41%] h-[clamp(280px,34vw,500px)] w-[clamp(280px,34vw,500px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-transform ease-[cubic-bezier(0.2,0,0.8,1)] ${
+              isTransitioning
+                ? "z-[250] scale-[22] duration-[2200ms] cursor-default"
+                : "z-[10] scale-100 duration-[400ms] hover:scale-[1.03] cursor-pointer"
+            }`}
           >
             <HeroGlobe
               wrapperClassName="absolute inset-0 z-[1] overflow-visible"
@@ -1148,13 +1114,13 @@ export default function LandingPage() {
             removal. Every cleaned recording brings us closer to understanding
             — and protecting — these remarkable animals.
           </p>
-          <Link
-            href="/upload"
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="group inline-flex items-center gap-3 px-10 py-5 bg-accent-savanna text-ev-ivory text-lg font-semibold rounded-full hover:bg-accent-gold transition-all duration-300 hover:shadow-xl hover:shadow-accent-savanna/20"
           >
-            Upload a Recording
+            Back to the Top
             <svg
-              className="w-5 h-5 transition-transform group-hover:translate-x-1"
+              className="w-5 h-5 transition-transform group-hover:-translate-y-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -1163,10 +1129,10 @@ export default function LandingPage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
+                d="M5 10l7-7m0 0l7 7m-7-7v18"
               />
             </svg>
-          </Link>
+          </button>
           <p className="mt-10 text-sm text-ev-dust/35">
             Built in partnership with{" "}
             <span className="text-accent-savanna/50">ElephantVoices</span>
