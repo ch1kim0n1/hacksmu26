@@ -91,14 +91,21 @@ export function SceneTransitionProvider({
       hasNavigatedRef.current = false;
       cloudRevealScheduledRef.current = false;
 
+      // Switch to clouds phase
       timeoutsRef.current.push(
         window.setTimeout(() => {
           setPhase("clouds");
+        }, ZOOM_MS)
+      );
+
+      // Navigate only after clouds are fully opaque (fade-in is ~550ms)
+      timeoutsRef.current.push(
+        window.setTimeout(() => {
           if (!hasNavigatedRef.current) {
             hasNavigatedRef.current = true;
             router.push(DASHBOARD_ROUTE);
           }
-        }, ZOOM_MS)
+        }, ZOOM_MS + 600)
       );
     },
     [clearTimers, isTransitioning, router]
