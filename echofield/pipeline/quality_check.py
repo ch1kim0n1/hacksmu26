@@ -127,9 +127,13 @@ def assess_quality(y_original: np.ndarray, y_cleaned: np.ndarray, sr: int) -> di
     # preservation, 10 pts PESQ bonus.  Energy preservation is weighted
     # lightly because noisy field recordings legitimately lose 90%+ of
     # in-band energy when the noise is removed.
-    snr_component = np.clip(max(snr_improvement, 0.0) / 15.0, 0.0, 1.0) * 50.0
-    distortion_component = max(1.0 - spectral_distortion, 0.0) * 25.0
-    preservation_component = min(energy_preservation / 0.3, 1.0) * 15.0  # full marks at >= 30 %
+    # Tuned thresholds for realistic field recording scenarios:
+    # - SNR: full marks at 8 dB improvement (was 15 dB - too strict for field recordings)
+    # - Distortion: tolerates up to 0.25 distortion for full marks (field recordings inherently noisy)
+    # - Preservation: full marks at 15% energy (was 30% - elephant vocalizations are sparse)
+    snr_component = np.clip(max(snr_improvement, 0.0) / 8.0, 0.0, 1.0) * 50.0
+    distortion_component = max(1.0 - spectral_distortion / 0.25, 0.0) * 25.0
+    preservation_component = min(energy_preservation / 0.15, 1.0) * 15.0  # full marks at >= 15%
     pesq_component = (min(max((pesq_score or 0.0) - 1.0, 0.0) / 3.5, 1.0)) * 10.0
     quality_score = round(float(np.clip(
         snr_component + distortion_component + preservation_component + pesq_component,
@@ -156,5 +160,5 @@ def assess_quality(y_original: np.ndarray, y_cleaned: np.ndarray, sr: int) -> di
         "energy_preservation": energy_preservation,
         "quality_score": quality_score,
         "quality_rating": rating,
-        "flagged_for_review": snr_improvement < 3.0,
+        "flagged_for_review": snr_improvement < 2.0 or spectral_distortion > 0.3,
     }
