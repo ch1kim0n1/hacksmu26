@@ -179,7 +179,7 @@ export default function ResultsPage() {
               onClick={() => setShowShortcutHelp(true)}
               aria-label="Show keyboard shortcuts"
               title="Keyboard shortcuts (?)"
-              className="inline-flex items-center gap-1.5 text-xs text-ev-warm-gray glass border border-ev-sand/30 px-3 py-1.5 rounded-xl font-medium hover:text-ev-charcoal hover:border-ev-sand/60 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-ev-warm-gray glass border border-ev-sand/30 px-3 py-1.5 rounded-xl font-medium -translate-y-0.5 shadow-[0_12px_32px_rgba(44,41,38,0.10)] hover:text-ev-charcoal hover:border-ev-sand/60 transition-all duration-300"
             >
               <Keyboard className="w-3 h-3" />
               Shortcuts
@@ -271,7 +271,7 @@ export default function ResultsPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-16 rounded-2xl glass border border-dashed border-ev-sand/60 text-center"
+            className="p-16 rounded-2xl glass border border-dashed border-ev-sand/60 text-center -translate-y-0.5 shadow-[0_18px_40px_rgba(44,41,38,0.08)] transition-all duration-300"
           >
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-savanna/10 to-accent-gold/5 flex items-center justify-center mx-auto mb-4">
               <Music className="w-7 h-7 text-accent-savanna/50" />
