@@ -1,12 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
+  ArrowLeft,
   Search,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   MapPin,
   Database as DatabaseIcon,
   RefreshCw,
@@ -118,6 +121,13 @@ export default function DatabasePage() {
         className="flex flex-col sm:flex-row sm:items-end justify-between gap-4"
       >
         <div>
+          <Link
+            href="/upload"
+            className="mb-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-ev-sand/40 bg-white/80 px-4 py-2.5 text-sm font-medium text-ev-elephant shadow-sm transition-all hover:border-ev-warm-gray/30 hover:bg-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Upload
+          </Link>
           <h1 className="text-2xl font-bold text-ev-charcoal">
             Call Database
           </h1>
@@ -153,22 +163,27 @@ export default function DatabasePage() {
           />
         </div>
 
-        <select
-          value={callTypeFilter}
-          onChange={(e) => {
-            setCallTypeFilter(e.target.value);
-            setPage(0);
-          }}
-          aria-label="Filter by call type"
-          className="px-3.5 py-2.5 glass border border-ev-sand/40 rounded-xl text-sm text-ev-charcoal focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all appearance-none bg-[right_0.75rem_center] bg-[length:16px_16px] bg-no-repeat pr-9"
-          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238A837B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")` }}
-        >
-          {CALL_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={callTypeFilter}
+            onChange={(e) => {
+              setCallTypeFilter(e.target.value);
+              setPage(0);
+            }}
+            aria-label="Filter by call type"
+            className="min-w-[11rem] px-3.5 py-2.5 pr-10 glass border border-ev-sand/40 rounded-xl text-sm text-ev-charcoal focus:outline-none focus:border-accent-savanna/40 focus:ring-2 focus:ring-accent-savanna/10 transition-all appearance-none"
+          >
+            {CALL_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ev-warm-gray"
+            aria-hidden="true"
+          />
+        </div>
 
         <div className="relative sm:w-44">
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ev-warm-gray" />
@@ -188,7 +203,7 @@ export default function DatabasePage() {
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="p-4 rounded-2xl glass border border-ev-sand/30 animate-pulse"
+              className="p-4 rounded-xl glass border border-ev-sand/30 animate-pulse"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
               <div className="flex items-center justify-between mb-3">
@@ -203,7 +218,7 @@ export default function DatabasePage() {
           ))}
         </div>
       ) : error ? (
-        <div className="p-8 rounded-2xl glass border border-ev-sand/30 text-center">
+        <div className="p-8 rounded-xl glass border border-ev-sand/30 text-center">
           <AlertCircle className="w-8 h-8 text-danger mx-auto mb-3" />
           <p className="text-danger mb-4">{error}</p>
           <motion.button
@@ -243,7 +258,7 @@ export default function DatabasePage() {
               variants={fadeUp}
               onClick={() => router.push(`/results/${call.id}`)}
               aria-label={`View call ${call.call_type} ${call.id.slice(0, 8)}`}
-              className="group p-4 rounded-2xl glass border border-ev-sand/30 card-hover text-left flex flex-col"
+              className="group p-4 rounded-xl glass border border-ev-sand/30 card-hover text-left flex flex-col"
             >
               {/* Top row */}
               <div className="flex items-start justify-between gap-2 mb-3">

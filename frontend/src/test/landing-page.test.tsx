@@ -67,7 +67,7 @@ describe("Landing Page", () => {
 
   it("renders How It Works section with three steps", () => {
     render(<LandingPage />);
-    expect(screen.getByText("Upload")).toBeInTheDocument();
+    expect(screen.getAllByText("Upload").length).toBeGreaterThan(0);
     expect(screen.getByText("AI Denoise")).toBeInTheDocument();
     expect(screen.getByText("Analyze")).toBeInTheDocument();
   });
@@ -77,6 +77,14 @@ describe("Landing Page", () => {
     expect(screen.getByText("Get Started")).toBeInTheDocument();
     const link = screen.getByText("Get Started").closest("a");
     expect(link?.getAttribute("href")).toBe("/upload");
+  });
+
+  it("renders hero navbar links", () => {
+    render(<LandingPage />);
+    expect(screen.getByRole("link", { name: "About" })).toHaveAttribute("href", "/about");
+    expect(screen.getAllByRole("link", { name: "Upload" })[0]).toHaveAttribute("href", "/upload");
+    expect(screen.getByRole("link", { name: "Database" })).toHaveAttribute("href", "/database");
+    expect(screen.getByRole("link", { name: "Get Started" })).toHaveAttribute("href", "#get-started");
   });
 
   it("renders HackSMU badge", () => {

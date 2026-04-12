@@ -42,7 +42,7 @@ export default function BatchPage() {
   return (
     <main className="min-h-screen bg-ev-ivory">
       <div className="mx-auto max-w-7xl px-6 py-12">
-        <Link href="/upload" className="mb-4 inline-flex text-sm text-ev-warm-gray hover:text-ev-elephant">
+        <Link href="/recordings" className="mb-4 inline-flex text-sm text-ev-warm-gray hover:text-ev-elephant">
           Back to recordings
         </Link>
         <div className="mb-8">

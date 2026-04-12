@@ -37,7 +37,7 @@ function formatDuration(seconds: number): string {
   return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
 }
 
-function rmsFromAnalyser(analyser: AnalyserNode, data: Uint8Array<ArrayBuffer>): number {
+function rmsFromAnalyser(analyser: AnalyserNode, data: Uint8Array): number {
   analyser.getByteTimeDomainData(data);
   let sumSq = 0;
   for (let i = 0; i < data.length; i++) { const s = (data[i] - 128) / 128; sumSq += s * s; }
@@ -226,7 +226,7 @@ export default function RealtimeMicTest({ onUploaded }: { onUploaded?: () => voi
       });
       const resp = await fetch(
         `${API_BASE}/api/filter-chunk?${params}`,
-        { method: "POST", body: chunk.buffer as ArrayBuffer, headers: { "Content-Type": "application/octet-stream" } }
+        { method: "POST", body: chunk.buffer, headers: { "Content-Type": "application/octet-stream" } }
       );
       if (!resp.ok) return;
 

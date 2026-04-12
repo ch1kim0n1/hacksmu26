@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music, TrendingUp, ArrowRight, Clock, Keyboard } from "lucide-react";
+import { Music, TrendingUp, ArrowLeft, ArrowRight, Clock, Keyboard, X } from "lucide-react";
 import { getRecordings, API_BASE, type Recording, type Call } from "@/lib/audio-api";
 import { staggerContainer, fadeUp } from "@/components/ui/motion-primitives";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -33,13 +34,7 @@ export default function ResultsPage() {
     try {
       setLoading(true);
       const data = await getRecordings({ status: "complete", limit: 50 });
-      // Sort by quality score descending so best results appear first
-      const sorted = [...data.recordings].sort((a, b) => {
-        const aScore = a.result?.quality?.quality_score ?? 0;
-        const bScore = b.result?.quality?.quality_score ?? 0;
-        return bScore - aScore;
-      });
-      setRecordings(sorted);
+      setRecordings(data.recordings);
     } catch {
       // silently fail — show empty state
     } finally {
@@ -170,6 +165,13 @@ export default function ResultsPage() {
           className="flex items-end justify-between gap-4"
         >
           <div>
+            <Link
+              href="/upload"
+              className="mb-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-ev-sand/40 bg-white/80 px-4 py-2.5 text-sm font-medium text-ev-elephant shadow-sm transition-all hover:border-ev-warm-gray/30 hover:bg-white"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Upload
+            </Link>
             <h1 className="text-2xl font-bold text-ev-charcoal">Results</h1>
             <p className="text-sm text-ev-warm-gray mt-1">
               Browse processed recordings and their analysis results.
@@ -185,7 +187,7 @@ export default function ResultsPage() {
               onClick={() => setShowShortcutHelp(true)}
               aria-label="Show keyboard shortcuts"
               title="Keyboard shortcuts (?)"
-              className="inline-flex items-center gap-1.5 text-xs text-ev-warm-gray glass border border-ev-sand/30 px-3 py-1.5 rounded-xl font-medium hover:text-ev-charcoal hover:border-ev-sand/60 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-ev-warm-gray glass border border-ev-sand/30 px-3 py-1.5 rounded-xl font-medium -translate-y-0.5 shadow-[0_12px_32px_rgba(44,41,38,0.10)] hover:text-ev-charcoal hover:border-ev-sand/60 transition-all duration-300"
             >
               <Keyboard className="w-3 h-3" />
               Shortcuts
@@ -218,12 +220,17 @@ export default function ResultsPage() {
                 transition={{ duration: 0.22, ease: "easeOut" }}
                 className="rounded-2xl glass border border-ev-sand/40 overflow-hidden"
               >
-                <ABPlayer
-                  originalSrc={`${API_BASE}/api/recordings/${rec.id}/audio?type=original`}
-                  cleanedSrc={`${API_BASE}/api/recordings/${rec.id}/audio?type=cleaned`}
-                  beforeSpectrogramSrc={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=before`}
-                  afterSpectrogramSrc={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`}
-                />
+                {/* Spectrogram Thumbnail */}
+                <div className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
+                  <Image
+                    src={spectrogramUrl}
+                    alt={`Spectrogram for ${rec.filename}`}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    unoptimized
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                  />
+                </div>
               </motion.div>
             );
           })()}
@@ -272,7 +279,7 @@ export default function ResultsPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="p-16 rounded-2xl glass border border-dashed border-ev-sand/60 text-center"
+            className="p-16 rounded-2xl glass border border-dashed border-ev-sand/60 text-center -translate-y-0.5 shadow-[0_18px_40px_rgba(44,41,38,0.08)] transition-all duration-300"
           >
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-savanna/10 to-accent-gold/5 flex items-center justify-center mx-auto mb-4">
               <Music className="w-7 h-7 text-accent-savanna/50" />
@@ -337,14 +344,14 @@ export default function ResultsPage() {
                           <div className="glass-strong rounded-lg px-2 py-1 border border-white/20">
                             <span
                               className={`text-xs font-bold ${
-                                quality.quality_score >= 80
+                                quality.quality_score >= 0.8
                                   ? "text-success"
-                                  : quality.quality_score >= 60
+                                  : quality.quality_score >= 0.6
                                     ? "text-accent-savanna"
                                     : "text-danger"
                               }`}
                             >
-                              {Math.round(quality.quality_score)}%
+                              {Math.round(quality.quality_score * 100)}%
                             </span>
                           </div>
                         </div>
@@ -383,11 +390,11 @@ export default function ResultsPage() {
                               </span>
                             )}
                         </div>
-                        {(rec.duration ?? rec.duration_s) != null && (
+                        {rec.duration != null && (
                           <span className="tabular-nums inline-flex items-center gap-1 shrink-0">
                             <Clock className="w-3 h-3" />
-                            {Math.floor((rec.duration ?? rec.duration_s) / 60)}:
-                            {String(Math.floor((rec.duration ?? rec.duration_s) % 60)).padStart(
+                            {Math.floor(rec.duration / 60)}:
+                            {String(Math.floor(rec.duration % 60)).padStart(
                               2,
                               "0",
                             )}

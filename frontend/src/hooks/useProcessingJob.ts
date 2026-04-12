@@ -15,6 +15,34 @@ interface QualityInfo {
   score: number;
 }
 
+const CANONICAL_STAGE_ORDER = [
+  "ingestion",
+  "spectrogram",
+  "noise_classification",
+  "noise_removal",
+  "feature_extraction",
+  "quality_assessment",
+  "complete",
+] as const;
+
+function normalizeStageName(stage: string | null | undefined): string {
+  if (!stage) return "";
+  if (CANONICAL_STAGE_ORDER.includes(stage as (typeof CANONICAL_STAGE_ORDER)[number])) {
+    return stage;
+  }
+
+  if (stage.startsWith("spectrogram:")) return "spectrogram";
+  if (stage.startsWith("denoising:")) return "noise_removal";
+  if (stage.startsWith("calls:")) return "feature_extraction";
+  if (stage.startsWith("quality:")) return "quality_assessment";
+
+  return stage;
+}
+
+function getStageIndex(stage: string): number {
+  return CANONICAL_STAGE_ORDER.indexOf(stage as (typeof CANONICAL_STAGE_ORDER)[number]);
+}
+
 export interface ProcessingState {
   status: "idle" | "connecting" | "processing" | "complete" | "error";
   currentStage: string;
@@ -108,7 +136,8 @@ export default function useProcessingJob(
       }
 
       case "STAGE_UPDATE": {
-        const stageName = msg.data.stage as string;
+        const rawStageName = msg.data.stage as string;
+        const stageName = normalizeStageName(rawStageName);
         const stageStatus = msg.data.status as
           | "pending"
           | "active"
@@ -116,18 +145,33 @@ export default function useProcessingJob(
         const progress = (msg.data.progress as number) ?? 0;
 
         setState((prev) => {
-          const stageIndex = prev.stages.findIndex((s) => s.name === stageName);
+          const previousStage = normalizeStageName(prev.currentStage);
+          const previousStageIndex = getStageIndex(previousStage);
+          const incomingStageIndex = getStageIndex(stageName);
+          const hasKnownIncomingStage = incomingStageIndex >= 0;
+          const shouldAdvanceStage =
+            hasKnownIncomingStage &&
+            (previousStageIndex < 0 || incomingStageIndex >= previousStageIndex);
+          const effectiveStage = shouldAdvanceStage ? stageName : previousStage;
+          const effectiveStageIndex = getStageIndex(effectiveStage);
+          const effectiveProgress = Math.max(prev.progress, progress);
 
           const newStages = prev.stages.map((s, index) => {
-            if (stageName === "complete") {
+            if (effectiveStage === "complete") {
               return { ...s, status: "complete" as const };
             }
-            if (stageIndex >= 0) {
-              if (index < stageIndex) {
+            if (effectiveStageIndex >= 0) {
+              if (index < effectiveStageIndex) {
                 return { ...s, status: "complete" as const };
               }
-              if (index === stageIndex) {
-                return { ...s, status: stageStatus };
+              if (index === effectiveStageIndex) {
+                return {
+                  ...s,
+                  status:
+                    stageStatus === "complete" && shouldAdvanceStage
+                      ? "complete"
+                      : "active",
+                };
               }
             }
             return s;
@@ -136,8 +180,8 @@ export default function useProcessingJob(
           return {
             ...prev,
             status: "processing",
-            currentStage: stageName,
-            progress,
+            currentStage: effectiveStage || previousStage || stageName,
+            progress: effectiveProgress,
             stages: newStages,
             noiseType: typeof msg.data.noise_type === "string" ? msg.data.noise_type : prev.noiseType,
             callCount: typeof msg.data.call_count === "number" ? msg.data.call_count : prev.callCount,
@@ -147,7 +191,7 @@ export default function useProcessingJob(
                   [msg.data.variant === "before" ? "before" : "after"]: msg.data.spectrogram_url,
                 }
               : prev.spectrograms,
-            liveEvents: [stageName, ...prev.liveEvents.filter((event) => event !== stageName)].slice(0, 8),
+            liveEvents: [rawStageName, ...prev.liveEvents.filter((event) => event !== rawStageName)].slice(0, 8),
           };
         });
         break;

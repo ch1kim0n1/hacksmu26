@@ -14,7 +14,13 @@ import {
   ChevronRight,
 } from "lucide-react";
 import useProcessingJob from "@/hooks/useProcessingJob";
-import { getRecording, API_BASE, type Recording } from "@/lib/audio-api";
+import {
+  getRecording,
+  getRecordingStatus,
+  API_BASE,
+  type Recording,
+  type RecordingStatusResponse,
+} from "@/lib/audio-api";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import {
   COLORMAPS,
@@ -48,12 +54,19 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
   const activeIndex = currentIndex >= 0 ? currentIndex : 0;
 
   return (
-    <div className="flex items-center w-full overflow-x-auto pb-1" role="progressbar" aria-valuenow={activeIndex} aria-valuemin={0} aria-valuemax={STAGES.length - 1} aria-label="Processing progress">
+    <div
+      className="flex w-full items-center overflow-x-auto px-1 py-2"
+      role="progressbar"
+      aria-valuenow={activeIndex}
+      aria-valuemin={0}
+      aria-valuemax={STAGES.length - 1}
+      aria-label="Processing progress"
+    >
       {STAGES.map((stage, i) => {
         const isComplete = i < activeIndex || currentStage === "complete";
         const isCurrent = i === activeIndex && currentStage !== "complete";
         return (
-          <div key={stage.key} className="flex items-center flex-1 min-w-0">
+          <div key={stage.key} className="flex min-w-0 flex-1 items-center overflow-visible">
             <div className="flex flex-col items-center gap-1.5 shrink-0 w-10">
               <motion.div
                 initial={false}
@@ -90,6 +103,100 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
   );
 }
 
+function LiveSNRMeter({ snrBefore, snrAfter, isProcessing }: {
+  snrBefore?: number;
+  snrAfter?: number;
+  isProcessing: boolean;
+}) {
+  const hasData = snrBefore !== undefined;
+  const maxDb = 40;
+  const beforePct = snrBefore ? Math.min(100, (snrBefore / maxDb) * 100) : 0;
+  const afterPct = snrAfter ? Math.min(100, (snrAfter / maxDb) * 100) : 0;
+  const improvement = snrBefore !== undefined && snrAfter !== undefined ? snrAfter - snrBefore : null;
+
+  if (!hasData && isProcessing) {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent-savanna animate-pulse" />
+          <span className="text-[11px] text-accent-savanna font-medium tracking-wide">Live — Measuring…</span>
+        </div>
+        <div className="flex items-end gap-[2px] h-14 w-full overflow-hidden rounded-lg bg-ev-cream/60 px-2 py-1">
+          {Array.from({ length: 32 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-sm"
+              style={{
+                background: `linear-gradient(to top, #C4A46C, #E4C080)`,
+                animation: `sound-bar ${0.8 + (i % 6) * 0.09}s ease-in-out infinite`,
+                animationDelay: `${(i * 0.05 + Math.sin(i * 1.5) * 0.12).toFixed(2)}s`,
+                transformOrigin: "bottom",
+                height: "100%",
+              }}
+            />
+          ))}
+        </div>
+        <p className="text-[10px] text-ev-warm-gray text-center">Analyzing signal-to-noise ratio…</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <div className="flex justify-between mb-1.5">
+          <span className="text-xs text-ev-warm-gray">Before</span>
+          <span className="text-xs font-mono font-bold tabular-nums" style={{ color: "#C4785A" }}>
+            {snrBefore !== undefined ? `${snrBefore.toFixed(1)} dB` : "—"}
+          </span>
+        </div>
+        <div className="h-2 bg-ev-cream rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: "linear-gradient(90deg, #C4785A, #E4A060)" }}
+            initial={{ width: 0 }}
+            animate={{ width: `${beforePct}%` }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          />
+        </div>
+      </div>
+      <div>
+        <div className="flex justify-between mb-1.5">
+          <span className="text-xs text-ev-warm-gray">After</span>
+          <span className="text-xs font-mono font-bold tabular-nums text-success">
+            {snrAfter !== undefined ? `${snrAfter.toFixed(1)} dB` : "—"}
+          </span>
+        </div>
+        <div className="h-2 bg-ev-cream rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: "linear-gradient(90deg, #5A8B6F, #10C876)", boxShadow: "0 0 8px rgba(16,200,118,0.35)" }}
+            initial={{ width: 0 }}
+            animate={{ width: `${afterPct}%` }}
+            transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
+          />
+        </div>
+      </div>
+      {improvement !== null && (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+          className="pt-2.5 border-t border-ev-sand/30 flex items-center justify-between"
+        >
+          <span className="text-xs text-ev-warm-gray">Improvement</span>
+          <span className="text-sm font-bold text-success tabular-nums" style={{ textShadow: "0 0 10px rgba(16,200,118,0.45)" }}>
+            +{improvement.toFixed(1)} dB
+          </span>
+        </motion.div>
+      )}
+      {!hasData && (
+        <p className="text-xs text-ev-warm-gray text-center">Awaiting processing…</p>
+      )}
+    </div>
+  );
+}
+
 function MetricCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="p-4 rounded-xl glass border border-ev-sand/30">
@@ -115,6 +222,7 @@ export default function ProcessingPage() {
   const processing = useProcessingJob(jobId || null);
 
   const [recording, setRecording] = useState<Recording | null>(null);
+  const [backendStatus, setBackendStatus] = useState<RecordingStatusResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sliderPosition, setSliderPosition] = useState(50);
@@ -133,8 +241,37 @@ export default function ProcessingPage() {
     }
   }, [jobId]);
 
+  const fetchBackendStatus = useCallback(async () => {
+    try {
+      const status = await getRecordingStatus(jobId);
+      setBackendStatus(status);
+    } catch {
+      // Keep the last known status; websocket remains primary for live updates.
+    }
+  }, [jobId]);
+
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => { if (processing.status === "complete") fetchData(); }, [processing.status, fetchData]);
+  useEffect(() => { if (backendStatus?.status === "complete") fetchData(); }, [backendStatus?.status, fetchData]);
+  useEffect(() => {
+    fetchBackendStatus();
+  }, [fetchBackendStatus]);
+
+  useEffect(() => {
+    const isActiveRun =
+      processing.status === "processing" ||
+      processing.status === "connecting" ||
+      recording?.status === "processing" ||
+      backendStatus?.status === "processing";
+
+    if (!isActiveRun) return;
+
+    const intervalId = window.setInterval(() => {
+      void fetchBackendStatus();
+    }, 1200);
+
+    return () => window.clearInterval(intervalId);
+  }, [backendStatus?.status, fetchBackendStatus, processing.status, recording?.status]);
 
   const handleSliderMove = useCallback((clientX: number) => {
     if (!sliderRef.current || !isDraggingSlider.current) return;
@@ -155,11 +292,35 @@ export default function ProcessingPage() {
     return () => { window.removeEventListener("mousemove", onMM); window.removeEventListener("mouseup", onMU); window.removeEventListener("touchmove", onTM); window.removeEventListener("touchend", onTE); };
   }, [handleSliderMove]);
 
-  const currentStage = recording?.status === "complete" ? "complete" : processing.currentStage || recording?.processing?.current_stage || recording?.status || "pending";
-  const progress = recording?.status === "complete" ? 100 : Math.max(processing.progress, Number(recording?.processing?.progress_pct ?? 0));
-  const isComplete = recording?.status === "complete" || processing.status === "complete";
-  const isProcessing = !isComplete && (recording?.status === "processing" || processing.status === "processing" || processing.status === "connecting");
-  const isFailed = recording?.status === "failed" || processing.status === "error";
+  const currentStage =
+    recording?.status === "complete"
+      ? "complete"
+      : processing.currentStage ||
+        backendStatus?.stage ||
+        recording?.processing?.current_stage ||
+        recording?.status ||
+        "pending";
+  const progress =
+    recording?.status === "complete"
+      ? 100
+      : backendStatus?.progress_pct ??
+        (processing.progress > 0
+          ? processing.progress
+          : Number(recording?.processing?.progress_pct ?? 0));
+  const isComplete =
+    recording?.status === "complete" ||
+    backendStatus?.status === "complete" ||
+    processing.status === "complete";
+  const isProcessing =
+    !isComplete &&
+    (backendStatus?.status === "processing" ||
+      recording?.status === "processing" ||
+      processing.status === "processing" ||
+      processing.status === "connecting");
+  const isFailed =
+    recording?.status === "failed" ||
+    backendStatus?.status === "failed" ||
+    processing.status === "error";
 
   const [colormap, setColormap] = useLocalStorage<SpectrogramColormap>("echofield.colormap", "viridis");
   const spectrogramBefore = `${API_BASE}/api/recordings/${jobId}/spectrogram?type=before&colormap=${colormap}`;
@@ -204,7 +365,7 @@ export default function ProcessingPage() {
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-2 text-sm text-ev-warm-gray mb-1">
-            <Link href="/upload" className="hover:text-ev-elephant transition-colors">Recordings</Link>
+            <Link href="/recordings" className="hover:text-ev-elephant transition-colors">Recordings</Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-ev-elephant">{recording?.filename || "Processing"}</span>
           </div>
@@ -364,32 +525,11 @@ export default function ProcessingPage() {
           </MetricCard>
 
           <MetricCard label="Signal-to-Noise Ratio">
-            <div className="space-y-3">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-ev-elephant">Before</span>
-                  <span className="text-xs font-mono text-ev-charcoal tabular-nums">{metrics?.snr_before !== undefined ? `${metrics.snr_before.toFixed(1)} dB` : "--"}</span>
-                </div>
-                <div className="h-1.5 bg-ev-cream rounded-full overflow-hidden">
-                  <motion.div className="h-full bg-warning rounded-full" initial={{ width: 0 }} animate={{ width: metrics?.snr_before ? `${Math.min(100, (metrics.snr_before / 40) * 100)}%` : "0%" }} transition={{ duration: 0.8, delay: 0.3 }} />
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-ev-elephant">After</span>
-                  <span className="text-xs font-mono text-ev-charcoal tabular-nums">{metrics?.snr_after !== undefined ? `${metrics.snr_after.toFixed(1)} dB` : "--"}</span>
-                </div>
-                <div className="h-1.5 bg-ev-cream rounded-full overflow-hidden">
-                  <motion.div className="h-full bg-success rounded-full" initial={{ width: 0 }} animate={{ width: metrics?.snr_after ? `${Math.min(100, (metrics.snr_after / 40) * 100)}%` : "0%" }} transition={{ duration: 0.8, delay: 0.5 }} />
-                </div>
-              </div>
-              {metrics?.snr_before !== undefined && metrics?.snr_after !== undefined && (
-                <div className="pt-2.5 border-t border-ev-sand/30 flex items-center justify-between">
-                  <span className="text-xs text-ev-elephant">Improvement</span>
-                  <span className="text-xs font-bold text-success tabular-nums">+{(metrics.snr_after - metrics.snr_before).toFixed(1)} dB</span>
-                </div>
-              )}
-            </div>
+            <LiveSNRMeter
+              snrBefore={metrics?.snr_before}
+              snrAfter={metrics?.snr_after}
+              isProcessing={isProcessing}
+            />
           </MetricCard>
 
           {metrics?.noise_reduction_db !== undefined && (

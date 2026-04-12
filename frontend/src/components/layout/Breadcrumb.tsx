@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const SEGMENT_LABELS: Record<string, string> = {
   upload: "Upload",
+  recordings: "Recordings",
   database: "Database",
   export: "Export",
   about: "About",

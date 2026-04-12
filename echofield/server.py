@@ -28,7 +28,7 @@ from echofield.ml.active_learning import ActiveLearningManager
 from echofield.ml.classifier import CallClassifier
 from echofield.ml.narrative import generate_narrative
 from echofield.ml.taxonomy import validate_call_type, validate_social_function, CALL_TYPES, SOCIAL_FUNCTIONS
-from echofield.data_loader import RecordingStore, list_recordings_with_metadata, sync_processed_results
+from echofield.data_loader import RecordingStore, list_recordings_with_metadata
 from echofield.metrics import metrics
 from echofield.model_registry import ModelRegistry
 from echofield.models import (
@@ -143,20 +143,12 @@ async def lifespan(application: FastAPI):
     store = RecordingStore(persist_path=settings.catalog_file, db_path=settings.db_path)
     preload = list_recordings_with_metadata(settings.audio_dir, settings.metadata_file)
     store.load_many(preload)
-    call_db = CallDatabase.from_metadata(
+    application.state.call_database = CallDatabase.from_metadata(
         settings.metadata_file,
         review_label_path=settings.cache_dir / "review_labels.json",
         db_path=settings.db_path,
     )
-    application.state.call_database = call_db
     application.state.store = store
-    sync_processed_results(
-        store,
-        processed_dir=settings.processed_dir,
-        spectrogram_dir=settings.spectrogram_dir,
-        cache_dir=settings.cache_dir,
-        call_database=call_db,
-    )
     application.state.cache = CacheManager(str(settings.cache_dir))
     application.state.pipeline = ProcessingPipeline(settings, application.state.cache)
     application.state.processing_tasks = {}
@@ -332,11 +324,6 @@ def _to_summary(recording: dict[str, Any]) -> RecordingSummary:
 
 def _to_detail(recording: dict[str, Any]) -> RecordingDetail:
     result = recording.get("result")
-    if result:
-        result = dict(result)
-        result.setdefault("recording_id", recording["id"])
-        result.setdefault("stages_completed", [])
-        result.setdefault("processing_time_s", 0.0)
     return RecordingDetail(
         **_to_summary(recording).model_dump(),
         result=ProcessingResult(**result) if result else None,
@@ -816,22 +803,16 @@ async def upload_recording(
     )
 
 
-@app.get("/api/recordings")
+@app.get("/api/recordings", response_model=RecordingListResponse)
 async def list_recordings(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     status: str | None = Query(default=None),
     location: str | None = Query(default=None),
-) -> dict[str, Any]:
+) -> RecordingListResponse:
     items, total = _get_store().list(limit=limit, offset=offset, status=status, location=location)
-    details = []
-    for item in items:
-        summary = _to_summary(item).model_dump()
-        result = item.get("result")
-        if result:
-            summary["result"] = result
-        details.append(summary)
-    return {"total": total, "returned": len(details), "recordings": details}
+    summaries = [_to_summary(item) for item in items]
+    return RecordingListResponse(total=total, returned=len(summaries), recordings=summaries)
 
 
 @app.get("/api/recordings/{recording_id}", response_model=RecordingDetail)
@@ -2340,6 +2321,72 @@ async def analytics_recording_features(recording_id: str):
             "duration_ms": _stats(duration_values),
         },
     }
+
+
+@app.post("/api/filter-chunk")
+async def filter_chunk(
+    request: Request,
+    sr: int = Query(default=44100, ge=8000, le=192000),
+    preserve_harmonics: bool = Query(default=True),
+    aggressiveness: float = Query(default=1.0, ge=0.1, le=3.0),
+    high_hz: float = Query(default=1200.0, ge=100.0, le=20000.0),
+) -> Response:
+    """Filter a raw PCM chunk using the spectral-gate pipeline.
+
+    Request body: little-endian float32 PCM samples (mono).
+    Response body: filtered float32 PCM samples (same length).
+    Extra headers: X-Noise-Type, X-Noise-Confidence, X-SNR-Before-DB, X-SNR-After-DB.
+
+    For phone/speaker playback use aggressiveness=0.5 and high_hz=4000 to avoid
+    treating the signal itself as noise and to capture the phone's wider output range.
+    """
+    from echofield.pipeline.spectral_gate import spectral_gate_denoise, apply_bandpass_filter
+    from echofield.pipeline.noise_classifier import classify_noise
+    from echofield.pipeline.quality_check import compute_snr
+
+    body = await request.body()
+    if not body:
+        return Response(content=b"", media_type="application/octet-stream")
+
+    y = np.frombuffer(body, dtype="<f4").copy()
+
+    noise_info: dict[str, object] = classify_noise(y, sr)
+    noise_type = str(noise_info.get("noise_type") or "other")
+    confidence = float(noise_info.get("confidence", 0.0))
+
+    snr_before = float(compute_snr(y, sr))
+
+    # Run spectral gate with caller-supplied aggressiveness, then apply the
+    # requested bandpass so phone-mode (high_hz=4000) passes more of the signal.
+    result = spectral_gate_denoise(
+        y,
+        sr,
+        aggressiveness=aggressiveness,
+        noise_type=noise_type,
+        preserve_harmonics=preserve_harmonics,
+        post_process=True,
+    )
+    cleaned: np.ndarray = result["cleaned_audio"]
+    # Re-apply bandpass with the requested high_hz (default pipeline uses 1200 Hz)
+    if high_hz != 1200.0:
+        cleaned = apply_bandpass_filter(cleaned, sr, low_hz=8.0, high_hz=high_hz)
+
+    snr_after = float(compute_snr(cleaned, sr))
+
+    headers = {
+        "X-Noise-Type": noise_type,
+        "X-Noise-Confidence": f"{confidence:.4f}",
+        "X-SNR-Before-DB": f"{snr_before:.2f}",
+        "X-SNR-After-DB": f"{snr_after:.2f}",
+        "Access-Control-Expose-Headers": (
+            "X-Noise-Type, X-Noise-Confidence, X-SNR-Before-DB, X-SNR-After-DB"
+        ),
+    }
+    return Response(
+        content=cleaned.astype("<f4").tobytes(),
+        media_type="application/octet-stream",
+        headers=headers,
+    )
 
 
 @app.websocket("/ws/live")

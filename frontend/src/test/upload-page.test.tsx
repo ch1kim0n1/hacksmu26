@@ -1,27 +1,24 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
-// Mock next modules
 vi.mock("next/link", () => ({
-  default: ({ children, href, ...props }: { children: React.ReactNode; href: string; [key: string]: unknown }) => (
-    <a href={href} {...props}>{children}</a>
+  default: ({
+    children,
+    href,
+    ...props
+  }: {
+    children: React.ReactNode;
+    href: string;
+    [key: string]: unknown;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
   ),
 }));
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
-}));
 
-// Mock API
 vi.mock("@/lib/audio-api", () => ({
   uploadFiles: vi.fn(),
   getRecordings: vi.fn().mockResolvedValue({ recordings: [], total: 0 }),
-  processRecording: vi.fn(),
-  downloadRecording: vi.fn(),
-}));
-
-// Mock AnalysisLabels
-vi.mock("@/components/research/AnalysisLabels", () => ({
-  AnalysisLabelsBadge: () => null,
 }));
 
 import UploadPage from "@/app/upload/page";
@@ -31,7 +28,7 @@ describe("Upload Page", () => {
     vi.clearAllMocks();
   });
 
-  it("renders page title", async () => {
+  it("renders page title", () => {
     render(<UploadPage />);
     expect(screen.getByText("Upload Recordings")).toBeInTheDocument();
   });
@@ -41,15 +38,9 @@ describe("Upload Page", () => {
     expect(screen.getByText(/AI-powered noise removal/)).toBeInTheDocument();
   });
 
-  it("renders back to home link", () => {
-    render(<UploadPage />);
-    const link = screen.getByText("Back to Home").closest("a");
-    expect(link?.getAttribute("href")).toBe("/");
-  });
-
   it("renders drag-drop zone", () => {
     render(<UploadPage />);
-    expect(screen.getByText(/Drop .wav or .mp3 here/)).toBeInTheDocument();
+    expect(screen.getByText(/Drop .wav or .mp3 files here/)).toBeInTheDocument();
   });
 
   it("renders browse files button", () => {
@@ -65,29 +56,31 @@ describe("Upload Page", () => {
     expect(input?.getAttribute("accept")).toContain(".mp3");
   });
 
-  it("renders Your Recordings section", () => {
+  it("renders stat cards as links", () => {
     render(<UploadPage />);
-    expect(screen.getByText("Your Recordings")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Total Recordings/i })).toHaveAttribute(
+      "href",
+      "/recordings",
+    );
+    expect(screen.getByRole("link", { name: /Completed/i })).toHaveAttribute(
+      "href",
+      "/results",
+    );
+    expect(screen.getByRole("link", { name: /Pending/i })).toHaveAttribute(
+      "href",
+      "/recordings?status=pending",
+    );
+    expect(screen.getByRole("link", { name: /Processing/i })).toHaveAttribute(
+      "href",
+      "/recordings?status=processing",
+    );
   });
 
-  it("renders AI enhancement toggle", () => {
+  it("renders recordings management link", () => {
     render(<UploadPage />);
-    expect(screen.getByText("AI Enhance")).toBeInTheDocument();
-    expect(screen.getByLabelText("Toggle AI enhancement")).toBeInTheDocument();
-  });
-
-  it("shows empty state when no recordings", async () => {
-    render(<UploadPage />);
-    // Wait for loading to finish
-    const empty = await screen.findByText("No recordings yet");
-    expect(empty).toBeInTheDocument();
-  });
-
-  it("toggles AI enhancement on click", () => {
-    render(<UploadPage />);
-    const toggle = screen.getByLabelText("Toggle AI enhancement");
-    expect(toggle.getAttribute("aria-checked")).toBe("true");
-    fireEvent.click(toggle);
-    expect(toggle.getAttribute("aria-checked")).toBe("false");
+    expect(screen.getByRole("link", { name: /Open Recordings/i })).toHaveAttribute(
+      "href",
+      "/recordings",
+    );
   });
 });

@@ -73,49 +73,25 @@ describe("Header", () => {
 // ── Sidebar ──
 
 describe("Sidebar", () => {
-  let matchMediaMock: ReturnType<typeof vi.fn>;
-
-  beforeEach(() => {
-    // Mock matchMedia for wide viewport
-    matchMediaMock = vi.fn().mockReturnValue({
-      matches: false,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    });
-    window.matchMedia = matchMediaMock as unknown as typeof window.matchMedia;
-  });
-
-  it("renders navigation links", () => {
+  it("renders navigation icons with accessible labels", () => {
     render(<Sidebar />);
-    expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Upload")).toBeInTheDocument();
-    expect(screen.getByText("Database")).toBeInTheDocument();
+    expect(screen.getByLabelText("Upload")).toBeInTheDocument();
+    expect(screen.getByLabelText("Recordings")).toBeInTheDocument();
+    expect(screen.getByLabelText("Results")).toBeInTheDocument();
+    expect(screen.getByLabelText("Database")).toBeInTheDocument();
   });
 
-  it("has expand/collapse toggle button", () => {
-    render(<Sidebar />);
-    const toggle = screen.getByLabelText(/sidebar/i);
-    expect(toggle).toBeInTheDocument();
-  });
-
-  it("collapses on toggle click", () => {
+  it("uses the icon rail sidebar layout", () => {
     const { container } = render(<Sidebar />);
     const aside = container.querySelector("aside");
-
-    // Initially expanded (w-52)
-    expect(aside?.className).toContain("w-52");
-
-    // Click to collapse
-    const toggle = screen.getByLabelText(/sidebar/i);
-    fireEvent.click(toggle);
     expect(aside?.className).toContain("w-16");
   });
 
-  it("hides on mobile (hidden sm:flex)", () => {
+  it("renders as a visible side rail", () => {
     const { container } = render(<Sidebar />);
     const aside = container.querySelector("aside");
-    expect(aside?.className).toContain("hidden");
-    expect(aside?.className).toContain("sm:flex");
+    expect(aside?.className).toContain("flex");
+    expect(aside?.className).toContain("w-16");
   });
 
   it("sidebar links have minimum 44px touch target", () => {
@@ -124,19 +100,6 @@ describe("Sidebar", () => {
     links.forEach((link) => {
       expect((link as HTMLElement).className).toContain("min-h-[44px]");
     });
-  });
-
-  it("auto-collapses on narrow viewports", () => {
-    // Mock narrow viewport
-    window.matchMedia = vi.fn().mockReturnValue({
-      matches: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    });
-
-    const { container } = render(<Sidebar />);
-    const aside = container.querySelector("aside");
-    expect(aside?.className).toContain("w-16");
   });
 
   it("uses SVG icons instead of emoji", () => {

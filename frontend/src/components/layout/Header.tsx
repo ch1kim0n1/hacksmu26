@@ -4,16 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, BarChart3, Database, Menu, X, Waves } from "lucide-react";
+import { Upload, BarChart3, Database, Menu, Music2, X, Waves } from "lucide-react";
 
 const MOBILE_NAV = [
   { href: "/upload", label: "Upload", icon: Upload },
+  { href: "/recordings", label: "Recordings", icon: Music2 },
   { href: "/results", label: "Results", icon: BarChart3 },
   { href: "/database", label: "Database", icon: Database },
 ];
 
 const PAGE_TITLES: Record<string, string> = {
   "/upload": "Upload Recordings",
+  "/recordings": "Recordings",
   "/results": "Results",
   "/database": "Call Database",
   "/processing": "Processing",

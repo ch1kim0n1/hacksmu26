@@ -110,6 +110,53 @@ describe("useProcessingJob", () => {
     expect(spectrogram?.status).toBe("complete");
   });
 
+  it("normalizes backend sub-stage events to canonical stages", () => {
+    const { result, rerender } = renderHook(() => useProcessingJob("rec-1"));
+
+    mockUseWebSocket.mockReturnValue({
+      lastMessage: makeMessage("STAGE_UPDATE", {
+        stage: "denoising:started",
+        status: "active",
+        progress: 50,
+      }),
+      isConnected: true,
+      send: vi.fn(),
+    });
+    rerender();
+
+    expect(result.current.currentStage).toBe("noise_removal");
+    expect(result.current.progress).toBe(50);
+  });
+
+  it("does not regress to an earlier canonical stage on repeated sub-steps", () => {
+    const { result, rerender } = renderHook(() => useProcessingJob("rec-1"));
+
+    mockUseWebSocket.mockReturnValue({
+      lastMessage: makeMessage("STAGE_UPDATE", {
+        stage: "noise_removal",
+        status: "active",
+        progress: 50,
+      }),
+      isConnected: true,
+      send: vi.fn(),
+    });
+    rerender();
+
+    mockUseWebSocket.mockReturnValue({
+      lastMessage: makeMessage("STAGE_UPDATE", {
+        stage: "spectrogram:after_complete",
+        status: "complete",
+        progress: 65,
+      }),
+      isConnected: true,
+      send: vi.fn(),
+    });
+    rerender();
+
+    expect(result.current.currentStage).toBe("noise_removal");
+    expect(result.current.progress).toBe(65);
+  });
+
   it("stores quality on QUALITY_SCORE", () => {
     const { result, rerender } = renderHook(() => useProcessingJob("rec-1"));
 

@@ -239,7 +239,7 @@ export default function ExportPage() {
         <button
           onClick={handleExport}
           disabled={selectedIds.size === 0 || exporting}
-          className="w-full py-3 bg-gradient-to-r from-accent-savanna to-accent-gold text-white font-semibold rounded-xl shadow-sm shadow-accent-savanna/20 hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 bg-accent-savanna text-ev-ivory font-semibold rounded-xl hover:bg-accent-savanna/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {exporting
             ? "Exporting..."

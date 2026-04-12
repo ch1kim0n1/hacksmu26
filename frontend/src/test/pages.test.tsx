@@ -41,6 +41,13 @@ vi.mock("@/lib/audio-api", () => ({
     sample_rate: 44100,
     metadata: {},
   }),
+  getRecordingStatus: vi.fn().mockResolvedValue({
+    id: "test-job-123",
+    status: "pending",
+    progress_pct: 0,
+    stage: "ingestion",
+    message: "Pending processing",
+  }),
   getCalls: vi.fn().mockResolvedValue({ calls: [], total: 0 }),
   API_BASE: "http://localhost:8000",
 }));
@@ -74,10 +81,10 @@ describe("Processing Page", () => {
     expect(screen.getByText("Noise Removal")).toBeInTheDocument();
   });
 
-  it("renders back link to upload after loading", async () => {
+  it("renders back link to recordings after loading", async () => {
     render(<ProcessingPage />);
     const link = await screen.findByText("Back to Recordings");
-    expect(link.closest("a")?.getAttribute("href")).toBe("/upload");
+    expect(link.closest("a")?.getAttribute("href")).toBe("/recordings");
   });
 
   it("renders recording info section after loading", async () => {
