@@ -1,0 +1,178 @@
+{
+  "sequences": [
+    {
+      "id": "2000-23_background_vehicle_noise-seq-0",
+      "recording_id": "2000-23_background_vehicle_noise",
+      "calls": [
+        "2000-23_background_vehicle_noise-call-0",
+        "2000-23_background_vehicle_noise-call-1",
+        "2000-23_background_vehicle_noise-call-2",
+        "2000-23_background_vehicle_noise-call-3"
+      ],
+      "pattern": "rumble -> rumble -> rumble -> rumble",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "total_duration_ms": 4150.0,
+      "inter_call_gaps_ms": [
+        150.0,
+        50.0,
+        350.0
+      ]
+    },
+    {
+      "id": "2000-23_background_vehicle_noise-seq-1",
+      "recording_id": "2000-23_background_vehicle_noise",
+      "calls": [
+        "2000-23_background_vehicle_noise-call-4",
+        "2000-23_background_vehicle_noise-call-5",
+        "2000-23_background_vehicle_noise-call-6",
+        "2000-23_background_vehicle_noise-call-7",
+        "2000-23_background_vehicle_noise-call-8",
+        "2000-23_background_vehicle_noise-call-9",
+        "2000-23_background_vehicle_noise-call-10",
+        "2000-23_background_vehicle_noise-call-11",
+        "2000-23_background_vehicle_noise-call-12",
+        "2000-23_background_vehicle_noise-call-13",
+        "2000-23_background_vehicle_noise-call-14",
+        "2000-23_background_vehicle_noise-call-15",
+        "2000-23_background_vehicle_noise-call-16",
+        "2000-23_background_vehicle_noise-call-17",
+        "2000-23_background_vehicle_noise-call-18",
+        "2000-23_background_vehicle_noise-call-19",
+        "2000-23_background_vehicle_noise-call-20",
+        "2000-23_background_vehicle_noise-call-21",
+        "2000-23_background_vehicle_noise-call-22",
+        "2000-23_background_vehicle_noise-call-23",
+        "2000-23_background_vehicle_noise-call-24",
+        "2000-23_background_vehicle_noise-call-25"
+      ],
+      "pattern": "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "total_duration_ms": 31650.0,
+      "inter_call_gaps_ms": [
+        0.0,
+        1050.0,
+        850.0,
+        650.0,
+        250.0,
+        450.0,
+        50.0,
+        950.0,
+        3150.0,
+        150.0,
+        4450.0,
+        650.0,
+        550.0,
+        0.0,
+        0.0,
+        650.0,
+        150.0,
+        450.0,
+        3650.0,
+        350.0,
+        1650.0
+      ]
+    }
+  ],
+  "recurring_patterns": [
+    {
+      "pattern_id": "pat-4cec18ae34",
+      "motif": [
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble",
+      "occurrences": 24,
+      "recordings": [
+        "2000-23_background_vehicle_noise"
+      ],
+      "avg_gap_ms": 941.67,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
+          21
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble",
+          3
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-854dccdb4b",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble -> rumble",
+      "occurrences": 22,
+      "recordings": [
+        "2000-23_background_vehicle_noise"
+      ],
+      "avg_gap_ms": 946.24,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
+          20
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-bd8ea08534",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble -> rumble -> rumble",
+      "occurrences": 20,
+      "recordings": [
+        "2000-23_background_vehicle_noise"
+      ],
+      "avg_gap_ms": 951.37,
+      "contexts": [
+        [
+          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
+          19
+        ],
+        [
+          "rumble -> rumble -> rumble -> rumble",
+          1
+        ]
+      ]
+    }
+  ]
+}

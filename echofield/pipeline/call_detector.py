@@ -29,6 +29,7 @@ from echofield.pipeline.feature_extract import (
     detect_anomaly,
     extract_acoustic_features,
 )
+from echofield.ml.feature_engineer import compute_extended_features, compute_inter_call_features
 from echofield.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -413,6 +414,7 @@ class CallDetector:
         self, snippet: np.ndarray, sr: int
     ) -> dict[str, Any]:
         features = extract_acoustic_features(snippet, sr)
+        features = compute_extended_features(snippet, sr, features)
         anomaly_score = detect_anomaly(features)
         if anomaly_score is not None and anomaly_score > 0.8:
             return {
@@ -532,6 +534,8 @@ class CallDetector:
                 "detector_backend": detector_backend,
                 "classifier_backend": classifier_backend,
             })
+
+        calls = compute_inter_call_features(calls)
 
         logger.info(
             "call_detector: detected %d call(s) in recording '%s' "

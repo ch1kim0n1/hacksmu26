@@ -14,6 +14,7 @@ from scipy import stats
 
 from echofield.metrics import metrics
 from echofield.pipeline.feature_extract import _features_to_vector
+from echofield.research.call_fingerprint import cosine_similarity, ensure_call_fingerprint
 
 from echofield.pipeline.feature_extract import classify_call_type, extract_acoustic_features
 
@@ -226,11 +227,12 @@ class SimilarityMatrixCache:
     def _digest(calls: list[dict[str, Any]], threshold: float) -> str:
         rows = []
         for call in calls:
-            features = call.get("acoustic_features") or {}
+            enriched = ensure_call_fingerprint(dict(call))
             rows.append({
                 "id": call.get("id"),
                 "call_type": call.get("call_type"),
-                "signature": build_identity_signature(features),
+                "fingerprint": enriched.get("fingerprint"),
+                "fingerprint_version": enriched.get("fingerprint_version"),
             })
         encoded = json.dumps({"threshold": threshold, "rows": rows}, sort_keys=True, default=str)
         return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
@@ -242,15 +244,19 @@ class SimilarityMatrixCache:
             metrics.inc("echofield_similarity_cache_hits_total")
             return self._payload["graph"]
         metrics.inc("echofield_similarity_cache_misses_total")
-        analyses = []
-        for call in capped_calls:
-            features = call.get("acoustic_features") or {}
-            analyses.append({
-                "call_id": call.get("id", ""),
-                "call_type": call.get("call_type", "unknown"),
-                "identity_signature": build_identity_signature(features),
-            })
-        graph = build_similarity_graph(analyses, threshold=threshold)
+        enriched = [ensure_call_fingerprint(dict(call)) for call in capped_calls]
+        nodes = [{"id": call.get("id", ""), "label": call.get("call_type", "unknown")} for call in enriched]
+        edges = []
+        for index, source in enumerate(enriched):
+            for target in enriched[index + 1 :]:
+                similarity = round(cosine_similarity(source.get("fingerprint") or [], target.get("fingerprint") or []), 4)
+                if similarity >= threshold:
+                    edges.append({
+                        "source": source.get("id", ""),
+                        "target": target.get("id", ""),
+                        "weight": similarity,
+                    })
+        graph = {"nodes": _annotate_graph(nodes, edges), "edges": edges}
         self._payload = {"digest": digest, "threshold": threshold, "graph": graph}
         self.path.write_text(json.dumps(self._payload, indent=2, default=str), encoding="utf-8")
         return graph

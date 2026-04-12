@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getCalls, type Call } from "@/lib/audio-api";
+import { API_BASE, getCalls, type ActivityHeatmapResponse, type Call } from "@/lib/audio-api";
+import ActivityHeatmap from "@/components/research/ActivityHeatmap";
 
 const CALL_TYPES = [
   "All Types",
@@ -50,6 +51,7 @@ export default function DatabasePage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [heatmap, setHeatmap] = useState<ActivityHeatmapResponse | null>(null);
 
   const [search, setSearch] = useState("");
   const [callTypeFilter, setCallTypeFilter] = useState("All Types");
@@ -77,6 +79,13 @@ export default function DatabasePage() {
   useEffect(() => {
     fetchCalls();
   }, [fetchCalls]);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/stats/activity-heatmap`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: ActivityHeatmapResponse | null) => setHeatmap(data))
+      .catch(() => setHeatmap(null));
+  }, []);
 
   // Client-side filtering for search and location
   const filtered = calls.filter((call) => {
@@ -116,7 +125,33 @@ export default function DatabasePage() {
           <p className="text-ev-elephant mt-2">
             Browse and search all detected elephant vocalizations.
           </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/export"
+              className="rounded-lg bg-accent-savanna px-4 py-2 text-sm font-semibold text-ev-ivory transition-colors hover:bg-accent-savanna/90"
+            >
+              Export for Research
+            </Link>
+            <Link
+              href="/review"
+              className="rounded-lg border border-ev-sand bg-ev-cream px-4 py-2 text-sm font-medium text-ev-charcoal transition-colors hover:border-ev-warm-gray"
+            >
+              Review Queue
+            </Link>
+            <Link
+              href="/compare"
+              className="rounded-lg border border-ev-sand bg-ev-cream px-4 py-2 text-sm font-medium text-ev-charcoal transition-colors hover:border-ev-warm-gray"
+            >
+              Cross-Species Compare
+            </Link>
+          </div>
         </div>
+
+        {heatmap && (
+          <div className="mb-8">
+            <ActivityHeatmap data={heatmap} />
+          </div>
+        )}
 
         {/* Search */}
         <div className="mb-6">
