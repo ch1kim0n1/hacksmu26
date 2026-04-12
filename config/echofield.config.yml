@@ -337,3 +337,18 @@ demo:
     - action: play_before_after
     - action: show_spectrogram_comparison
     - action: download_results
+
+# ─────────────────────────────────────────
+# Live Recording Configuration
+# ─────────────────────────────────────────
+# Parameters for real-time chunk-by-chunk audio denoising via WebSocket.
+
+live_recording:
+  # Target chunk duration the browser should send per WebSocket binary frame.
+  # Actual chunk size depends on the browser AudioContext buffer size.
+  chunk_size_s: 1.0          # seconds
+
+  # Overlap between consecutive chunks (overlap-save technique).
+  # The last (overlap_s / chunk_size_s * 100)% of raw samples from the
+  # previous chunk are prepended before denoising to avoid edge artifacts.
+  overlap_s: 0.5             # seconds

@@ -15,6 +15,7 @@ MAX_FILESIZE_MB = 500.0
 class RecordingStatus(str, Enum):
     pending = "pending"
     processing = "processing"
+    recording = "recording"
     complete = "complete"
     failed = "failed"
     cancelled = "cancelled"
@@ -659,3 +660,44 @@ class WebhookEvent(EchoBaseModel):
     quality: dict[str, Any] | None = None
     payload: dict[str, Any] = Field(default_factory=dict)
     timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
+
+
+# ---------------------------------------------------------------------------
+# Live recording WebSocket messages
+# ---------------------------------------------------------------------------
+
+
+class LiveChunkProcessed(EchoBaseModel):
+    """Payload sent after each denoised audio chunk is processed.
+
+    Sent as a JSON WebSocket frame with ``type="CHUNK_PROCESSED"`` and
+    ``data=<this model>``.
+    """
+
+    chunk_index: int = Field(ge=0, description="Zero-based index of this chunk.")
+    noise_type: str = Field(
+        description="Dominant noise type detected in the raw chunk.",
+        examples=["airplane", "car", "generator", "wind", "other"],
+    )
+    confidence: float = Field(ge=0.0, le=1.0, description="Classifier confidence [0, 1].")
+    snr_before: float = Field(description="Estimated SNR (dB) of the raw input chunk.")
+    snr_after: float = Field(description="Estimated SNR (dB) of the denoised output chunk.")
+    cleaned_audio_b64: str = Field(
+        description="Base64-encoded float32 PCM bytes of the denoised chunk."
+    )
+    spectrogram_columns: list[list[float]] = Field(
+        description="STFT magnitude (dB) columns; shape [n_freq_bins][n_time_frames]."
+    )
+
+
+class LiveRecordingComplete(EchoBaseModel):
+    """Payload sent when a live recording session ends cleanly via ``stop``.
+
+    Sent as a JSON WebSocket frame with ``type="RECORDING_COMPLETE"`` and
+    ``data=<this model>``.
+    """
+
+    recording_id: str = Field(description="Store ID for the completed recording.")
+    duration_s: float = Field(ge=0.0, description="Total duration of captured audio, in seconds.")
+    total_chunks: int = Field(ge=0, description="Number of chunks successfully processed.")
+    output_path: str = Field(description="Absolute path of the saved WAV file.")

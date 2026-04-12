@@ -57,6 +57,8 @@ from echofield.models import (
     IndividualCluster,
     InfrasoundRevealRequest,
     InfrasoundRevealResponse,
+    LiveChunkProcessed,
+    LiveRecordingComplete,
     IndividualMatch,
     IndividualProfile,
     MarkerResponse,
@@ -86,6 +88,7 @@ from echofield.models import (
     WebhookConfig,
 )
 from echofield.pipeline.cache_manager import CacheManager
+from echofield.pipeline.live_pipeline import LiveRecordingSession
 from echofield.pipeline.infrasound import detect_infrasound_regions, create_infrasound_reveal
 from echofield.pipeline.circuit_breaker import get_circuit_breaker_registry
 from echofield.pipeline.hybrid_pipeline import ProcessingPipeline
@@ -160,6 +163,7 @@ async def lifespan(application: FastAPI):
     application.state.batch_webhooks_emitted = set()
     application.state.ml_classifier = CallClassifier()
     application.state.al_manager = ActiveLearningManager()
+    application.state.live_sessions: dict[str, Any] = {}
     active_model = application.state.model_registry.active_model_path()
     load_classifier(active_model or settings.classifier_model_path)
     try:
@@ -244,6 +248,10 @@ def _get_webhooks() -> WebhookManager:
 
 def _get_individual_identifier() -> IndividualIdentifier:
     return app.state.individual_identifier  # type: ignore[return-value]
+
+
+def _get_live_sessions() -> dict[str, Any]:
+    return app.state.live_sessions  # type: ignore[return-value]
 
 
 def _get_ml_classifier() -> CallClassifier:
@@ -2297,3 +2305,178 @@ async def ws_processing(websocket: WebSocket, recording_id: str) -> None:
         manager.disconnect_recording(websocket, recording_id)
     finally:
         heartbeat_task.cancel()
+
+
+@app.websocket("/ws/record/{session_id}")
+async def ws_record(websocket: WebSocket, session_id: str) -> None:
+    """Real-time audio recording endpoint with live denoising.
+
+    Protocol
+    --------
+    1. Client connects and sends ``{"action": "start", "sample_rate": <int>}``.
+    2. Server replies ``{"type": "SESSION_STARTED", "session_id": ..., "recording_id": ...}``.
+    3. Client streams raw PCM float32 mono bytes as binary WebSocket frames.
+       For each frame the server replies with a JSON frame::
+
+           {"type": "CHUNK_PROCESSED", "data": {<LiveChunkProcessed fields>}}
+
+    4. Client sends ``{"action": "stop"}`` when done.
+    5. Server saves the concatenated audio to the processed directory, updates
+       the RecordingStore, removes the session, and replies::
+
+           {"type": "RECORDING_COMPLETE", "data": {<LiveRecordingComplete fields>}}
+
+    If the client disconnects without sending ``stop``, the recording is marked
+    *failed* and the session entry is removed from ``app.state.live_sessions``.
+    """
+    import base64 as _base64
+
+    await websocket.accept()
+
+    store = _get_store()
+    live_sessions = _get_live_sessions()
+    settings = get_settings()
+
+    session: LiveRecordingSession | None = None
+    recording_id: str | None = None
+    chunk_index: int = 0
+    stopped: bool = False
+
+    try:
+        # ------------------------------------------------------------------
+        # Wait for the start action
+        # ------------------------------------------------------------------
+        raw = await websocket.receive()
+        if raw.get("type") == "websocket.disconnect":
+            return
+
+        try:
+            msg = json.loads(raw.get("text") or raw.get("bytes") or b"{}")
+        except (json.JSONDecodeError, TypeError):
+            msg = {}
+
+        if msg.get("action") != "start":
+            await websocket.close(code=4000)
+            return
+
+        sample_rate: int = int(msg.get("sample_rate", 44_100))
+
+        # Create a store entry so the recording is visible immediately.
+        recording_id = str(uuid.uuid4())
+        store.add(
+            recording_id,
+            filename=f"live_{session_id}.wav",
+            duration_s=0.0,
+            filesize_mb=0.0,
+            source_path="",
+        )
+        store.update_status(recording_id, "recording", progress=0, current_stage="recording")
+
+        # Initialise the pipeline session.
+        session = LiveRecordingSession(session_id=session_id, sample_rate=sample_rate)
+        live_sessions[session_id] = session
+
+        await websocket.send_json(
+            {
+                "type": "SESSION_STARTED",
+                "session_id": session_id,
+                "recording_id": recording_id,
+            }
+        )
+
+        # ------------------------------------------------------------------
+        # Main loop: binary chunks → CHUNK_PROCESSED; text stop → complete
+        # ------------------------------------------------------------------
+        while True:
+            raw = await websocket.receive()
+
+            if raw.get("type") == "websocket.disconnect":
+                break
+
+            # Binary frame → audio chunk
+            chunk_bytes: bytes | None = raw.get("bytes")
+            if chunk_bytes is not None:
+                result = await asyncio.to_thread(session.process_chunk, chunk_bytes)
+
+                spec_list: list[list[float]] = result.spectrogram_columns.tolist()
+                payload = LiveChunkProcessed(
+                    chunk_index=chunk_index,
+                    noise_type=result.noise_type,
+                    confidence=result.confidence,
+                    snr_before=result.snr_before,
+                    snr_after=result.snr_after,
+                    cleaned_audio_b64=_base64.b64encode(result.cleaned_bytes).decode(),
+                    spectrogram_columns=spec_list,
+                )
+                await websocket.send_json(
+                    {"type": "CHUNK_PROCESSED", "data": payload.model_dump()}
+                )
+                chunk_index += 1
+                continue
+
+            # Text frame → control message (stop)
+            text: str | None = raw.get("text")
+            if text:
+                try:
+                    ctrl = json.loads(text)
+                except (json.JSONDecodeError, TypeError):
+                    ctrl = {}
+
+                if ctrl.get("action") == "stop":
+                    stopped = True
+                    break
+
+        # ------------------------------------------------------------------
+        # Finalise on clean stop
+        # ------------------------------------------------------------------
+        if stopped and session is not None and recording_id is not None:
+            final_audio: np.ndarray = await asyncio.to_thread(session.finalize)
+            duration_s: float = session.duration_s
+
+            # Save WAV to processed directory.
+            out_dir = Path(settings.processed_dir)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            out_path = out_dir / f"live_{recording_id}.wav"
+            await asyncio.to_thread(save_audio, final_audio, sample_rate, str(out_path))
+
+            # Update store.
+            store.update_status(recording_id, "complete", progress=100, current_stage="complete")
+            store.update_result(
+                recording_id,
+                {
+                    "recording_id": recording_id,
+                    "status": "complete",
+                    "stages_completed": ["complete"],
+                    "noise_types": [],
+                    "quality": {},
+                    "calls": [],
+                    "processing_time_s": 0.0,
+                    "output_audio_path": str(out_path),
+                    "spectrogram_before_path": "",
+                    "spectrogram_after_path": "",
+                    "comparison_spectrogram_path": "",
+                },
+            )
+
+            complete_payload = LiveRecordingComplete(
+                recording_id=recording_id,
+                duration_s=duration_s,
+                total_chunks=chunk_index,
+                output_path=str(out_path),
+            )
+            await websocket.send_json(
+                {"type": "RECORDING_COMPLETE", "data": complete_payload.model_dump()}
+            )
+
+    except WebSocketDisconnect:
+        pass
+    finally:
+        # Clean up session from live_sessions dict.
+        live_sessions.pop(session_id, None)
+
+        # If we never sent RECORDING_COMPLETE, mark the recording failed.
+        if not stopped and recording_id is not None:
+            try:
+                store.update_status(recording_id, "failed", progress=0, current_stage="failed")
+            except Exception:
+                pass
