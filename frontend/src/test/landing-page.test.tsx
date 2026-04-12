@@ -8,7 +8,8 @@ vi.mock("next/link", () => ({
   ),
 }));
 vi.mock("next/image", () => ({
-  default: ({ fill, priority, ...props }: Record<string, unknown>) => <img {...props} />,
+  // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
+  default: (props: Record<string, unknown>) => <img src={props.src as string} alt={props.alt as string} />,
 }));
 
 // Mock GSAP and ScrollTrigger — stub every method the landing page calls
@@ -21,7 +22,7 @@ vi.mock("gsap", () => {
   return {
     default: {
       registerPlugin: vi.fn(),
-      context: (_fn: () => void) => ({ revert: vi.fn() }),
+      context: () => ({ revert: vi.fn() }),
       from: vi.fn(),
       to: vi.fn(),
       set: vi.fn(),

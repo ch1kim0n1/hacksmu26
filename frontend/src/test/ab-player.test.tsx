@@ -3,7 +3,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 
 // Mock next/image to render a plain <img> (avoids /_next/image URL rewriting)
 vi.mock("next/image", () => ({
-  default: ({ fill, priority, ...props }: Record<string, unknown>) => <img {...props} />,
+  // eslint-disable-next-line jsx-a11y/alt-text, @next/next/no-img-element
+  default: (props: Record<string, unknown>) => <img src={props.src as string} alt={props.alt as string} />,
 }));
 
 import ABPlayer from "@/components/audio/ABPlayer";
