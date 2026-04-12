@@ -60,14 +60,6 @@ export default function LandingHero() {
         }`}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-16 z-[11] flex items-center justify-end px-5 pt-3 text-[10px] uppercase tracking-[0.28em] text-[#5d4a34] sm:px-8 md:px-12 lg:px-16">
-        <div className="hidden text-right leading-relaxed sm:block">
-          Cinematic Wildlife
-          <br />
-          Globe Study
-        </div>
-      </div>
-
       <div
         className={`absolute inset-0 z-[3] transform-gpu transition-all duration-[1250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isTransitioning ? "scale-[1.02] opacity-70 blur-[2px]" : "scale-100 opacity-100 blur-0"
@@ -89,7 +81,7 @@ export default function LandingHero() {
           onClick={handleGlobeClick}
           disabled={isTransitioning}
           aria-label="Enter EchoField dashboard"
-          className={`pointer-events-auto absolute left-[49%] top-[34%] h-[clamp(220px,28vw,420px)] w-[clamp(220px,28vw,420px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-all duration-[1250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`pointer-events-auto absolute left-[49%] top-[38%] h-[clamp(220px,28vw,420px)] w-[clamp(220px,28vw,420px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-all duration-[1250ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               isTransitioning
                 ? "z-[20] scale-[3.4] opacity-0"
                 : "z-[10] scale-100 opacity-100 hover:scale-[1.03]"
@@ -116,7 +108,7 @@ export default function LandingHero() {
         </button>
       </div>
 
-      <div className="pointer-events-none absolute right-[5vw] top-[26%] z-[8] hidden max-w-[24rem] rounded-[2rem] border border-[#b59a76]/26 bg-white/24 p-6 text-[#4e3b28] shadow-[0_24px_50px_rgba(125,98,63,0.12)] backdrop-blur-md lg:block">
+      <div className="pointer-events-none absolute right-[4vw] top-[31%] z-[8] hidden max-w-[28rem] rounded-[2rem] border border-[#b59a76]/26 bg-white/24 px-7 py-7 text-[#4e3b28] shadow-[0_24px_50px_rgba(125,98,63,0.12)] backdrop-blur-md lg:block">
         <p className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#7b6246]">
           Mission Statement
         </p>
