@@ -440,7 +440,7 @@ export default function LandingPage() {
           </div>
 
           {/* Get started hint */}
-          <div className="pointer-events-none absolute left-[58%] top-[54%] z-[11] flex flex-col items-center gap-1">
+          <div className="pointer-events-none absolute left-[28%] top-[25%] z-[11] flex flex-col items-center gap-1">
             <span className="text-sm font-medium italic text-[#5a3e22]/80 tracking-wide">get started</span>
             <svg width="36" height="36" viewBox="0 0 36 36" fill="none" className="-mt-1 -rotate-12">
               <path
