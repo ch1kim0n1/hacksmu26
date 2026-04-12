@@ -7,6 +7,16 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroGlobe from "@/components/hero/HeroGlobe";
 
+type Tusk3DProps = { className?: string };
+
+function LazyTusk3D(props: Tusk3DProps) {
+  const [Comp, setComp] = useState<ComponentType<Tusk3DProps> | null>(null);
+  useEffect(() => {
+    import("@/components/hero/Tusk3D").then((m) => setComp(() => m.default));
+  }, []);
+  return Comp ? <Comp {...props} /> : null;
+}
+
 type ParticleFieldProps = {
   className?: string;
   count?: number;
@@ -190,18 +200,7 @@ export default function LandingPage() {
         },
       });
 
-      /* Hero parallax on scroll */
-      gsap.to("[data-hero-content]", {
-        y: -80,
-        opacity: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "60% top",
-          end: "bottom top",
-          scrub: 1,
-        },
-      });
+      /* Hero parallax removed per design — elephant stays fixed */
 
       /* Scroll indicator bounce */
       gsap.to("[data-scroll-ind]", {
@@ -442,14 +441,14 @@ export default function LandingPage() {
               <Link
                 key={item}
                 href={`/${item.toLowerCase()}`}
-                className="text-sm font-medium text-white/60 hover:text-white transition-colors duration-300"
+                className="text-sm font-medium text-white/80 hover:text-white transition-colors duration-300"
               >
                 {item}
               </Link>
             ))}
             <Link
               href="/upload"
-              className="px-6 py-2.5 rounded-full bg-white/10 border border-white/20 text-white text-sm font-semibold hover:bg-white/20 transition-all duration-300 backdrop-blur-sm"
+              className="px-6 py-2.5 rounded-full bg-white/15 border border-white/30 text-white text-sm font-semibold hover:bg-white/25 transition-all duration-300 backdrop-blur-sm"
             >
               Get Started
             </Link>
@@ -507,161 +506,215 @@ export default function LandingPage() {
       </nav>
 
       {/* ═══════════════════════════════════════════
-          HERO — massive typography + elephant + globe
+          HERO — dark cinematic, globe behind text
          ═══════════════════════════════════════════ */}
       <section
         ref={heroRef}
         className="relative min-h-screen overflow-hidden"
         style={{
           background:
-            "linear-gradient(180deg, #dcccb6 0%, #c3ab88 38%, #a8875c 100%)",
+            "linear-gradient(180deg, #0D0905 0%, #1A0E07 32%, #3D2010 68%, #8B5E3C 100%)",
         }}
       >
-        {/* Background layers */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_26%,rgba(255,248,236,0.52),transparent_24%),radial-gradient(circle_at_78%_36%,rgba(255,236,196,0.18),transparent_20%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0)_18%,rgba(103,73,37,0.14)_62%,rgba(55,37,18,0.28)_100%)]" />
-          <Image
-            src="/background_texture.jpg"
-            alt=""
-            fill
-            priority
-            className="pointer-events-none object-cover opacity-[0.25] mix-blend-multiply"
-            sizes="100vw"
+        {/* Texture */}
+        <Image
+          src="/background_texture.jpg"
+          alt=""
+          fill
+          priority
+          className="pointer-events-none object-cover opacity-[0.07] mix-blend-screen"
+          sizes="100vw"
+        />
+
+        {/* Warm radial glow at center */}
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 60% at 52% 50%, rgba(160,100,38,0.22) 0%, transparent 65%)",
+          }}
+        />
+
+        {/* WebGL particle starfield */}
+        <LazyParticleField
+          className="z-[1] opacity-25"
+          count={100}
+          color="#C4A46C"
+          speed={0.004}
+          size={0.016}
+        />
+
+        {/* ── GLOBE — hero centerpiece, BEHIND text ── */}
+        <div
+          className="absolute z-[2] pointer-events-none"
+          style={{
+            left: "50%",
+            top: "50%",
+            transform: "translate(-46%, -50%)",
+            width: "clamp(380px, 72vh, 880px)",
+            height: "clamp(380px, 72vh, 880px)",
+          }}
+        >
+          {/* Atmospheric halo */}
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              inset: "-18%",
+              background:
+                "radial-gradient(ellipse, rgba(196,164,108,0.1) 0%, transparent 65%)",
+            }}
+          />
+          <HeroGlobe
+            wrapperClassName="absolute inset-0 z-[1] overflow-visible"
+            globeClassName="absolute inset-0"
+            showSceneBackdrop={false}
+            showGrid={false}
+            showGlow={false}
+            sceneOptions={{
+              backgroundColor: "rgba(0,0,0,0)",
+              showStars: false,
+              atmosphereColor: "#C4A46C",
+              atmosphereAltitude: 0.1,
+              idleRotationSpeed: 0.025,
+              cameraPosition: { x: 0, y: 8, z: 248 },
+              controls: { minDistance: 180, maxDistance: 280 },
+            }}
           />
         </div>
 
-        {/* Vignette */}
-        <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_80%_26%,rgba(255,255,255,0.12),transparent_16%)]" />
-        <div className="absolute inset-x-0 bottom-0 z-[2] h-[32vh] bg-[linear-gradient(180deg,rgba(208,177,124,0)_0%,rgba(167,130,78,0.16)_40%,rgba(90,61,27,0.3)_100%)]" />
+        {/* ── ELEPHANT — atmospheric bottom-left, BEHIND text ── */}
+        <div
+          className="absolute bottom-0 z-[3] pointer-events-none"
+          style={{
+            left: "-2vw",
+            width: "clamp(260px, 34vw, 620px)",
+            height: "clamp(220px, 58vh, 820px)",
+          }}
+        >
+          <Image
+            src="/elephant-background.png"
+            alt=""
+            fill
+            priority
+            quality={95}
+            className="object-contain object-left-bottom"
+            sizes="34vw"
+          />
+          {/* Blend edges into dark bg */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(13,9,5,0.5) 0%, transparent 28%), linear-gradient(180deg, transparent 48%, rgba(13,9,5,0.45) 100%)",
+            }}
+          />
+        </div>
 
-        {/* Composition layer */}
-        <div data-hero-content className="absolute inset-0 z-[3]">
-          {/* Elephant */}
-          <div className="absolute bottom-0 left-[-5vw] h-[50vh] w-[75vw] sm:left-[-3vw] sm:h-[60vh] sm:w-[55vw] md:h-[65vh] md:w-[50vw] lg:left-[-1vw] lg:h-[72vh] lg:w-[44vw] lg:max-w-[940px]">
-            <Image
-              src="/elephant-background.png"
-              alt="Elephant holding the globe on its trunk"
-              fill
-              priority
-              quality={95}
-              className="object-contain object-left-bottom"
-              sizes="(min-width: 1024px) 44vw, (min-width: 768px) 50vw, 75vw"
-            />
-          </div>
+        {/* ── 3D TUSKS — decorative, behind text, in front of elephant ── */}
+        <div
+          className="absolute z-[4] pointer-events-none hidden md:block"
+          style={{
+            left: "18%",
+            right: "18%",
+            top: "28%",
+            bottom: "0",
+          }}
+        >
+          <LazyTusk3D className="w-full h-full" />
+        </div>
 
-          {/* Globe */}
-          <button
-            type="button"
-            onClick={() =>
-              document
-                .getElementById("crisis")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
-            aria-label="Explore the elephant crisis"
-            className="pointer-events-auto absolute left-[38%] top-[48%] h-[160px] w-[160px] sm:left-[42%] sm:top-[44%] sm:h-[220px] sm:w-[220px] md:left-[46%] md:top-[42%] md:h-[280px] md:w-[280px] lg:left-[49%] lg:top-[41%] lg:h-[clamp(300px,26vw,440px)] lg:w-[clamp(300px,26vw,440px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full z-[10] cursor-pointer transition-transform duration-300 hover:scale-[1.03]"
+        {/* ── TEXT — foreground z-[6], white, centered ── */}
+        <div
+          data-hero-content
+          className="relative z-[6] flex flex-col items-center justify-center min-h-screen text-center px-6 pointer-events-none"
+          style={{ paddingBottom: "6vh" }}
+        >
+          {/* Eyebrow label */}
+          <div
+            data-hero-sub
+            className="inline-flex items-center gap-3 mb-6 md:mb-8"
           >
-            <HeroGlobe
-              wrapperClassName="absolute inset-0 z-[1] overflow-visible"
-              globeClassName="absolute inset-0"
-              showSceneBackdrop={false}
-              showGrid={false}
-              showGlow={false}
-              sceneOptions={{
-                backgroundColor: "rgba(0,0,0,0)",
-                showStars: false,
-                atmosphereColor: "#C4A46C",
-                atmosphereAltitude: 0.06,
-                idleRotationSpeed: 0.03,
-                cameraPosition: { x: 0, y: 8, z: 248 },
-                controls: { minDistance: 180, maxDistance: 280 },
+            <div
+              className="h-px w-12"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(196,164,108,0.5))",
               }}
             />
-          </button>
-
-          {/* ── Desktop hero text (lg+) ── */}
-          <div className="absolute inset-0 z-[8] hidden lg:flex items-center justify-end pointer-events-none">
-            <div className="pr-[5vw] max-w-[55vw]">
-              <div className="overflow-hidden">
-                <h1
-                  data-hero-line
-                  className="text-[clamp(5rem,9vw,11rem)] font-display font-bold leading-[0.88] tracking-[-0.04em] text-[#2C2926]"
-                >
-                  ECHO
-                </h1>
-              </div>
-              <div className="overflow-hidden mt-1">
-                <h1
-                  data-hero-line
-                  className="text-[clamp(5rem,9vw,11rem)] font-display font-bold leading-[0.88] tracking-[-0.04em] hero-text-outline"
-                >
-                  FIELD
-                </h1>
-              </div>
-              <div className="mt-8 max-w-md">
-                <p
-                  data-hero-sub
-                  className="text-lg text-[#3f3121]/80 leading-relaxed font-sans"
-                >
-                  Reveal the intelligence hidden inside every elephant field
-                  recording. AI-powered noise removal for conservation research.
-                </p>
-                <Link
-                  href="/upload"
-                  data-hero-cta
-                  className="pointer-events-auto inline-flex items-center gap-3 mt-8 px-8 py-4 bg-[#2C2926] text-ev-cream text-sm font-semibold rounded-full hover:bg-[#4A453F] transition-all duration-300 group"
-                >
-                  Start Analyzing
-                  <svg
-                    className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
-                </Link>
-              </div>
-            </div>
+            <span
+              className="font-semibold tracking-[0.3em] uppercase"
+              style={{ fontSize: "10px", color: "rgba(196,164,108,0.65)" }}
+            >
+              Elephant Conservation Research
+            </span>
+            <div
+              className="h-px w-12"
+              style={{
+                background:
+                  "linear-gradient(90deg, rgba(196,164,108,0.5), transparent)",
+              }}
+            />
           </div>
 
-          {/* ── Mobile/Tablet hero text ── */}
-          <div className="lg:hidden absolute top-24 left-0 right-0 z-[8] px-6 pointer-events-none">
-            <div className="overflow-hidden">
-              <h1
-                data-hero-line
-                className="text-[clamp(3rem,13vw,5.5rem)] font-display font-bold leading-[0.88] tracking-[-0.04em] text-[#2C2926]"
-              >
-                ECHO
-              </h1>
-            </div>
-            <div className="overflow-hidden mt-1">
-              <h1
-                data-hero-line
-                className="text-[clamp(3rem,13vw,5.5rem)] font-display font-bold leading-[0.88] tracking-[-0.04em] hero-text-outline"
-              >
-                FIELD
-              </h1>
-            </div>
-            <p
-              data-hero-sub
-              className="mt-4 text-sm text-[#3f3121]/70 max-w-xs leading-relaxed"
+          {/* ECHO — solid white */}
+          <div className="overflow-hidden">
+            <h1
+              data-hero-line
+              className="font-display font-bold leading-[0.83] tracking-[-0.045em] text-white"
+              style={{
+                fontSize: "clamp(5rem, 14vw, 13rem)",
+                textShadow: "0 4px 48px rgba(0,0,0,0.7)",
+              }}
             >
-              AI-powered noise removal for elephant conservation research.
-            </p>
+              ECHO
+            </h1>
+          </div>
+          {/* FIELD — outline */}
+          <div className="overflow-hidden mt-1">
+            <h1
+              data-hero-line
+              className="font-display font-bold leading-[0.83] tracking-[-0.045em]"
+              style={{
+                fontSize: "clamp(5rem, 14vw, 13rem)",
+                WebkitTextStroke: "1.5px rgba(255,255,255,0.65)",
+                color: "transparent",
+              }}
+            >
+              FIELD
+            </h1>
+          </div>
+
+          {/* Subtitle */}
+          <p
+            data-hero-sub
+            className="mt-8 leading-relaxed max-w-sm"
+            style={{
+              fontSize: "clamp(0.9rem, 1.3vw, 1.05rem)",
+              color: "rgba(255,255,255,0.42)",
+              textShadow: "0 2px 20px rgba(0,0,0,0.9)",
+            }}
+          >
+            Reveal the intelligence hidden inside every elephant field
+            recording. AI-powered noise removal for conservation research.
+          </p>
+
+          {/* CTA */}
+          <div data-hero-cta className="mt-10 pointer-events-auto">
             <Link
               href="/upload"
-              data-hero-cta
-              className="pointer-events-auto inline-flex items-center gap-2 mt-5 px-6 py-3 bg-[#2C2926] text-ev-cream text-sm font-semibold rounded-full"
+              className="inline-flex items-center gap-3 px-9 py-4 text-sm font-semibold rounded-full transition-all duration-300 group"
+              style={{
+                background: "rgba(196,164,108,0.14)",
+                border: "1px solid rgba(196,164,108,0.42)",
+                color: "rgba(255,255,255,0.92)",
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
+              }}
             >
               Start Analyzing
               <svg
-                className="w-4 h-4"
+                className="w-4 h-4 transition-transform group-hover:translate-x-1"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -680,16 +733,20 @@ export default function LandingPage() {
         {/* Scroll indicator */}
         <div
           data-scroll-ind
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-[7]"
         >
-          <span className="text-[11px] text-[#5d4a34]/60 tracking-[0.25em] uppercase font-medium">
+          <span
+            className="text-[11px] tracking-[0.25em] uppercase font-medium"
+            style={{ color: "rgba(196,164,108,0.4)" }}
+          >
             Scroll
           </span>
           <svg
-            className="w-4 h-4 text-[#5d4a34]/50"
+            className="w-4 h-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            style={{ color: "rgba(196,164,108,0.35)" }}
           >
             <path
               strokeLinecap="round"
@@ -707,30 +764,13 @@ export default function LandingPage() {
       <section
         ref={crisisRef}
         id="crisis"
-        className="relative pt-0 pb-20 md:pb-28"
+        className="relative pt-20 md:pt-32 pb-20 md:pb-28"
         style={{
           background:
             "linear-gradient(180deg, #8B5E3C 0%, #B0764E 15%, #C4785A 30%, #C48B5A 50%, #C89E60 70%, #C4A46C 100%)",
         }}
       >
-        {/* Wave: Hero -> Crisis */}
-        <div
-          className="w-full"
-          style={{ marginTop: "-1px", marginBottom: "-1px" }}
-        >
-          <svg
-            viewBox="0 0 1440 120"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-            className="block w-full"
-            style={{ height: "clamp(60px, 10vw, 140px)" }}
-          >
-            <path
-              d="M0,0 L1440,0 L1440,30 C1200,110 900,10 600,60 C300,110 120,40 0,80 L0,0 Z"
-              fill="#a8875c"
-            />
-          </svg>
-        </div>
+        {/* Straight edge: Hero -> Crisis */}
 
         {/* Subtle texture */}
         <div
@@ -1081,55 +1121,248 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════
           SOLUTION
          ═══════════════════════════════════════════ */}
-      <section ref={solutionRef} className="py-20 md:py-28 bg-ev-cream">
+      <section
+        ref={solutionRef}
+        className="relative pt-20 md:pt-28 pb-32 md:pb-40 bg-ev-cream overflow-hidden"
+      >
+        {/* Thin gradient at the very bottom — transitions into dark Steps */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-28 pointer-events-none z-[2]"
+          style={{
+            background:
+              "linear-gradient(180deg, transparent 0%, #171310 100%)",
+          }}
+        />
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Spectrogram mockup */}
+            {/* Spectrogram mockup — realistic frequency / time display */}
             <div
               data-sol-left
-              className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-ev-charcoal p-1"
+              className="relative aspect-[4/3] rounded-2xl overflow-hidden"
+              style={{
+                background: "#09141F",
+                boxShadow:
+                  "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,80,160,0.12)",
+              }}
             >
-              <div className="w-full h-full rounded-xl overflow-hidden relative bg-gradient-to-br from-spectrogram-low via-[#0a2540] to-spectrogram-low">
-                {[12, 22, 35, 45, 58, 68, 78, 88].map((top, i) => (
+              {/* Frequency axis labels */}
+              <div className="absolute top-4 left-0 bottom-10 w-11 flex flex-col justify-between items-end pr-2 z-[3]">
+                {["500", "200", "100", "50", "20", "8"].map((f) => (
+                  <span
+                    key={f}
+                    className="font-mono leading-none"
+                    style={{ fontSize: "7px", color: "rgba(80,140,255,0.35)" }}
+                  >
+                    {f}Hz
+                  </span>
+                ))}
+              </div>
+
+              {/* Main spectrogram body */}
+              <div
+                className="absolute top-4 left-11 right-3 bottom-10 rounded overflow-hidden"
+                style={{ background: "#0C1E35" }}
+              >
+                {/* Frequency grid */}
+                {[20, 40, 60, 80].map((p) => (
                   <div
-                    key={i}
-                    className="absolute h-[2px] left-[5%] right-[5%] bg-spectrogram-mid/20"
+                    key={p}
+                    className="absolute left-0 right-0"
                     style={{
-                      top: `${top}%`,
-                      opacity: 0.15 + (i % 3) * 0.08,
+                      top: `${p}%`,
+                      height: "1px",
+                      background: "rgba(0,80,200,0.1)",
                     }}
                   />
                 ))}
+                {/* Time grid */}
+                {[25, 50, 75].map((p) => (
+                  <div
+                    key={p}
+                    className="absolute top-0 bottom-0"
+                    style={{
+                      left: `${p}%`,
+                      width: "1px",
+                      background: "rgba(0,80,200,0.08)",
+                    }}
+                  />
+                ))}
+
+                {/* === NOISE LAYERS === */}
+                {/* Aircraft noise — high frequency band */}
                 <div
-                  className="absolute h-3 rounded-full"
+                  className="absolute left-0 right-0"
                   style={{
-                    top: "52%",
-                    left: "18%",
-                    right: "28%",
+                    top: "0%",
+                    height: "22%",
                     background:
-                      "linear-gradient(90deg,transparent,#FFD700,#C4A46C,#FFD700,transparent)",
-                    opacity: 0.55,
+                      "linear-gradient(180deg, rgba(30,80,220,0.12) 0%, rgba(40,100,240,0.28) 55%, transparent 100%)",
                   }}
                 />
+                {/* Wind / broadband noise — mid range */}
                 <div
-                  className="absolute h-2 rounded-full"
+                  className="absolute left-0 right-0"
                   style={{
-                    top: "58%",
-                    left: "22%",
-                    right: "34%",
+                    top: "18%",
+                    height: "42%",
                     background:
-                      "linear-gradient(90deg,transparent,#C4A46C,transparent)",
-                    opacity: 0.35,
+                      "linear-gradient(90deg, rgba(20,60,180,0.18) 0%, rgba(25,80,210,0.34) 28%, rgba(15,55,170,0.16) 48%, rgba(28,85,215,0.36) 72%, rgba(20,65,185,0.2) 100%)",
+                    filter: "blur(1px)",
                   }}
                 />
+                {/* Scattered noise blobs */}
+                {[
+                  { t: "6%", l: "12%", w: "14%", h: "7%", o: 0.28 },
+                  { t: "4%", l: "48%", w: "9%", h: "11%", o: 0.22 },
+                  { t: "28%", l: "8%", w: "22%", h: "9%", o: 0.24 },
+                  { t: "32%", l: "62%", w: "16%", h: "13%", o: 0.3 },
+                  { t: "42%", l: "33%", w: "24%", h: "7%", o: 0.2 },
+                  { t: "14%", l: "76%", w: "14%", h: "8%", o: 0.18 },
+                ].map(({ t, l, w, h, o }, ni) => (
+                  <div
+                    key={ni}
+                    className="absolute rounded-full"
+                    style={{
+                      top: t,
+                      left: l,
+                      width: w,
+                      height: h,
+                      background: `radial-gradient(ellipse, rgba(40,105,230,${o}) 0%, transparent 100%)`,
+                      filter: "blur(4px)",
+                    }}
+                  />
+                ))}
+
+                {/* === ELEPHANT VOCALIZATION SIGNAL === */}
+                {/* Fundamental ~27 Hz — bright gold */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "61%",
+                    height: "8px",
+                    left: "10%",
+                    right: "22%",
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,200,40,0.55) 12%, rgba(255,218,55,1) 32%, rgba(255,205,45,0.88) 62%, rgba(240,185,30,0.5) 84%, transparent)",
+                    filter: "blur(0.4px)",
+                    boxShadow: "0 0 14px rgba(255,210,40,0.45)",
+                  }}
+                />
+                {/* 2nd harmonic ~54 Hz */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "53%",
+                    height: "4px",
+                    left: "16%",
+                    right: "32%",
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,200,40,0.32) 18%, rgba(255,215,50,0.65) 44%, rgba(255,198,38,0.28) 74%, transparent)",
+                    boxShadow: "0 0 8px rgba(255,210,40,0.2)",
+                  }}
+                />
+                {/* 3rd harmonic ~81 Hz */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "47%",
+                    height: "3px",
+                    left: "20%",
+                    right: "40%",
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,200,40,0.18) 28%, rgba(255,212,48,0.42) 54%, transparent)",
+                  }}
+                />
+
+                {/* Scan line */}
                 <div
                   data-scan-line
-                  className="absolute top-[3%] bottom-[3%] w-[2px] bg-gradient-to-b from-transparent via-accent-savanna to-transparent opacity-60"
-                  style={{ left: "5%" }}
+                  className="absolute top-0 bottom-0"
+                  style={{
+                    left: "5%",
+                    width: "2px",
+                    background:
+                      "linear-gradient(180deg, transparent, rgba(196,164,108,0.85) 18%, rgba(196,164,108,0.9) 82%, transparent)",
+                    boxShadow: "0 0 8px rgba(196,164,108,0.6)",
+                  }}
                 />
-                <div className="absolute bottom-4 left-4 px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm">
-                  <span className="text-xs text-white/60">
-                    Raw Recording — Signal Buried in Noise
+
+                {/* Legend — top-right */}
+                <div className="absolute top-2 right-2 flex flex-col gap-1 z-[2]">
+                  {[
+                    {
+                      color: "rgba(35,90,225,0.75)",
+                      label: "aircraft",
+                    },
+                    {
+                      color: "rgba(20,68,190,0.75)",
+                      label: "wind",
+                    },
+                    {
+                      color: "rgba(255,210,42,0.9)",
+                      label: "vocalization",
+                    },
+                  ].map(({ color, label }) => (
+                    <div
+                      key={label}
+                      className="flex items-center gap-1.5 rounded px-1.5 py-[3px]"
+                      style={{ background: "rgba(0,0,0,0.45)" }}
+                    >
+                      <div
+                        className="rounded-sm"
+                        style={{
+                          width: "16px",
+                          height: "3px",
+                          background: color,
+                        }}
+                      />
+                      <span
+                        className="font-mono"
+                        style={{
+                          fontSize: "7px",
+                          color:
+                            label === "vocalization"
+                              ? "rgba(255,210,42,0.6)"
+                              : "rgba(100,150,255,0.5)",
+                        }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Time axis */}
+              <div className="absolute left-11 right-3 bottom-2 flex justify-between z-[3]">
+                {["0s", "5s", "10s", "15s", "20s"].map((t) => (
+                  <span
+                    key={t}
+                    className="font-mono"
+                    style={{ fontSize: "7px", color: "rgba(80,140,255,0.3)" }}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+
+              {/* Bottom label */}
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[4]">
+                <div
+                  className="px-3 py-1.5 rounded-lg backdrop-blur-sm"
+                  style={{
+                    background: "rgba(0,0,0,0.55)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <span
+                    className="font-mono"
+                    style={{
+                      fontSize: "9px",
+                      color: "rgba(255,255,255,0.38)",
+                    }}
+                  >
+                    raw_recording.wav — signal buried in noise
                   </span>
                 </div>
               </div>
@@ -1207,132 +1440,300 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Wave: Solution -> Steps */}
-      <WaveDivider topColor="#F0EBE3" bottomColor="#F8F5F0" variant={1} />
+      {/* No wave — solution section gradient fades directly to dark steps */}
 
       {/* ═══════════════════════════════════════════
-          HOW IT WORKS
+          HOW IT WORKS — dark 3D glassmorphism
          ═══════════════════════════════════════════ */}
-      <section ref={stepsRef} className="py-20 md:py-28 bg-ev-ivory">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <span className="text-sm font-semibold text-accent-savanna tracking-[0.2em] uppercase mb-4 block">
-              How It Works
-            </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-ev-charcoal">
-              Three Steps to Clarity
+      <section
+        ref={stepsRef}
+        className="relative py-28 md:py-44 overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(160deg, #171310 0%, #221D19 50%, #1A1512 100%)",
+        }}
+      >
+        {/* WebGL particle field */}
+        <LazyParticleField
+          className="z-0 opacity-25"
+          count={150}
+          color="#C4A46C"
+          speed={0.005}
+          size={0.022}
+        />
+
+        {/* Ambient center glow */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 75% 55% at 50% 45%, rgba(196,164,108,0.07) 0%, transparent 65%)",
+          }}
+        />
+
+        {/* Dot-grid texture */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, rgba(196,164,108,0.18) 1px, transparent 1px)",
+            backgroundSize: "52px 52px",
+            opacity: 0.18,
+          }}
+        />
+
+        <div className="relative z-[1] max-w-6xl mx-auto px-6">
+          {/* ── Header ── */}
+          <div className="text-center mb-24">
+            <div className="inline-flex items-center gap-4 mb-6">
+              <div
+                className="h-px w-14"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(196,164,108,0.55))",
+                }}
+              />
+              <span
+                className="font-semibold tracking-[0.35em] uppercase"
+                style={{ fontSize: "10px", color: "rgba(196,164,108,0.55)" }}
+              >
+                How It Works
+              </span>
+              <div
+                className="h-px w-14"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(196,164,108,0.55), transparent)",
+                }}
+              />
+            </div>
+            <h2
+              className="font-display font-bold leading-[0.87] tracking-[-0.03em]"
+              style={{ fontSize: "clamp(3.2rem,8vw,6.5rem)" }}
+            >
+              <span className="text-ev-cream">Three Steps</span>
+              <br />
+              <span
+                style={{
+                  WebkitTextStroke: "1px rgba(196,164,108,0.6)",
+                  color: "transparent",
+                }}
+              >
+                to Clarity
+              </span>
             </h2>
+            <p
+              className="mt-6 max-w-md mx-auto text-base leading-relaxed"
+              style={{ color: "rgba(181,173,164,0.5)" }}
+            >
+              From raw field recording to publishable research data — automated
+              end-to-end.
+            </p>
           </div>
 
-          <div className="relative grid md:grid-cols-3 gap-12">
-            {/* Connector lines */}
-            <div className="hidden md:block absolute top-[3.5rem] left-[33%] right-[33%] h-0.5">
+          {/* ── Steps grid ── */}
+          <div className="relative">
+            {/* Connector line — icon-center col-1 to icon-center col-3 */}
+            <div
+              className="hidden md:block absolute z-[2] pointer-events-none"
+              style={{
+                top: "27px",
+                left: "16.67%",
+                right: "16.67%",
+                height: "1px",
+              }}
+            >
               <div
                 data-step-line
-                className="absolute left-0 right-[50%] h-full bg-gradient-to-r from-accent-savanna to-accent-gold"
-              />
-              <div
-                data-step-line
-                className="absolute left-[50%] right-0 h-full bg-gradient-to-r from-accent-gold to-nature-sage"
+                className="w-full h-full"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(196,164,108,0.85) 0%, rgba(232,200,122,1) 50%, rgba(122,139,111,0.85) 100%)",
+                  boxShadow: "0 0 10px rgba(196,164,108,0.4)",
+                }}
               />
             </div>
 
-            {[
-              {
-                step: "01",
-                title: "Upload",
-                desc: "Drop your WAV, MP3, or FLAC field recordings. Any sample rate, any bit depth — we handle it all.",
-                color: "bg-accent-savanna",
-                icon: (
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
-                ),
-              },
-              {
-                step: "02",
-                title: "Process",
-                desc: "AI identifies noise types, applies spectral gating, and extracts clean elephant vocalizations in seconds.",
-                color: "bg-accent-gold",
-                icon: (
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                ),
-              },
-              {
-                step: "03",
-                title: "Analyze",
-                desc: "Compare spectrograms, listen to cleaned audio, review detected calls, and export research-grade data.",
-                color: "bg-nature-sage",
-                icon: (
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                ),
-              },
-            ].map((s, i) => (
+            {/* Connector node dots */}
+            {([
+              { pct: "16.67%", color: "#C4A46C", glow: "rgba(196,164,108,0.8)" },
+              { pct: "50%",    color: "#E0C07A", glow: "rgba(224,192,122,0.8)" },
+              { pct: "83.33%", color: "#7A8B6F", glow: "rgba(122,139,111,0.8)" },
+            ] as const).map(({ pct, color, glow }, ni) => (
               <div
-                key={i}
-                data-step-card
-                className="relative text-center"
-                style={{ perspective: "600px" }}
-              >
-                <div
-                  className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg`}
-                >
-                  {s.icon}
-                </div>
-                <div
-                  data-step-num
-                  className="text-5xl font-display font-bold text-ev-sand/30 mb-3"
-                >
-                  {s.step}
-                </div>
-                <h3 className="text-xl font-bold text-ev-charcoal mb-3">
-                  {s.title}
-                </h3>
-                <p className="text-ev-elephant text-sm leading-relaxed">
-                  {s.desc}
-                </p>
-              </div>
+                key={ni}
+                className="hidden md:block absolute z-[3] pointer-events-none"
+                style={{
+                  top: "21px",
+                  left: pct,
+                  transform: "translateX(-50%)",
+                  width: "13px",
+                  height: "13px",
+                  borderRadius: "50%",
+                  background: color,
+                  boxShadow: `0 0 14px ${glow}`,
+                }}
+              />
             ))}
+
+            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+              {[
+                {
+                  step: "01",
+                  title: "Upload",
+                  desc: "Drop your WAV, MP3, or FLAC field recordings. Any sample rate, any bit depth — we handle it all.",
+                  gradient: "linear-gradient(135deg, #C4A46C 0%, #A8873B 100%)",
+                  glow: "rgba(196,164,108,0.55)",
+                  icon: (
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                  ),
+                },
+                {
+                  step: "02",
+                  title: "Process",
+                  desc: "AI identifies noise types, applies spectral gating, and extracts clean elephant vocalizations in seconds.",
+                  gradient: "linear-gradient(135deg, #E0C07A 0%, #C4A46C 100%)",
+                  glow: "rgba(224,192,122,0.55)",
+                  icon: (
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                  ),
+                },
+                {
+                  step: "03",
+                  title: "Analyze",
+                  desc: "Compare spectrograms, listen to cleaned audio, review detected calls, and export research-grade data.",
+                  gradient: "linear-gradient(135deg, #7A8B6F 0%, #5A6B4F 100%)",
+                  glow: "rgba(122,139,111,0.55)",
+                  icon: (
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      />
+                    </svg>
+                  ),
+                },
+              ].map((s, i) => (
+                <div
+                  key={i}
+                  data-step-card
+                  className="relative text-center group"
+                  style={{ perspective: "700px" }}
+                >
+                  {/* Ghost step number behind card */}
+                  <div
+                    data-step-num
+                    className="absolute left-1/2 -translate-x-1/2 font-display font-bold select-none pointer-events-none z-0"
+                    style={{
+                      top: "-2.5rem",
+                      fontSize: "clamp(5rem,11vw,8rem)",
+                      color: "rgba(196,164,108,0.045)",
+                      letterSpacing: "-0.05em",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {s.step}
+                  </div>
+
+                  {/* Icon with halo glow */}
+                  <div className="relative flex justify-center mb-8 z-[2]">
+                    <div className="relative">
+                      <div
+                        className="absolute inset-[-8px] rounded-3xl blur-2xl opacity-0 group-hover:opacity-70 transition-opacity duration-700"
+                        style={{ background: s.glow }}
+                      />
+                      <div
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl
+                          ring-1 ring-white/10
+                          group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500"
+                        style={{ background: s.gradient }}
+                      >
+                        {s.icon}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Glassmorphism card body */}
+                  <div
+                    className="relative rounded-2xl p-7 transition-all duration-500
+                      group-hover:-translate-y-4"
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(196,164,108,0.13)",
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
+                      boxShadow:
+                        "0 8px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)",
+                      transformStyle: "preserve-3d",
+                    }}
+                  >
+                    {/* Hover shimmer overlay */}
+                    <div
+                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background: `linear-gradient(135deg, ${s.glow.replace("0.55", "0.09")} 0%, transparent 65%)`,
+                      }}
+                    />
+                    <div className="relative z-[1]">
+                      <div
+                        className="font-mono tracking-[0.22em] mb-3"
+                        style={{
+                          fontSize: "10px",
+                          color: "rgba(196,164,108,0.38)",
+                        }}
+                      >
+                        STEP {s.step}
+                      </div>
+                      <h3 className="text-2xl font-display font-bold text-ev-cream mb-3">
+                        {s.title}
+                      </h3>
+                      <p
+                        className="text-sm leading-relaxed"
+                        style={{ color: "rgba(181,173,164,0.62)" }}
+                      >
+                        {s.desc}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Wave: Steps -> CTA */}
-      <WaveDivider topColor="#F8F5F0" bottomColor="#2C2926" variant={2} />
+      {/* No wave needed — steps flows directly into CTA (both dark) */}
 
       {/* ═══════════════════════════════════════════
           CTA — with particle field
