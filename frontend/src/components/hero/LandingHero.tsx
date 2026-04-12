@@ -129,6 +129,17 @@ export default function LandingHero() {
           Reveal the intelligence hidden inside every field recording.
         </h2>
       </div>
+
+      <div
+        className={`pointer-events-none absolute inset-0 z-[30] bg-[radial-gradient(circle_at_center,rgba(25,54,104,0.28)_0%,rgba(12,25,49,0.72)_42%,rgba(5,10,20,0.96)_100%)] transition-opacity duration-[1100ms] ease-out ${
+          isTransitioning ? "opacity-100" : "opacity-0"
+        }`}
+      />
+      <div
+        className={`pointer-events-none absolute inset-0 z-[31] bg-[#07101d] transition-opacity duration-[1350ms] ease-out ${
+          isTransitioning ? "opacity-100" : "opacity-0"
+        }`}
+      />
     </section>
   );
 }
