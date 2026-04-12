@@ -206,3 +206,32 @@ def test_build_spectrogram_artifacts_invalid_cmap_raises(tmp_path: Path) -> None
             tmp_path / "spectrograms",
             cmap="rainbow",
         )
+
+
+# ── Spectrogram axis readability tests ──
+
+
+def test_generate_spectrogram_png_produces_larger_image(tmp_path: Path) -> None:
+    """The PNG is large enough (≥ 400px wide) to display without axis clutter."""
+    from PIL import Image  # type: ignore[import]
+
+    sr = 44_100
+    waveform = _make_waveform(sr=sr, seconds=1)
+    stft_data = compute_stft(waveform, sr)
+    output = tmp_path / "spec.png"
+    generate_spectrogram_png(stft_data["magnitude_db"], sr, 512, output)
+    img = Image.open(output)
+    width, height = img.size
+    assert width >= 400, f"PNG width {width}px is too narrow — axis labels will clutter"
+    assert height >= 300, f"PNG height {height}px is too short"
+
+
+def test_generate_spectrogram_png_short_recording_readable(tmp_path: Path) -> None:
+    """A very short recording (0.5s) generates a PNG without crashing or garbled axes."""
+    sr = 44_100
+    short_waveform = _make_waveform(sr=sr, seconds=1)[:sr // 2]
+    stft_data = compute_stft(short_waveform, sr)
+    output = tmp_path / "spec_short.png"
+    result = generate_spectrogram_png(stft_data["magnitude_db"], sr, 512, output)
+    assert Path(result).exists()
+    assert Path(result).stat().st_size > 1000  # non-trivial PNG
