@@ -94,6 +94,7 @@ function WaveDivider({
    ──────────────────────────────────────────── */
 export default function LandingPage() {
   const { isTransitioning, startDashboardTransition } = useSceneTransition();
+  const [isGlobeActivated, setIsGlobeActivated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const crisisRef = useRef<HTMLElement>(null);
@@ -115,15 +116,51 @@ export default function LandingPage() {
         .from("[data-nav]", { y: -50, opacity: 0, duration: 0.8 })
         .from("[data-scroll-ind]", { opacity: 0, y: -10, duration: 0.4 }, "-=0.2");
 
-      /* nav always solid */
+      /* nav fades from transparent to solid as the hero scrolls away */
       gsap.set("[data-nav]", {
+        backgroundColor: "rgba(44,41,38,0)",
+        backdropFilter: "blur(0px)",
+        borderBottomColor: "rgba(255,255,255,0)",
+      });
+      gsap.set("[data-nav-brand]", {
+        color: "#3f3121",
+      });
+      gsap.set("[data-nav-logo]", {
+        filter: "brightness(0) saturate(100%)",
+      });
+      gsap.to("[data-nav]", {
         backgroundColor: "rgba(44,41,38,0.92)",
         backdropFilter: "blur(16px)",
+        borderBottomColor: "rgba(255,255,255,0.1)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "+=180",
+          scrub: true,
+        },
       });
-      gsap.set("[data-nav-edge-path]", {
-        attr: { fill: "rgba(44,41,38,0.92)" },
+      gsap.to("[data-nav-brand]", {
+        color: "#F7F3EA",
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "+=180",
+          scrub: true,
+        },
       });
-  
+      gsap.to("[data-nav-logo]", {
+        filter: "brightness(1) saturate(100%)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "+=180",
+          scrub: true,
+        },
+      });
+
       /* scroll indicator bounce */
       gsap.to("[data-scroll-ind]", {
         y: 10,
@@ -367,34 +404,18 @@ export default function LandingPage() {
          ═══════════════════════════════════════════ */}
       <nav
         data-nav
-        className="fixed top-0 left-0 right-0 z-50 transition-colors"
+        className="fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent"
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2"
-          >
-            <Image src="/logo.png" alt="EchoField logo" width={52} height={52} className="object-contain" />
-            <span className="text-4xl font-display font-semibold text-accent-savanna">EchoField</span>
+          <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+            <Link
+              href="/"
+              className="flex items-center gap-2"
+            >
+            <Image src="/logo.png" alt="EchoField logo" width={52} height={52} className="object-contain" data-nav-logo />
+            <span className="text-4xl font-display font-semibold text-[#3f3121]" data-nav-brand>EchoField</span>
           </Link>
 
         </div>
-
-
-        {/* Decorative bottom edge */}
-        <svg
-          className="absolute left-0 right-0 top-full w-full h-3 pointer-events-none"
-          viewBox="0 0 1440 12"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          data-nav-edge
-        >
-          <path
-            d="M0,0 C240,12 480,4 720,8 C960,12 1200,2 1440,6 L1440,0 L0,0 Z"
-            fill="rgba(44,41,38,0)"
-            data-nav-edge-path
-          />
-        </svg>
       </nav>
 
       {/* ═══════════════════════════════════════════
@@ -461,16 +482,17 @@ export default function LandingPage() {
           </div>
 
           {/* Interactive globe */}
-          <button
-            id="landing-globe-trigger"
-            type="button"
-            onClick={() => {
-              if (isTransitioning) return;
-              const el = document.getElementById("landing-globe-trigger");
-              const rect = el?.getBoundingClientRect();
-              if (!rect) return;
-              startDashboardTransition({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
-            }}
+            <button
+              id="landing-globe-trigger"
+              type="button"
+              onClick={() => {
+                if (isTransitioning) return;
+                setIsGlobeActivated(true);
+                const el = document.getElementById("landing-globe-trigger");
+                const rect = el?.getBoundingClientRect();
+                if (!rect) return;
+                startDashboardTransition({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+              }}
             disabled={isTransitioning}
             aria-label="Enter EchoField dashboard"
             className={`pointer-events-auto absolute left-[49%] top-[41%] h-[clamp(280px,34vw,500px)] w-[clamp(280px,34vw,500px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-transform ease-[cubic-bezier(0.2,0,0.8,1)] ${
@@ -496,29 +518,33 @@ export default function LandingPage() {
               }}
             />
           </button>
-        </div>
+          </div>
 
-        {/* Mission text */}
-        <div className="pointer-events-none absolute right-[4vw] top-[31%] z-[8] hidden max-w-[28rem] px-7 py-7 text-[#4e3b28] lg:block">
-          <p className="font-[Arial] text-sm font-semibold uppercase tracking-[0.28em] text-[#7b6246] underline underline-offset-[6px]">
-            Mission Statement
-          </p>
+          {/* Mission text */}
+          <div
+            className={`pointer-events-none absolute right-[4vw] top-[31%] z-[8] hidden max-w-[28rem] px-7 py-7 text-[#4e3b28] lg:block ${
+              isGlobeActivated ? "invisible opacity-0" : "visible opacity-100"
+            }`}
+          >
+            <p className="font-[Arial] text-sm font-semibold uppercase tracking-[0.28em] text-[#7b6246] underline underline-offset-[6px]">
+              Mission Statement
+            </p>
           <h2 className="mt-4 text-[2.15rem] font-bold leading-tight tracking-[-0.04em] text-[#3f3121]">
             Reveal the intelligence hidden inside every field recording.
           </h2>
         </div>
         {/* Scroll indicator */}
-        <div
-          data-scroll-ind
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
-        >
-          <span className="text-[11px] text-[#5d4a34]/60 tracking-[0.25em] uppercase font-medium">
-            Scroll
-          </span>
-          <svg className="w-4 h-4 text-[#5d4a34]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7" />
-          </svg>
-        </div>
+          <div
+            data-scroll-ind
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
+          >
+            <span className="text-[11px] text-[#4b3520]/90 tracking-[0.25em] uppercase font-medium">
+              Scroll
+            </span>
+            <svg className="w-4 h-4 text-[#4b3520]/85" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7" />
+            </svg>
+          </div>
 
       </section>
 
