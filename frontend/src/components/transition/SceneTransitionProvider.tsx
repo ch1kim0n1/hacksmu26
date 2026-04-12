@@ -33,8 +33,8 @@ const SceneTransitionContext = createContext<SceneTransitionContextValue | null>
 );
 
 const DASHBOARD_ROUTE = "/dashboard";
-const ZOOM_MS = 500;
-const CLOUD_MS = 760;
+const ZOOM_MS = 460;
+const CLOUD_MS = 620;
 const REVEAL_MS = 320;
 
 export function SceneTransitionProvider({
@@ -171,20 +171,18 @@ export function SceneTransitionProvider({
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "cover",
-                  willChange: "transform, opacity, filter",
+                  willChange: "transform, opacity",
                 }}
-                initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                initial={{ opacity: 1, scale: 1 }}
                 animate={
                   phase === "zoom"
                     ? {
                         opacity: 1,
-                        scale: 15,
-                        filter: "blur(0px)",
+                        scale: 13.5,
                       }
                     : {
                         opacity: 0,
-                        scale: 19,
-                        filter: "blur(18px)",
+                        scale: 16.5,
                       }
                 }
                 transition={{
