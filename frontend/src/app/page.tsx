@@ -487,7 +487,7 @@ export default function LandingPage() {
                 data-nav-logo
               />
             </div>
-            <span className="text-[2.35rem] font-display font-semibold leading-none text-[#3f3121] sm:text-[2.6rem]" data-nav-brand>EchoField</span>
+            <span className="text-[2.35rem] font-display font-semibold leading-none text-[#3f3121] sm:text-[2.6rem]" data-nav-brand>Project Tusk</span>
           </Link>
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
@@ -1090,7 +1090,7 @@ export default function LandingPage() {
                 </span>
               </h2>
               <p className="text-ev-elephant mb-8 leading-relaxed">
-                EchoField uses spectral gating and AI classification to identify
+                Project Tusk uses spectral gating and AI classification to identify
                 and remove overlapping noise — airplanes, cars, generators, wind
                 — while preserving the elephant vocalizations researchers need.
               </p>
@@ -1453,7 +1453,7 @@ export default function LandingPage() {
             href="/"
             className="text-base font-display font-semibold text-accent-savanna/60 hover:text-accent-savanna transition-colors"
           >
-            EchoField
+            Project Tusk
           </Link>
           <div className="flex items-center gap-5">
             {["Upload", "Recordings", "Database"].map((item) => (
@@ -1475,7 +1475,7 @@ export default function LandingPage() {
             </a>
           </div>
           <p className="text-xs text-[#b7aca0]/20">
-            &copy; 2026 EchoField &middot; HackSMU
+            &copy; 2026 Project Tusk &middot; HackSMU
           </p>
         </div>
       </footer>

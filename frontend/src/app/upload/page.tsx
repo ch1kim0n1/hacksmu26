@@ -173,7 +173,7 @@ export default function UploadPage() {
       await startPipelineForUploads(result);
       const count = result.recording_ids.length;
       setUploadSuccess(
-        `Uploaded ${count} file${count === 1 ? "" : "s"} and started full EchoField analysis.`,
+        `Uploaded ${count} file${count === 1 ? "" : "s"} and started full Project Tusk analysis.`,
       );
       await fetchRecordings();
       if (result.recording_ids.length === 1) {
