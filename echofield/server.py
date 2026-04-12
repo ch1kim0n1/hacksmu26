@@ -2438,7 +2438,14 @@ async def ml_labeling_queue(limit: int = Query(10, ge=1, le=100)):
     db = _get_call_database()
     mgr = _get_al_manager()
     queue = mgr.get_labeling_queue(db._calls, limit=limit)
-    return queue
+    # Map "id" to "call_id" for frontend API contract
+    return [
+        {
+            **call,
+            "call_id": call.get("id"),
+        }
+        for call in queue
+    ]
 
 
 @app.post("/api/ml/label/{call_id}")

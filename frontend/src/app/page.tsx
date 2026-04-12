@@ -610,11 +610,6 @@ export default function LandingPage() {
                 controls: { minDistance: 180, maxDistance: 280 },
               }}
             />
-            <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-              <span className="max-w-[9ch] text-center text-xl font-semibold italic leading-tight tracking-[0.02em] text-white/92 drop-shadow-[0_2px_12px_rgba(18,34,58,0.55)] sm:text-2xl">
-                Ready to Listen?
-              </span>
-            </div>
           </button>
           </div>
 
