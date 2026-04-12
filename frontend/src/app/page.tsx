@@ -124,10 +124,7 @@ export default function LandingPage() {
       gsap.set("[data-nav-edge-path]", {
         attr: { fill: "rgba(44,41,38,0.92)" },
       });
-      if (false) {
-        },
-      });
-
+  
       /* scroll indicator bounce */
       gsap.to("[data-scroll-ind]", {
         y: 10,
