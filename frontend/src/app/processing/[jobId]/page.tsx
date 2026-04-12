@@ -204,7 +204,7 @@ export default function ProcessingPage() {
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-2 text-sm text-ev-warm-gray mb-1">
-            <Link href="/upload" className="hover:text-ev-elephant transition-colors">Recordings</Link>
+            <Link href="/recordings" className="hover:text-ev-elephant transition-colors">Recordings</Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-ev-elephant">{recording?.filename || "Processing"}</span>
           </div>

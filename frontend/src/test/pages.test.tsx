@@ -74,10 +74,10 @@ describe("Processing Page", () => {
     expect(screen.getByText("Noise Removal")).toBeInTheDocument();
   });
 
-  it("renders back link to upload after loading", async () => {
+  it("renders back link to recordings after loading", async () => {
     render(<ProcessingPage />);
     const link = await screen.findByText("Back to Recordings");
-    expect(link.closest("a")?.getAttribute("href")).toBe("/upload");
+    expect(link.closest("a")?.getAttribute("href")).toBe("/recordings");
   });
 
   it("renders recording info section after loading", async () => {
