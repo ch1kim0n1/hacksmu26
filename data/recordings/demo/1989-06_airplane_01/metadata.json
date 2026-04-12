@@ -1,0 +1,27 @@
+{
+  "filename": "1989-06_airplane_01.wav",
+  "recording_id": "60d0063b-63f4-54c4-822c-12828e577e8c",
+  "quality": {
+    "snr_before_db": 10.2,
+    "snr_after_db": 15.3,
+    "snr_improvement_db": 5.070018707664356,
+    "pesq": null,
+    "peak_frequency_before_hz": 52.5,
+    "peak_frequency_after_hz": 22.0,
+    "spectral_distortion": 0.1536,
+    "energy_preservation": 0.7407,
+    "quality_score": 56.3,
+    "quality_rating": "fair",
+    "flagged_for_review": false
+  },
+  "metadata": {
+    "location": "",
+    "date": "",
+    "species": "African bush elephant",
+    "noise_type_ref": "airplane",
+    "animal_id": "1989-06",
+    "call_id": "1989-06_airplane_01",
+    "start_sec": 0.0,
+    "end_sec": 83.038
+  }
+}

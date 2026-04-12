@@ -1,0 +1,33 @@
+{
+  "inventory_file": "data/analysis/audio_inventory.csv",
+  "review_file": "data/analysis/audio_inventory_review.csv",
+  "total_rows": 44,
+  "status_counts": {
+    "review_classifier_mismatch": 24,
+    "trusted": 18,
+    "review_mixed": 2
+  },
+  "trusted_fields": [
+    "call_id",
+    "filename",
+    "animal_id",
+    "duration_s",
+    "sample_rate",
+    "channels",
+    "noise_type_ref"
+  ],
+  "inferred_fields": [
+    "classifier_primary_noise",
+    "classifier_confidence",
+    "call_type",
+    "call_type_confidence",
+    "fundamental_frequency_hz",
+    "harmonicity",
+    "harmonic_count",
+    "bandwidth_hz",
+    "spectral_centroid_hz",
+    "snr_db"
+  ],
+  "metadata_corrections_required": [],
+  "notes": "Filename-derived reference labels are kept as canonical; classifier disagreement is flagged for manual review."
+}

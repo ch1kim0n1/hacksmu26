@@ -1,0 +1,45 @@
+call_id,filename,animal_id,noise_type_ref,classifier_primary_noise,call_type,label_status,mixed_reference_label,classifier_matches_reference,suggested_noise_type,metadata_update_required,review_note
+04-040920-02_vehicle_1,04-040920-02_vehicle_1.wav,04-040920-02,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+04-040920-02_vehicle_2,04-040920-02_vehicle_2.wav,04-040920-02,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+04-040920-03_vehicle_noise_1,04-040920-03_vehicle_noise_1.wav,04-040920-03,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+04-061218-25_vehicle_noise_1,04-061218-25_vehicle_noise_1.wav,04-061218-25,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+061220-24_airplane_01,061220-24_airplane_01.wav,061220-24,airplane,airplane,trumpet,trusted,false,true,airplane,false,Classifier agrees with reference
+090224-09_generator_01,090224-09_generator_01.wav,090224-09,generator,airplane,rumble,review_classifier_mismatch,false,false,generator,false,Classifier disagrees with filename-derived reference
+1989-06_airplane_01,1989-06_airplane_01.wav,1989-06,airplane,airplane,rumble,trusted,false,true,airplane,false,Classifier agrees with reference
+1989-08_airplane_01,1989-08_airplane_01.wav,1989-08,airplane,airplane,rumble,trusted,false,true,airplane,false,Classifier agrees with reference
+1989-08_airplane_02,1989-08_airplane_02.wav,1989-08,airplane,airplane,unknown,trusted,false,true,airplane,false,Classifier agrees with reference
+1989-08_airplane_03,1989-08_airplane_03.wav,1989-08,airplane,airplane,rumble,trusted,false,true,airplane,false,Classifier agrees with reference
+2000-23_background_and_vehicle_noise_2,2000-23_background_and_vehicle_noise_2.wav,2000-23,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+2000-23_background_noise_1,2000-23_background_noise_1.wav,2000-23,background,airplane,rumble,review_classifier_mismatch,false,false,background,false,Classifier disagrees with filename-derived reference
+2000-23_background_vehicle_noise,2000-23_background_vehicle_noise.wav,2000-23,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+2000-23_vehicle_noise_1,2000-23_vehicle_noise_1.wav,2000-23,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+2000-23_vehicle_noise_2,2000-23_vehicle_noise_2.wav,2000-23,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+2000-23_vehicle_noise_3,2000-23_vehicle_noise_3.wav,2000-23,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+2000-23_vehicle_noise_4,2000-23_vehicle_noise_4.wav,2000-23,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+2000-24_generator_noise_1,2000-24_generator_noise_1.wav,2000-24,generator,airplane,rumble,review_classifier_mismatch,false,false,generator,false,Classifier disagrees with filename-derived reference
+2000-24_generator_noise_2,2000-24_generator_noise_2.wav,2000-24,generator,airplane,unknown,review_classifier_mismatch,false,false,generator,false,Classifier disagrees with filename-derived reference
+2000-24_generator_noise_3,2000-24_generator_noise_3.wav,2000-24,generator,airplane,unknown,review_classifier_mismatch,false,false,generator,false,Classifier disagrees with filename-derived reference
+2000-24_generator_noise_4,2000-24_generator_noise_4.wav,2000-24,generator,airplane,trumpet,review_classifier_mismatch,false,false,generator,false,Classifier disagrees with filename-derived reference
+2000-24_vehicle_and_generator_noise_1,2000-24_vehicle_and_generator_noise_1.wav,2000-24,vehicle+generator,airplane,rumble,review_mixed,true,false,vehicle+generator,false,Mixed reference label; classifier captured one component or disagreed
+2000-24_vehicle_noise_1,2000-24_vehicle_noise_1.wav,2000-24,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+2000-24_vehicle_noise_2,2000-24_vehicle_noise_2.wav,2000-24,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+2000-27_airplane_01,2000-27_airplane_01.wav,2000-27,airplane,airplane,unknown,trusted,false,true,airplane,false,Classifier agrees with reference
+2000-3_airplane_01,2000-3_airplane_01.wav,2000-3,airplane,airplane,rumble,trusted,false,true,airplane,false,Classifier agrees with reference
+2000-3_airplane_02,2000-3_airplane_02.wav,2000-3,airplane,airplane,rumble,trusted,false,true,airplane,false,Classifier agrees with reference
+2000-3_airplane_03,2000-3_airplane_03.wav,2000-3,airplane,airplane,rumble,trusted,false,true,airplane,false,Classifier agrees with reference
+2000-3_vehicle_01,2000-3_vehicle_01.wav,2000-3,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+2000-4 _airplane_01,2000-4 _airplane_01.wav,2000-4,airplane,airplane,rumble,trusted,false,true,airplane,false,Classifier agrees with reference
+2000-4_airplane_02,2000-4_airplane_02.wav,2000-4,airplane,generator,trumpet,review_classifier_mismatch,false,false,airplane,false,Classifier disagrees with filename-derived reference
+2002-2_airplane_01,2002-2_airplane_01.wav,2002-2,airplane,generator,unknown,review_classifier_mismatch,false,false,airplane,false,Classifier disagrees with filename-derived reference
+2003-7_airplane_01,2003-7_airplane_01.wav,2003-7,airplane,airplane,rumble,trusted,false,true,airplane,false,Classifier agrees with reference
+99-22A_airplane_01,99-22A_airplane_01.wav,99-22A,airplane,airplane,trumpet,trusted,false,true,airplane,false,Classifier agrees with reference
+99-24_airplane_01,99-24_airplane_01.wav,99-24,airplane,airplane,trumpet,trusted,false,true,airplane,false,Classifier agrees with reference
+99-37_airplane_02,99-37_airplane_02.wav,99-37,airplane,airplane,rumble,trusted,false,true,airplane,false,Classifier agrees with reference
+99-37_airplane_and_vehicle_01,99-37_airplane_and_vehicle_01.wav,99-37,airplane+vehicle,generator,unknown,review_mixed,true,false,airplane+vehicle,false,Mixed reference label; classifier captured one component or disagreed
+99-37_vehicle_01,99-37_vehicle_01.wav,99-37,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+99-45_airplane_01,99-45_airplane_01.wav,99-45,airplane,airplane,unknown,trusted,false,true,airplane,false,Classifier agrees with reference
+99-45_airplane_03,99-45_airplane_03.wav,99-45,airplane,airplane,unknown,trusted,false,true,airplane,false,Classifier agrees with reference
+99-45_vehicle_01,99-45_vehicle_01.wav,99-45,vehicle,airplane,unknown,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+99-45_vehicle_02,99-45_vehicle_02.wav,99-45,vehicle,airplane,rumble,review_classifier_mismatch,false,false,vehicle,false,Classifier disagrees with filename-derived reference
+J86-1_airplane_01,J86-1_airplane_01.wav,J86-1,airplane,airplane,trumpet,trusted,false,true,airplane,false,Classifier agrees with reference
+J87-27_airplane_01,J87-27_airplane_01.wav,J87-27,airplane,airplane,unknown,trusted,false,true,airplane,false,Classifier agrees with reference
