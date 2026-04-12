@@ -26,7 +26,7 @@ type SceneTransitionContextValue = {
 
 const SceneTransitionContext = createContext<SceneTransitionContextValue | null>(null);
 
-const DASHBOARD_ROUTE = "/dashboard";
+const DASHBOARD_ROUTE = "/upload";
 const ZOOM_MS   = 900;   // clouds kick in here, while globe is still growing
 const CLOUD_MS  = 1800;
 const REVEAL_MS = 600;
