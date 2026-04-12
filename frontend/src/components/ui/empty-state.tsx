@@ -59,7 +59,7 @@ export function EmptyRecordings() {
   return (
     <EmptyState
       icon={
-        <svg className="h-8 w-8 text-accent-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="h-8 w-8 text-accent-savanna" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
         </svg>
       }
@@ -103,7 +103,7 @@ export function ErrorState({
         onRetry ? (
           <button
             onClick={onRetry}
-            className="inline-flex items-center gap-2 rounded-lg bg-accent-teal px-5 py-2 text-sm font-medium text-ev-ivory transition-colors hover:bg-accent-teal/90"
+            className="inline-flex items-center gap-2 rounded-lg bg-accent-savanna px-5 py-2 text-sm font-medium text-ev-ivory transition-colors hover:bg-accent-savanna/90"
           >
             Try again
           </button>

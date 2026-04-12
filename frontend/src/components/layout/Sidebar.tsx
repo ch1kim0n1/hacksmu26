@@ -19,6 +19,9 @@ import {
   Brain,
   Box,
   Webhook,
+  Download,
+  GitCompareArrows,
+  CheckSquare,
 } from "lucide-react";
 import { useMobileSidebar } from "@/hooks/useSidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -59,6 +62,14 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
       { href: "/analytics", label: "Analytics", icon: PieChart },
       { href: "/patterns", label: "Patterns", icon: GitBranch },
       { href: "/sites", label: "Sites", icon: MapPin },
+    ],
+  },
+  {
+    title: "Research",
+    items: [
+      { href: "/export", label: "Export", icon: Download },
+      { href: "/compare", label: "Compare", icon: GitCompareArrows },
+      { href: "/review", label: "Review Queue", icon: CheckSquare },
     ],
   },
   {
@@ -185,9 +196,9 @@ export default function Sidebar() {
           <p className="text-[10px] text-ev-dust/40 text-center">
             Built for HackSMU 2026
           </p>
-          <p className="text-[10px] text-ev-dust/30 text-center">
+          <a href="https://www.elephantvoices.org" target="_blank" rel="noopener noreferrer" className="text-[10px] text-ev-dust/30 text-center hover:text-accent-savanna/40 transition-colors">
             ElephantVoices Track
-          </p>
+          </a>
         </div>
       </aside>
 
@@ -199,7 +210,10 @@ export default function Sidebar() {
           <SidebarNav onNavigate={() => setMobileOpen(false)} />
           <div className="border-t border-[#3A3530] px-4 py-3 shrink-0">
             <p className="text-[10px] text-ev-dust/40 text-center">
-              Built for HackSMU 2026 — ElephantVoices Track
+              Built for HackSMU 2026 —{" "}
+              <a href="https://www.elephantvoices.org" target="_blank" rel="noopener noreferrer" className="hover:text-accent-savanna/40 transition-colors">
+                ElephantVoices Track
+              </a>
             </p>
           </div>
         </SheetContent>
