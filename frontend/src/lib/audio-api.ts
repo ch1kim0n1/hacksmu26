@@ -366,6 +366,10 @@ export async function revealInfrasound(id: string, params?: {
   });
 }
 
+export function getInfrasoundShiftedAudioUrl(recordingId: string): string {
+  return `${API_BASE}/api/recordings/${recordingId}/audio/infrasound-shifted`;
+}
+
 export async function getEmotionTimeline(id: string): Promise<EmotionTimelineResponse> {
   return fetchAPI<EmotionTimelineResponse>(`/api/recordings/${id}/emotion-timeline`);
 }
