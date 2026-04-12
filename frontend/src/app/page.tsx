@@ -426,19 +426,28 @@ export default function LandingPage() {
         data-nav
         className="fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent"
       >
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-6 px-6 py-4">
+          <div className="flex w-full items-center gap-6 px-3 py-4 sm:px-4 lg:px-5">
             <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.png" alt="EchoField logo" width={52} height={52} className="object-contain" data-nav-logo />
-            <span className="text-4xl font-display font-semibold text-[#3f3121]" data-nav-brand>EchoField</span>
+            <div className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden">
+              <Image
+                src="/logo.png"
+                alt="EchoField logo"
+                width={72}
+                height={72}
+                className="scale-[1.35] object-contain brightness-0 opacity-90"
+                data-nav-logo
+              />
+            </div>
+            <span className="text-[2.35rem] font-display font-semibold leading-none text-[#3f3121] sm:text-[2.6rem]" data-nav-brand>EchoField</span>
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
             {landingNavItems.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
                 data-nav-link
-                className="rounded-full px-3 py-2 text-sm font-medium tracking-[0.02em] text-[#4b3520] transition-colors duration-300 hover:text-white sm:px-4"
+                className="rounded-full px-3 py-2 text-base font-medium tracking-[0.02em] text-[#4b3520] transition-colors duration-300 hover:text-white sm:px-4 sm:text-lg"
               >
                 {item.label}
               </Link>
@@ -560,7 +569,7 @@ export default function LandingPage() {
               Mission Statement
             </p>
           <h2 className="mt-4 text-[2.15rem] font-bold leading-tight tracking-[-0.04em] text-[#3f3121]">
-            Reveal the intelligence hidden inside every field recording.
+            To give elephants a voice by revealing their hidden language through noise-free sound
           </h2>
         </div>
         {/* Scroll indicator */}

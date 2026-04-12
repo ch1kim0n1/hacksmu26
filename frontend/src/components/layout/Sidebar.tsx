@@ -42,17 +42,11 @@ export default function Sidebar() {
           const Icon = link.icon;
 
           return (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-label={link.label}
-              className="group relative flex min-h-[44px] w-full items-center justify-center rounded-xl py-2.5 transition-colors"
-            >
-              {/* Active indicator bar */}
+            <div key={link.href} className="relative flex h-12 w-full items-center justify-center">
               {isActive && (
                 <motion.div
                   layoutId="sidebar-indicator"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-gradient-to-b from-accent-savanna to-accent-gold"
+                  className="absolute left-0 top-1/2 h-7 w-[4px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-accent-savanna to-accent-gold"
                   transition={{
                     type: "spring",
                     stiffness: 350,
@@ -64,38 +58,43 @@ export default function Sidebar() {
                 />
               )}
 
-              {/* Active background */}
-              {isActive && (
-                <motion.div
-                  layoutId="sidebar-glow"
-                  className="absolute inset-x-1 inset-y-0 rounded-xl bg-white/[0.07]"
-                  transition={{
-                    type: "spring",
-                    stiffness: 350,
-                    damping: 30,
-                  }}
-                />
-              )}
-
-              <motion.div
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                className="relative z-10"
+              <Link
+                href={link.href}
+                aria-label={link.label}
+                className="group relative flex h-12 w-12 items-center justify-center rounded-2xl transition-colors"
               >
-                <Icon
-                  className={`h-5 w-5 transition-all duration-200 ${
-                    isActive
-                      ? "text-accent-savanna drop-shadow-[0_0_6px_rgba(196,164,108,0.4)]"
-                      : "text-ev-dust/70 group-hover:text-ev-cream"
-                  }`}
-                />
-              </motion.div>
+                {isActive && (
+                  <motion.div
+                    layoutId="sidebar-glow"
+                    className="absolute inset-0 rounded-2xl bg-white/[0.07]"
+                    transition={{
+                      type: "spring",
+                      stiffness: 350,
+                      damping: 30,
+                    }}
+                  />
+                )}
 
-              <div className="pointer-events-none absolute left-full z-50 ml-3 whitespace-nowrap rounded-lg border border-white/[0.06] bg-ev-charcoal-light px-2.5 py-1.5 text-[11px] font-medium text-ev-cream opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100">
-                {link.label}
-                <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-ev-charcoal-light" />
-              </div>
-            </Link>
+                <motion.div
+                  whileHover={{ scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="relative z-10"
+                >
+                  <Icon
+                    className={`h-5 w-5 transition-all duration-200 ${
+                      isActive
+                        ? "text-accent-savanna drop-shadow-[0_0_6px_rgba(196,164,108,0.4)]"
+                        : "text-ev-dust/70 group-hover:text-ev-cream"
+                    }`}
+                  />
+                </motion.div>
+
+                <div className="pointer-events-none absolute left-full z-50 ml-3 whitespace-nowrap rounded-lg border border-white/[0.06] bg-ev-charcoal-light px-2.5 py-1.5 text-[11px] font-medium text-ev-cream opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100">
+                  {link.label}
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-ev-charcoal-light" />
+                </div>
+              </Link>
+            </div>
           );
         })}
       </nav>
