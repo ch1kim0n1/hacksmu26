@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { SpectrogramImage } from "@/components/spectrogram/SpectrogramImage";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -108,13 +108,14 @@ export default function ComparePage() {
               <h2 className="mb-4 text-xl font-semibold text-ev-charcoal">
                 Elephant vs. {String(comparison.reference.species)}
               </h2>
-              <Image
+              <SpectrogramImage
                 src={`${API_BASE}${comparison.visualizations?.overlay_url ?? ""}`}
                 alt="Cross-species frequency overlay"
                 width={1600}
                 height={900}
                 unoptimized
                 className="h-auto w-full rounded-xl border border-ev-sand/30"
+                fallbackText="Comparison visualization unavailable"
               />
               <p className="mt-4 rounded-xl glass p-4 text-sm leading-relaxed text-ev-elephant">
                 {String(comparison.comparison.insight)}

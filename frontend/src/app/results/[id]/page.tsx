@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import { SpectrogramImage } from "@/components/spectrogram/SpectrogramImage";
 import { motion } from "framer-motion";
 import {
   ChevronRight,
@@ -221,7 +221,7 @@ export default function ResultsDetailPage() {
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2 font-medium">Original</p>
                 <div className="relative w-full h-48">
-                  <Image
+                  <SpectrogramImage
                     src={spectrogramBefore}
                     alt="Original spectrogram"
                     fill
@@ -232,7 +232,7 @@ export default function ResultsDetailPage() {
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2 font-medium">Cleaned</p>
                 <div className="relative w-full h-48">
-                  <Image
+                  <SpectrogramImage
                     src={spectrogramAfter}
                     alt="Cleaned spectrogram"
                     fill

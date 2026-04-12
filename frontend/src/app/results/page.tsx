@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import Image from "next/image";
+import Link from "next/link";
+import { SpectrogramImage } from "@/components/spectrogram/SpectrogramImage";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Music, TrendingUp, ArrowRight, Clock, Keyboard, AlertCircle } from "lucide-react";
@@ -216,7 +217,7 @@ export default function ResultsPage() {
               >
                 {/* Spectrogram Thumbnail */}
                 <div className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
-                  <Image
+                  <SpectrogramImage
                     src={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`}
                     alt={`Spectrogram for ${rec.filename}`}
                     fill
@@ -332,7 +333,7 @@ export default function ResultsPage() {
                       aria-label={`View ${rec.filename} results`}
                       className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden w-full text-left"
                     >
-                      <Image
+                      <SpectrogramImage
                         src={spectrogramUrl}
                         alt={`Spectrogram for ${rec.filename}`}
                         fill
