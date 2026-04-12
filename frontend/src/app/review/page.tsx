@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   getReviewQueue,
   retrainClassifier,
@@ -23,7 +24,12 @@ function ReviewCard({
   const [corrected, setCorrected] = useState(call.call_type || "rumble");
 
   return (
-    <article className="rounded-lg border border-ev-sand bg-ev-cream p-5">
+    <motion.article
+      className="rounded-2xl glass border border-ev-sand/30 p-5"
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="font-mono text-xs text-ev-warm-gray">{call.id}</p>
@@ -58,21 +64,21 @@ function ReviewCard({
         <button
           disabled={busy}
           onClick={() => onReview(call.id, "confirm")}
-          className="rounded-lg bg-success px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-xl bg-success px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           Confirm
         </button>
         <button
           disabled={busy}
           onClick={() => onReview(call.id, "discard")}
-          className="rounded-lg bg-danger px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-xl bg-danger px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
         >
           Discard
         </button>
         <select
           value={corrected}
           onChange={(event) => setCorrected(event.target.value)}
-          className="rounded-lg border border-ev-sand bg-background-elevated px-3 py-2 text-sm text-ev-charcoal"
+          className="rounded-xl glass border border-ev-sand/40 px-3 py-2 text-sm text-ev-charcoal focus:border-accent-savanna/50 focus:outline-none"
         >
           {CALL_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -83,12 +89,12 @@ function ReviewCard({
         <button
           disabled={busy}
           onClick={() => onReview(call.id, "reclassify", corrected)}
-          className="rounded-lg bg-accent-savanna px-3 py-2 text-sm font-semibold text-ev-ivory disabled:opacity-50"
+          className="rounded-xl bg-accent-savanna px-3 py-2 text-sm font-semibold text-ev-ivory disabled:opacity-50"
         >
           Reclassify
         </button>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -153,32 +159,42 @@ export default function ReviewPage() {
   };
 
   return (
-    <main className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
+    <motion.main
+      className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6"
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
         <Link href="/database" className="mb-4 inline-flex text-sm text-ev-warm-gray hover:text-ev-elephant">
           Back to database
         </Link>
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <motion.div
+          className="mb-8 flex flex-wrap items-end justify-between gap-4"
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.05 }}
+        >
           <div>
-            <h1 className="text-4xl font-bold text-ev-charcoal">Review Queue</h1>
+            <h1 className="text-2xl font-bold text-ev-charcoal">Review Queue</h1>
             <p className="mt-2 text-ev-elephant">
               Low-confidence calls waiting for confirmation, correction, or discard.
             </p>
           </div>
           <button
             onClick={handleRetrain}
-            className="rounded-lg bg-accent-savanna px-4 py-2 text-sm font-semibold text-ev-ivory hover:bg-accent-savanna/90"
+            className="rounded-xl bg-accent-savanna px-4 py-2 text-sm font-semibold text-ev-ivory hover:bg-accent-savanna/90"
           >
             Retrain Classifier
           </button>
-        </div>
+        </motion.div>
 
         {status && (
-          <div className="mb-4 rounded-lg border border-success/20 bg-success/10 px-4 py-3 text-sm text-success">
+          <div className="mb-4 rounded-xl border border-success/15 bg-success/5 px-4 py-3 text-sm text-success">
             {status}
           </div>
         )}
         {error && (
-          <div className="mb-4 rounded-lg border border-danger/20 bg-danger/10 px-4 py-3 text-sm text-danger">
+          <div className="mb-4 rounded-xl border border-danger/15 bg-danger/5 px-4 py-3 text-sm text-danger">
             {error}
           </div>
         )}
@@ -188,11 +204,11 @@ export default function ReviewPage() {
         </div>
 
         {loading ? (
-          <div className="rounded-lg border border-ev-sand bg-ev-cream p-8 text-ev-elephant">
+          <div className="rounded-2xl glass border border-ev-sand/30 p-8 text-ev-elephant">
             Loading review queue...
           </div>
         ) : calls.length === 0 ? (
-          <div className="rounded-lg border border-ev-sand bg-ev-cream p-10 text-center text-ev-elephant">
+          <div className="rounded-2xl border border-dashed border-ev-sand/60 p-12 text-center glass">
             No pending low-confidence calls.
           </div>
         ) : (
@@ -207,6 +223,6 @@ export default function ReviewPage() {
             ))}
           </div>
         )}
-    </main>
+    </motion.main>
   );
 }
