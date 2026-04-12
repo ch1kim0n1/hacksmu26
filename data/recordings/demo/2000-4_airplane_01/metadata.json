@@ -1,0 +1,104 @@
+{
+  "recording_id": "20aab02a-425c-5cd4-8162-2f9280fa0178",
+  "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/demo/2000-4_airplane_01/original.wav",
+  "method": "isolate",
+  "aggressiveness": 2.0,
+  "quality": {
+    "snr_before_db": 60.0,
+    "snr_after_db": 60.0,
+    "snr_improvement_db": 0.0,
+    "pesq": null,
+    "peak_frequency_before_hz": 107.7,
+    "peak_frequency_after_hz": 86.1,
+    "spectral_distortion": 0.2016,
+    "energy_preservation": 0.0088,
+    "quality_score": 80.2,
+    "quality_rating": "good",
+    "quality_mode": "call_isolation",
+    "flagged_for_review": false
+  },
+  "noise_types": [
+    {
+      "type": "airplane",
+      "percentage": 38.3,
+      "frequency_range": [
+        20.0,
+        500.0
+      ]
+    },
+    {
+      "type": "car",
+      "percentage": 33.4,
+      "frequency_range": [
+        20.0,
+        250.0
+      ]
+    },
+    {
+      "type": "generator",
+      "percentage": 23.8,
+      "frequency_range": [
+        50.0,
+        250.0
+      ]
+    },
+    {
+      "type": "wind",
+      "percentage": 3.7,
+      "frequency_range": [
+        200.0,
+        2000.0
+      ]
+    }
+  ],
+  "call_count": 6,
+  "call_gate": {
+    "enabled": true,
+    "skipped_reason": null,
+    "pre_detection_call_count": 14,
+    "regions_sample_index_pairs": [
+      [
+        672084,
+        723681
+      ],
+      [
+        927864,
+        1169091
+      ],
+      [
+        1457064,
+        1482201
+      ],
+      [
+        1858374,
+        1984941
+      ],
+      [
+        2039184,
+        2099601
+      ],
+      [
+        2202354,
+        2245131
+      ],
+      [
+        2259684,
+        2298051
+      ]
+    ],
+    "fade_ms": 20.0,
+    "floor_linear": 0.0,
+    "min_confidence": 0.55,
+    "pad_ms": 160.0,
+    "merge_gap_ms": 80.0,
+    "coverage_ratio": 0.1644,
+    "mode": "isolate",
+    "bandpass_low_hz": 8.0,
+    "bandpass_high_hz": 2400.0,
+    "quality_mode": "call_isolation"
+  },
+  "output_audio_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/processed/20aab02a-425c-5cd4-8162-2f9280fa0178_cleaned.wav",
+  "spectrogram_before_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/spectrograms/20aab02a-425c-5cd4-8162-2f9280fa0178_before_spectrogram.png",
+  "spectrogram_after_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/spectrograms/20aab02a-425c-5cd4-8162-2f9280fa0178_after_spectrogram.png",
+  "rebuilt_at": "2026-04-12T05:44:56.038713+00:00"
+}

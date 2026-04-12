@@ -1,26 +1,1827 @@
 {
   "total": 44,
-  "correct": 19,
-  "accuracy": 0.432,
+  "correct": 23,
+  "accuracy": 0.523,
   "per_class_recall": {
-    "car": 0.0,
-    "airplane": 0.905,
-    "generator": 0.0,
+    "car": 0.529,
+    "airplane": 0.476,
+    "generator": 0.8,
     "other": 0.0
   },
   "confusion": {
     "car": {
-      "airplane": 17
+      "airplane": 4,
+      "generator": 4,
+      "car": 9
     },
     "airplane": {
-      "airplane": 19,
-      "generator": 2
+      "car": 11,
+      "airplane": 10
     },
     "generator": {
-      "airplane": 5
+      "generator": 4,
+      "car": 1
     },
     "other": {
-      "airplane": 1
+      "generator": 1
     }
-  }
+  },
+  "samples": [
+    {
+      "path": "data/recordings/original/04-040920-02_vehicle_1.wav",
+      "filename": "04-040920-02_vehicle_1.wav",
+      "label": "car",
+      "predicted": "airplane",
+      "confidence": 0.528,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 52.8,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 32.9,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 7.7,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 6.6,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/04-040920-02_vehicle_2.wav",
+      "filename": "04-040920-02_vehicle_2.wav",
+      "label": "car",
+      "predicted": "generator",
+      "confidence": 0.437,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "generator",
+          "percentage": 43.7,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 41.7,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.6,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 23.8
+    },
+    {
+      "path": "data/recordings/original/04-040920-03_vehicle_noise_1.wav",
+      "filename": "04-040920-03_vehicle_noise_1.wav",
+      "label": "car",
+      "predicted": "airplane",
+      "confidence": 0.404,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 40.4,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 39.9,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 15.2,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 4.4,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 23.8
+    },
+    {
+      "path": "data/recordings/original/04-061218-25_vehicle_noise_1.wav",
+      "filename": "04-061218-25_vehicle_noise_1.wav",
+      "label": "car",
+      "predicted": "car",
+      "confidence": 0.465,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 46.5,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 38.8,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.6,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 23.8
+    },
+    {
+      "path": "data/recordings/original/061220-24_airplane_01.wav",
+      "filename": "061220-24_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.461,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 46.1,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 33.6,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 16.3,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 3.8,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 47.5
+    },
+    {
+      "path": "data/recordings/original/090224-09_generator_01.wav",
+      "filename": "090224-09_generator_01.wav",
+      "label": "generator",
+      "predicted": "generator",
+      "confidence": 0.426,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "generator",
+          "percentage": 42.6,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 41.7,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 14.6,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 1.1,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/1989-06_airplane_01.wav",
+      "filename": "1989-06_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.501,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 50.1,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 34.8,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 11.4,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 3.7,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/1989-08_airplane_01.wav",
+      "filename": "1989-08_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.495,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 49.5,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 36.7,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 8.0,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 5.7,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/1989-08_airplane_02.wav",
+      "filename": "1989-08_airplane_02.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.535,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 53.5,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 31.2,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 7.6,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 7.6,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/1989-08_airplane_03.wav",
+      "filename": "1989-08_airplane_03.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.443,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 44.3,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 37.8,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 13.7,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 4.1,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-23_background_and_vehicle_noise_2.wav",
+      "filename": "2000-23_background_and_vehicle_noise_2.wav",
+      "label": "car",
+      "predicted": "car",
+      "confidence": 0.48,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 48.0,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 29.7,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 18.5,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 3.4,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-23_background_noise_1.wav",
+      "filename": "2000-23_background_noise_1.wav",
+      "label": "other",
+      "predicted": "generator",
+      "confidence": 0.45,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "generator",
+          "percentage": 45.0,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 41.0,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.3,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-23_background_vehicle_noise.wav",
+      "filename": "2000-23_background_vehicle_noise.wav",
+      "label": "car",
+      "predicted": "car",
+      "confidence": 0.478,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 47.8,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 37.7,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 14.2,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-23_vehicle_noise_1.wav",
+      "filename": "2000-23_vehicle_noise_1.wav",
+      "label": "car",
+      "predicted": "car",
+      "confidence": 0.476,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 47.6,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 32.1,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 18.7,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 1.6,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-23_vehicle_noise_2.wav",
+      "filename": "2000-23_vehicle_noise_2.wav",
+      "label": "car",
+      "predicted": "car",
+      "confidence": 0.499,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 49.9,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 34.7,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.9,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 1.3,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-23_vehicle_noise_3.wav",
+      "filename": "2000-23_vehicle_noise_3.wav",
+      "label": "car",
+      "predicted": "car",
+      "confidence": 0.492,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 49.2,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 36.3,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.6,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-23_vehicle_noise_4.wav",
+      "filename": "2000-23_vehicle_noise_4.wav",
+      "label": "car",
+      "predicted": "car",
+      "confidence": 0.452,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 45.2,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 40.4,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.4,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-24_generator_noise_1.wav",
+      "filename": "2000-24_generator_noise_1.wav",
+      "label": "generator",
+      "predicted": "generator",
+      "confidence": 0.46,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "generator",
+          "percentage": 46.0,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 39.8,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.4,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-24_generator_noise_2.wav",
+      "filename": "2000-24_generator_noise_2.wav",
+      "label": "generator",
+      "predicted": "generator",
+      "confidence": 0.468,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "generator",
+          "percentage": 46.8,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 38.9,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.4,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-24_generator_noise_3.wav",
+      "filename": "2000-24_generator_noise_3.wav",
+      "label": "generator",
+      "predicted": "car",
+      "confidence": 0.542,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 54.2,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 23.5,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 20.1,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 2.2,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-24_generator_noise_4.wav",
+      "filename": "2000-24_generator_noise_4.wav",
+      "label": "generator",
+      "predicted": "generator",
+      "confidence": 0.433,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "generator",
+          "percentage": 43.3,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 41.0,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 14.5,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 1.1,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-24_vehicle_and_generator_noise_1.wav",
+      "filename": "2000-24_vehicle_and_generator_noise_1.wav",
+      "label": "car",
+      "predicted": "generator",
+      "confidence": 0.435,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "generator",
+          "percentage": 43.5,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 42.5,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.3,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 23.8
+    },
+    {
+      "path": "data/recordings/original/2000-24_vehicle_noise_1.wav",
+      "filename": "2000-24_vehicle_noise_1.wav",
+      "label": "car",
+      "predicted": "car",
+      "confidence": 0.437,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 43.7,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 42.3,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.2,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-24_vehicle_noise_2.wav",
+      "filename": "2000-24_vehicle_noise_2.wav",
+      "label": "car",
+      "predicted": "generator",
+      "confidence": 0.429,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "generator",
+          "percentage": 42.9,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 42.7,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.7,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 23.8
+    },
+    {
+      "path": "data/recordings/original/2000-27_airplane_01.wav",
+      "filename": "2000-27_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.495,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 49.5,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 26.7,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 15.2,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 8.6,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 71.3
+    },
+    {
+      "path": "data/recordings/original/2000-3_airplane_01.wav",
+      "filename": "2000-3_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.481,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 48.1,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 34.9,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 12.9,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 4.0,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-3_airplane_02.wav",
+      "filename": "2000-3_airplane_02.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.449,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 44.9,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 31.0,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 21.0,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 2.7,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-3_airplane_03.wav",
+      "filename": "2000-3_airplane_03.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.428,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 42.8,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 33.7,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 19.2,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 4.1,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-3_vehicle_01.wav",
+      "filename": "2000-3_vehicle_01.wav",
+      "label": "car",
+      "predicted": "car",
+      "confidence": 0.466,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 46.6,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 38.5,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.9,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-4 _airplane_01.wav",
+      "filename": "2000-4 _airplane_01.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.529,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 52.9,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 24.3,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 15.5,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 7.2,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2000-4_airplane_02.wav",
+      "filename": "2000-4_airplane_02.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.519,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 51.9,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 31.0,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 10.1,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 6.8,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 71.3
+    },
+    {
+      "path": "data/recordings/original/2002-2_airplane_01.wav",
+      "filename": "2002-2_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.43,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 43.0,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 29.9,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 17.5,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 9.2,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/2003-7_airplane_01.wav",
+      "filename": "2003-7_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.525,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 52.5,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 30.4,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 8.6,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 8.4,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/99-22A_airplane_01.wav",
+      "filename": "99-22A_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.405,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 40.5,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 27.2,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 17.5,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 14.5,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 71.3
+    },
+    {
+      "path": "data/recordings/original/99-24_airplane_01.wav",
+      "filename": "99-24_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.459,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 45.9,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 23.6,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 19.6,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 10.7,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/99-37_airplane_02.wav",
+      "filename": "99-37_airplane_02.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.464,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 46.4,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 35.7,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 16.6,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 1.3,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/99-37_airplane_and_vehicle_01.wav",
+      "filename": "99-37_airplane_and_vehicle_01.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.43,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 43.0,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 25.9,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 23.5,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 7.5,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 71.3
+    },
+    {
+      "path": "data/recordings/original/99-37_vehicle_01.wav",
+      "filename": "99-37_vehicle_01.wav",
+      "label": "car",
+      "predicted": "generator",
+      "confidence": 0.456,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "generator",
+          "percentage": 45.6,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 36.6,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 15.1,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 2.1,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/99-45_airplane_01.wav",
+      "filename": "99-45_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.49,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 49.0,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 26.6,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 18.6,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 5.8,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 71.3
+    },
+    {
+      "path": "data/recordings/original/99-45_airplane_03.wav",
+      "filename": "99-45_airplane_03.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.487,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 48.7,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 26.9,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 18.6,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 5.8,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 71.3
+    },
+    {
+      "path": "data/recordings/original/99-45_vehicle_01.wav",
+      "filename": "99-45_vehicle_01.wav",
+      "label": "car",
+      "predicted": "airplane",
+      "confidence": 0.516,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 51.6,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 31.8,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 10.3,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 6.3,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/99-45_vehicle_02.wav",
+      "filename": "99-45_vehicle_02.wav",
+      "label": "car",
+      "predicted": "airplane",
+      "confidence": 0.543,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 54.3,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 30.1,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 8.1,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 7.2,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 0.0
+    },
+    {
+      "path": "data/recordings/original/J86-1_airplane_01.wav",
+      "filename": "J86-1_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "car",
+      "confidence": 0.413,
+      "correct": false,
+      "noise_types": [
+        {
+          "type": "car",
+          "percentage": 41.3,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 39.3,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 14.0,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 5.1,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 47.5
+    },
+    {
+      "path": "data/recordings/original/J87-27_airplane_01.wav",
+      "filename": "J87-27_airplane_01.wav",
+      "label": "airplane",
+      "predicted": "airplane",
+      "confidence": 0.511,
+      "correct": true,
+      "noise_types": [
+        {
+          "type": "airplane",
+          "percentage": 51.1,
+          "frequency_range_hz": [
+            20.0,
+            500.0
+          ]
+        },
+        {
+          "type": "car",
+          "percentage": 21.4,
+          "frequency_range_hz": [
+            20.0,
+            250.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 18.2,
+          "frequency_range_hz": [
+            50.0,
+            250.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 9.3,
+          "frequency_range_hz": [
+            200.0,
+            2000.0
+          ]
+        }
+      ],
+      "dominant_frequency_hz": 71.3
+    }
+  ]
 }

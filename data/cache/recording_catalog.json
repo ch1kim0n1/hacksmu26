@@ -2,11 +2,11 @@
   "version": 1,
   "recordings": [
     {
-      "id": "b2436158-5602-5f55-a3ac-6ac27380d9a2",
+      "id": "dccc9fd8-3f41-5832-bd84-c060152a06c4",
       "filename": "04-040920-02_vehicle_1.wav",
       "duration_s": 57.53,
       "filesize_mb": 5.267,
-      "uploaded_at": "2026-04-12T06:52:44.360401+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588117+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -18,7 +18,7 @@
         "start_sec": 0.0,
         "end_sec": 57.53
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/04-040920-02_vehicle_1.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/04-040920-02_vehicle_1.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -30,11 +30,11 @@
       "result": null
     },
     {
-      "id": "b6d60a2c-8686-5587-8801-9d6ff335d223",
+      "id": "c7703b69-cd38-5812-83e6-697ebcffa616",
       "filename": "04-040920-02_vehicle_2.wav",
       "duration_s": 51.474,
       "filesize_mb": 4.713,
-      "uploaded_at": "2026-04-12T06:52:44.360458+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588170+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -46,7 +46,7 @@
         "start_sec": 0.0,
         "end_sec": 51.474
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/04-040920-02_vehicle_2.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/04-040920-02_vehicle_2.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -58,11 +58,11 @@
       "result": null
     },
     {
-      "id": "9d2adfe7-9cca-53f5-bb42-0b2aaef5cf58",
+      "id": "99136991-ef99-51db-8331-b26b50da2a02",
       "filename": "04-040920-03_vehicle_noise_1.wav",
       "duration_s": 168.979,
       "filesize_mb": 15.471,
-      "uploaded_at": "2026-04-12T06:52:44.360508+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588212+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -74,7 +74,7 @@
         "start_sec": 0.0,
         "end_sec": 168.979
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/04-040920-03_vehicle_noise_1.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/04-040920-03_vehicle_noise_1.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -86,11 +86,11 @@
       "result": null
     },
     {
-      "id": "00f002e1-4191-5f7b-b821-d09b44961b1c",
+      "id": "d69a404a-6921-5d9b-aa43-931881822498",
       "filename": "04-061218-25_vehicle_noise_1.wav",
       "duration_s": 152.893,
       "filesize_mb": 13.998,
-      "uploaded_at": "2026-04-12T06:52:44.360557+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588250+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -102,7 +102,7 @@
         "start_sec": 0.0,
         "end_sec": 152.893
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/04-061218-25_vehicle_noise_1.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/04-061218-25_vehicle_noise_1.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -114,11 +114,11 @@
       "result": null
     },
     {
-      "id": "8cabd1c1-163b-5336-b9ae-5e32c2ac7300",
+      "id": "658b5a54-c479-5e94-8d10-29d6bbcce70a",
       "filename": "061220-24_airplane_01.wav",
       "duration_s": 45.833,
       "filesize_mb": 4.196,
-      "uploaded_at": "2026-04-12T06:52:44.360604+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588289+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -130,7 +130,7 @@
         "start_sec": 0.0,
         "end_sec": 45.833
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/061220-24_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/061220-24_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -142,11 +142,11 @@
       "result": null
     },
     {
-      "id": "5c671650-e24b-5e07-9d01-14ad38091a6f",
+      "id": "95c2d3f0-87be-5831-9dfa-883fc4e47b7f",
       "filename": "090224-09_generator_01.wav",
       "duration_s": 411.058,
       "filesize_mb": 37.634,
-      "uploaded_at": "2026-04-12T06:52:44.360647+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588325+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -158,7 +158,7 @@
         "start_sec": 0.0,
         "end_sec": 411.058
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/090224-09_generator_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/090224-09_generator_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -170,11 +170,11 @@
       "result": null
     },
     {
-      "id": "6ea52ac8-3482-5a01-8d13-28d6edbe4e90",
+      "id": "75d96ebb-5d25-5128-9568-31293608681b",
       "filename": "1989-06_airplane_01.wav",
       "duration_s": 83.038,
       "filesize_mb": 7.602,
-      "uploaded_at": "2026-04-12T06:52:44.360690+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588361+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -186,7 +186,7 @@
         "start_sec": 0.0,
         "end_sec": 83.038
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/1989-06_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/1989-06_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -198,11 +198,11 @@
       "result": null
     },
     {
-      "id": "84d6645d-67d2-5160-bf95-0852f8006e10",
+      "id": "d12acd1f-b688-5ea1-8fc9-dba8bdbee067",
       "filename": "1989-08_airplane_01.wav",
       "duration_s": 115.023,
       "filesize_mb": 10.531,
-      "uploaded_at": "2026-04-12T06:52:44.360732+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588395+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -214,7 +214,7 @@
         "start_sec": 0.0,
         "end_sec": 115.023
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/1989-08_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/1989-08_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -226,11 +226,11 @@
       "result": null
     },
     {
-      "id": "b2688f8d-bd6d-5e2b-bd8c-551b6323d95a",
+      "id": "3d6f9f3a-cecf-577c-a368-f44f7058b971",
       "filename": "1989-08_airplane_02.wav",
       "duration_s": 44.432,
       "filesize_mb": 4.068,
-      "uploaded_at": "2026-04-12T06:52:44.360773+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588430+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -242,7 +242,7 @@
         "start_sec": 0.0,
         "end_sec": 44.432
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/1989-08_airplane_02.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/1989-08_airplane_02.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -254,11 +254,11 @@
       "result": null
     },
     {
-      "id": "cb7d6c01-e8cd-5a18-9171-d982bdc113f2",
+      "id": "b3cf1ab8-c0bb-5af2-8107-8e59001b018d",
       "filename": "1989-08_airplane_03.wav",
       "duration_s": 192.056,
       "filesize_mb": 17.583,
-      "uploaded_at": "2026-04-12T06:52:44.360816+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588465+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -270,7 +270,7 @@
         "start_sec": 0.0,
         "end_sec": 192.056
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/1989-08_airplane_03.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/1989-08_airplane_03.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -282,11 +282,11 @@
       "result": null
     },
     {
-      "id": "480f8e4e-05f7-56d9-a71a-31ad27663c5a",
+      "id": "6b769bfb-991e-5bea-b2e2-cc7118cec7b9",
       "filename": "2000-23_background_and_vehicle_noise_2.wav",
       "duration_s": 66.255,
       "filesize_mb": 6.066,
-      "uploaded_at": "2026-04-12T06:52:44.360860+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588502+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -298,7 +298,7 @@
         "start_sec": 0.0,
         "end_sec": 66.255
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-23_background_and_vehicle_noise_2.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-23_background_and_vehicle_noise_2.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -310,11 +310,11 @@
       "result": null
     },
     {
-      "id": "ed79a2d9-d650-5369-b74d-a6290a851258",
+      "id": "af222eac-27f3-5bf9-a2e2-43b765ef0253",
       "filename": "2000-23_background_noise_1.wav",
       "duration_s": 38.747,
       "filesize_mb": 3.547,
-      "uploaded_at": "2026-04-12T06:52:44.360904+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588538+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -326,7 +326,7 @@
         "start_sec": 0.0,
         "end_sec": 38.747
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-23_background_noise_1.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-23_background_noise_1.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -338,11 +338,11 @@
       "result": null
     },
     {
-      "id": "dfce8488-060c-5940-921b-ade9eeb71e32",
+      "id": "326c7493-9e2a-5c68-80c6-e7a772c684fd",
       "filename": "2000-23_background_vehicle_noise.wav",
       "duration_s": 45.838,
       "filesize_mb": 4.197,
-      "uploaded_at": "2026-04-12T06:52:44.360947+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588574+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -354,7 +354,7 @@
         "start_sec": 0.0,
         "end_sec": 45.838
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-23_background_vehicle_noise.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-23_background_vehicle_noise.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -366,11 +366,11 @@
       "result": null
     },
     {
-      "id": "3dffbcd5-7880-5dd0-80bb-bf837b3cad52",
+      "id": "a2c9776d-141e-572a-8c10-149a39785b5a",
       "filename": "2000-23_vehicle_noise_1.wav",
       "duration_s": 210.502,
       "filesize_mb": 19.272,
-      "uploaded_at": "2026-04-12T06:52:44.360989+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588609+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -382,7 +382,7 @@
         "start_sec": 0.0,
         "end_sec": 210.502
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-23_vehicle_noise_1.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-23_vehicle_noise_1.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -394,11 +394,11 @@
       "result": null
     },
     {
-      "id": "ce6da1c5-970e-543e-a9fb-3c025f0280b9",
+      "id": "3cb0e90c-b447-51ff-8c1e-7b9cc18e9340",
       "filename": "2000-23_vehicle_noise_2.wav",
       "duration_s": 21.552,
       "filesize_mb": 1.973,
-      "uploaded_at": "2026-04-12T06:52:44.361030+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588644+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -410,7 +410,7 @@
         "start_sec": 0.0,
         "end_sec": 21.552
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-23_vehicle_noise_2.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-23_vehicle_noise_2.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -422,11 +422,11 @@
       "result": null
     },
     {
-      "id": "75999afb-90eb-53e0-9726-10fcc33386f4",
+      "id": "1a542332-fe74-5942-9e78-ffdef9e487ce",
       "filename": "2000-23_vehicle_noise_3.wav",
       "duration_s": 37.142,
       "filesize_mb": 3.4,
-      "uploaded_at": "2026-04-12T06:52:44.361071+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588680+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -438,7 +438,7 @@
         "start_sec": 0.0,
         "end_sec": 37.142
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-23_vehicle_noise_3.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-23_vehicle_noise_3.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -450,11 +450,11 @@
       "result": null
     },
     {
-      "id": "5c6a29b5-8ee5-593e-bf70-335fc46236f5",
+      "id": "a2534a5e-03dd-565c-b0c7-b5b6fa10fe55",
       "filename": "2000-23_vehicle_noise_4.wav",
       "duration_s": 72.087,
       "filesize_mb": 6.6,
-      "uploaded_at": "2026-04-12T06:52:44.361122+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588714+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -466,7 +466,7 @@
         "start_sec": 0.0,
         "end_sec": 72.087
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-23_vehicle_noise_4.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-23_vehicle_noise_4.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -478,11 +478,11 @@
       "result": null
     },
     {
-      "id": "5179b717-6536-5e5c-a566-7091ba130fc9",
+      "id": "7e8eb972-b0b3-5e2c-a219-1b784e4832d9",
       "filename": "2000-24_generator_noise_1.wav",
       "duration_s": 101.235,
       "filesize_mb": 9.268,
-      "uploaded_at": "2026-04-12T06:52:44.361169+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588751+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -494,7 +494,7 @@
         "start_sec": 0.0,
         "end_sec": 101.235
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-24_generator_noise_1.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-24_generator_noise_1.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -506,11 +506,11 @@
       "result": null
     },
     {
-      "id": "30b83799-6aa1-5eb7-b8e6-2fd750c92a73",
+      "id": "92a7917b-c546-5f66-8dda-adcf3b18b587",
       "filename": "2000-24_generator_noise_2.wav",
       "duration_s": 369.59,
       "filesize_mb": 33.837,
-      "uploaded_at": "2026-04-12T06:52:44.361213+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588825+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -522,7 +522,7 @@
         "start_sec": 0.0,
         "end_sec": 369.59
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-24_generator_noise_2.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-24_generator_noise_2.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -534,11 +534,11 @@
       "result": null
     },
     {
-      "id": "548a9355-bdcc-5206-8560-736c95c08556",
+      "id": "e395eb06-8289-5e0b-ac26-7197d8e52fda",
       "filename": "2000-24_generator_noise_3.wav",
       "duration_s": 41.816,
       "filesize_mb": 3.828,
-      "uploaded_at": "2026-04-12T06:52:44.361256+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588877+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -550,7 +550,7 @@
         "start_sec": 0.0,
         "end_sec": 41.816
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-24_generator_noise_3.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-24_generator_noise_3.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -562,11 +562,11 @@
       "result": null
     },
     {
-      "id": "8bf319d3-2918-512d-81cf-f3061ae2b8a9",
+      "id": "71adb1f8-5f45-5f11-b120-722852bc4baa",
       "filename": "2000-24_generator_noise_4.wav",
       "duration_s": 230.662,
       "filesize_mb": 21.118,
-      "uploaded_at": "2026-04-12T06:52:44.361303+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588918+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -578,7 +578,7 @@
         "start_sec": 0.0,
         "end_sec": 230.662
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-24_generator_noise_4.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-24_generator_noise_4.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -590,11 +590,11 @@
       "result": null
     },
     {
-      "id": "6262deb8-91fb-553c-a225-0908d1a757d8",
+      "id": "44b74d50-f2b8-5a9b-b978-d4155b1cdcf0",
       "filename": "2000-24_vehicle_and_generator_noise_1.wav",
       "duration_s": 107.642,
       "filesize_mb": 9.855,
-      "uploaded_at": "2026-04-12T06:52:44.361347+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.588956+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -606,7 +606,7 @@
         "start_sec": 0.0,
         "end_sec": 107.642
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-24_vehicle_and_generator_noise_1.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-24_vehicle_and_generator_noise_1.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -618,11 +618,11 @@
       "result": null
     },
     {
-      "id": "075aa0a4-4f07-5baa-bd3a-d26dc073f64f",
+      "id": "044af8c8-6bb5-5d7e-86c0-fb8d02e4a17e",
       "filename": "2000-24_vehicle_noise_1.wav",
       "duration_s": 302.702,
       "filesize_mb": 27.713,
-      "uploaded_at": "2026-04-12T06:52:44.361393+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589002+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -634,7 +634,7 @@
         "start_sec": 0.0,
         "end_sec": 302.702
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-24_vehicle_noise_1.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-24_vehicle_noise_1.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -646,11 +646,11 @@
       "result": null
     },
     {
-      "id": "5f1b5ea9-203c-5d00-b0e9-f7e72ee4134f",
+      "id": "9efb3421-c7cc-5e57-94cf-d2aa8a1b5d24",
       "filename": "2000-24_vehicle_noise_2.wav",
       "duration_s": 50.756,
       "filesize_mb": 4.647,
-      "uploaded_at": "2026-04-12T06:52:44.361436+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589051+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -662,7 +662,7 @@
         "start_sec": 0.0,
         "end_sec": 50.756
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-24_vehicle_noise_2.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-24_vehicle_noise_2.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -674,11 +674,11 @@
       "result": null
     },
     {
-      "id": "392e3f14-b22b-5d9a-9b3b-f8ef47f9f8a8",
+      "id": "60af309a-68e0-58d5-b22c-9528ba35ce9a",
       "filename": "2000-27_airplane_01.wav",
       "duration_s": 308.157,
       "filesize_mb": 28.213,
-      "uploaded_at": "2026-04-12T06:52:44.361479+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589085+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -690,7 +690,7 @@
         "start_sec": 0.0,
         "end_sec": 308.157
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-27_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-27_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -702,11 +702,11 @@
       "result": null
     },
     {
-      "id": "8b6b8fab-2496-5c30-9e27-4dd102881939",
+      "id": "6f485385-d2b3-5dc1-99f0-06b8457ec066",
       "filename": "2000-3_airplane_01.wav",
       "duration_s": 136.238,
       "filesize_mb": 12.473,
-      "uploaded_at": "2026-04-12T06:52:44.361528+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589120+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -718,7 +718,7 @@
         "start_sec": 0.0,
         "end_sec": 136.238
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-3_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-3_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -730,11 +730,11 @@
       "result": null
     },
     {
-      "id": "c60affdb-b429-574c-a126-11633248ca09",
+      "id": "9a4b401a-64ce-5674-9aad-e3c77c505a4a",
       "filename": "2000-3_airplane_02.wav",
       "duration_s": 66.028,
       "filesize_mb": 6.045,
-      "uploaded_at": "2026-04-12T06:52:44.361576+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589155+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -746,7 +746,7 @@
         "start_sec": 0.0,
         "end_sec": 66.028
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-3_airplane_02.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-3_airplane_02.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -758,11 +758,11 @@
       "result": null
     },
     {
-      "id": "411b9c3d-ecbb-5db1-97fb-b8d8172b370d",
+      "id": "f03be9d6-7deb-5919-ae2e-e02707a7ef77",
       "filename": "2000-3_airplane_03.wav",
       "duration_s": 197.032,
       "filesize_mb": 18.039,
-      "uploaded_at": "2026-04-12T06:52:44.361618+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589189+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -774,7 +774,7 @@
         "start_sec": 0.0,
         "end_sec": 197.032
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-3_airplane_03.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-3_airplane_03.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -786,11 +786,11 @@
       "result": null
     },
     {
-      "id": "1d925720-49a6-5da2-b7d2-eebbcfa00c71",
+      "id": "537fe0c2-f2d6-5c1e-97da-48d839a934e8",
       "filename": "2000-3_vehicle_01.wav",
       "duration_s": 145.321,
       "filesize_mb": 13.305,
-      "uploaded_at": "2026-04-12T06:52:44.361661+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589223+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -802,7 +802,7 @@
         "start_sec": 0.0,
         "end_sec": 145.321
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-3_vehicle_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-3_vehicle_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -814,11 +814,11 @@
       "result": null
     },
     {
-      "id": "26f89ce3-8656-5bd7-9eca-9c2b756f368e",
+      "id": "6048f319-0bdd-5239-baa0-1d24aa63d5b1",
       "filename": "2000-4 _airplane_01.wav",
       "duration_s": 80.827,
       "filesize_mb": 7.4,
-      "uploaded_at": "2026-04-12T06:52:44.361704+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589257+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -830,7 +830,7 @@
         "start_sec": 0.0,
         "end_sec": 80.827
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-4 _airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-4 _airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -842,11 +842,11 @@
       "result": null
     },
     {
-      "id": "242a255d-0d72-5ba7-b707-05c34d9e2aca",
+      "id": "601db746-929d-52a0-bcec-d3a645f3cf2d",
       "filename": "2000-4_airplane_02.wav",
       "duration_s": 143.317,
       "filesize_mb": 13.121,
-      "uploaded_at": "2026-04-12T06:52:44.361750+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589292+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -858,7 +858,7 @@
         "start_sec": 0.0,
         "end_sec": 143.317
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2000-4_airplane_02.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2000-4_airplane_02.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -870,11 +870,11 @@
       "result": null
     },
     {
-      "id": "7127fb8e-64e6-5cca-be06-d0eaeb9a85c2",
+      "id": "3207e4a3-5a32-5993-beeb-1aa84463fb8f",
       "filename": "2002-2_airplane_01.wav",
       "duration_s": 207.858,
       "filesize_mb": 19.03,
-      "uploaded_at": "2026-04-12T06:52:44.361802+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589326+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -886,7 +886,7 @@
         "start_sec": 0.0,
         "end_sec": 207.858
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2002-2_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2002-2_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -898,11 +898,11 @@
       "result": null
     },
     {
-      "id": "3453a29f-d377-5883-b12d-817d668750d2",
+      "id": "7cdeea6e-bb96-53e7-b11e-c22b0c414e77",
       "filename": "2003-7_airplane_01.wav",
       "duration_s": 109.405,
       "filesize_mb": 10.016,
-      "uploaded_at": "2026-04-12T06:52:44.361850+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589360+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -914,7 +914,7 @@
         "start_sec": 0.0,
         "end_sec": 109.405
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/2003-7_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/2003-7_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -926,11 +926,11 @@
       "result": null
     },
     {
-      "id": "fb574c25-f1f5-5698-be68-cecf72c678ea",
+      "id": "56871039-bf0c-5aa1-b614-7bc7a4daa602",
       "filename": "99-22A_airplane_01.wav",
       "duration_s": 288.332,
       "filesize_mb": 26.398,
-      "uploaded_at": "2026-04-12T06:52:44.361893+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589394+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -942,7 +942,7 @@
         "start_sec": 0.0,
         "end_sec": 288.332
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/99-22A_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/99-22A_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -954,11 +954,11 @@
       "result": null
     },
     {
-      "id": "5d469d2f-7ef7-5d4c-a291-9bcbdc9f640c",
+      "id": "37a3f155-6f14-5479-8b8d-969b63bf3a16",
       "filename": "99-24_airplane_01.wav",
       "duration_s": 68.98,
       "filesize_mb": 6.315,
-      "uploaded_at": "2026-04-12T06:52:44.361939+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589428+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -970,7 +970,7 @@
         "start_sec": 0.0,
         "end_sec": 68.98
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/99-24_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/99-24_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -982,11 +982,11 @@
       "result": null
     },
     {
-      "id": "06cd01ae-20de-5f2d-80f2-dd3bf2281d2f",
+      "id": "a71dad85-a285-5c90-a19a-292a6fc699e4",
       "filename": "99-37_airplane_02.wav",
       "duration_s": 41.129,
       "filesize_mb": 3.766,
-      "uploaded_at": "2026-04-12T06:52:44.361987+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589462+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -998,7 +998,7 @@
         "start_sec": 0.0,
         "end_sec": 41.129
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/99-37_airplane_02.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/99-37_airplane_02.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1010,11 +1010,11 @@
       "result": null
     },
     {
-      "id": "6b2ca955-aa25-53fc-a724-1581e3ed56ae",
+      "id": "98cbe31d-7ea9-5ecc-a6b1-476694db9522",
       "filename": "99-37_airplane_and_vehicle_01.wav",
       "duration_s": 229.434,
       "filesize_mb": 21.005,
-      "uploaded_at": "2026-04-12T06:52:44.362039+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589499+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -1026,7 +1026,7 @@
         "start_sec": 0.0,
         "end_sec": 229.434
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/99-37_airplane_and_vehicle_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/99-37_airplane_and_vehicle_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1038,11 +1038,11 @@
       "result": null
     },
     {
-      "id": "095799e0-2207-5ea8-835c-d19c5601fcf6",
+      "id": "5031ba61-28b7-5fe2-b56f-475d92cb3d4a",
       "filename": "99-37_vehicle_01.wav",
       "duration_s": 38.664,
       "filesize_mb": 3.54,
-      "uploaded_at": "2026-04-12T06:52:44.362085+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589533+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -1054,7 +1054,7 @@
         "start_sec": 0.0,
         "end_sec": 38.664
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/99-37_vehicle_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/99-37_vehicle_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1066,11 +1066,11 @@
       "result": null
     },
     {
-      "id": "c93cc546-71cd-5341-bf2a-8a62bf0767fe",
+      "id": "ad22f52c-fe65-5955-8b84-c85c99e02c17",
       "filename": "99-45_airplane_01.wav",
       "duration_s": 239.413,
       "filesize_mb": 21.919,
-      "uploaded_at": "2026-04-12T06:52:44.362130+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589567+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -1082,7 +1082,7 @@
         "start_sec": 0.0,
         "end_sec": 239.413
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/99-45_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/99-45_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1094,11 +1094,11 @@
       "result": null
     },
     {
-      "id": "dbb9c100-bc6f-52fa-8f98-d869841019d8",
+      "id": "e6962905-a400-57ae-8fd7-cd55d9f08ae1",
       "filename": "99-45_airplane_03.wav",
       "duration_s": 262.077,
       "filesize_mb": 23.994,
-      "uploaded_at": "2026-04-12T06:52:44.362177+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589601+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -1110,7 +1110,7 @@
         "start_sec": 0.0,
         "end_sec": 262.077
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/99-45_airplane_03.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/99-45_airplane_03.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1122,11 +1122,11 @@
       "result": null
     },
     {
-      "id": "4566a207-168f-57dc-8a49-827174a1c288",
+      "id": "6ef5d631-4ba1-5742-848f-8b3c79622157",
       "filename": "99-45_vehicle_01.wav",
       "duration_s": 378.943,
       "filesize_mb": 34.693,
-      "uploaded_at": "2026-04-12T06:52:44.362237+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589635+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -1138,7 +1138,7 @@
         "start_sec": 0.0,
         "end_sec": 378.943
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/99-45_vehicle_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/99-45_vehicle_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1150,11 +1150,11 @@
       "result": null
     },
     {
-      "id": "223e2c66-2cdf-5589-ae0d-b3b820e3fb42",
+      "id": "36acae1e-9943-55c9-b523-6bb04d907e2a",
       "filename": "99-45_vehicle_02.wav",
       "duration_s": 148.963,
       "filesize_mb": 13.638,
-      "uploaded_at": "2026-04-12T06:52:44.362292+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589670+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -1166,7 +1166,7 @@
         "start_sec": 0.0,
         "end_sec": 148.963
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/99-45_vehicle_02.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/99-45_vehicle_02.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1178,11 +1178,11 @@
       "result": null
     },
     {
-      "id": "074bab31-d5b5-592c-81e9-1a083db8581d",
+      "id": "e98859f1-51df-550d-a197-0b5db5454062",
       "filename": "J86-1_airplane_01.wav",
       "duration_s": 215.452,
       "filesize_mb": 19.725,
-      "uploaded_at": "2026-04-12T06:52:44.362337+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589704+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -1194,7 +1194,7 @@
         "start_sec": 0.0,
         "end_sec": 215.452
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/J86-1_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/J86-1_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1206,11 +1206,11 @@
       "result": null
     },
     {
-      "id": "18466a03-edea-5eb7-a06b-0ae02fb924d7",
+      "id": "a3ad297d-7c3a-5f14-9755-5d5f5a77abd0",
       "filename": "J87-27_airplane_01.wav",
       "duration_s": 97.277,
       "filesize_mb": 8.906,
-      "uploaded_at": "2026-04-12T06:52:44.362381+00:00",
+      "uploaded_at": "2026-04-12T05:44:08.589738+00:00",
       "status": "pending",
       "metadata": {
         "location": "",
@@ -1222,7 +1222,7 @@
         "start_sec": 0.0,
         "end_sec": 97.277
       },
-      "source_path": "/Users/tanishmurali/Desktop/REPOS/hacksmu26/data/audio-files/J87-27_airplane_01.wav",
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/original/J87-27_airplane_01.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1234,191 +1234,14 @@
       "result": null
     },
     {
-      "id": "75d02571-b6de-5d56-853b-57d3328eb930",
-      "filename": "04-040920-02_vehicle_1.wav",
-      "duration_s": 57.53,
-      "filesize_mb": 5.267,
-      "uploaded_at": "2026-04-11T21:47:48.389127+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "04-040920-02",
-        "call_id": "04-040920-02_vehicle_1",
-        "start_sec": 0.0,
-        "end_sec": 57.53
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-040920-02_vehicle_1.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "84698b7a-bcdd-5cba-8e1e-9ec5330e677d",
-      "filename": "04-040920-02_vehicle_2.wav",
-      "duration_s": 51.474,
-      "filesize_mb": 4.713,
-      "uploaded_at": "2026-04-11T21:47:48.389286+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "04-040920-02",
-        "call_id": "04-040920-02_vehicle_2",
-        "start_sec": 0.0,
-        "end_sec": 51.474
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-040920-02_vehicle_2.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "4b43b01c-7722-599b-b187-481b6f9675e2",
-      "filename": "04-040920-03_vehicle_noise_1.wav",
-      "duration_s": 168.979,
-      "filesize_mb": 15.471,
-      "uploaded_at": "2026-04-11T21:47:48.389381+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "04-040920-03",
-        "call_id": "04-040920-03_vehicle_noise_1",
-        "start_sec": 0.0,
-        "end_sec": 168.979
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-040920-03_vehicle_noise_1.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "9b2858ae-08d6-578c-8178-f7b0703214c1",
-      "filename": "04-061218-25_vehicle_noise_1.wav",
-      "duration_s": 152.893,
-      "filesize_mb": 13.998,
-      "uploaded_at": "2026-04-11T21:47:48.389439+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "04-061218-25",
-        "call_id": "04-061218-25_vehicle_noise_1",
-        "start_sec": 0.0,
-        "end_sec": 152.893
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/04-061218-25_vehicle_noise_1.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "106888f4-54a4-5977-8b75-5cffc89a130d",
-      "filename": "061220-24_airplane_01.wav",
-      "duration_s": 45.833,
-      "filesize_mb": 4.196,
-      "uploaded_at": "2026-04-11T21:47:48.389505+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "061220-24",
-        "call_id": "061220-24_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 45.833
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/061220-24_airplane_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "287358b4-5afc-5079-a581-224b8960efcf",
-      "filename": "090224-09_generator_01.wav",
-      "duration_s": 411.058,
-      "filesize_mb": 37.634,
-      "uploaded_at": "2026-04-11T21:47:48.389610+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "generator",
-        "animal_id": "090224-09",
-        "call_id": "090224-09_generator_01",
-        "start_sec": 0.0,
-        "end_sec": 411.058
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/090224-09_generator_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "60d0063b-63f4-54c4-822c-12828e577e8c",
-      "filename": "1989-06_airplane_01.wav",
-      "duration_s": 83.038,
+      "id": "360bf545-c932-54b9-831b-2af57b8c2d6e",
+      "filename": "original.wav",
+      "duration_s": 0.0,
       "filesize_mb": 7.602,
-      "uploaded_at": "2026-04-11T21:47:48.389678+00:00",
+      "uploaded_at": "2026-04-12T08:42:03.729181+00:00",
       "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "1989-06",
-        "call_id": "1989-06_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 83.038
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-06_airplane_01.wav",
+      "metadata": {},
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/demo/1989-06_airplane_01/original.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1430,23 +1253,14 @@
       "result": null
     },
     {
-      "id": "2f1e4431-2d6c-57a6-a8fd-4f07097180e6",
-      "filename": "1989-08_airplane_01.wav",
-      "duration_s": 115.023,
-      "filesize_mb": 10.531,
-      "uploaded_at": "2026-04-11T21:47:48.389771+00:00",
+      "id": "d9ea3ed1-d3b5-5100-bd57-8753c8d01bfb",
+      "filename": "processed.wav",
+      "duration_s": 0.0,
+      "filesize_mb": 6.985,
+      "uploaded_at": "2026-04-12T08:42:03.729227+00:00",
       "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "1989-08",
-        "call_id": "1989-08_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 115.023
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-08_airplane_01.wav",
+      "metadata": {},
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/demo/1989-06_airplane_01/processed.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -1458,611 +1272,14 @@
       "result": null
     },
     {
-      "id": "98396215-8523-5ab9-a15c-c965708a7dce",
-      "filename": "1989-08_airplane_02.wav",
-      "duration_s": 44.432,
-      "filesize_mb": 4.068,
-      "uploaded_at": "2026-04-11T21:47:48.389846+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "1989-08",
-        "call_id": "1989-08_airplane_02",
-        "start_sec": 0.0,
-        "end_sec": 44.432
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-08_airplane_02.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "c0c516d6-7e16-5ccd-ad03-ce72113793bb",
-      "filename": "1989-08_airplane_03.wav",
-      "duration_s": 192.056,
-      "filesize_mb": 17.583,
-      "uploaded_at": "2026-04-11T21:47:48.389917+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "1989-08",
-        "call_id": "1989-08_airplane_03",
-        "start_sec": 0.0,
-        "end_sec": 192.056
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/1989-08_airplane_03.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "618fc0e2-d52c-5dd5-8bfd-b9d569d96949",
-      "filename": "2000-23_background_and_vehicle_noise_2.wav",
-      "duration_s": 66.255,
-      "filesize_mb": 6.066,
-      "uploaded_at": "2026-04-11T21:47:48.390016+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-23",
-        "call_id": "2000-23_background_and_vehicle_noise_2",
-        "start_sec": 0.0,
-        "end_sec": 66.255
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_background_and_vehicle_noise_2.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "b5bd4dd6-e80c-5c04-901a-ecbfff1fea36",
-      "filename": "2000-23_background_noise_1.wav",
-      "duration_s": 38.747,
-      "filesize_mb": 3.547,
-      "uploaded_at": "2026-04-11T21:47:48.390069+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "background",
-        "animal_id": "2000-23",
-        "call_id": "2000-23_background_noise_1",
-        "start_sec": 0.0,
-        "end_sec": 38.747
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_background_noise_1.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "59d0e48b-3399-525c-a9fd-e632f91d431c",
-      "filename": "2000-23_background_vehicle_noise.wav",
-      "duration_s": 45.838,
-      "filesize_mb": 4.197,
-      "uploaded_at": "2026-04-11T21:47:48.390132+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-23",
-        "call_id": "2000-23_background_vehicle_noise",
-        "start_sec": 0.0,
-        "end_sec": 45.838
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_background_vehicle_noise.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "d47712fc-0104-59c5-90d3-12e845de76df",
-      "filename": "2000-23_vehicle_noise_1.wav",
-      "duration_s": 210.502,
-      "filesize_mb": 19.272,
-      "uploaded_at": "2026-04-11T21:47:48.390217+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-23",
-        "call_id": "2000-23_vehicle_noise_1",
-        "start_sec": 0.0,
-        "end_sec": 210.502
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_1.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "ddbd318d-279b-5903-8bc3-a73fc845c952",
-      "filename": "2000-23_vehicle_noise_2.wav",
-      "duration_s": 21.552,
-      "filesize_mb": 1.973,
-      "uploaded_at": "2026-04-11T21:47:48.390296+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-23",
-        "call_id": "2000-23_vehicle_noise_2",
-        "start_sec": 0.0,
-        "end_sec": 21.552
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_2.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "efb0a5fa-b718-535a-ab78-6bb2dd4df602",
-      "filename": "2000-23_vehicle_noise_3.wav",
-      "duration_s": 37.142,
-      "filesize_mb": 3.4,
-      "uploaded_at": "2026-04-11T21:47:48.390371+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-23",
-        "call_id": "2000-23_vehicle_noise_3",
-        "start_sec": 0.0,
-        "end_sec": 37.142
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_3.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "c2b01ff7-1c5f-5e7b-aed3-03e1ef6fedc7",
-      "filename": "2000-23_vehicle_noise_4.wav",
-      "duration_s": 72.087,
-      "filesize_mb": 6.6,
-      "uploaded_at": "2026-04-11T21:47:48.390441+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-23",
-        "call_id": "2000-23_vehicle_noise_4",
-        "start_sec": 0.0,
-        "end_sec": 72.087
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-23_vehicle_noise_4.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "baff1013-df6d-5c5e-a08f-a7f6704a3ef3",
-      "filename": "2000-24_generator_noise_1.wav",
-      "duration_s": 101.235,
-      "filesize_mb": 9.268,
-      "uploaded_at": "2026-04-11T21:47:48.390519+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "generator",
-        "animal_id": "2000-24",
-        "call_id": "2000-24_generator_noise_1",
-        "start_sec": 0.0,
-        "end_sec": 101.235
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_1.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "9bfcae83-7502-546b-a6b7-9b218174bf4d",
-      "filename": "2000-24_generator_noise_2.wav",
-      "duration_s": 369.59,
-      "filesize_mb": 33.837,
-      "uploaded_at": "2026-04-11T21:47:48.390618+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "generator",
-        "animal_id": "2000-24",
-        "call_id": "2000-24_generator_noise_2",
-        "start_sec": 0.0,
-        "end_sec": 369.59
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_2.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "93d028e0-0a2b-5e27-9084-5b3f197ae33a",
-      "filename": "2000-24_generator_noise_3.wav",
-      "duration_s": 41.816,
-      "filesize_mb": 3.828,
-      "uploaded_at": "2026-04-11T21:47:48.390709+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "generator",
-        "animal_id": "2000-24",
-        "call_id": "2000-24_generator_noise_3",
-        "start_sec": 0.0,
-        "end_sec": 41.816
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_3.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "92fccffe-f397-5031-a534-73343a899331",
-      "filename": "2000-24_generator_noise_4.wav",
-      "duration_s": 230.662,
-      "filesize_mb": 21.118,
-      "uploaded_at": "2026-04-11T21:47:48.390798+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "generator",
-        "animal_id": "2000-24",
-        "call_id": "2000-24_generator_noise_4",
-        "start_sec": 0.0,
-        "end_sec": 230.662
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_generator_noise_4.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "49a83bff-d025-5559-b643-7f836ca962b7",
-      "filename": "2000-24_vehicle_and_generator_noise_1.wav",
-      "duration_s": 107.642,
-      "filesize_mb": 9.855,
-      "uploaded_at": "2026-04-11T21:47:48.390851+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle+generator",
-        "animal_id": "2000-24",
-        "call_id": "2000-24_vehicle_and_generator_noise_1",
-        "start_sec": 0.0,
-        "end_sec": 107.642
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_vehicle_and_generator_noise_1.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "90527abe-cfac-5eaa-9be2-93d926d5501e",
-      "filename": "2000-24_vehicle_noise_1.wav",
-      "duration_s": 302.702,
-      "filesize_mb": 27.713,
-      "uploaded_at": "2026-04-11T21:47:48.390937+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-24",
-        "call_id": "2000-24_vehicle_noise_1",
-        "start_sec": 0.0,
-        "end_sec": 302.702
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_vehicle_noise_1.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "0a5a88b8-1aef-58d0-a6cf-7269a3f70916",
-      "filename": "2000-24_vehicle_noise_2.wav",
-      "duration_s": 50.756,
-      "filesize_mb": 4.647,
-      "uploaded_at": "2026-04-11T21:47:48.390995+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-24",
-        "call_id": "2000-24_vehicle_noise_2",
-        "start_sec": 0.0,
-        "end_sec": 50.756
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-24_vehicle_noise_2.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "e29e576b-96fd-5bed-8e3c-8ccd281c7870",
-      "filename": "2000-27_airplane_01.wav",
-      "duration_s": 308.157,
-      "filesize_mb": 28.213,
-      "uploaded_at": "2026-04-11T21:47:48.391055+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2000-27",
-        "call_id": "2000-27_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 308.157
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-27_airplane_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "517de2d1-be5c-58ab-8035-afcc7e01b545",
-      "filename": "2000-3_airplane_01.wav",
-      "duration_s": 136.238,
-      "filesize_mb": 12.473,
-      "uploaded_at": "2026-04-11T21:47:48.391134+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2000-3",
-        "call_id": "2000-3_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 136.238
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "c8611c8a-d40d-50e5-a8d4-41930437453d",
-      "filename": "2000-3_airplane_02.wav",
-      "duration_s": 66.028,
-      "filesize_mb": 6.045,
-      "uploaded_at": "2026-04-11T21:47:48.391203+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2000-3",
-        "call_id": "2000-3_airplane_02",
-        "start_sec": 0.0,
-        "end_sec": 66.028
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_02.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "29f76859-7fcf-5688-9026-70197d3e7b0c",
-      "filename": "2000-3_airplane_03.wav",
-      "duration_s": 197.032,
-      "filesize_mb": 18.039,
-      "uploaded_at": "2026-04-11T21:47:48.391288+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2000-3",
-        "call_id": "2000-3_airplane_03",
-        "start_sec": 0.0,
-        "end_sec": 197.032
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_airplane_03.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "8127e458-71d3-5a02-8b0d-8e4b252a5ffb",
-      "filename": "2000-3_vehicle_01.wav",
-      "duration_s": 145.321,
-      "filesize_mb": 13.305,
-      "uploaded_at": "2026-04-11T21:47:48.391354+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "2000-3",
-        "call_id": "2000-3_vehicle_01",
-        "start_sec": 0.0,
-        "end_sec": 145.321
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-3_vehicle_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "d25d33ac-cde7-50bd-84f9-a76d68146315",
-      "filename": "2000-4 _airplane_01.wav",
-      "duration_s": 80.827,
+      "id": "20aab02a-425c-5cd4-8162-2f9280fa0178",
+      "filename": "original.wav",
+      "duration_s": 0.0,
       "filesize_mb": 7.4,
-      "uploaded_at": "2026-04-11T21:47:48.391563+00:00",
+      "uploaded_at": "2026-04-12T08:42:03.729268+00:00",
       "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2000-4",
-        "call_id": "2000-4 _airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 80.827
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-4 _airplane_01.wav",
+      "metadata": {},
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/demo/2000-4_airplane_01/original.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -2074,23 +1291,33 @@
       "result": null
     },
     {
-      "id": "e0a5df28-4bab-5e8e-b164-a0a0519fef3c",
-      "filename": "2000-4_airplane_02.wav",
-      "duration_s": 143.317,
+      "id": "cc8085ac-e6ed-51f1-837f-5a5d3b333a3b",
+      "filename": "processed.wav",
+      "duration_s": 0.0,
+      "filesize_mb": 6.799,
+      "uploaded_at": "2026-04-12T08:42:03.729308+00:00",
+      "status": "pending",
+      "metadata": {},
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/demo/2000-4_airplane_01/processed.wav",
+      "file_hash": null,
+      "processing": {
+        "progress": 0.0,
+        "current_stage": null,
+        "started_at": null,
+        "completed_at": null,
+        "duration_s": null
+      },
+      "result": null
+    },
+    {
+      "id": "07fd26ac-41a8-5c5c-b4f3-9c191c497c48",
+      "filename": "original.wav",
+      "duration_s": 0.0,
       "filesize_mb": 13.121,
-      "uploaded_at": "2026-04-11T21:47:48.391697+00:00",
+      "uploaded_at": "2026-04-12T08:42:03.729345+00:00",
       "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2000-4",
-        "call_id": "2000-4_airplane_02",
-        "start_sec": 0.0,
-        "end_sec": 143.317
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2000-4_airplane_02.wav",
+      "metadata": {},
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/demo/2000-4_airplane_02/original.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
@@ -2102,359 +1329,14 @@
       "result": null
     },
     {
-      "id": "5d19c945-d834-51bc-a57b-77da16b34a81",
-      "filename": "2002-2_airplane_01.wav",
-      "duration_s": 207.858,
-      "filesize_mb": 19.03,
-      "uploaded_at": "2026-04-11T21:47:48.391820+00:00",
+      "id": "0f8d98ba-dbbe-5bbe-aa53-306f8ef8d905",
+      "filename": "processed.wav",
+      "duration_s": 0.0,
+      "filesize_mb": 19.625,
+      "uploaded_at": "2026-04-12T08:42:03.729382+00:00",
       "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2002-2",
-        "call_id": "2002-2_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 207.858
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2002-2_airplane_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "a8c5e2bf-6db9-5fad-bfcf-a3433e328d2f",
-      "filename": "2003-7_airplane_01.wav",
-      "duration_s": 109.405,
-      "filesize_mb": 10.016,
-      "uploaded_at": "2026-04-11T21:47:48.392047+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "2003-7",
-        "call_id": "2003-7_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 109.405
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/2003-7_airplane_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "534662a5-b10c-514f-ba0b-a476626d5b5d",
-      "filename": "99-22A_airplane_01.wav",
-      "duration_s": 288.332,
-      "filesize_mb": 26.398,
-      "uploaded_at": "2026-04-11T21:47:48.392189+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "99-22A",
-        "call_id": "99-22A_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 288.332
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-22A_airplane_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "5850793e-c742-5049-8aa3-623544556134",
-      "filename": "99-24_airplane_01.wav",
-      "duration_s": 68.98,
-      "filesize_mb": 6.315,
-      "uploaded_at": "2026-04-11T21:47:48.392342+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "99-24",
-        "call_id": "99-24_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 68.98
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-24_airplane_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "3f37f0ed-6680-52a3-a996-1885a255945f",
-      "filename": "99-37_airplane_02.wav",
-      "duration_s": 41.129,
-      "filesize_mb": 3.766,
-      "uploaded_at": "2026-04-11T21:47:48.392541+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "99-37",
-        "call_id": "99-37_airplane_02",
-        "start_sec": 0.0,
-        "end_sec": 41.129
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_airplane_02.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "54a5e6c8-be48-59dd-a858-02d1860b675c",
-      "filename": "99-37_airplane_and_vehicle_01.wav",
-      "duration_s": 229.434,
-      "filesize_mb": 21.005,
-      "uploaded_at": "2026-04-11T21:47:48.392793+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane+vehicle",
-        "animal_id": "99-37",
-        "call_id": "99-37_airplane_and_vehicle_01",
-        "start_sec": 0.0,
-        "end_sec": 229.434
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_airplane_and_vehicle_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "2e0478de-3bba-5336-a055-9d2075b68d33",
-      "filename": "99-37_vehicle_01.wav",
-      "duration_s": 38.664,
-      "filesize_mb": 3.54,
-      "uploaded_at": "2026-04-11T21:47:48.392991+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "99-37",
-        "call_id": "99-37_vehicle_01",
-        "start_sec": 0.0,
-        "end_sec": 38.664
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-37_vehicle_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "1ae637f5-be9b-5e04-88f3-e86bb16cbc85",
-      "filename": "99-45_airplane_01.wav",
-      "duration_s": 239.413,
-      "filesize_mb": 21.919,
-      "uploaded_at": "2026-04-11T21:47:48.393099+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "99-45",
-        "call_id": "99-45_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 239.413
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_airplane_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "05198cad-4bd4-576b-94ba-1df0fbf7eccb",
-      "filename": "99-45_airplane_03.wav",
-      "duration_s": 262.077,
-      "filesize_mb": 23.994,
-      "uploaded_at": "2026-04-11T21:47:48.393199+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "99-45",
-        "call_id": "99-45_airplane_03",
-        "start_sec": 0.0,
-        "end_sec": 262.077
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_airplane_03.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "6b7d3b44-4294-5fff-ba23-5f10ea267785",
-      "filename": "99-45_vehicle_01.wav",
-      "duration_s": 378.943,
-      "filesize_mb": 34.693,
-      "uploaded_at": "2026-04-11T21:47:48.393319+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "99-45",
-        "call_id": "99-45_vehicle_01",
-        "start_sec": 0.0,
-        "end_sec": 378.943
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_vehicle_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "bbb14c55-299c-5fec-9c86-2cf4003820be",
-      "filename": "99-45_vehicle_02.wav",
-      "duration_s": 148.963,
-      "filesize_mb": 13.638,
-      "uploaded_at": "2026-04-11T21:47:48.393481+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "vehicle",
-        "animal_id": "99-45",
-        "call_id": "99-45_vehicle_02",
-        "start_sec": 0.0,
-        "end_sec": 148.963
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/99-45_vehicle_02.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "c076e14e-e9a0-5082-9539-9cc06521785c",
-      "filename": "J86-1_airplane_01.wav",
-      "duration_s": 215.452,
-      "filesize_mb": 19.725,
-      "uploaded_at": "2026-04-11T21:47:48.393652+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "J86-1",
-        "call_id": "J86-1_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 215.452
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/J86-1_airplane_01.wav",
-      "file_hash": null,
-      "processing": {
-        "progress": 0.0,
-        "current_stage": null,
-        "started_at": null,
-        "completed_at": null,
-        "duration_s": null
-      },
-      "result": null
-    },
-    {
-      "id": "68527b6c-7e61-5234-be56-8bc0e88c1b99",
-      "filename": "J87-27_airplane_01.wav",
-      "duration_s": 97.277,
-      "filesize_mb": 8.906,
-      "uploaded_at": "2026-04-11T21:47:48.393816+00:00",
-      "status": "pending",
-      "metadata": {
-        "location": "",
-        "date": "",
-        "species": "African bush elephant",
-        "noise_type_ref": "airplane",
-        "animal_id": "J87-27",
-        "call_id": "J87-27_airplane_01",
-        "start_sec": 0.0,
-        "end_sec": 97.277
-      },
-      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/audio-files/J87-27_airplane_01.wav",
+      "metadata": {},
+      "source_path": "/Users/pomoika/Documents/GitHub_repo/hacksmu26/data/recordings/demo/2000-4_airplane_02/processed.wav",
       "file_hash": null,
       "processing": {
         "progress": 0.0,
