@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import {
   createContext,
   useCallback,
@@ -32,9 +33,9 @@ const SceneTransitionContext = createContext<SceneTransitionContextValue | null>
 );
 
 const DASHBOARD_ROUTE = "/dashboard";
-const ZOOM_MS = 620;
-const CLOUD_MS = 260;
-const REVEAL_MS = 380;
+const ZOOM_MS = 500;
+const CLOUD_MS = 760;
+const REVEAL_MS = 320;
 
 export function SceneTransitionProvider({
   children,
@@ -148,44 +149,64 @@ export function SceneTransitionProvider({
     <SceneTransitionContext.Provider value={contextValue}>
       {children}
 
-      <div
-        className={`pointer-events-none fixed inset-0 z-[200] overflow-hidden ${
-          phase === "idle" ? "invisible" : "visible"
-        }`}
-        aria-hidden="true"
-      >
-        <div
-          className={`absolute inset-0 bg-[#07101d] transition-opacity duration-300 ${
-            phase === "zoom" ? "opacity-0" : "opacity-100"
-          }`}
-        />
-
-        {globeRect && (
-          <div
-            className={`absolute rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(145,189,255,0.86)_0%,rgba(42,91,177,0.9)_36%,rgba(8,24,54,0.98)_72%,rgba(3,10,24,1)_100%)] shadow-[0_0_80px_rgba(50,104,196,0.22)] transition-[transform,opacity,filter] duration-[620ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              phase === "zoom"
-                ? "opacity-100 scale-[14] blur-0"
-                : "opacity-0 scale-[18] blur-[24px]"
-            }`}
-            style={{
-              ...globeStyle,
-              backgroundImage: globeSnapshotUrl
-                ? `url(${globeSnapshotUrl})`
-                : undefined,
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              backgroundSize: "cover",
-            }}
+      <AnimatePresence>
+        {phase !== "idle" && (
+          <motion.div
+            key="scene-transition-overlay"
+            className="pointer-events-none fixed inset-0 z-[200] overflow-hidden"
+            aria-hidden="true"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_34%_28%,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_36%),radial-gradient(circle_at_52%_58%,rgba(255,255,255,0)_44%,rgba(194,222,255,0.16)_68%,rgba(194,222,255,0)_100%)]" />
-          </div>
-        )}
+            {globeRect && (
+              <motion.div
+                className="absolute rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(145,189,255,0.86)_0%,rgba(42,91,177,0.9)_36%,rgba(8,24,54,0.98)_72%,rgba(3,10,24,1)_100%)] shadow-[0_0_80px_rgba(50,104,196,0.22)]"
+                style={{
+                  ...globeStyle,
+                  backgroundImage: globeSnapshotUrl
+                    ? `url(${globeSnapshotUrl})`
+                    : undefined,
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "cover",
+                  willChange: "transform, opacity, filter",
+                }}
+                initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                animate={
+                  phase === "zoom"
+                    ? {
+                        opacity: 1,
+                        scale: 15,
+                        filter: "blur(0px)",
+                      }
+                    : {
+                        opacity: 0,
+                        scale: 19,
+                        filter: "blur(18px)",
+                      }
+                }
+                transition={{
+                  duration: ZOOM_MS / 1000,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+              >
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_34%_28%,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_36%),radial-gradient(circle_at_52%_58%,rgba(255,255,255,0)_44%,rgba(194,222,255,0.16)_68%,rgba(194,222,255,0)_100%)]"
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: phase === "zoom" ? 1 : 0 }}
+                  transition={{ duration: 0.16 }}
+                />
+              </motion.div>
+            )}
 
-        <CloudTransitionScene
-          active={phase === "clouds" || phase === "reveal"}
-          reveal={phase === "reveal"}
-        />
-      </div>
+            {(phase === "clouds" || phase === "reveal") && (
+              <CloudTransitionScene phase={phase} />
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </SceneTransitionContext.Provider>
   );
 }
