@@ -103,6 +103,100 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
   );
 }
 
+function LiveSNRMeter({ snrBefore, snrAfter, isProcessing }: {
+  snrBefore?: number;
+  snrAfter?: number;
+  isProcessing: boolean;
+}) {
+  const hasData = snrBefore !== undefined;
+  const maxDb = 40;
+  const beforePct = snrBefore ? Math.min(100, (snrBefore / maxDb) * 100) : 0;
+  const afterPct = snrAfter ? Math.min(100, (snrAfter / maxDb) * 100) : 0;
+  const improvement = snrBefore !== undefined && snrAfter !== undefined ? snrAfter - snrBefore : null;
+
+  if (!hasData && isProcessing) {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent-savanna animate-pulse" />
+          <span className="text-[11px] text-accent-savanna font-medium tracking-wide">Live — Measuring…</span>
+        </div>
+        <div className="flex items-end gap-[2px] h-14 w-full overflow-hidden rounded-lg bg-ev-cream/60 px-2 py-1">
+          {Array.from({ length: 32 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-sm"
+              style={{
+                background: `linear-gradient(to top, #C4A46C, #E4C080)`,
+                animation: `sound-bar ${0.8 + (i % 6) * 0.09}s ease-in-out infinite`,
+                animationDelay: `${(i * 0.05 + Math.sin(i * 1.5) * 0.12).toFixed(2)}s`,
+                transformOrigin: "bottom",
+                height: "100%",
+              }}
+            />
+          ))}
+        </div>
+        <p className="text-[10px] text-ev-warm-gray text-center">Analyzing signal-to-noise ratio…</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <div className="flex justify-between mb-1.5">
+          <span className="text-xs text-ev-warm-gray">Before</span>
+          <span className="text-xs font-mono font-bold tabular-nums" style={{ color: "#C4785A" }}>
+            {snrBefore !== undefined ? `${snrBefore.toFixed(1)} dB` : "—"}
+          </span>
+        </div>
+        <div className="h-2 bg-ev-cream rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: "linear-gradient(90deg, #C4785A, #E4A060)" }}
+            initial={{ width: 0 }}
+            animate={{ width: `${beforePct}%` }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          />
+        </div>
+      </div>
+      <div>
+        <div className="flex justify-between mb-1.5">
+          <span className="text-xs text-ev-warm-gray">After</span>
+          <span className="text-xs font-mono font-bold tabular-nums text-success">
+            {snrAfter !== undefined ? `${snrAfter.toFixed(1)} dB` : "—"}
+          </span>
+        </div>
+        <div className="h-2 bg-ev-cream rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: "linear-gradient(90deg, #5A8B6F, #10C876)", boxShadow: "0 0 8px rgba(16,200,118,0.35)" }}
+            initial={{ width: 0 }}
+            animate={{ width: `${afterPct}%` }}
+            transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
+          />
+        </div>
+      </div>
+      {improvement !== null && (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9 }}
+          className="pt-2.5 border-t border-ev-sand/30 flex items-center justify-between"
+        >
+          <span className="text-xs text-ev-warm-gray">Improvement</span>
+          <span className="text-sm font-bold text-success tabular-nums" style={{ textShadow: "0 0 10px rgba(16,200,118,0.45)" }}>
+            +{improvement.toFixed(1)} dB
+          </span>
+        </motion.div>
+      )}
+      {!hasData && (
+        <p className="text-xs text-ev-warm-gray text-center">Awaiting processing…</p>
+      )}
+    </div>
+  );
+}
+
 function MetricCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="p-4 rounded-xl glass border border-ev-sand/30">
@@ -431,32 +525,11 @@ export default function ProcessingPage() {
           </MetricCard>
 
           <MetricCard label="Signal-to-Noise Ratio">
-            <div className="space-y-3">
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-ev-elephant">Before</span>
-                  <span className="text-xs font-mono text-ev-charcoal tabular-nums">{metrics?.snr_before !== undefined ? `${metrics.snr_before.toFixed(1)} dB` : "--"}</span>
-                </div>
-                <div className="h-1.5 bg-ev-cream rounded-full overflow-hidden">
-                  <motion.div className="h-full bg-warning rounded-full" initial={{ width: 0 }} animate={{ width: metrics?.snr_before ? `${Math.min(100, (metrics.snr_before / 40) * 100)}%` : "0%" }} transition={{ duration: 0.8, delay: 0.3 }} />
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-ev-elephant">After</span>
-                  <span className="text-xs font-mono text-ev-charcoal tabular-nums">{metrics?.snr_after !== undefined ? `${metrics.snr_after.toFixed(1)} dB` : "--"}</span>
-                </div>
-                <div className="h-1.5 bg-ev-cream rounded-full overflow-hidden">
-                  <motion.div className="h-full bg-success rounded-full" initial={{ width: 0 }} animate={{ width: metrics?.snr_after ? `${Math.min(100, (metrics.snr_after / 40) * 100)}%` : "0%" }} transition={{ duration: 0.8, delay: 0.5 }} />
-                </div>
-              </div>
-              {metrics?.snr_before !== undefined && metrics?.snr_after !== undefined && (
-                <div className="pt-2.5 border-t border-ev-sand/30 flex items-center justify-between">
-                  <span className="text-xs text-ev-elephant">Improvement</span>
-                  <span className="text-xs font-bold text-success tabular-nums">+{(metrics.snr_after - metrics.snr_before).toFixed(1)} dB</span>
-                </div>
-              )}
-            </div>
+            <LiveSNRMeter
+              snrBefore={metrics?.snr_before}
+              snrAfter={metrics?.snr_after}
+              isProcessing={isProcessing}
+            />
           </MetricCard>
 
           {metrics?.noise_reduction_db !== undefined && (
