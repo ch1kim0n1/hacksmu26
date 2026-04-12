@@ -16,7 +16,7 @@ import yaml
 from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_CORS_ORIGINS = ["http://localhost:3000", "http://localhost:5173"]
+DEFAULT_CORS_ORIGINS = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:5173"]
 DEFAULT_AUTH_ALGORITHMS = ["RS256"]
 DEFAULT_AUTH_SCOPE = "openid profile email"
 DEFAULT_AUTH_PUBLIC_PATHS = [

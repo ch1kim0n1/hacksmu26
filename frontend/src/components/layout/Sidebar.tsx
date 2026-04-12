@@ -10,18 +10,13 @@ import {
   Radio,
   Layers,
   Users,
-  BookOpen,
   Network,
-  Monitor,
   PieChart,
   GitBranch,
-  MapPin,
   Brain,
   Box,
   Webhook,
   Download,
-  GitCompareArrows,
-  CheckSquare,
 } from "lucide-react";
 import { useMobileSidebar } from "@/hooks/useSidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -48,9 +43,7 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
       { href: "/upload", label: "Upload", icon: Upload },
       { href: "/recordings", label: "Recordings", icon: Layers },
       { href: "/elephants", label: "Elephants", icon: Users },
-      { href: "/research/ethology", label: "Call Guide", icon: BookOpen },
       { href: "/research/social-network", label: "Social Network", icon: Network },
-      { href: "/field-monitor", label: "Field Monitor", icon: Monitor },
       { href: "/realtime", label: "Real-Time Filter", icon: Radio },
     ],
   },
@@ -61,15 +54,12 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
       { href: "/database", label: "Call Database", icon: Database },
       { href: "/analytics", label: "Analytics", icon: PieChart },
       { href: "/patterns", label: "Patterns", icon: GitBranch },
-      { href: "/sites", label: "Sites", icon: MapPin },
     ],
   },
   {
     title: "Research",
     items: [
       { href: "/export", label: "Export", icon: Download },
-      { href: "/compare", label: "Compare", icon: GitCompareArrows },
-      { href: "/review", label: "Review Queue", icon: CheckSquare },
     ],
   },
   {
