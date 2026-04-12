@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import Image from "next/image";
 
 export interface ABPlayerProps {
   originalSrc: string;
@@ -173,10 +174,11 @@ export default function ABPlayer({
           className="absolute inset-0 transition-opacity duration-200"
           style={{ opacity: isOriginal ? 1 : 0 }}
         >
-          <img
+          <Image
             src={beforeSpectrogramSrc}
             alt="Before — original recording spectrogram"
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
             draggable={false}
           />
         </div>
@@ -187,10 +189,11 @@ export default function ABPlayer({
           className="absolute inset-0 transition-opacity duration-200"
           style={{ opacity: isOriginal ? 0 : 1 }}
         >
-          <img
+          <Image
             src={afterSpectrogramSrc}
             alt="After — cleaned recording spectrogram"
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
             draggable={false}
           />
         </div>

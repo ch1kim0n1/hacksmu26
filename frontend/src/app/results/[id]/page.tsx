@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   ChevronRight,
@@ -179,19 +180,25 @@ export default function ResultsDetailPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2 font-medium">Original</p>
-                <img
-                  src={spectrogramBefore}
-                  alt="Original spectrogram"
-                  className="w-full rounded-lg border border-ev-sand/30"
-                />
+                <div className="relative w-full h-48">
+                  <Image
+                    src={spectrogramBefore}
+                    alt="Original spectrogram"
+                    fill
+                    className="rounded-lg border border-ev-sand/30 object-cover"
+                  />
+                </div>
               </div>
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2 font-medium">Cleaned</p>
-                <img
-                  src={spectrogramAfter}
-                  alt="Cleaned spectrogram"
-                  className="w-full rounded-lg border border-ev-sand/30"
-                />
+                <div className="relative w-full h-48">
+                  <Image
+                    src={spectrogramAfter}
+                    alt="Cleaned spectrogram"
+                    fill
+                    className="rounded-lg border border-ev-sand/30 object-cover"
+                  />
+                </div>
               </div>
             </div>
           </motion.div>

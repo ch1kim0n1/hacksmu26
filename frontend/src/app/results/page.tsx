@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music, TrendingUp, ArrowLeft, ArrowRight, Clock, Keyboard, X } from "lucide-react";
+import { Music, TrendingUp, ArrowLeft, ArrowRight, Clock, Keyboard } from "lucide-react";
 import { getRecordings, API_BASE, type Recording, type Call } from "@/lib/audio-api";
 import { staggerContainer, fadeUp } from "@/components/ui/motion-primitives";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import ShortcutHelp from "@/components/layout/ShortcutHelp";
-import ABPlayer from "@/components/audio/ABPlayer";
 
 const CALL_TYPES = ["rumble", "trumpet", "roar", "bark", "cry"] as const;
 
@@ -331,11 +331,12 @@ export default function ResultsPage() {
                       aria-label={`View ${rec.filename} results`}
                       className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden w-full text-left"
                     >
-                      <img
+                      <Image
                         src={spectrogramUrl}
                         alt={`Spectrogram for ${rec.filename}`}
-                        className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
-                        loading="lazy"
+                        fill
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                        className="object-cover group-hover:scale-[1.04] transition-transform duration-500"
                       />
                       <div className="absolute inset-0 spec-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 

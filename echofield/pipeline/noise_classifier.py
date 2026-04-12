@@ -136,6 +136,7 @@ def _iter_labeled_audio(dataset_path: str | Path) -> list[tuple[Path, str]]:
                     candidate_paths = [
                         path.parent / audio_path,  # Original: data/04-040920-02_vehicle_1.wav
                         path.parent / "audio-files" / audio_path.name,  # New: data/audio-files/04-040920-02_vehicle_1.wav
+                        path.parent / "recordings" / "original" / audio_path.name,  # data/recordings/original/04-040920-02_vehicle_1.wav
                     ]
                     audio_path = None
                     for candidate in candidate_paths:
