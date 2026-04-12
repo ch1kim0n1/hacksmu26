@@ -2,24 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { exportResearch, getRecordings, API_BASE, type Recording } from "@/lib/audio-api";
-
-function QualityBadge({ score }: { score: number }) {
-  const pct = Math.round(score * 100);
-  const color =
-    pct >= 80
-      ? "bg-success/15 text-success"
-      : pct >= 60
-      ? "bg-warning/15 text-warning"
-      : "bg-danger/15 text-danger";
-
-  return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${color}`}>
-      {pct}%
-    </span>
-  );
-}
+import { motion } from "framer-motion";
+import { Music, TrendingUp, ArrowRight, Clock } from "lucide-react";
+import { getRecordings, API_BASE, type Recording } from "@/lib/audio-api";
+import { staggerContainer, fadeUp } from "@/components/ui/motion-primitives";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -42,128 +28,155 @@ export default function ResultsPage() {
     fetchResults();
   }, [fetchResults]);
 
-  const handleQuickExport = async (recordingId: string, format: "csv" | "zip") => {
-    const blob = await exportResearch({
-      format,
-      recording_ids: [recordingId],
-      include_audio: false,
-      include_spectrograms: false,
-      include_fingerprints: true,
-    });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `echofield-${recordingId}.${format}`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-    URL.revokeObjectURL(url);
-  };
-
   return (
-    <div className="min-h-screen bg-ev-ivory">
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="mb-10">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-ev-warm-gray hover:text-ev-elephant transition-colors mb-4"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Home
-          </Link>
-          <h1 className="text-4xl font-bold text-ev-charcoal">Results</h1>
-          <p className="text-ev-elephant mt-2">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-end justify-between gap-4"
+      >
+        <div>
+          <h1 className="text-2xl font-bold text-ev-charcoal">Results</h1>
+          <p className="text-sm text-ev-warm-gray mt-1">
             Browse processed recordings and their analysis results.
           </p>
         </div>
-
-        {loading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-xl bg-ev-cream border border-ev-sand p-6 animate-pulse">
-                <div className="h-32 bg-background-elevated rounded mb-4" />
-                <div className="h-4 w-3/4 bg-background-elevated rounded mb-2" />
-                <div className="h-3 w-1/2 bg-background-elevated rounded" />
-              </div>
-            ))}
-          </div>
-        ) : recordings.length === 0 ? (
-          <div className="p-12 rounded-xl bg-ev-cream border border-ev-sand text-center">
-            <p className="text-ev-elephant mb-1">No processed recordings yet</p>
-            <p className="text-ev-warm-gray text-sm">
-              Upload and process a recording to see results here.
-            </p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recordings.map((rec) => {
-              const quality = rec.result?.quality;
-              const spectrogramUrl = `${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`;
-
-              return (
-                <article
-                  key={rec.id}
-                  onClick={() => router.push(`/processing/${rec.id}`)}
-                  className="cursor-pointer overflow-hidden rounded-xl border border-ev-sand bg-ev-cream text-left transition-all hover:border-ev-warm-gray group"
-                >
-                  <div className="h-36 bg-background-elevated overflow-hidden">
-                    <img
-                      src={spectrogramUrl}
-                      alt={`Spectrogram for ${rec.filename}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-ev-charcoal truncate">
-                        {rec.filename}
-                      </p>
-                      {quality?.quality_score != null && (
-                        <QualityBadge score={quality.quality_score} />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-ev-warm-gray">
-                      {quality?.snr_before_db != null && quality?.snr_after_db != null && (
-                        <span>
-                          SNR: {quality.snr_before_db.toFixed(1)} → {quality.snr_after_db.toFixed(1)} dB
-                        </span>
-                      )}
-                      {rec.duration != null && (
-                        <span>
-                          {Math.floor(rec.duration / 60)}:{String(Math.floor(rec.duration % 60)).padStart(2, "0")}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 pt-2">
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleQuickExport(rec.id, "csv").catch(() => undefined);
-                        }}
-                        className="rounded-lg bg-background-elevated px-3 py-1.5 text-xs font-medium text-ev-charcoal hover:bg-ev-sand"
-                      >
-                        Download CSV
-                      </button>
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleQuickExport(rec.id, "zip").catch(() => undefined);
-                        }}
-                        className="rounded-lg bg-accent-savanna px-3 py-1.5 text-xs font-semibold text-ev-ivory hover:bg-accent-savanna/90"
-                      >
-                        Download ZIP
-                      </button>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+        {recordings.length > 0 && (
+          <motion.p
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.15 }}
+            className="text-xs text-ev-warm-gray glass border border-ev-sand/30 px-3 py-1.5 rounded-xl font-medium"
+          >
+            {recordings.length} processed
+          </motion.p>
         )}
-      </div>
+      </motion.div>
+
+      {loading ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="rounded-2xl glass border border-ev-sand/30 overflow-hidden animate-pulse"
+              style={{ animationDelay: `${i * 0.1}s` }}
+            >
+              <div className="h-36 bg-ev-cream" />
+              <div className="p-4 space-y-2">
+                <div className="h-4 w-3/4 bg-ev-cream rounded" />
+                <div className="h-3 w-1/2 bg-ev-cream rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : recordings.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="p-16 rounded-2xl glass border border-dashed border-ev-sand/60 text-center"
+        >
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-savanna/10 to-accent-gold/5 flex items-center justify-center mx-auto mb-4">
+            <Music className="w-7 h-7 text-accent-savanna/50" />
+          </div>
+          <p className="text-ev-elephant font-medium mb-1">
+            No processed recordings yet
+          </p>
+          <p className="text-ev-warm-gray text-sm">
+            Upload and process a recording to see results here.
+          </p>
+        </motion.div>
+      ) : (
+        <motion.div
+          variants={staggerContainer}
+          initial="initial"
+          animate="animate"
+          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
+        >
+          {recordings.map((rec) => {
+            const quality = rec.result?.quality;
+            const spectrogramUrl = `${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`;
+
+            return (
+              <motion.button
+                key={rec.id}
+                variants={fadeUp}
+                onClick={() => router.push(`/processing/${rec.id}`)}
+                aria-label={`View ${rec.filename} results`}
+                className="text-left rounded-2xl glass border border-ev-sand/30 overflow-hidden group card-hover flex flex-col"
+              >
+                {/* Spectrogram Thumbnail */}
+                <div className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
+                  <img
+                    src={spectrogramUrl}
+                    alt={`Spectrogram for ${rec.filename}`}
+                    className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 spec-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                  {quality?.quality_score != null && (
+                    <div className="absolute top-3 right-3">
+                      <div className="glass-strong rounded-lg px-2 py-1 border border-white/20">
+                        <span
+                          className={`text-xs font-bold ${
+                            quality.quality_score >= 0.8
+                              ? "text-success"
+                              : quality.quality_score >= 0.6
+                                ? "text-accent-savanna"
+                                : "text-danger"
+                          }`}
+                        >
+                          {Math.round(quality.quality_score * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Content */}
+                <div className="p-4 space-y-2.5 flex-1 flex flex-col">
+                  <p className="font-medium text-ev-charcoal truncate text-sm group-hover:text-accent-savanna transition-colors">
+                    {rec.filename}
+                  </p>
+
+                  <div className="flex items-center justify-between text-xs text-ev-warm-gray">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {quality?.snr_before_db != null &&
+                        quality?.snr_after_db != null && (
+                          <span className="inline-flex items-center gap-1">
+                            <span className="tabular-nums">
+                              {quality.snr_before_db.toFixed(1)}
+                            </span>
+                            <TrendingUp className="w-3 h-3 text-success shrink-0" />
+                            <span className="text-success font-semibold tabular-nums">
+                              {quality.snr_after_db.toFixed(1)} dB
+                            </span>
+                          </span>
+                        )}
+                    </div>
+                    {rec.duration != null && (
+                      <span className="tabular-nums inline-flex items-center gap-1 shrink-0">
+                        <Clock className="w-3 h-3" />
+                        {Math.floor(rec.duration / 60)}:
+                        {String(Math.floor(rec.duration % 60)).padStart(
+                          2,
+                          "0",
+                        )}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1 text-xs text-accent-savanna font-medium opacity-0 group-hover:opacity-100 transition-opacity pt-1 mt-auto">
+                    <span>View details</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </div>
+                </div>
+              </motion.button>
+            );
+          })}
+        </motion.div>
+      )}
     </div>
   );
 }

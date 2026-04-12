@@ -1,10 +1,28 @@
+"use client";
+
+import { useRef } from "react";
 import Link from "next/link";
+import { motion, useInView } from "framer-motion";
+import {
+  CloudUpload,
+  Sparkles,
+  Music,
+  Zap,
+  Mic,
+  BarChart3,
+  Download,
+  Heart,
+  ArrowRight,
+} from "lucide-react";
+import { SoundWave } from "@/components/ui/motion-primitives";
+
+/* ── Data ── */
 
 const TEAM_MEMBERS = [
-  { name: "Dmitry Moiseenko", role: "Full-Stack & Design" },
-  { name: "Team Member", role: "ML Pipeline" },
-  { name: "Team Member", role: "Frontend Lead" },
-  { name: "Team Member", role: "Backend Lead" },
+  { name: "Dmitry Moiseenko", role: "Full-Stack & Design", initials: "DM" },
+  { name: "Team Member", role: "ML Pipeline", initials: "ML" },
+  { name: "Team Member", role: "Frontend Lead", initials: "FE" },
+  { name: "Team Member", role: "Backend Lead", initials: "BE" },
 ];
 
 const STEPS = [
@@ -13,45 +31,109 @@ const STEPS = [
     title: "Upload",
     description:
       "Drop field recordings into EchoField. We accept WAV, MP3, and FLAC at any sample rate.",
-    icon: "M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12",
+    Icon: CloudUpload,
+    color: "text-accent-savanna bg-accent-savanna/10",
   },
   {
     number: "02",
     title: "AI Denoise",
     description:
       "Spectral gating and hybrid denoising isolate elephant vocalizations from environmental noise in seconds.",
-    icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+    Icon: Sparkles,
+    color: "text-success bg-success/10",
   },
   {
     number: "03",
     title: "Analyze",
     description:
       "View spectrograms, listen to cleaned audio, review acoustic metrics, and export research data.",
-    icon: "M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z",
+    Icon: Music,
+    color: "text-nature-sage bg-nature-sage/10",
   },
 ];
 
+const FEATURES = [
+  {
+    title: "Spectral Gating",
+    description: "Removes stationary noise using frequency-domain analysis",
+    Icon: Zap,
+  },
+  {
+    title: "Call Detection",
+    description:
+      "Classifies rumbles, trumpets, roars, and 6 more call types",
+    Icon: Mic,
+  },
+  {
+    title: "12 Acoustic Metrics",
+    description:
+      "From fundamental frequency to MFCCs and spectral centroid",
+    Icon: BarChart3,
+  },
+  {
+    title: "Research Export",
+    description: "CSV, JSON, and ZIP bundles ready for analysis workflows",
+    Icon: Download,
+  },
+];
+
+/* ── Animated Section ── */
+
+function AnimatedSection({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
+
+  return (
+    <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className={className}
+    >
+      {children}
+    </motion.section>
+  );
+}
+
+/* ── Page ── */
+
 export default function AboutPage() {
   return (
-    <div className="max-w-4xl mx-auto space-y-16 pb-16">
+    <div className="p-6 lg:p-8 max-w-4xl mx-auto space-y-12 pb-12">
       {/* Hero */}
-      <section className="text-center pt-8">
-        <h1 className="text-4xl font-bold text-echofield-text-primary mb-4">
+      <motion.section
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center pt-4"
+      >
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-savanna/10 text-accent-savanna text-xs font-medium mb-4">
+          <SoundWave bars={3} className="h-3" color="bg-accent-savanna/60" />
+          HackSMU 2026 &middot; ElephantVoices Track
+        </div>
+        <h1 className="text-3xl font-bold text-ev-charcoal mb-3">
           About EchoField
         </h1>
-        <p className="text-lg text-echofield-text-secondary max-w-2xl mx-auto">
+        <p className="text-base text-ev-elephant max-w-2xl mx-auto leading-relaxed">
           An interactive platform that removes overlapping noise from elephant
           field recordings, revealing hidden vocalizations for conservation
           research.
         </p>
-      </section>
+      </motion.section>
 
       {/* Why It Matters */}
-      <section>
-        <h2 className="text-2xl font-bold text-echofield-text-primary mb-4">
+      <AnimatedSection className="rounded-2xl glass-strong border border-ev-sand/30 p-6 lg:p-8">
+        <h2 className="text-xl font-bold text-ev-charcoal mb-4">
           Why This Matters
         </h2>
-        <div className="space-y-4 text-echofield-text-secondary leading-relaxed">
+        <div className="space-y-3 text-sm text-ev-elephant leading-relaxed">
           <p>
             Elephant communication research is blocked by noise. Field
             recordings from Africa contain overlapping sounds from aircraft,
@@ -59,11 +141,11 @@ export default function AboutPage() {
             vocalizations researchers need to study.
           </p>
           <p>
-            Elephants communicate at frequencies as low as 8 Hz — well below
-            human hearing — with harmonic structures extending up to 1000 Hz.
-            These rumbles carry information about identity, emotional state,
-            reproductive status, and social coordination across distances of
-            several kilometers.
+            Elephants communicate at frequencies as low as 8 Hz &mdash; well
+            below human hearing &mdash; with harmonic structures extending up
+            to 1000 Hz. These rumbles carry information about identity,
+            emotional state, reproductive status, and social coordination
+            across distances of several kilometers.
           </p>
           <p>
             Without clean recordings, researchers cannot reliably measure
@@ -72,129 +154,145 @@ export default function AboutPage() {
             voice visible and analyzable.
           </p>
         </div>
-      </section>
+      </AnimatedSection>
 
-      {/* Methodology */}
-      <section>
-        <h2 className="text-2xl font-bold text-echofield-text-primary mb-8">
+      {/* How It Works */}
+      <AnimatedSection>
+        <h2 className="text-xl font-bold text-ev-charcoal mb-6">
           How It Works
         </h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {STEPS.map((step) => (
-            <div
+        <div className="grid md:grid-cols-3 gap-4">
+          {STEPS.map((step, idx) => (
+            <motion.div
               key={step.number}
-              className="rounded-xl border border-echofield-border bg-echofield-surface p-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + idx * 0.12, duration: 0.5 }}
+              className="rounded-xl glass border border-ev-sand/30 p-5 card-hover"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-teal/10">
-                  <svg
-                    className="h-5 w-5 text-accent-teal"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d={step.icon}
-                    />
-                  </svg>
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${step.color}`}
+                >
+                  <step.Icon className="h-5 w-5" />
                 </div>
-                <span className="text-sm font-bold text-echofield-text-muted">
+                <span className="text-xs font-bold text-ev-warm-gray uppercase tracking-wider">
                   Step {step.number}
                 </span>
               </div>
-              <h3 className="text-lg font-semibold text-echofield-text-primary mb-2">
+              <h3 className="text-base font-semibold text-ev-charcoal mb-1.5">
                 {step.title}
               </h3>
-              <p className="text-sm text-echofield-text-secondary leading-relaxed">
+              <p className="text-sm text-ev-elephant leading-relaxed">
                 {step.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </AnimatedSection>
+
+      {/* Capabilities */}
+      <AnimatedSection>
+        <h2 className="text-xl font-bold text-ev-charcoal mb-6">
+          Capabilities
+        </h2>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {FEATURES.map((feat, idx) => (
+            <motion.div
+              key={feat.title}
+              initial={{ opacity: 0, x: idx % 2 === 0 ? -12 : 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.05 + idx * 0.08, duration: 0.45 }}
+              className="flex items-start gap-3.5 rounded-xl glass border border-ev-sand/30 p-4 card-hover"
+            >
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-accent-savanna/10 to-accent-gold/5 flex items-center justify-center flex-shrink-0">
+                <feat.Icon className="w-4 h-4 text-accent-savanna" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-ev-charcoal">
+                  {feat.title}
+                </h3>
+                <p className="text-xs text-ev-warm-gray mt-0.5 leading-relaxed">
+                  {feat.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </AnimatedSection>
 
       {/* Team */}
-      <section>
-        <h2 className="text-2xl font-bold text-echofield-text-primary mb-6">
-          The Team
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <AnimatedSection>
+        <h2 className="text-xl font-bold text-ev-charcoal mb-6">The Team</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {TEAM_MEMBERS.map((member, i) => (
-            <div
+            <motion.div
               key={i}
-              className="rounded-xl border border-echofield-border bg-echofield-surface p-4 text-center"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.05 + i * 0.08, duration: 0.4 }}
+              whileHover={{ y: -3 }}
+              className="rounded-xl glass border border-ev-sand/30 p-4 text-center card-hover"
             >
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-echofield-surface-elevated">
-                <svg
-                  className="h-6 w-6 text-echofield-text-muted"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent-savanna/20 to-accent-gold/10 shadow-sm">
+                <span className="text-xs font-bold text-accent-savanna">
+                  {member.initials}
+                </span>
               </div>
-              <p className="text-sm font-semibold text-echofield-text-primary">
+              <p className="text-sm font-semibold text-ev-charcoal">
                 {member.name}
               </p>
-              <p className="text-xs text-echofield-text-muted">{member.role}</p>
-            </div>
+              <p className="text-xs text-ev-warm-gray mt-0.5">
+                {member.role}
+              </p>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </AnimatedSection>
 
       {/* ElephantVoices Credit */}
-      <section className="rounded-xl border border-gold/20 bg-gold/5 p-8">
-        <div className="flex flex-col md:flex-row items-center gap-6">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gold/10">
-            <svg
-              className="h-8 w-8 text-gold"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          </div>
+      <AnimatedSection className="rounded-2xl border border-accent-savanna/15 bg-gradient-to-br from-accent-savanna/5 to-accent-gold/3 p-6 lg:p-8">
+        <div className="flex flex-col md:flex-row items-center gap-5">
+          <motion.div
+            whileHover={{ scale: 1.05, rotate: -3 }}
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-accent-savanna/10 shadow-glow"
+          >
+            <Heart className="h-7 w-7 text-accent-savanna" />
+          </motion.div>
           <div>
-            <h3 className="text-lg font-bold text-gold mb-1">
+            <h3 className="text-base font-bold text-accent-savanna mb-1">
               In Partnership with ElephantVoices
             </h3>
-            <p className="text-sm text-echofield-text-secondary leading-relaxed">
-              EchoField was built for the ElephantVoices track at HackSMU 2026.
-              ElephantVoices is a nonprofit dedicated to elephant cognition,
-              communication, and conservation. Their decades of field research
-              and acoustic data make this work possible.
+            <p className="text-sm text-ev-elephant leading-relaxed">
+              EchoField was built for the ElephantVoices track at HackSMU
+              2026. ElephantVoices is a nonprofit dedicated to elephant
+              cognition, communication, and conservation. Their decades of
+              field research and acoustic data make this work possible.
             </p>
           </div>
         </div>
-      </section>
+      </AnimatedSection>
 
-      {/* HackSMU */}
-      <section className="text-center">
-        <p className="text-sm text-echofield-text-muted mb-4">
-          Built in 36 hours at HackSMU 2026 — April 2026, Dallas, TX
+      {/* Bottom CTA */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="text-center space-y-4"
+      >
+        <p className="text-xs text-ev-warm-gray">
+          Built in 36 hours at HackSMU 2026 &mdash; April 2026, Dallas, TX
         </p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 rounded-lg bg-accent-teal px-6 py-2.5 text-sm font-medium text-echofield-bg transition-colors hover:bg-accent-teal/90"
-        >
-          Back to EchoField
-        </Link>
-      </section>
+        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+          <Link
+            href="/upload"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent-savanna to-accent-gold px-6 py-2.5 text-sm font-medium text-white shadow-sm shadow-accent-savanna/20 hover:shadow-md hover:shadow-accent-savanna/25 transition-shadow"
+          >
+            Get Started
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
+      </motion.section>
     </div>
   );
 }

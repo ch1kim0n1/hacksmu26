@@ -75,6 +75,15 @@ const config: Config = {
         "gradient-spectrogram":
           "linear-gradient(to right, #0C1A2A, #00D9FF, #FFD700, #EF4444)",
       },
+      boxShadow: {
+        glow: "0 0 20px rgba(196, 164, 108, 0.15)",
+        "glow-lg": "0 0 40px rgba(196, 164, 108, 0.2)",
+        card: "0 1px 3px rgba(44, 41, 38, 0.05), 0 4px 16px rgba(44, 41, 38, 0.03)",
+        "card-hover":
+          "0 8px 25px rgba(44, 41, 38, 0.08), 0 2px 8px rgba(44, 41, 38, 0.04)",
+        "card-elevated":
+          "0 12px 40px rgba(44, 41, 38, 0.1), 0 4px 12px rgba(44, 41, 38, 0.06)",
+      },
       keyframes: {
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
@@ -84,10 +93,34 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-6px)" },
+        },
+        "slide-up": {
+          "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "scale-in": {
+          "0%": { opacity: "0", transform: "scale(0.92)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": {
+            boxShadow: "0 0 0 0 rgba(196, 164, 108, 0)",
+          },
+          "50%": {
+            boxShadow: "0 0 24px 4px rgba(196, 164, 108, 0.12)",
+          },
+        },
       },
       animation: {
         shimmer: "shimmer 2s ease-in-out infinite",
         "fade-in": "fade-in 0.3s ease-out",
+        float: "float 4s ease-in-out infinite",
+        "slide-up": "slide-up 0.5s ease-out",
+        "scale-in": "scale-in 0.4s ease-out",
+        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
       },
     },
   },
