@@ -565,9 +565,15 @@ export default function LandingPage() {
         className="relative pt-0 pb-20 md:pb-28"
         style={{
           background:
-            "linear-gradient(180deg, #c5b294 0%, #B0904E 8%, #A87A45 16%, #8B5E3C 28%, #B0764E 40%, #C4785A 52%, #C48B5A 65%, #C89E60 80%, #C4A46C 100%)",
+            "linear-gradient(180deg, #8B5E3C 0%, #B0764E 15%, #C4785A 30%, #C48B5A 50%, #C89E60 70%, #C4A46C 100%)",
         }}
       >
+        {/* ── Wave: Hero → Crisis (inside section so no seam) ── */}
+        <div className="w-full" style={{ marginTop: "-1px", marginBottom: "-1px" }}>
+          <svg viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true" className="block w-full" style={{ height: "clamp(60px, 10vw, 140px)" }}>
+            <path d="M0,0 L1440,0 L1440,30 C1200,110 900,10 600,60 C300,110 120,40 0,80 L0,0 Z" fill="#c5b294" />
+          </svg>
+        </div>
         {/* Subtle texture overlay */}
         <div
           className="absolute inset-0 opacity-[0.03]"
