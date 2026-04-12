@@ -1433,9 +1433,9 @@ export default function LandingPage() {
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
               </svg>
             </div>
-            <p className="text-xl md:text-2xl font-display font-semibold text-ev-cream/60 mb-3">
+            <a href="https://www.elephantvoices.org" target="_blank" rel="noopener noreferrer" className="text-xl md:text-2xl font-display font-semibold text-ev-cream/60 mb-3 hover:text-accent-savanna/60 transition-colors">
               ElephantVoices
-            </p>
+            </a>
             <p className="text-sm text-[#b7aca0]/50 leading-relaxed max-w-sm mx-auto">
               A nonprofit dedicated to elephant cognition, communication, and
               conservation — whose decades of field research make this work possible.
@@ -1465,6 +1465,14 @@ export default function LandingPage() {
                 {item}
               </Link>
             ))}
+            <a
+              href="https://www.elephantvoices.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[#b7aca0]/30 hover:text-accent-savanna/60 transition-colors"
+            >
+              ElephantVoices
+            </a>
           </div>
           <p className="text-xs text-[#b7aca0]/20">
             &copy; 2026 EchoField &middot; HackSMU
