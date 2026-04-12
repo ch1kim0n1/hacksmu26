@@ -3,7 +3,7 @@ import os
 
 
 def test_template_fallback_when_no_api_key(monkeypatch):
-    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
     from echofield.ml.narrative import generate_narrative
     result = generate_narrative(
         call_type="contact-rumble",

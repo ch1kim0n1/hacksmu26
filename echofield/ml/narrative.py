@@ -1,4 +1,4 @@
-"""Claude API narrative interpretation with template fallback."""
+"""Gemini API narrative interpretation with template fallback."""
 
 from __future__ import annotations
 
@@ -42,12 +42,12 @@ def generate_narrative(
     top_features: list[tuple[str, float]],
     sequence_context: str | None = None,
 ) -> str:
-    api_key = os.getenv("ANTHROPIC_API_KEY")
+    api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         return _template_narrative(call_type, social_function, confidence, top_features)
 
     try:
-        import anthropic
+        import google.generativeai as genai
 
         feature_lines = "\n".join(
             f"- {name}: {value}" for name, value in top_features[:5]
@@ -66,13 +66,13 @@ def generate_narrative(
             f"Write the interpretation in plain English for a researcher."
         )
 
-        client = anthropic.Anthropic(api_key=api_key)
-        message = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=200,
-            messages=[{"role": "user", "content": prompt}],
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-2.0-flash")
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(max_output_tokens=200)
         )
-        text = message.content[0].text.strip()
+        text = response.text.strip()
         return text if text else _template_narrative(
             call_type, social_function, confidence, top_features
         )
