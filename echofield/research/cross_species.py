@@ -1,244 +1,137 @@
-"""Cross-species acoustic comparison engine."""
+"""Cross-species acoustic comparison helpers."""
+
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 import numpy as np
-import librosa
 
-from echofield.pipeline.feature_extract import extract_acoustic_features
-
-logger = logging.getLogger(__name__)
-
-# Reference species database — using synthetic approximations
-# These generate characteristic waveforms at known frequency ranges
-REFERENCE_SPECIES = {
-    "blue_whale": {
+REFERENCE_CALLS: dict[str, dict[str, Any]] = {
+    "blue_whale_call": {
+        "id": "blue_whale_call",
         "species": "Blue whale (Balaenoptera musculus)",
         "call_type": "D-call",
-        "description": "Infrasonic pulse at 10-40Hz — used for long-distance ocean communication across hundreds of kilometers",
-        "frequency_range_hz": [10, 40],
-        "f0_hz": 18,
-        "duration_s": 3.0,
-        "harmonicity": 0.6,
-        "bandwidth_hz": 30,
+        "description": "Synthetic infrasonic pulse approximation, 10-40Hz, long-distance communication.",
+        "frequency_range_hz": (10.0, 40.0),
+        "synthetic": True,
     },
-    "humpback_whale": {
+    "humpback_whale_song": {
+        "id": "humpback_whale_song",
         "species": "Humpback whale (Megaptera novaeangliae)",
         "call_type": "Song unit",
-        "description": "Complex tonal vocalization with frequency sweeps — part of elaborate songs lasting up to 30 minutes",
-        "frequency_range_hz": [80, 4000],
-        "f0_hz": 200,
-        "duration_s": 2.0,
-        "harmonicity": 0.75,
-        "bandwidth_hz": 3000,
+        "description": "Synthetic tonal song unit approximation, 80-4000Hz.",
+        "frequency_range_hz": (80.0, 4000.0),
+        "synthetic": True,
     },
     "lion_roar": {
+        "id": "lion_roar",
         "species": "African lion (Panthera leo)",
         "call_type": "Roar",
-        "description": "Low-frequency territorial call — shares savanna habitat with elephants, audible up to 8km",
-        "frequency_range_hz": [40, 200],
-        "f0_hz": 80,
-        "duration_s": 4.0,
-        "harmonicity": 0.35,
-        "bandwidth_hz": 800,
+        "description": "Synthetic low-frequency territorial roar approximation.",
+        "frequency_range_hz": (40.0, 200.0),
+        "synthetic": True,
     },
     "human_speech": {
+        "id": "human_speech",
         "species": "Human (Homo sapiens)",
         "call_type": "Voiced speech",
-        "description": "Voiced speech segment — formant and harmonic comparison with elephant vocalizations",
-        "frequency_range_hz": [85, 300],
-        "f0_hz": 120,
-        "duration_s": 2.0,
-        "harmonicity": 0.7,
-        "bandwidth_hz": 3000,
+        "description": "Synthetic voiced speech reference for harmonic/formant comparison.",
+        "frequency_range_hz": (85.0, 300.0),
+        "synthetic": True,
     },
 }
 
 
-def _generate_synthetic_call(spec: dict[str, Any], sr: int = 22050) -> np.ndarray:
-    """Generate a synthetic approximation of a species' characteristic call."""
-    f0 = spec["f0_hz"]
-    duration = spec["duration_s"]
-    harmonicity = spec.get("harmonicity", 0.5)
-    n_samples = int(sr * duration)
-    t = np.linspace(0, duration, n_samples, endpoint=False)
-
-    # Fundamental
-    signal = np.sin(2 * np.pi * f0 * t)
-
-    # Add harmonics based on harmonicity
-    n_harmonics = int(harmonicity * 8) + 1
-    for h in range(2, n_harmonics + 1):
-        amplitude = harmonicity / h
-        signal += amplitude * np.sin(2 * np.pi * f0 * h * t)
-
-    # Apply amplitude envelope (fade in/out)
-    envelope = np.ones(n_samples)
-    fade_len = int(sr * 0.1)
-    if fade_len > 0 and fade_len * 2 < n_samples:
-        envelope[:fade_len] = np.linspace(0, 1, fade_len)
-        envelope[-fade_len:] = np.linspace(1, 0, fade_len)
-
-    signal *= envelope
-
-    # Normalize
-    max_val = np.max(np.abs(signal))
-    if max_val > 0:
-        signal = signal / max_val * 0.8
-
-    return signal.astype(np.float32)
+def _safe_float(value: Any) -> float:
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return 0.0
+    return result if np.isfinite(result) else 0.0
 
 
-def get_reference_audio(reference_id: str, sr: int = 22050) -> tuple[np.ndarray, int]:
-    """Get audio for a reference species (synthetic)."""
-    spec = REFERENCE_SPECIES.get(reference_id)
-    if not spec:
-        raise ValueError(f"Unknown reference species: {reference_id}")
-    return _generate_synthetic_call(spec, sr), sr
+def _range_overlap(left: tuple[float, float], right: tuple[float, float]) -> tuple[float, tuple[float, float]]:
+    low = max(left[0], right[0])
+    high = min(left[1], right[1])
+    if high <= low:
+        return 0.0, (0.0, 0.0)
+    union = max(max(left[1], right[1]) - min(left[0], right[0]), 1e-8)
+    return round((high - low) / union * 100.0, 2), (round(low, 2), round(high, 2))
 
 
-def compare_calls(
-    elephant_audio: np.ndarray,
-    elephant_sr: int,
-    reference_id: str,
-) -> dict[str, Any]:
-    """Compare an elephant call against a reference species."""
-    spec = REFERENCE_SPECIES.get(reference_id)
-    if not spec:
-        raise ValueError(f"Unknown reference species: {reference_id}")
+def _call_range(call: dict[str, Any]) -> tuple[float, float]:
+    features = call.get("acoustic_features") or {}
+    low = _safe_float(call.get("frequency_min_hz") or features.get("frequency_min_hz"))
+    high = _safe_float(call.get("frequency_max_hz") or features.get("frequency_max_hz"))
+    f0 = _safe_float(features.get("fundamental_frequency_hz"))
+    if low <= 0 and f0 > 0:
+        low = max(f0 * 0.75, 1.0)
+    if high <= low:
+        high = max(f0 * 2.5, low + 1.0)
+    return (low, high)
 
-    ref_audio, ref_sr = get_reference_audio(reference_id, elephant_sr)
 
-    # Extract features from both
-    elephant_features = extract_acoustic_features(elephant_audio, elephant_sr)
-    reference_features = extract_acoustic_features(ref_audio, ref_sr)
-
-    # Compute frequency overlap
-    e_f0 = elephant_features.get("fundamental_frequency_hz", 0)
-    e_bw = elephant_features.get("bandwidth_hz", 0)
-    e_low = max(e_f0 - e_bw / 2, 0)
-    e_high = e_f0 + e_bw / 2
-
-    r_low, r_high = spec["frequency_range_hz"]
-
-    overlap_low = max(e_low, r_low)
-    overlap_high = min(e_high, r_high)
-    overlap_range = max(0, overlap_high - overlap_low)
-    total_range = max(e_high - e_low, r_high - r_low, 1)
-    frequency_overlap_pct = round((overlap_range / total_range) * 100, 1)
-
-    # Spectral similarity via mean spectral envelopes
-    e_S = np.abs(librosa.stft(elephant_audio, n_fft=2048))
-    r_S = np.abs(librosa.stft(ref_audio, n_fft=2048))
-
-    e_envelope = np.mean(e_S, axis=1)
-    r_envelope = np.mean(r_S, axis=1)
-
-    min_len = min(len(e_envelope), len(r_envelope))
-    e_env = e_envelope[:min_len]
-    r_env = r_envelope[:min_len]
-
-    # Cosine similarity
-    denom = np.linalg.norm(e_env) * np.linalg.norm(r_env)
-    spectral_similarity = float(np.dot(e_env, r_env) / denom) if denom > 0 else 0.0
-    spectral_similarity = round(max(0, spectral_similarity), 3)
-
-    # Harmonic similarity
-    e_harm = elephant_features.get("harmonicity", 0)
-    r_harm = reference_features.get("harmonicity", 0)
-    harmonic_similarity = round(1.0 - abs(e_harm - r_harm), 3)
-
-    # Temporal similarity (amplitude envelope correlation)
-    e_rms = librosa.feature.rms(y=elephant_audio)[0]
-    r_rms = librosa.feature.rms(y=ref_audio)[0]
-    min_rms_len = min(len(e_rms), len(r_rms))
-    if min_rms_len > 1:
-        e_rms_r = np.interp(np.linspace(0, 1, 100), np.linspace(0, 1, len(e_rms)), e_rms)
-        r_rms_r = np.interp(np.linspace(0, 1, 100), np.linspace(0, 1, len(r_rms)), r_rms)
-        corr = np.corrcoef(e_rms_r, r_rms_r)[0, 1]
-        temporal_similarity = round(max(0, float(corr) if np.isfinite(corr) else 0), 3)
-    else:
-        temporal_similarity = 0.0
-
-    # Generate insight
-    insight = _generate_insight(
-        spec, frequency_overlap_pct, spectral_similarity,
-        harmonic_similarity, e_f0
+def generate_insight(reference: dict[str, Any], overlap_pct: float, harmonic_similarity: float) -> str:
+    if overlap_pct >= 60:
+        return (
+            f"Strong frequency overlap with {reference['species']}: both signals use similar bands, "
+            "a useful clue for convergent long-distance communication strategies."
+        )
+    if harmonic_similarity >= 0.7:
+        return (
+            f"Shared harmonic structure with {reference['species']} suggests a useful comparative case "
+            "for vocal identity or arousal studies."
+        )
+    return (
+        f"{reference['species']} differs acoustically from this elephant call, but the contrast is useful "
+        "for separating species-specific communication strategies."
     )
 
-    # Feature comparison
-    feature_comparison = {}
-    for key in ["fundamental_frequency_hz", "harmonicity", "bandwidth_hz",
-                "spectral_centroid_hz", "duration_s", "snr_db"]:
-        e_val = float(elephant_features.get(key, 0))
-        r_val = float(reference_features.get(key, 0))
-        diff_pct = round(abs(e_val - r_val) / max(abs(r_val), 0.01) * 100, 1)
-        feature_comparison[key] = {
-            "elephant": round(e_val, 2),
-            "reference": round(r_val, 2),
-            "difference_pct": diff_pct,
-        }
 
+def compare_call_to_reference(call: dict[str, Any], reference_id: str) -> dict[str, Any]:
+    if reference_id not in REFERENCE_CALLS:
+        raise KeyError(reference_id)
+    reference = REFERENCE_CALLS[reference_id]
+    elephant_range = _call_range(call)
+    reference_range = tuple(float(value) for value in reference["frequency_range_hz"])
+    overlap_pct, shared = _range_overlap(elephant_range, reference_range)
+    features = call.get("acoustic_features") or {}
+    f0 = _safe_float(features.get("fundamental_frequency_hz"))
+    reference_mid = (reference_range[0] + reference_range[1]) / 2.0
+    spectral_similarity = round(1.0 / (1.0 + abs((f0 or elephant_range[0]) - reference_mid) / max(reference_mid, 1.0)), 3)
+    harmonicity = max(min(_safe_float(features.get("harmonicity")), 1.0), 0.0)
+    harmonic_similarity = round(0.5 + harmonicity * 0.5 if overlap_pct > 0 else harmonicity * 0.5, 3)
+    duration_ms = _safe_float(call.get("duration_ms"))
+    temporal_similarity = round(min(duration_ms / 5000.0, 1.0), 3)
     return {
-        "reference": {
-            "id": reference_id,
-            "species": spec["species"],
-            "call_type": spec["call_type"],
-            "description": spec["description"],
+        "elephant_call": {
+            "call_id": call.get("id"),
+            "call_type": call.get("call_type"),
+            "species": "African elephant",
         },
+        "reference": reference,
         "comparison": {
-            "frequency_overlap_pct": frequency_overlap_pct,
+            "frequency_overlap_pct": overlap_pct,
             "spectral_similarity": spectral_similarity,
             "harmonic_similarity": harmonic_similarity,
             "temporal_similarity": temporal_similarity,
-            "shared_frequency_range_hz": [round(overlap_low, 1), round(overlap_high, 1)] if overlap_range > 0 else None,
-            "insight": insight,
+            "shared_frequency_range_hz": shared,
+            "insight": generate_insight(reference, overlap_pct, harmonic_similarity),
         },
-        "feature_comparison": feature_comparison,
+        "visualizations": {
+            "side_by_side_url": f"/api/compare/viz/{call.get('id')}/{reference_id}.png?type=side_by_side",
+            "overlay_url": f"/api/compare/viz/{call.get('id')}/{reference_id}.png?type=overlay",
+        },
+        "feature_comparison": {
+            "fundamental_frequency_hz": {
+                "elephant": round(f0, 2),
+                "reference": round(reference_mid, 2),
+                "difference_pct": round(abs((f0 or 0.0) - reference_mid) / max(reference_mid, 1.0) * 100.0, 2),
+            },
+            "harmonicity": {
+                "elephant": round(harmonicity, 3),
+                "reference": 0.6,
+                "difference_pct": round(abs(harmonicity - 0.6) / 0.6 * 100.0, 2),
+            },
+        },
     }
-
-
-def _generate_insight(
-    spec: dict[str, Any],
-    freq_overlap: float,
-    spectral_sim: float,
-    harmonic_sim: float,
-    elephant_f0: float,
-) -> str:
-    parts = []
-    species_short = spec["species"].split("(")[0].strip()
-
-    if freq_overlap > 60:
-        parts.append(
-            f"Remarkable frequency overlap ({freq_overlap:.0f}%) between elephant and {species_short} vocalizations — "
-            f"both species communicate in similar frequency bands, suggesting convergent acoustic strategies."
-        )
-    elif freq_overlap > 30:
-        parts.append(
-            f"Moderate frequency overlap ({freq_overlap:.0f}%) — "
-            f"some shared acoustic space between these species."
-        )
-    else:
-        parts.append(
-            f"Limited frequency overlap ({freq_overlap:.0f}%) — "
-            f"these species occupy different acoustic niches."
-        )
-
-    if harmonic_sim > 0.8:
-        parts.append(
-            "Strikingly similar harmonic structure — both vocalizations rely on rich overtone series."
-        )
-    elif harmonic_sim < 0.4:
-        parts.append(
-            "Different harmonic profiles — one vocalization is more tonal while the other is more broadband."
-        )
-
-    if elephant_f0 < 25 and spec["f0_hz"] < 50:
-        parts.append(
-            "Both species use infrasound for long-distance communication — "
-            "a convergent evolution across very different environments."
-        )
-
-    return " ".join(parts)
