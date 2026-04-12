@@ -346,6 +346,10 @@ export async function revealInfrasound(id: string, params?: {
   });
 }
 
+export function getInfrasoundShiftedAudioUrl(recordingId: string): string {
+  return `${API_BASE}/api/recordings/${recordingId}/audio/infrasound-shifted`;
+}
+
 export async function getEmotionTimeline(id: string): Promise<EmotionTimelineResponse> {
   return fetchAPI<EmotionTimelineResponse>(`/api/recordings/${id}/emotion-timeline`);
 }
@@ -422,44 +426,6 @@ export async function getCall(id: string): Promise<Call> {
     frequency_low: call.frequency_min_hz,
     frequency_high: call.frequency_max_hz,
   };
-}
-
-export interface InfrasoundRegion {
-  start_ms: number;
-  end_ms: number;
-  estimated_f0_hz: number;
-  shifted_f0_hz: number;
-  energy_db: number;
-}
-
-export interface InfrasoundRevealResponse {
-  recording_id: string;
-  infrasound_detected: boolean;
-  infrasound_regions: InfrasoundRegion[];
-  shifted_audio_url: string;
-  shift_octaves: number;
-  frequency_range_original_hz: [number, number];
-  frequency_range_shifted_hz: [number, number];
-  infrasound_energy_pct: number;
-  mix_mode: string;
-}
-
-export async function revealInfrasound(
-  recordingId: string,
-  options?: { shift_octaves?: number; mix_mode?: string }
-): Promise<InfrasoundRevealResponse> {
-  const params = new URLSearchParams();
-  if (options?.shift_octaves) params.set("shift_octaves", String(options.shift_octaves));
-  if (options?.mix_mode) params.set("mix_mode", options.mix_mode);
-  const query = params.toString();
-  return fetchAPI<InfrasoundRevealResponse>(
-    `/api/recordings/${recordingId}/infrasound-reveal${query ? `?${query}` : ""}`,
-    { method: "POST" }
-  );
-}
-
-export function getInfrasoundShiftedAudioUrl(recordingId: string): string {
-  return `${API_BASE}/api/recordings/${recordingId}/audio/infrasound-shifted`;
 }
 
 export interface SpectrogramData {
