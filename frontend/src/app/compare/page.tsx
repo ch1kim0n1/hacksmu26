@@ -88,7 +88,7 @@ export default function ComparePage() {
                 Elephant vs. {String(comparison.reference.species)}
               </h2>
               <img
-                src={`${API_BASE}${comparison.visualizations.overlay_url}`}
+                src={`${API_BASE}${comparison.visualizations?.overlay_url ?? ""}`}
                 alt="Cross-species frequency overlay"
                 className="w-full rounded-lg border border-ev-sand"
               />
