@@ -2,102 +2,183 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
-import { Upload, BarChart3, Database, Waves, Radio, Layers } from "lucide-react";
+import {
+  Upload,
+  BarChart3,
+  Database,
+  Waves,
+  Radio,
+  Layers,
+} from "lucide-react";
+import { useMobileSidebar } from "@/hooks/useSidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
-const NAV_LINKS = [
-  { href: "/upload", label: "Upload", icon: Upload },
-  { href: "/recordings", label: "Recordings", icon: Layers },
-  { href: "/results", label: "Results", icon: BarChart3 },
-  { href: "/database", label: "Database", icon: Database },
-  { href: "/realtime", label: "Real-Time Filter", icon: Radio },
+/* ── Navigation data ── */
+
+interface NavItem {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
+  {
+    title: "Main",
+    items: [
+      { href: "/upload", label: "Upload", icon: Upload },
+      { href: "/recordings", label: "Recordings", icon: Layers },
+      { href: "/realtime", label: "Real-Time Filter", icon: Radio },
+    ],
+  },
+  {
+    title: "Analysis",
+    items: [
+      { href: "/results", label: "Results", icon: BarChart3 },
+      { href: "/database", label: "Call Database", icon: Database },
+    ],
+  },
 ];
 
-export default function Sidebar() {
+/* ── Sidebar link ── */
+
+function SidebarLink({
+  item,
+  onNavigate,
+}: {
+  item: NavItem;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
+  const isActive =
+    pathname === item.href || pathname.startsWith(item.href + "/");
+  const Icon = item.icon;
 
   return (
-    <aside className="hidden sm:flex flex-col w-16 bg-ev-charcoal shrink-0">
-      {/* Logo */}
-      <div className="flex items-center justify-center h-14 border-b border-white/[0.06]">
-        <Link href="/">
-          <motion.div
-            whileHover={{ scale: 1.1, rotate: -3 }}
-            whileTap={{ scale: 0.9 }}
-            className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent-savanna to-accent-deep-gold flex items-center justify-center shadow-lg shadow-accent-savanna/25"
-          >
-            <Waves className="w-[18px] h-[18px] text-white" />
-          </motion.div>
-        </Link>
-      </div>
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      className={cn(
+        "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+        isActive
+          ? "bg-white/[0.08] text-accent-savanna"
+          : "text-ev-dust hover:bg-white/[0.05] hover:text-ev-cream"
+      )}
+    >
+      {/* Active indicator bar */}
+      {isActive && (
+        <div
+          className="absolute left-0 inset-y-1.5 w-[3px] rounded-r-full bg-gradient-to-b from-accent-savanna to-accent-gold"
+          style={{ boxShadow: "0 0 8px rgba(196, 164, 108, 0.4)" }}
+        />
+      )}
 
-      {/* Navigation */}
-      <nav className="flex-1 flex flex-col items-center gap-1 pt-4 px-2">
-        {NAV_LINKS.map((link) => {
-          const isActive =
-            pathname === link.href ||
-            pathname.startsWith(link.href + "/");
-          const Icon = link.icon;
+      <Icon
+        className={cn(
+          "h-[18px] w-[18px] shrink-0 transition-colors duration-200",
+          isActive
+            ? "text-accent-savanna"
+            : "text-ev-dust/70 group-hover:text-ev-cream"
+        )}
+      />
 
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-label={link.label}
-              className="group relative flex items-center justify-center w-full py-2.5 rounded-xl transition-colors"
-            >
-              {/* Active indicator bar */}
-              {isActive && (
-                <motion.div
-                  layoutId="sidebar-indicator"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-gradient-to-b from-accent-savanna to-accent-gold"
-                  transition={{
-                    type: "spring",
-                    stiffness: 350,
-                    damping: 30,
-                  }}
-                  style={{
-                    boxShadow: "0 0 10px rgba(196, 164, 108, 0.5)",
-                  }}
-                />
-              )}
+      <span className="truncate">{item.label}</span>
+    </Link>
+  );
+}
 
-              {/* Active background */}
-              {isActive && (
-                <motion.div
-                  layoutId="sidebar-glow"
-                  className="absolute inset-x-1 inset-y-0 rounded-xl bg-white/[0.07]"
-                  transition={{
-                    type: "spring",
-                    stiffness: 350,
-                    damping: 30,
-                  }}
-                />
-              )}
+/* ── Sidebar content (shared between desktop + mobile) ── */
 
-              <motion.div
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                className="relative z-10"
-              >
-                <Icon
-                  className={`w-5 h-5 transition-all duration-200 ${
-                    isActive
-                      ? "text-accent-savanna drop-shadow-[0_0_6px_rgba(196,164,108,0.4)]"
-                      : "text-ev-dust/70 group-hover:text-ev-cream"
-                  }`}
-                />
-              </motion.div>
+function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+  return (
+    <ScrollArea className="flex-1">
+      <nav className="flex flex-col gap-1 p-3">
+        {NAV_SECTIONS.map((section, i) => (
+          <div key={section.title}>
+            {i > 0 && <Separator className="my-2 bg-[#3A3530]" />}
 
-              {/* Tooltip */}
-              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-ev-charcoal-light rounded-lg text-[11px] text-ev-cream font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-50 shadow-xl border border-white/[0.06]">
-                {link.label}
-                <div className="absolute right-full top-1/2 -translate-y-1/2 border-[5px] border-transparent border-r-ev-charcoal-light" />
-              </div>
-            </Link>
-          );
-        })}
+            <p className="mb-1 px-3 text-[10px] font-semibold uppercase tracking-widest text-ev-dust/50">
+              {section.title}
+            </p>
+
+            {section.items.map((item) => (
+              <SidebarLink
+                key={item.href}
+                item={item}
+                onNavigate={onNavigate}
+              />
+            ))}
+          </div>
+        ))}
       </nav>
-    </aside>
+    </ScrollArea>
+  );
+}
+
+/* ── Logo header ── */
+
+function SidebarLogo({ onNavigate }: { onNavigate?: () => void }) {
+  return (
+    <div className="flex items-center gap-3 h-14 px-4 border-b border-[#3A3530] shrink-0">
+      <Link href="/" onClick={onNavigate} className="shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent-savanna to-accent-deep-gold flex items-center justify-center shadow-lg shadow-accent-savanna/25">
+          <Waves className="w-[18px] h-[18px] text-white" />
+        </div>
+      </Link>
+      <div className="flex flex-col min-w-0">
+        <span className="text-sm font-semibold text-ev-cream truncate">
+          EchoField
+        </span>
+        <span className="text-[10px] text-ev-dust/60 truncate">
+          Vocalization Platform
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Desktop sidebar ── */
+
+export default function Sidebar() {
+  const { mobileOpen, setMobileOpen } = useMobileSidebar();
+
+  return (
+    <>
+      {/* Desktop — always expanded */}
+      <aside className="hidden md:flex flex-col w-[220px] bg-[#1E1B19] shrink-0 border-r border-[#3A3530] relative z-30">
+        <SidebarLogo />
+        <SidebarNav />
+
+        {/* Footer in sidebar */}
+        <div className="border-t border-[#3A3530] px-4 py-3 shrink-0">
+          <p className="text-[10px] text-ev-dust/40 text-center">
+            Built for HackSMU 2026
+          </p>
+          <p className="text-[10px] text-ev-dust/30 text-center">
+            ElephantVoices Track
+          </p>
+        </div>
+      </aside>
+
+      {/* Mobile sheet */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="w-[260px] p-0 bg-[#1E1B19] border-r border-[#3A3530]">
+          <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <SidebarLogo onNavigate={() => setMobileOpen(false)} />
+          <SidebarNav onNavigate={() => setMobileOpen(false)} />
+          <div className="border-t border-[#3A3530] px-4 py-3 shrink-0">
+            <p className="text-[10px] text-ev-dust/40 text-center">
+              Built for HackSMU 2026 — ElephantVoices Track
+            </p>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

@@ -122,7 +122,7 @@ export default function ResultsDetailPage() {
   const audioCleaned = `${API_BASE}/api/recordings/${id}/audio?type=cleaned`;
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}

@@ -40,8 +40,7 @@ export default function BatchPage() {
   }, [fetchSummary]);
 
   return (
-    <main className="min-h-screen bg-ev-ivory">
-      <div className="mx-auto max-w-7xl px-6 py-12">
+    <main className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
         <Link href="/recordings" className="mb-4 inline-flex text-sm text-ev-warm-gray hover:text-ev-elephant">
           Back to recordings
         </Link>
@@ -142,7 +141,6 @@ export default function BatchPage() {
             )}
           </div>
         ) : null}
-      </div>
     </main>
   );
 }

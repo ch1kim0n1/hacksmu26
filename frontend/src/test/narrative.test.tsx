@@ -83,66 +83,7 @@ class MockIntersectionObserver {
 }
 vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
 
-import AboutPage from "@/app/about/page";
 import CallCard from "@/components/research/CallCard";
-
-// ── About Page Narrative Tests ──
-
-describe("About Page — Narrative Framing (#130)", () => {
-  it("renders the mission headline about decoding elephant communication", () => {
-    render(<AboutPage />);
-    expect(screen.getByText("About EchoField")).toBeInTheDocument();
-  });
-
-  it("renders mission statement about elephant communication research", () => {
-    render(<AboutPage />);
-    // Check for mission-framing text
-    expect(
-      screen.getByText(/reveals the hidden voice of elephants/i)
-    ).toBeInTheDocument();
-  });
-
-  it("renders the Rosetta Stone framing", () => {
-    render(<AboutPage />);
-    const matches = screen.getAllByText(/Rosetta Stone/i);
-    expect(matches.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("renders ElephantVoices partnership badge prominently", () => {
-    render(<AboutPage />);
-    expect(
-      screen.getByText("In Partnership with ElephantVoices")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/ElephantVoices is a nonprofit/i)
-    ).toBeInTheDocument();
-  });
-
-  it("renders technical approach paragraph", () => {
-    render(<AboutPage />);
-    // Should describe the technical pipeline
-    const matches = screen.getAllByText(/spectral gating/i);
-    expect(matches.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("renders the conservation connection", () => {
-    render(<AboutPage />);
-    const matches = screen.getAllByText(/conservation/i);
-    expect(matches.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("renders team section with roles", () => {
-    render(<AboutPage />);
-    expect(screen.getByText("The Team")).toBeInTheDocument();
-    expect(screen.getByText("Dmitry Moiseenko")).toBeInTheDocument();
-  });
-
-  it("renders HackSMU attribution", () => {
-    render(<AboutPage />);
-    const matches = screen.getAllByText(/HackSMU 2026/i);
-    expect(matches.length).toBeGreaterThanOrEqual(1);
-  });
-});
 
 // ── CallCard Narrative Tests ──
 

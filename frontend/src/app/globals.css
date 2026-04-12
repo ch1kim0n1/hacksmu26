@@ -40,34 +40,34 @@
 }
 
 body {
-  background-color: var(--ev-ivory);
-  color: var(--ev-charcoal);
+  background-color: var(--ev-charcoal);
+  color: var(--ev-cream, #F0EBE3);
   min-height: 100vh;
 }
 
-/* ─── Custom Scrollbar ─── */
+/* ─── Custom Scrollbar (dark) ─── */
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--ev-cream);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--ev-sand);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--ev-dust);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--ev-sand) var(--ev-cream);
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 /* ─── Utility Classes ─── */

@@ -4,7 +4,7 @@ export const metadata = { title: "Real-Time Filter · EchoField" };
 
 export default function RealtimePage() {
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="mx-auto max-w-6xl space-y-6 p-6 lg:p-8">
       <div>
         <h1 className="text-2xl font-bold text-ev-charcoal">Real-Time Filter</h1>
         <p className="mt-1 text-sm text-ev-warm-gray">
