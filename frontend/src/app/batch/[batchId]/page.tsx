@@ -35,9 +35,10 @@ export default function BatchPage() {
 
   useEffect(() => {
     fetchSummary();
+    if (summary?.status === "complete" || summary?.status === "failed") return;
     const timer = window.setInterval(fetchSummary, 4000);
     return () => window.clearInterval(timer);
-  }, [fetchSummary]);
+  }, [fetchSummary, summary?.status]);
 
   return (
     <main className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
