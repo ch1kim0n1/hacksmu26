@@ -447,7 +447,11 @@ export default function LandingPage() {
                 key={item.label}
                 href={item.href}
                 data-nav-link
-                className="rounded-full px-3 py-2 text-base font-medium tracking-[0.02em] text-[#4b3520] transition-colors duration-300 hover:text-white sm:px-4 sm:text-lg"
+                className={`rounded-full px-3 py-2 text-sm font-medium tracking-[0.02em] transition-all duration-300 sm:px-4 ${
+                  item.label === "Get Started"
+                    ? "border border-[#4b3520]/25 bg-white/20 text-[#3f3121] shadow-[0_10px_24px_rgba(75,53,32,0.08)] hover:border-white/70 hover:bg-white/24 hover:text-white"
+                    : "text-[#4b3520] hover:text-white"
+                }`}
               >
                 {item.label}
               </Link>
@@ -498,28 +502,6 @@ export default function LandingPage() {
             />
           </div>
 
-          {/* Get started hint */}
-          <div className="pointer-events-none absolute left-[28%] top-[25%] z-[11] flex flex-col items-center gap-1">
-            <span className="text-sm font-medium italic text-[#5a3e22]/80 tracking-wide">get started</span>
-            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" className="-mt-1 -rotate-12">
-              <path
-                d="M18 4 C10 10, 6 20, 14 28"
-                stroke="#7b5a32"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M10 26 L14 29 L16 23"
-                stroke="#7b5a32"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-              />
-            </svg>
-          </div>
-
           {/* Interactive globe */}
             <button
               id="landing-globe-trigger"
@@ -556,6 +538,11 @@ export default function LandingPage() {
                 controls: { minDistance: 180, maxDistance: 280 },
               }}
             />
+            <div className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
+              <span className="max-w-[9ch] text-center text-xl font-semibold italic leading-tight tracking-[0.02em] text-white/92 drop-shadow-[0_2px_12px_rgba(18,34,58,0.55)] sm:text-2xl">
+                Ready to Explore?
+              </span>
+            </div>
           </button>
           </div>
 
@@ -799,10 +786,40 @@ export default function LandingPage() {
          ═══════════════════════════════════════════ */}
       <section
         ref={voiceRef}
-        className="relative py-20 md:py-28 bg-ev-charcoal overflow-hidden"
+        className="relative overflow-hidden bg-[#2f2823] py-24 md:py-32"
       >
+        {/* Floating dots */}
+        <div className="pointer-events-none absolute inset-0">
+          {[
+            { left: "6%", top: "34%", size: "10px", opacity: 0.26 },
+            { left: "22%", top: "20%", size: "5px", opacity: 0.28 },
+            { left: "41%", top: "11%", size: "4px", opacity: 0.2 },
+            { left: "52%", top: "17%", size: "3px", opacity: 0.18 },
+            { left: "64%", top: "29%", size: "12px", opacity: 0.95 },
+            { left: "73%", top: "24%", size: "4px", opacity: 0.22 },
+            { left: "85%", top: "14%", size: "3px", opacity: 0.16 },
+            { left: "89%", top: "52%", size: "4px", opacity: 0.2 },
+            { left: "78%", top: "72%", size: "3px", opacity: 0.18 },
+            { left: "92%", top: "88%", size: "4px", opacity: 0.18 },
+            { left: "67%", top: "84%", size: "3px", opacity: 0.16 },
+          ].map((dot, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-[#f3eadc]"
+              style={{
+                left: dot.left,
+                top: dot.top,
+                width: dot.size,
+                height: dot.size,
+                opacity: dot.opacity,
+                animation: `float ${8 + i * 0.7}s ease-in-out ${i * 0.35}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+
         {/* BG waves */}
-        <div className="absolute inset-0 opacity-[0.04]">
+        <div className="absolute inset-0 opacity-[0.08]">
           <svg
             className="w-full h-full"
             viewBox="0 0 1440 400"
@@ -812,32 +829,33 @@ export default function LandingPage() {
               <path
                 key={i}
                 data-wave-line
-                d={`M0 ${200 + i * 15} Q360 ${120 + i * 30} 720 ${200 + i * 15} Q1080 ${280 - i * 30} 1440 ${200 + i * 15}`}
-                stroke="#C4A46C"
-                strokeWidth={2 - i * 0.5}
+                d={`M0 ${230 + i * 22} Q360 ${150 + i * 26} 720 ${215 + i * 18} Q1080 ${285 - i * 18} 1440 ${248 + i * 20}`}
+                stroke="#8b7a63"
+                strokeWidth={2.5 - i * 0.45}
                 fill="none"
               />
             ))}
           </svg>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div>
+        <div className="relative mx-auto max-w-7xl px-6">
+          <div className="grid items-center gap-12 md:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.85fr)] lg:gap-20">
+            <div className="max-w-5xl">
               <span
                 data-voice-title
-                className="text-sm font-semibold text-accent-savanna tracking-[0.2em] uppercase mb-4 block"
+                className="mb-5 block text-sm font-semibold uppercase tracking-[0.24em] text-[#d5b171]"
               >
                 Their Voice
               </span>
               <h2
                 data-voice-title
-                className="text-4xl md:text-5xl font-display font-semibold text-ev-cream mb-8"
+                className="max-w-6xl text-5xl font-display font-semibold leading-[0.95] text-[#f3eadc] md:text-6xl lg:text-[5.8rem]"
               >
-                Communication Beyond Human Hearing
+                Communication{" "}
+                <span className="text-[#d5b171]">Beyond</span> Human Hearing
               </h2>
 
-              <div className="space-y-5">
+              <div className="mt-10 max-w-4xl space-y-8">
                 {[
                   "Elephants communicate using infrasound — frequencies below 20\u00A0Hz that travel up to 10\u00A0kilometers through ground and air.",
                   "These calls carry complex social information: warnings, greetings, mating signals, and emotional states we\u2019re only beginning to understand.",
@@ -846,7 +864,7 @@ export default function LandingPage() {
                   <p
                     key={i}
                     data-voice-text
-                    className="text-ev-dust/70 leading-relaxed"
+                    className="max-w-4xl text-lg leading-relaxed text-[#b7aca0] md:text-[1.05rem]"
                   >
                     {txt}
                   </p>
@@ -855,7 +873,7 @@ export default function LandingPage() {
             </div>
 
             {/* Sound-wave visual */}
-            <div data-voice-visual className="relative">
+            <div data-voice-visual className="relative min-h-[280px]">
               <svg
                 viewBox="0 0 400 300"
                 className="w-full"
@@ -867,9 +885,9 @@ export default function LandingPage() {
                     key={i}
                     data-voice-wave
                     d={`M50 ${150} Q125 ${100 - i * 18} 200 ${150} Q275 ${200 + i * 18} 350 ${150}`}
-                    stroke="#C4A46C"
+                    stroke="#d5b171"
                     strokeWidth={2.5 - i * 0.35}
-                    opacity={0.7 - i * 0.1}
+                    opacity={0.78 - i * 0.1}
                   />
                 ))}
                 {/* Background oscillation waves */}
@@ -878,9 +896,9 @@ export default function LandingPage() {
                     key={`bg-${i}`}
                     data-wave-line
                     d={`M50 ${150} Q125 ${100 - i * 18} 200 ${150} Q275 ${200 + i * 18} 350 ${150}`}
-                    stroke="#C4A46C"
+                    stroke="#d5b171"
                     strokeWidth={2.5 - i * 0.35}
-                    opacity={0.1}
+                    opacity={0.12}
                   />
                 ))}
                 {/* Frequency labels */}
@@ -888,7 +906,7 @@ export default function LandingPage() {
                   x="200"
                   y="258"
                   textAnchor="middle"
-                  fill="#8A837B"
+                  fill="#a79888"
                   fontSize="11"
                   fontFamily="var(--font-jakarta)"
                 >
@@ -898,7 +916,7 @@ export default function LandingPage() {
                   x="200"
                   y="278"
                   textAnchor="middle"
-                  fill="#6B6560"
+                  fill="#85786d"
                   fontSize="9"
                   fontFamily="var(--font-jakarta)"
                 >
@@ -907,9 +925,9 @@ export default function LandingPage() {
               </svg>
 
               {/* Decorative rings */}
-              <div className="absolute top-4 right-4 w-20 h-20 rounded-full border border-accent-savanna/10" />
-              <div className="absolute top-8 right-8 w-12 h-12 rounded-full border border-accent-savanna/20" />
-              <div className="absolute top-[2.75rem] right-[2.75rem] w-4 h-4 rounded-full bg-accent-savanna/30" />
+              <div className="absolute right-6 top-5 h-24 w-24 rounded-full border border-[#d5b171]/12" />
+              <div className="absolute right-10 top-9 h-14 w-14 rounded-full border border-[#d5b171]/18" />
+              <div className="absolute right-[3.15rem] top-[3.2rem] h-4 w-4 rounded-full bg-[#f3eadc]/90" />
             </div>
           </div>
         </div>
@@ -921,21 +939,28 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════
           SOLUTION
          ═══════════════════════════════════════════ */}
-      <section ref={solutionRef} className="py-20 md:py-28 bg-ev-cream">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <section ref={solutionRef} className="bg-ev-cream py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid items-center gap-14 md:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)] lg:gap-24">
             {/* Spectrogram mockup */}
             <div
               data-sol-left
-              className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-ev-charcoal p-1 shadow-[0_18px_40px_rgba(16,24,40,0.22),0_42px_80px_rgba(10,37,64,0.18),0_3px_0_rgba(255,255,255,0.06)_inset]"
+              className="relative aspect-[4/3] overflow-hidden rounded-[1.9rem] bg-[#0b1722] p-1.5 shadow-[0_22px_46px_rgba(16,24,40,0.24),0_48px_90px_rgba(12,33,61,0.14)]"
             >
-              <div className="w-full h-full rounded-xl overflow-hidden relative bg-gradient-to-br from-spectrogram-low via-[#0a2540] to-spectrogram-low">
+              <div className="relative h-full w-full overflow-hidden rounded-[1.55rem] bg-gradient-to-br from-[#11284e] via-[#10284a] to-[#112744]">
                 {/* Noise bands */}
                 {[12, 22, 35, 45, 58, 68, 78, 88].map((top, i) => (
                   <div
                     key={i}
-                    className="absolute h-[2px] left-[5%] right-[5%] bg-spectrogram-mid/20"
+                    className="absolute left-[5%] right-[5%] h-[2px] bg-[#1d5583]/26"
                     style={{ top: `${top}%`, opacity: 0.15 + (i % 3) * 0.08 }}
+                  />
+                ))}
+                {[24, 50, 76].map((left, i) => (
+                  <div
+                    key={`col-${i}`}
+                    className="absolute top-[4%] bottom-[4%] w-[1px] bg-[#285785]/18"
+                    style={{ left: `${left}%` }}
                   />
                 ))}
                 {/* Elephant call signal */}
