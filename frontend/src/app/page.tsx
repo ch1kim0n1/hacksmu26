@@ -412,6 +412,54 @@ export default function LandingPage() {
           },
         });
       });
+
+      /* ═══ TEAM — staggered card entrance ═══ */
+      gsap.from("[data-team-label]", {
+        y: 30,
+        opacity: 0,
+        duration: 0.7,
+        scrollTrigger: { trigger: teamRef.current, start: "top 85%" },
+      });
+      gsap.from("[data-team-desc]", {
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        delay: 0.15,
+        scrollTrigger: { trigger: teamRef.current, start: "top 85%" },
+      });
+
+      gsap.utils.toArray<HTMLElement>("[data-team-card]").forEach((card, i) => {
+        gsap.from(card, {
+          y: 50,
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.7,
+          delay: 0.1 + i * 0.12,
+          ease: "back.out(1.4)",
+          scrollTrigger: {
+            trigger: teamRef.current,
+            start: "top 78%",
+          },
+        });
+      });
+
+      /* Team divider line draws on */
+      gsap.from("[data-team-divider]", {
+        scaleX: 0,
+        transformOrigin: "center center",
+        duration: 1,
+        ease: "power2.inOut",
+        scrollTrigger: { trigger: teamRef.current, start: "top 75%" },
+      });
+
+      /* ElephantVoices badge */
+      gsap.from("[data-ev-badge]", {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        scrollTrigger: { trigger: "[data-ev-badge]", start: "top 90%" },
+      });
     }, containerRef);
 
     return () => ctx.revert();
@@ -1188,7 +1236,8 @@ export default function LandingPage() {
       <section
         ref={ctaRef}
         id="get-started"
-        className="relative py-20 md:py-28 bg-ev-charcoal overflow-hidden"
+        className="relative py-24 md:py-32 overflow-hidden"
+        style={{ background: "linear-gradient(180deg, #2C2926 0%, #1a1714 100%)" }}
       >
         {/* Animated BG rings */}
         <div className="absolute inset-0 flex items-center justify-center">
@@ -1233,13 +1282,13 @@ export default function LandingPage() {
             removal. Every cleaned recording brings us closer to understanding
             — and protecting — these remarkable animals.
           </p>
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          <Link
+            href="/upload"
             className="group inline-flex items-center gap-3 px-10 py-5 bg-accent-savanna text-ev-ivory text-lg font-semibold rounded-full hover:bg-accent-gold transition-all duration-300 hover:shadow-xl hover:shadow-accent-savanna/20"
           >
-            Back to the Top
+            Get Started
             <svg
-              className="w-5 h-5 transition-transform group-hover:-translate-y-1"
+              className="w-5 h-5 transition-transform group-hover:translate-x-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -1248,57 +1297,143 @@ export default function LandingPage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M5 10l7-7m0 0l7 7m-7-7v18"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
               />
             </svg>
-          </button>
-          <p className="mt-10 text-sm text-ev-dust/35">
-            Built in partnership with{" "}
-            <span className="text-accent-savanna/50">ElephantVoices</span>
-            {" "}for HackSMU 2026
-          </p>
+          </Link>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════
-          ABOUT — Team & Hackathon
+          TEAM & ABOUT
          ═══════════════════════════════════════════ */}
-      <section className="relative bg-ev-charcoal py-16 md:py-20 border-t border-white/[0.04]">
+      <section
+        ref={teamRef}
+        className="relative py-20 md:py-28 overflow-hidden"
+        style={{ background: "linear-gradient(180deg, #1a1714 0%, #141210 50%, #1a1714 100%)" }}
+      >
+        {/* Subtle grain texture */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")" }} />
+
+        {/* Floating ambient dots */}
+        <div className="pointer-events-none absolute inset-0">
+          {[
+            { left: "8%", top: "20%", size: "3px", opacity: 0.12 },
+            { left: "18%", top: "65%", size: "2px", opacity: 0.1 },
+            { left: "82%", top: "30%", size: "3px", opacity: 0.08 },
+            { left: "92%", top: "70%", size: "2px", opacity: 0.1 },
+            { left: "45%", top: "15%", size: "2px", opacity: 0.08 },
+            { left: "65%", top: "85%", size: "3px", opacity: 0.1 },
+          ].map((dot, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-accent-savanna"
+              style={{
+                left: dot.left,
+                top: dot.top,
+                width: dot.size,
+                height: dot.size,
+                opacity: dot.opacity,
+                animation: `float ${10 + i * 1.2}s ease-in-out ${i * 0.5}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+
         <div className="relative max-w-5xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-[#d5b171] mb-3 block">
-              The Team
-            </span>
-            <p className="text-sm text-ev-dust/50 max-w-lg mx-auto leading-relaxed">
-              Built in 36 hours at HackSMU 2026 — April 2026, Dallas, TX.
-              In partnership with{" "}
-              <span className="text-accent-savanna/70">ElephantVoices</span>, a
-              nonprofit dedicated to elephant cognition, communication, and
-              conservation.
+          {/* Section header */}
+          <div className="text-center mb-14">
+            <div className="flex items-center justify-center gap-4 mb-5" data-team-label>
+              <div className="h-px w-10 bg-[#d5b171]/30" />
+              <span className="text-xs font-semibold uppercase tracking-[0.28em] text-[#d5b171]">
+                The Team
+              </span>
+              <div className="h-px w-10 bg-[#d5b171]/30" />
+            </div>
+            <p className="text-sm text-[#b7aca0]/70 max-w-md mx-auto leading-relaxed" data-team-desc>
+              Built in 36 hours at HackSMU 2026 — April 2026, Dallas, TX
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+          {/* Team cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-6 max-w-3xl mx-auto mb-16">
             {[
-              { name: "Dmitry Moiseenko", initials: "DM" },
-              { name: "Vladislav Kondratyev", initials: "VK" },
-              { name: "Arnav Kumar", initials: "AK" },
-              { name: "Tanish Murali", initials: "TM" },
+              { name: "Dmitry Moiseenko", initials: "DM", linkedin: "https://www.linkedin.com/in/moiseenko-dmitry/" },
+              { name: "Vladislav Kondratyev", initials: "VK", linkedin: "https://www.linkedin.com/in/vladislav-kondratyev/" },
+              { name: "Arnav Kumar", initials: "AK", linkedin: "https://www.linkedin.com/in/arnav-kumar2932/" },
+              { name: "Tanish Murali", initials: "TM", linkedin: "https://www.linkedin.com/in/tanish-murali/" },
             ].map((member, i) => (
-              <div
+              <a
                 key={i}
-                className="rounded-xl p-4 text-center border border-white/[0.06] bg-white/[0.02]"
+                href={member.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-team-card
+                className="group relative rounded-2xl p-5 md:p-6 text-center transition-all duration-500 hover:-translate-y-2"
+                style={{
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
               >
-                <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-accent-savanna/10">
-                  <span className="text-xs font-bold text-accent-savanna">
-                    {member.initials}
-                  </span>
+                {/* Hover glow */}
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: "radial-gradient(circle at 50% 30%, rgba(196,164,108,0.08) 0%, transparent 70%)" }} />
+
+                <div className="relative">
+                  {/* Avatar */}
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-accent-savanna/10" style={{ background: "linear-gradient(135deg, rgba(196,164,108,0.15) 0%, rgba(196,164,108,0.05) 100%)", border: "1px solid rgba(196,164,108,0.15)" }}>
+                    <span className="text-sm font-bold text-accent-savanna/80 group-hover:text-accent-savanna transition-colors duration-300">
+                      {member.initials}
+                    </span>
+                  </div>
+
+                  {/* Name */}
+                  <p className="text-sm font-medium text-ev-cream/80 group-hover:text-ev-cream transition-colors duration-300 mb-3">
+                    {member.name}
+                  </p>
+
+                  {/* LinkedIn icon */}
+                  <div className="flex justify-center">
+                    <svg className="w-4 h-4 text-[#b7aca0]/30 group-hover:text-accent-savanna/70 transition-all duration-300 group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                  </div>
                 </div>
-                <p className="text-sm font-medium text-ev-cream/80">
-                  {member.name}
-                </p>
-              </div>
+              </a>
             ))}
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center justify-center mb-14">
+            <div
+              data-team-divider
+              className="h-px w-48 md:w-64"
+              style={{ background: "linear-gradient(90deg, transparent 0%, rgba(196,164,108,0.25) 50%, transparent 100%)" }}
+            />
+          </div>
+
+          {/* ElephantVoices partnership */}
+          <div
+            data-ev-badge
+            className="max-w-lg mx-auto text-center"
+          >
+            <div className="inline-flex items-center gap-2 mb-4">
+              <svg className="w-5 h-5 text-accent-savanna/50" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-accent-savanna/50">
+                In Partnership With
+              </span>
+              <svg className="w-5 h-5 text-accent-savanna/50" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </div>
+            <p className="text-xl md:text-2xl font-display font-semibold text-ev-cream/60 mb-3">
+              ElephantVoices
+            </p>
+            <p className="text-sm text-[#b7aca0]/50 leading-relaxed max-w-sm mx-auto">
+              A nonprofit dedicated to elephant cognition, communication, and
+              conservation — whose decades of field research make this work possible.
+            </p>
           </div>
         </div>
       </section>
@@ -1306,26 +1441,26 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════
           FOOTER
          ═══════════════════════════════════════════ */}
-      <footer className="bg-ev-charcoal border-t border-ev-charcoal-light/20 py-8 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="py-6 px-6" style={{ background: "#1a1714", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <Link
             href="/"
-            className="text-lg font-display font-semibold text-accent-savanna"
+            className="text-base font-display font-semibold text-accent-savanna/60 hover:text-accent-savanna transition-colors"
           >
             EchoField
           </Link>
-          <div className="flex items-center gap-6">
-            {["Upload", "Database"].map((item) => (
+          <div className="flex items-center gap-5">
+            {["Upload", "Recordings", "Database"].map((item) => (
               <Link
                 key={item}
                 href={`/${item.toLowerCase()}`}
-                className="text-xs text-ev-dust/40 hover:text-accent-savanna transition-colors"
+                className="text-xs text-[#b7aca0]/30 hover:text-accent-savanna/60 transition-colors"
               >
                 {item}
               </Link>
             ))}
           </div>
-          <p className="text-xs text-ev-dust/25">
+          <p className="text-xs text-[#b7aca0]/20">
             &copy; 2026 EchoField &middot; HackSMU
           </p>
         </div>
