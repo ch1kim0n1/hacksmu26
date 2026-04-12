@@ -1,12 +1,41 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroGlobe from "@/components/hero/HeroGlobe";
-import { useSceneTransition } from "@/components/transition/SceneTransitionProvider";
+
+type Tusk3DProps = { className?: string };
+
+function LazyTusk3D(props: Tusk3DProps) {
+  const [Comp, setComp] = useState<ComponentType<Tusk3DProps> | null>(null);
+  useEffect(() => {
+    import("@/components/hero/Tusk3D").then((m) => setComp(() => m.default));
+  }, []);
+  return Comp ? <Comp {...props} /> : null;
+}
+
+type ParticleFieldProps = {
+  className?: string;
+  count?: number;
+  color?: string;
+  speed?: number;
+  size?: number;
+};
+
+function LazyParticleField(props: ParticleFieldProps) {
+  const [Comp, setComp] = useState<ComponentType<ParticleFieldProps> | null>(
+    null,
+  );
+  useEffect(() => {
+    import("@/components/hero/ParticleField").then((m) =>
+      setComp(() => m.default),
+    );
+  }, []);
+  return Comp ? <Comp {...props} /> : null;
+}
 
 /* ────────────────────────────────────────────
    Animated counter (counts up on scroll)
@@ -42,7 +71,7 @@ function Counter({
           requestAnimationFrame(tick);
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -58,7 +87,7 @@ function Counter({
 }
 
 /* ────────────────────────────────────────────
-   SVG Wave Divider — smooth section transitions
+   SVG Wave Divider
    ──────────────────────────────────────────── */
 function WaveDivider({
   topColor,
@@ -77,7 +106,16 @@ function WaveDivider({
   };
 
   return (
-    <div className="wave-divider" style={{ background: bottomColor, marginTop: "-1px", marginBottom: "-6px", position: "relative", zIndex: 2 }}>
+    <div
+      className="wave-divider"
+      style={{
+        background: bottomColor,
+        marginTop: "-1px",
+        marginBottom: "-6px",
+        position: "relative",
+        zIndex: 2,
+      }}
+    >
       <svg
         viewBox="0 0 1440 120"
         preserveAspectRatio="none"
@@ -93,8 +131,6 @@ function WaveDivider({
    Main Landing Page
    ──────────────────────────────────────────── */
 export default function LandingPage() {
-  const { isTransitioning, startDashboardTransition } = useSceneTransition();
-  const [isGlobeActivated, setIsGlobeActivated] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const crisisRef = useRef<HTMLElement>(null);
@@ -104,6 +140,7 @@ export default function LandingPage() {
   const stepsRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
+  const [mobileNav, setMobileNav] = useState(false);
 
   /* ── GSAP orchestration ── */
   useEffect(() => {
@@ -111,57 +148,61 @@ export default function LandingPage() {
 
     const ctx = gsap.context(() => {
       /* ═══ HERO INTRO ═══ */
-      const hero = gsap.timeline({ defaults: { ease: "power3.out" } });
-      hero
-        .from("[data-nav]", { y: -50, opacity: 0, duration: 0.8 })
-        .from("[data-scroll-ind]", { opacity: 0, y: -10, duration: 0.4 }, "-=0.2");
+      const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      heroTl
+        .from("[data-nav]", { y: -40, opacity: 0, duration: 0.8 })
+        .from(
+          "[data-hero-line]",
+          {
+            y: 120,
+            opacity: 0,
+            stagger: 0.18,
+            duration: 1.1,
+            ease: "power4.out",
+          },
+          "-=0.4",
+        )
+        .from(
+          "[data-hero-sub]",
+          { y: 40, opacity: 0, duration: 0.8 },
+          "-=0.5",
+        )
+        .from(
+          "[data-hero-cta]",
+          { y: 30, opacity: 0, duration: 0.6 },
+          "-=0.4",
+        )
+        .from(
+          "[data-scroll-ind]",
+          { opacity: 0, y: -10, duration: 0.4 },
+          "-=0.2",
+        );
 
-      /* nav fades from transparent to solid as the hero scrolls away */
-      gsap.set("[data-nav]", {
-        backgroundColor: "rgba(44,41,38,0)",
-        backdropFilter: "blur(0px)",
-        borderBottomColor: "rgba(255,255,255,0)",
-      });
-      gsap.set("[data-nav-brand]", {
-        color: "#3f3121",
-      });
-      gsap.set("[data-nav-logo]", {
-        filter: "brightness(0) saturate(100%)",
-      });
-      gsap.to("[data-nav]", {
-        backgroundColor: "rgba(44,41,38,0.92)",
-        backdropFilter: "blur(16px)",
-        borderBottomColor: "rgba(255,255,255,0.1)",
-        ease: "none",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top top",
-          end: "+=180",
-          scrub: true,
+      /* Nav solidify on scroll */
+      ScrollTrigger.create({
+        trigger: heroRef.current,
+        start: "5% top",
+        onEnter: () => {
+          gsap.to("[data-nav]", {
+            backgroundColor: "rgba(44,41,38,0.92)",
+            backdropFilter: "blur(20px)",
+            duration: 0.4,
+          });
+          gsap.to("[data-nav-gradient]", { opacity: 0, duration: 0.3 });
         },
-      });
-      gsap.to("[data-nav-brand]", {
-        color: "#F7F3EA",
-        ease: "none",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top top",
-          end: "+=180",
-          scrub: true,
-        },
-      });
-      gsap.to("[data-nav-logo]", {
-        filter: "brightness(1) saturate(100%)",
-        ease: "none",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top top",
-          end: "+=180",
-          scrub: true,
+        onLeaveBack: () => {
+          gsap.to("[data-nav]", {
+            backgroundColor: "transparent",
+            backdropFilter: "none",
+            duration: 0.4,
+          });
+          gsap.to("[data-nav-gradient]", { opacity: 1, duration: 0.3 });
         },
       });
 
-      /* scroll indicator bounce */
+      /* Hero parallax removed per design — elephant stays fixed */
+
+      /* Scroll indicator bounce */
       gsap.to("[data-scroll-ind]", {
         y: 10,
         duration: 1.4,
@@ -170,7 +211,7 @@ export default function LandingPage() {
         repeat: -1,
       });
 
-      /* ═══ CRISIS — scrub-driven stat entrance ═══ */
+      /* ═══ CRISIS ═══ */
       gsap.from("[data-crisis-label]", {
         x: -60,
         opacity: 0,
@@ -184,7 +225,6 @@ export default function LandingPage() {
         scrollTrigger: { trigger: crisisRef.current, start: "top 80%" },
       });
 
-      /* Stats: scrub-based scale + fade for dramatic entrance */
       gsap.utils.toArray<HTMLElement>("[data-crisis-stat]").forEach((el, i) => {
         gsap.from(el, {
           y: 80,
@@ -200,7 +240,7 @@ export default function LandingPage() {
         });
       });
 
-      /* ═══ THREATS — 3D card entrance ═══ */
+      /* ═══ THREATS ═══ */
       gsap.from("[data-threat-title]", {
         y: 40,
         opacity: 0,
@@ -208,79 +248,61 @@ export default function LandingPage() {
         scrollTrigger: { trigger: threatsRef.current, start: "top 80%" },
       });
 
-      gsap.utils.toArray<HTMLElement>("[data-threat-card]").forEach((card, i) => {
-        gsap.from(card, {
-          y: 100,
-          opacity: 0,
-          rotateX: -12,
-          scale: 0.9,
-          duration: 0.9,
-          delay: i * 0.15,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: threatsRef.current,
-            start: "top 70%",
-          },
+      gsap.utils
+        .toArray<HTMLElement>("[data-threat-card]")
+        .forEach((card, i) => {
+          gsap.from(card, {
+            y: 100,
+            opacity: 0,
+            rotateX: -12,
+            scale: 0.9,
+            duration: 0.9,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: threatsRef.current,
+              start: "top 70%",
+            },
+          });
         });
-      });
 
-      /* Background decorative shapes float in */
-      gsap.utils.toArray<HTMLElement>("[data-threat-deco]").forEach((el, i) => {
-        gsap.from(el, {
-          scale: 0,
-          opacity: 0,
-          rotation: -45,
-          duration: 1.2,
-          delay: 0.3 + i * 0.2,
-          ease: "power4.out",
-          scrollTrigger: { trigger: threatsRef.current, start: "top 75%" },
-        });
-        /* Continuous float */
-        gsap.to(el, {
-          y: -15 + Math.random() * 30,
-          x: -10 + Math.random() * 20,
-          duration: 3 + Math.random() * 2,
-          ease: "sine.inOut",
-          yoyo: true,
-          repeat: -1,
-        });
-      });
-
-      /* ═══ VOICE — wave drawing with scrub ═══ */
+      /* ═══ VOICE ═══ */
       const voiceTl = gsap.timeline({
         scrollTrigger: { trigger: voiceRef.current, start: "top 70%" },
       });
       voiceTl
         .from("[data-voice-title]", { y: 40, opacity: 0, duration: 0.6 })
-        .from("[data-voice-text]", {
-          y: 25,
-          opacity: 0,
-          stagger: 0.1,
-          duration: 0.5,
-        }, "-=0.3")
-        .from("[data-voice-visual]", {
-          scale: 0.85,
-          opacity: 0,
-          duration: 0.8,
-        }, "-=0.4");
+        .from(
+          "[data-voice-text]",
+          { y: 25, opacity: 0, stagger: 0.1, duration: 0.5 },
+          "-=0.3",
+        )
+        .from(
+          "[data-voice-visual]",
+          { scale: 0.85, opacity: 0, duration: 0.8 },
+          "-=0.4",
+        );
 
-      /* Wave lines scrub animation — stroke draws on as you scroll */
-      gsap.utils.toArray<SVGPathElement>("[data-voice-wave]").forEach((path) => {
-        const length = path.getTotalLength?.() || 400;
-        gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
-        gsap.to(path, {
-          strokeDashoffset: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: voiceRef.current,
-            start: "top 60%",
-            end: "bottom 70%",
-            scrub: 1.5,
-          },
+      gsap.utils
+        .toArray<SVGPathElement>("[data-voice-wave]")
+        .forEach((path) => {
+          const length = path.getTotalLength?.() || 400;
+          gsap.set(path, {
+            strokeDasharray: length,
+            strokeDashoffset: length,
+          });
+          gsap.to(path, {
+            strokeDashoffset: 0,
+            ease: "none",
+            scrollTrigger: {
+              trigger: voiceRef.current,
+              start: "top 60%",
+              end: "bottom 70%",
+              scrub: 1.5,
+            },
+          });
         });
-      });
 
-      /* Continuous wave oscillation */
       gsap.to("[data-wave-line]", {
         y: 8,
         duration: 2,
@@ -290,7 +312,7 @@ export default function LandingPage() {
         stagger: 0.25,
       });
 
-      /* ═══ SOLUTION — slide in from sides ═══ */
+      /* ═══ SOLUTION ═══ */
       gsap.from("[data-sol-left]", {
         x: -80,
         opacity: 0,
@@ -306,7 +328,6 @@ export default function LandingPage() {
         scrollTrigger: { trigger: solutionRef.current, start: "top 75%" },
       });
 
-      /* Spectrogram scanning line */
       gsap.fromTo(
         "[data-scan-line]",
         { left: "5%" },
@@ -319,10 +340,9 @@ export default function LandingPage() {
             end: "bottom 60%",
             scrub: 2,
           },
-        }
+        },
       );
 
-      /* Feature items stagger in */
       gsap.from("[data-sol-feature]", {
         x: 30,
         opacity: 0,
@@ -331,24 +351,25 @@ export default function LandingPage() {
         scrollTrigger: { trigger: "[data-sol-features]", start: "top 85%" },
       });
 
-      /* ═══ STEPS — dramatic stagger with scale ═══ */
-      gsap.utils.toArray<HTMLElement>("[data-step-card]").forEach((card, i) => {
-        gsap.from(card, {
-          y: 80,
-          opacity: 0,
-          scale: 0.85,
-          rotateY: i % 2 === 0 ? -8 : 8,
-          duration: 0.8,
-          delay: i * 0.2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: stepsRef.current,
-            start: "top 75%",
-          },
+      /* ═══ STEPS ═══ */
+      gsap.utils
+        .toArray<HTMLElement>("[data-step-card]")
+        .forEach((card, i) => {
+          gsap.from(card, {
+            y: 80,
+            opacity: 0,
+            scale: 0.85,
+            rotateY: i % 2 === 0 ? -8 : 8,
+            duration: 0.8,
+            delay: i * 0.2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: stepsRef.current,
+              start: "top 75%",
+            },
+          });
         });
-      });
 
-      /* Step connector lines draw on */
       gsap.from("[data-step-line]", {
         scaleX: 0,
         transformOrigin: "left center",
@@ -358,7 +379,6 @@ export default function LandingPage() {
         scrollTrigger: { trigger: stepsRef.current, start: "top 65%" },
       });
 
-      /* Step numbers count up */
       gsap.from("[data-step-num]", {
         scale: 0,
         opacity: 0,
@@ -368,7 +388,7 @@ export default function LandingPage() {
         scrollTrigger: { trigger: stepsRef.current, start: "top 70%" },
       });
 
-      /* ═══ CTA — expanding rings + content rise ═══ */
+      /* ═══ CTA ═══ */
       gsap.from("[data-cta-inner]", {
         y: 60,
         opacity: 0,
@@ -378,20 +398,18 @@ export default function LandingPage() {
         scrollTrigger: { trigger: ctaRef.current, start: "top 80%" },
       });
 
-      /* CTA background rings expand with scrub */
-      gsap.utils.toArray<HTMLElement>("[data-cta-ring]").forEach((ring, i) => {
-        gsap.from(ring, {
-          scale: 0.3,
-          opacity: 0,
-          duration: 1.2,
-          delay: i * 0.15,
-          ease: "power1.out",
-          scrollTrigger: {
-            trigger: ctaRef.current,
-            start: "top 85%",
-          },
+      gsap.utils
+        .toArray<HTMLElement>("[data-cta-ring]")
+        .forEach((ring, i) => {
+          gsap.from(ring, {
+            scale: 0.3,
+            opacity: 0,
+            duration: 1.2,
+            delay: i * 0.15,
+            ease: "power1.out",
+            scrollTrigger: { trigger: ctaRef.current, start: "top 85%" },
+          });
         });
-      });
     }, containerRef);
 
     return () => ctx.revert();
@@ -400,152 +418,344 @@ export default function LandingPage() {
   return (
     <div ref={containerRef} className="landing-page">
       {/* ═══════════════════════════════════════════
-          NAV
+          NAV — single, clean, no decorative edge
          ═══════════════════════════════════════════ */}
-      <nav
-        data-nav
-        className="fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent"
-      >
-          <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-            <Link
-              href="/"
-              className="flex items-center gap-2"
-            >
-            <Image src="/logo.png" alt="EchoField logo" width={52} height={52} className="object-contain" data-nav-logo />
-            <span className="text-4xl font-display font-semibold text-[#3f3121]" data-nav-brand>EchoField</span>
+      <nav data-nav className="fixed top-0 left-0 right-0 z-50">
+        {/* Gradient for text legibility over hero */}
+        <div
+          data-nav-gradient
+          className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-transparent pointer-events-none"
+        />
+
+        <div className="relative max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-10 py-5">
+          <Link
+            href="/"
+            className="text-xl font-display font-semibold text-white/90 tracking-wide"
+          >
+            EchoField
           </Link>
 
+          {/* Desktop links */}
+          <div className="hidden md:flex items-center gap-10">
+            {["About", "Upload", "Database"].map((item) => (
+              <Link
+                key={item}
+                href={`/${item.toLowerCase()}`}
+                className="text-sm font-medium text-white/80 hover:text-white transition-colors duration-300"
+              >
+                {item}
+              </Link>
+            ))}
+            <Link
+              href="/upload"
+              className="px-6 py-2.5 rounded-full bg-white/15 border border-white/30 text-white text-sm font-semibold hover:bg-white/25 transition-all duration-300 backdrop-blur-sm"
+            >
+              Get Started
+            </Link>
+          </div>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileNav(!mobileNav)}
+            className="md:hidden flex items-center justify-center w-10 h-10 text-white/80"
+            aria-label="Menu"
+            aria-expanded={mobileNav}
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {mobileNav ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </svg>
+          </button>
+        </div>
+
+        {/* Mobile menu */}
+        <div
+          className={`md:hidden bg-ev-charcoal/95 backdrop-blur-xl border-t border-white/10 px-6 overflow-hidden transition-all duration-300 ease-out ${
+            mobileNav ? "max-h-60 py-4 opacity-100" : "max-h-0 py-0 opacity-0"
+          }`}
+        >
+          {["About", "Upload", "Database"].map((item) => (
+            <Link
+              key={item}
+              href={`/${item.toLowerCase()}`}
+              onClick={() => setMobileNav(false)}
+              className="block py-3 text-sm font-medium text-white/60 hover:text-accent-savanna transition-colors"
+            >
+              {item}
+            </Link>
+          ))}
         </div>
       </nav>
 
       {/* ═══════════════════════════════════════════
-          HERO — Globe
+          HERO — dark cinematic, globe behind text
          ═══════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className={`relative min-h-screen bg-[#c5b294] text-white ${isTransitioning ? "overflow-visible" : "overflow-hidden"}`}
+        className="relative min-h-screen overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(180deg, #0D0905 0%, #1A0E07 32%, #3D2010 68%, #8B5E3C 100%)",
+        }}
       >
-        {/* Background layers */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,#dcccb6_0%,#c3ab88_38%,#a8875c_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_26%,rgba(255,248,236,0.52),transparent_24%),radial-gradient(circle_at_78%_36%,rgba(255,236,196,0.18),transparent_20%),radial-gradient(circle_at_18%_18%,rgba(104,75,38,0.22),transparent_18%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0)_18%,rgba(103,73,37,0.14)_62%,rgba(55,37,18,0.28)_100%)]" />
+        {/* Texture */}
+        <Image
+          src="/background_texture.jpg"
+          alt=""
+          fill
+          priority
+          className="pointer-events-none object-cover opacity-[0.07] mix-blend-screen"
+          sizes="100vw"
+        />
+
+        {/* Warm radial glow at center */}
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 60% at 52% 50%, rgba(160,100,38,0.22) 0%, transparent 65%)",
+          }}
+        />
+
+        {/* WebGL particle starfield */}
+        <LazyParticleField
+          className="z-[1] opacity-25"
+          count={100}
+          color="#C4A46C"
+          speed={0.004}
+          size={0.016}
+        />
+
+        {/* ── GLOBE — hero centerpiece, BEHIND text ── */}
+        <div
+          className="absolute z-[2] pointer-events-none"
+          style={{
+            left: "50%",
+            top: "50%",
+            transform: "translate(-46%, -50%)",
+            width: "clamp(380px, 72vh, 880px)",
+            height: "clamp(380px, 72vh, 880px)",
+          }}
+        >
+          {/* Atmospheric halo */}
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              inset: "-18%",
+              background:
+                "radial-gradient(ellipse, rgba(196,164,108,0.1) 0%, transparent 65%)",
+            }}
+          />
+          <HeroGlobe
+            wrapperClassName="absolute inset-0 z-[1] overflow-visible"
+            globeClassName="absolute inset-0"
+            showSceneBackdrop={false}
+            showGrid={false}
+            showGlow={false}
+            sceneOptions={{
+              backgroundColor: "rgba(0,0,0,0)",
+              showStars: false,
+              atmosphereColor: "#C4A46C",
+              atmosphereAltitude: 0.1,
+              idleRotationSpeed: 0.025,
+              cameraPosition: { x: 0, y: 8, z: 248 },
+              controls: { minDistance: 180, maxDistance: 280 },
+            }}
+          />
+        </div>
+
+        {/* ── ELEPHANT — atmospheric bottom-left, BEHIND text ── */}
+        <div
+          className="absolute bottom-0 z-[3] pointer-events-none"
+          style={{
+            left: "-2vw",
+            width: "clamp(260px, 34vw, 620px)",
+            height: "clamp(220px, 58vh, 820px)",
+          }}
+        >
           <Image
-            src="/background_texture.jpg"
+            src="/elephant-background.png"
             alt=""
             fill
             priority
-            className="pointer-events-none object-cover opacity-[0.3] mix-blend-multiply"
-            sizes="100vw"
+            quality={95}
+            className="object-contain object-left-bottom"
+            sizes="34vw"
           />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_24%,rgba(255,255,255,0.16),transparent_22%),radial-gradient(circle_at_72%_32%,rgba(255,255,255,0.1),transparent_18%),radial-gradient(circle_at_48%_68%,rgba(162,121,64,0.18),transparent_24%)]" />
+          {/* Blend edges into dark bg */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(13,9,5,0.5) 0%, transparent 28%), linear-gradient(180deg, transparent 48%, rgba(13,9,5,0.45) 100%)",
+            }}
+          />
         </div>
 
-        {/* Light overlays */}
-        <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_80%_26%,rgba(255,255,255,0.12),transparent_16%),linear-gradient(180deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0)_24%,rgba(76,50,24,0.14)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 z-[2] h-[32vh] bg-[linear-gradient(180deg,rgba(208,177,124,0)_0%,rgba(167,130,78,0.16)_40%,rgba(90,61,27,0.3)_100%)]" />
-
-        {/* Elephant + Globe composition */}
-        <div className="absolute inset-0 z-[3]">
-          {/* Elephant image */}
-          <div className="absolute bottom-[-1vh] left-[-3vw] h-[68vh] w-[50vw] min-w-[520px] max-w-[900px] sm:bottom-[-1vh] sm:left-[-2vw] sm:h-[70vh] sm:w-[48vw] lg:bottom-0 lg:left-[-1vw] lg:h-[72vh] lg:w-[46vw] lg:max-w-[940px]">
-            <Image
-              src="/elephant-background.png"
-              alt="Elephant holding the globe on its trunk"
-              fill
-              priority
-              className="object-contain object-left-bottom drop-shadow-[0_28px_38px_rgba(67,43,16,0.18)]"
-              sizes="(min-width: 1024px) 40vw, 44vw"
-            />
-          </div>
-
-          {/* Get started hint */}
-          <div className="pointer-events-none absolute left-[28%] top-[25%] z-[11] flex flex-col items-center gap-1">
-            <span className="text-sm font-medium italic text-[#5a3e22]/80 tracking-wide">get started</span>
-            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" className="-mt-1 -rotate-12">
-              <path
-                d="M18 4 C10 10, 6 20, 14 28"
-                stroke="#7b5a32"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M10 26 L14 29 L16 23"
-                stroke="#7b5a32"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-              />
-            </svg>
-          </div>
-
-          {/* Interactive globe */}
-            <button
-              id="landing-globe-trigger"
-              type="button"
-              onClick={() => {
-                if (isTransitioning) return;
-                setIsGlobeActivated(true);
-                const el = document.getElementById("landing-globe-trigger");
-                const rect = el?.getBoundingClientRect();
-                if (!rect) return;
-                startDashboardTransition({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
-              }}
-            disabled={isTransitioning}
-            aria-label="Enter EchoField dashboard"
-            className={`pointer-events-auto absolute left-[49%] top-[41%] h-[clamp(280px,34vw,500px)] w-[clamp(280px,34vw,500px)] -translate-x-1/2 -translate-y-1/2 transform-gpu rounded-full transition-transform ease-[cubic-bezier(0.2,0,0.8,1)] ${
-              isTransitioning
-                ? "z-[250] scale-[22] duration-[2200ms] cursor-default"
-                : "z-[10] scale-100 duration-[400ms] hover:scale-[1.03] cursor-pointer"
-            }`}
-          >
-            <HeroGlobe
-              wrapperClassName="absolute inset-0 z-[1] overflow-visible"
-              globeClassName="absolute inset-0"
-              showSceneBackdrop={false}
-              showGrid={false}
-              showGlow={false}
-              sceneOptions={{
-                backgroundColor: "rgba(0,0,0,0)",
-                showStars: false,
-                atmosphereColor: "#4f7fc4",
-                atmosphereAltitude: 0.1,
-                idleRotationSpeed: 0.03,
-                cameraPosition: { x: 0, y: 8, z: 248 },
-                controls: { minDistance: 180, maxDistance: 280 },
-              }}
-            />
-          </button>
-          </div>
-
-          {/* Mission text */}
-          <div
-            className={`pointer-events-none absolute right-[4vw] top-[31%] z-[8] hidden max-w-[28rem] px-7 py-7 text-[#4e3b28] lg:block ${
-              isGlobeActivated ? "invisible opacity-0" : "visible opacity-100"
-            }`}
-          >
-            <p className="font-[Arial] text-sm font-semibold uppercase tracking-[0.28em] text-[#7b6246] underline underline-offset-[6px]">
-              Mission Statement
-            </p>
-          <h2 className="mt-4 text-[2.15rem] font-bold leading-tight tracking-[-0.04em] text-[#3f3121]">
-            Reveal the intelligence hidden inside every field recording.
-          </h2>
+        {/* ── 3D TUSKS — decorative, behind text, in front of elephant ── */}
+        <div
+          className="absolute z-[4] pointer-events-none hidden md:block"
+          style={{
+            left: "18%",
+            right: "18%",
+            top: "28%",
+            bottom: "0",
+          }}
+        >
+          <LazyTusk3D className="w-full h-full" />
         </div>
-        {/* Scroll indicator */}
+
+        {/* ── TEXT — foreground z-[6], white, centered ── */}
+        <div
+          data-hero-content
+          className="relative z-[6] flex flex-col items-center justify-center min-h-screen text-center px-6 pointer-events-none"
+          style={{ paddingBottom: "6vh" }}
+        >
+          {/* Eyebrow label */}
           <div
-            data-scroll-ind
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
+            data-hero-sub
+            className="inline-flex items-center gap-3 mb-6 md:mb-8"
           >
-            <span className="text-[11px] text-[#4b3520]/90 tracking-[0.25em] uppercase font-medium">
-              Scroll
+            <div
+              className="h-px w-12"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(196,164,108,0.5))",
+              }}
+            />
+            <span
+              className="font-semibold tracking-[0.3em] uppercase"
+              style={{ fontSize: "10px", color: "rgba(196,164,108,0.65)" }}
+            >
+              Elephant Conservation Research
             </span>
-            <svg className="w-4 h-4 text-[#4b3520]/85" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7" />
-            </svg>
+            <div
+              className="h-px w-12"
+              style={{
+                background:
+                  "linear-gradient(90deg, rgba(196,164,108,0.5), transparent)",
+              }}
+            />
           </div>
 
+          {/* ECHO — solid white */}
+          <div className="overflow-hidden">
+            <h1
+              data-hero-line
+              className="font-display font-bold leading-[0.83] tracking-[-0.045em] text-white"
+              style={{
+                fontSize: "clamp(5rem, 14vw, 13rem)",
+                textShadow: "0 4px 48px rgba(0,0,0,0.7)",
+              }}
+            >
+              ECHO
+            </h1>
+          </div>
+          {/* FIELD — outline */}
+          <div className="overflow-hidden mt-1">
+            <h1
+              data-hero-line
+              className="font-display font-bold leading-[0.83] tracking-[-0.045em]"
+              style={{
+                fontSize: "clamp(5rem, 14vw, 13rem)",
+                WebkitTextStroke: "1.5px rgba(255,255,255,0.65)",
+                color: "transparent",
+              }}
+            >
+              FIELD
+            </h1>
+          </div>
+
+          {/* Subtitle */}
+          <p
+            data-hero-sub
+            className="mt-8 leading-relaxed max-w-sm"
+            style={{
+              fontSize: "clamp(0.9rem, 1.3vw, 1.05rem)",
+              color: "rgba(255,255,255,0.42)",
+              textShadow: "0 2px 20px rgba(0,0,0,0.9)",
+            }}
+          >
+            Reveal the intelligence hidden inside every elephant field
+            recording. AI-powered noise removal for conservation research.
+          </p>
+
+          {/* CTA */}
+          <div data-hero-cta className="mt-10 pointer-events-auto">
+            <Link
+              href="/upload"
+              className="inline-flex items-center gap-3 px-9 py-4 text-sm font-semibold rounded-full transition-all duration-300 group"
+              style={{
+                background: "rgba(196,164,108,0.14)",
+                border: "1px solid rgba(196,164,108,0.42)",
+                color: "rgba(255,255,255,0.92)",
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
+              }}
+            >
+              Start Analyzing
+              <svg
+                className="w-4 h-4 transition-transform group-hover:translate-x-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div
+          data-scroll-ind
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-[7]"
+        >
+          <span
+            className="text-[11px] tracking-[0.25em] uppercase font-medium"
+            style={{ color: "rgba(196,164,108,0.4)" }}
+          >
+            Scroll
+          </span>
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            style={{ color: "rgba(196,164,108,0.35)" }}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 14l-7 7m0 0l-7-7"
+            />
+          </svg>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════════
@@ -554,19 +764,15 @@ export default function LandingPage() {
       <section
         ref={crisisRef}
         id="crisis"
-        className="relative pt-0 pb-20 md:pb-28"
+        className="relative pt-20 md:pt-32 pb-20 md:pb-28"
         style={{
           background:
             "linear-gradient(180deg, #8B5E3C 0%, #B0764E 15%, #C4785A 30%, #C48B5A 50%, #C89E60 70%, #C4A46C 100%)",
         }}
       >
-        {/* ── Wave: Hero → Crisis (inside section so no seam) ── */}
-        <div className="w-full" style={{ marginTop: "-1px", marginBottom: "-1px" }}>
-          <svg viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true" className="block w-full" style={{ height: "clamp(60px, 10vw, 140px)" }}>
-            <path d="M0,0 L1440,0 L1440,30 C1200,110 900,10 600,60 C300,110 120,40 0,80 L0,0 Z" fill="#c5b294" />
-          </svg>
-        </div>
-        {/* Subtle texture overlay */}
+        {/* Straight edge: Hero -> Crisis */}
+
+        {/* Subtle texture */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -577,13 +783,22 @@ export default function LandingPage() {
 
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="mb-14">
-            <span data-crisis-label className="text-sm font-semibold text-white/50 tracking-[0.2em] uppercase mb-4 block">
+            <span
+              data-crisis-label
+              className="text-sm font-semibold text-white/50 tracking-[0.2em] uppercase mb-4 block"
+            >
               The Crisis
             </span>
-            <h2 data-crisis-title className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-white mb-5">
+            <h2
+              data-crisis-title
+              className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-white mb-5"
+            >
               They&apos;re Disappearing
             </h2>
-            <p data-crisis-title className="text-lg text-white/60 max-w-xl">
+            <p
+              data-crisis-title
+              className="text-lg text-white/60 max-w-xl"
+            >
               African elephant populations have plummeted. Without action, these
               keystone species face extinction within our lifetime.
             </p>
@@ -634,44 +849,33 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Wave: Crisis → Threats ── */}
+      {/* Wave: Crisis -> Threats */}
       <WaveDivider topColor="#C4A46C" bottomColor="#F8F5F0" variant={2} />
 
       {/* ═══════════════════════════════════════════
-          THREATS
+          THREATS — clean cards
          ═══════════════════════════════════════════ */}
       <section
         ref={threatsRef}
         className="relative py-20 md:py-28 overflow-hidden"
         style={{
-          background: "linear-gradient(180deg, #F8F5F0 0%, #F0EBE3 40%, #EDE7DF 100%)",
+          background:
+            "linear-gradient(180deg, #F8F5F0 0%, #F0EBE3 40%, #EDE7DF 100%)",
         }}
       >
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 dot-pattern opacity-[0.3]" />
-
-        {/* Floating decorative shapes */}
-        <div data-threat-deco className="absolute top-16 right-[10%] w-24 h-24 rounded-full border border-accent-savanna/10" />
-        <div data-threat-deco className="absolute top-40 left-[8%] w-16 h-16 rounded-xl border border-nature-sage/10 rotate-12" />
-        <div data-threat-deco className="absolute bottom-20 right-[20%] w-20 h-20 rounded-full border border-nature-terracotta/10" />
-        <div data-threat-deco className="absolute bottom-32 left-[15%] w-12 h-12 rounded-lg border border-accent-gold/10 -rotate-6" />
-
-        {/* Large background numbers */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 flex justify-around pointer-events-none select-none opacity-[0.03]">
-          <span className="text-[20rem] font-display font-bold text-ev-charcoal leading-none">01</span>
-          <span className="text-[20rem] font-display font-bold text-ev-charcoal leading-none">02</span>
-          <span className="text-[20rem] font-display font-bold text-ev-charcoal leading-none">03</span>
-        </div>
-
         <div className="relative max-w-7xl mx-auto px-6">
           <div data-threat-title className="text-center mb-16">
             <span className="text-sm font-semibold text-accent-savanna tracking-[0.2em] uppercase mb-4 block">
               Why This Happens
             </span>
-            <h2 className="text-4xl md:text-5xl font-display font-semibold text-ev-charcoal mb-4">
-              Three Forces of Extinction
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-ev-charcoal mb-4">
+              Three Forces
+              <br />
+              <span className="hero-text-outline text-[clamp(2.5rem,5.5vw,4.5rem)]">
+                of Extinction
+              </span>
             </h2>
-            <p className="text-ev-elephant max-w-xl mx-auto">
+            <p className="text-ev-elephant max-w-xl mx-auto mt-6">
               Understanding the threats is the first step to protecting these
               incredible creatures.
             </p>
@@ -681,8 +885,18 @@ export default function LandingPage() {
             {[
               {
                 icon: (
-                  <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  <svg
+                    className="w-7 h-7"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
                   </svg>
                 ),
                 title: "Poaching for Ivory",
@@ -690,13 +904,22 @@ export default function LandingPage() {
                 stat: "35,000",
                 statLabel: "killed annually at peak",
                 iconBg: "bg-nature-terracotta/10 text-nature-terracotta",
-                tintBg: "bg-nature-terracotta/[0.03]",
                 accentColor: "#C4785A",
               },
               {
                 icon: (
-                  <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  <svg
+                    className="w-7 h-7"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
                   </svg>
                 ),
                 title: "Human-Wildlife Conflict",
@@ -704,13 +927,22 @@ export default function LandingPage() {
                 stat: "500+",
                 statLabel: "human deaths per year",
                 iconBg: "bg-accent-savanna/10 text-accent-savanna",
-                tintBg: "bg-accent-savanna/[0.03]",
                 accentColor: "#C4A46C",
               },
               {
                 icon: (
-                  <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-7 h-7"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 ),
                 title: "Habitat Destruction",
@@ -718,14 +950,13 @@ export default function LandingPage() {
                 stat: "75%",
                 statLabel: "of habitat lost since 1900",
                 iconBg: "bg-nature-sage/10 text-nature-deep-sage",
-                tintBg: "bg-nature-sage/[0.03]",
                 accentColor: "#5A6B4F",
               },
             ].map((t, i) => (
               <div
                 key={i}
                 data-threat-card
-                className={`threat-card relative p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-ev-sand/60 shadow-sm hover:shadow-2xl transition-all duration-500 group hover:-translate-y-3 ${t.tintBg}`}
+                className="threat-card relative p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-ev-sand/60 shadow-sm hover:shadow-2xl transition-all duration-500 group hover:-translate-y-3"
                 style={{ perspective: "800px" }}
               >
                 <div
@@ -739,12 +970,16 @@ export default function LandingPage() {
                 <p className="text-ev-elephant text-sm leading-relaxed mb-6">
                   {t.desc}
                 </p>
-                {/* Stat badge */}
                 <div className="pt-4 border-t border-ev-cream flex items-baseline gap-2">
-                  <span className="text-2xl font-display font-bold" style={{ color: t.accentColor }}>
+                  <span
+                    className="text-2xl font-display font-bold"
+                    style={{ color: t.accentColor }}
+                  >
                     {t.stat}
                   </span>
-                  <span className="text-xs text-ev-warm-gray">{t.statLabel}</span>
+                  <span className="text-xs text-ev-warm-gray">
+                    {t.statLabel}
+                  </span>
                 </div>
               </div>
             ))}
@@ -752,17 +987,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Wave: Threats → Voice ── */}
+      {/* Wave: Threats -> Voice */}
       <WaveDivider topColor="#EDE7DF" bottomColor="#2C2926" variant={3} />
 
       {/* ═══════════════════════════════════════════
-          THEIR VOICE
+          THEIR VOICE — with particle field
          ═══════════════════════════════════════════ */}
       <section
         ref={voiceRef}
         className="relative py-20 md:py-28 bg-ev-charcoal overflow-hidden"
       >
-        {/* BG waves */}
+        {/* WebGL particles */}
+        <LazyParticleField
+          className="z-0 opacity-60"
+          count={180}
+          color="#C4A46C"
+          speed={0.008}
+          size={0.03}
+        />
+
+        {/* Background waves */}
         <div className="absolute inset-0 opacity-[0.04]">
           <svg
             className="w-full h-full"
@@ -782,7 +1026,7 @@ export default function LandingPage() {
           </svg>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-6">
+        <div className="relative z-[1] max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div>
               <span
@@ -793,16 +1037,19 @@ export default function LandingPage() {
               </span>
               <h2
                 data-voice-title
-                className="text-4xl md:text-5xl font-display font-semibold text-ev-cream mb-8"
+                className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-ev-cream mb-8"
               >
-                Communication Beyond Human Hearing
+                Communication
+                <br />
+                <span className="text-accent-savanna">Beyond</span> Human
+                Hearing
               </h2>
 
               <div className="space-y-5">
                 {[
-                  "Elephants communicate using infrasound — frequencies below 20\u00A0Hz that travel up to 10\u00A0kilometers through ground and air.",
+                  "Elephants communicate using infrasound \u2014 frequencies below 20\u00A0Hz that travel up to 10\u00A0kilometers through ground and air.",
                   "These calls carry complex social information: warnings, greetings, mating signals, and emotional states we\u2019re only beginning to understand.",
-                  "Field recordings capture these vocalizations, but environmental noise — wind, vehicles, aircraft — buries the signals researchers need.",
+                  "Field recordings capture these vocalizations, but environmental noise \u2014 wind, vehicles, aircraft \u2014 buries the signals researchers need.",
                 ].map((txt, i) => (
                   <p
                     key={i}
@@ -817,12 +1064,7 @@ export default function LandingPage() {
 
             {/* Sound-wave visual */}
             <div data-voice-visual className="relative">
-              <svg
-                viewBox="0 0 400 300"
-                className="w-full"
-                fill="none"
-              >
-                {/* Scrub-drawn waves */}
+              <svg viewBox="0 0 400 300" className="w-full" fill="none">
                 {[0, 1, 2, 3, 4].map((i) => (
                   <path
                     key={i}
@@ -833,7 +1075,6 @@ export default function LandingPage() {
                     opacity={0.7 - i * 0.1}
                   />
                 ))}
-                {/* Background oscillation waves */}
                 {[0, 1, 2, 3, 4].map((i) => (
                   <path
                     key={`bg-${i}`}
@@ -844,7 +1085,6 @@ export default function LandingPage() {
                     opacity={0.1}
                   />
                 ))}
-                {/* Frequency labels */}
                 <text
                   x="200"
                   y="258"
@@ -867,7 +1107,6 @@ export default function LandingPage() {
                 </text>
               </svg>
 
-              {/* Decorative rings */}
               <div className="absolute top-4 right-4 w-20 h-20 rounded-full border border-accent-savanna/10" />
               <div className="absolute top-8 right-8 w-12 h-12 rounded-full border border-accent-savanna/20" />
               <div className="absolute top-[2.75rem] right-[2.75rem] w-4 h-4 rounded-full bg-accent-savanna/30" />
@@ -876,62 +1115,254 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Wave: Voice → Solution ── */}
+      {/* Wave: Voice -> Solution */}
       <WaveDivider topColor="#2C2926" bottomColor="#F0EBE3" variant={4} />
 
       {/* ═══════════════════════════════════════════
           SOLUTION
          ═══════════════════════════════════════════ */}
-      <section ref={solutionRef} className="py-20 md:py-28 bg-ev-cream">
+      <section
+        ref={solutionRef}
+        className="relative pt-20 md:pt-28 pb-32 md:pb-40 bg-ev-cream overflow-hidden"
+      >
+        {/* Thin gradient at the very bottom — transitions into dark Steps */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-28 pointer-events-none z-[2]"
+          style={{
+            background:
+              "linear-gradient(180deg, transparent 0%, #171310 100%)",
+          }}
+        />
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* Spectrogram mockup */}
+            {/* Spectrogram mockup — realistic frequency / time display */}
             <div
               data-sol-left
-              className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-ev-charcoal p-1"
+              className="relative aspect-[4/3] rounded-2xl overflow-hidden"
+              style={{
+                background: "#09141F",
+                boxShadow:
+                  "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,80,160,0.12)",
+              }}
             >
-              <div className="w-full h-full rounded-xl overflow-hidden relative bg-gradient-to-br from-spectrogram-low via-[#0a2540] to-spectrogram-low">
-                {/* Noise bands */}
-                {[12, 22, 35, 45, 58, 68, 78, 88].map((top, i) => (
+              {/* Frequency axis labels */}
+              <div className="absolute top-4 left-0 bottom-10 w-11 flex flex-col justify-between items-end pr-2 z-[3]">
+                {["500", "200", "100", "50", "20", "8"].map((f) => (
+                  <span
+                    key={f}
+                    className="font-mono leading-none"
+                    style={{ fontSize: "7px", color: "rgba(80,140,255,0.35)" }}
+                  >
+                    {f}Hz
+                  </span>
+                ))}
+              </div>
+
+              {/* Main spectrogram body */}
+              <div
+                className="absolute top-4 left-11 right-3 bottom-10 rounded overflow-hidden"
+                style={{ background: "#0C1E35" }}
+              >
+                {/* Frequency grid */}
+                {[20, 40, 60, 80].map((p) => (
                   <div
-                    key={i}
-                    className="absolute h-[2px] left-[5%] right-[5%] bg-spectrogram-mid/20"
-                    style={{ top: `${top}%`, opacity: 0.15 + (i % 3) * 0.08 }}
+                    key={p}
+                    className="absolute left-0 right-0"
+                    style={{
+                      top: `${p}%`,
+                      height: "1px",
+                      background: "rgba(0,80,200,0.1)",
+                    }}
                   />
                 ))}
-                {/* Elephant call signal */}
+                {/* Time grid */}
+                {[25, 50, 75].map((p) => (
+                  <div
+                    key={p}
+                    className="absolute top-0 bottom-0"
+                    style={{
+                      left: `${p}%`,
+                      width: "1px",
+                      background: "rgba(0,80,200,0.08)",
+                    }}
+                  />
+                ))}
+
+                {/* === NOISE LAYERS === */}
+                {/* Aircraft noise — high frequency band */}
                 <div
-                  className="absolute h-3 rounded-full"
+                  className="absolute left-0 right-0"
                   style={{
-                    top: "52%",
-                    left: "18%",
-                    right: "28%",
+                    top: "0%",
+                    height: "22%",
                     background:
-                      "linear-gradient(90deg,transparent,#FFD700,#C4A46C,#FFD700,transparent)",
-                    opacity: 0.55,
+                      "linear-gradient(180deg, rgba(30,80,220,0.12) 0%, rgba(40,100,240,0.28) 55%, transparent 100%)",
                   }}
                 />
+                {/* Wind / broadband noise — mid range */}
                 <div
-                  className="absolute h-2 rounded-full"
+                  className="absolute left-0 right-0"
                   style={{
-                    top: "58%",
-                    left: "22%",
-                    right: "34%",
+                    top: "18%",
+                    height: "42%",
                     background:
-                      "linear-gradient(90deg,transparent,#C4A46C,transparent)",
-                    opacity: 0.35,
+                      "linear-gradient(90deg, rgba(20,60,180,0.18) 0%, rgba(25,80,210,0.34) 28%, rgba(15,55,170,0.16) 48%, rgba(28,85,215,0.36) 72%, rgba(20,65,185,0.2) 100%)",
+                    filter: "blur(1px)",
                   }}
                 />
-                {/* Scanning line */}
+                {/* Scattered noise blobs */}
+                {[
+                  { t: "6%", l: "12%", w: "14%", h: "7%", o: 0.28 },
+                  { t: "4%", l: "48%", w: "9%", h: "11%", o: 0.22 },
+                  { t: "28%", l: "8%", w: "22%", h: "9%", o: 0.24 },
+                  { t: "32%", l: "62%", w: "16%", h: "13%", o: 0.3 },
+                  { t: "42%", l: "33%", w: "24%", h: "7%", o: 0.2 },
+                  { t: "14%", l: "76%", w: "14%", h: "8%", o: 0.18 },
+                ].map(({ t, l, w, h, o }, ni) => (
+                  <div
+                    key={ni}
+                    className="absolute rounded-full"
+                    style={{
+                      top: t,
+                      left: l,
+                      width: w,
+                      height: h,
+                      background: `radial-gradient(ellipse, rgba(40,105,230,${o}) 0%, transparent 100%)`,
+                      filter: "blur(4px)",
+                    }}
+                  />
+                ))}
+
+                {/* === ELEPHANT VOCALIZATION SIGNAL === */}
+                {/* Fundamental ~27 Hz — bright gold */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "61%",
+                    height: "8px",
+                    left: "10%",
+                    right: "22%",
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,200,40,0.55) 12%, rgba(255,218,55,1) 32%, rgba(255,205,45,0.88) 62%, rgba(240,185,30,0.5) 84%, transparent)",
+                    filter: "blur(0.4px)",
+                    boxShadow: "0 0 14px rgba(255,210,40,0.45)",
+                  }}
+                />
+                {/* 2nd harmonic ~54 Hz */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "53%",
+                    height: "4px",
+                    left: "16%",
+                    right: "32%",
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,200,40,0.32) 18%, rgba(255,215,50,0.65) 44%, rgba(255,198,38,0.28) 74%, transparent)",
+                    boxShadow: "0 0 8px rgba(255,210,40,0.2)",
+                  }}
+                />
+                {/* 3rd harmonic ~81 Hz */}
+                <div
+                  className="absolute"
+                  style={{
+                    top: "47%",
+                    height: "3px",
+                    left: "20%",
+                    right: "40%",
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,200,40,0.18) 28%, rgba(255,212,48,0.42) 54%, transparent)",
+                  }}
+                />
+
+                {/* Scan line */}
                 <div
                   data-scan-line
-                  className="absolute top-[3%] bottom-[3%] w-[2px] bg-gradient-to-b from-transparent via-accent-savanna to-transparent opacity-60"
-                  style={{ left: "5%" }}
+                  className="absolute top-0 bottom-0"
+                  style={{
+                    left: "5%",
+                    width: "2px",
+                    background:
+                      "linear-gradient(180deg, transparent, rgba(196,164,108,0.85) 18%, rgba(196,164,108,0.9) 82%, transparent)",
+                    boxShadow: "0 0 8px rgba(196,164,108,0.6)",
+                  }}
                 />
-                {/* Label */}
-                <div className="absolute bottom-4 left-4 px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-sm">
-                  <span className="text-xs text-white/60">
-                    Raw Recording — Signal Buried in Noise
+
+                {/* Legend — top-right */}
+                <div className="absolute top-2 right-2 flex flex-col gap-1 z-[2]">
+                  {[
+                    {
+                      color: "rgba(35,90,225,0.75)",
+                      label: "aircraft",
+                    },
+                    {
+                      color: "rgba(20,68,190,0.75)",
+                      label: "wind",
+                    },
+                    {
+                      color: "rgba(255,210,42,0.9)",
+                      label: "vocalization",
+                    },
+                  ].map(({ color, label }) => (
+                    <div
+                      key={label}
+                      className="flex items-center gap-1.5 rounded px-1.5 py-[3px]"
+                      style={{ background: "rgba(0,0,0,0.45)" }}
+                    >
+                      <div
+                        className="rounded-sm"
+                        style={{
+                          width: "16px",
+                          height: "3px",
+                          background: color,
+                        }}
+                      />
+                      <span
+                        className="font-mono"
+                        style={{
+                          fontSize: "7px",
+                          color:
+                            label === "vocalization"
+                              ? "rgba(255,210,42,0.6)"
+                              : "rgba(100,150,255,0.5)",
+                        }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Time axis */}
+              <div className="absolute left-11 right-3 bottom-2 flex justify-between z-[3]">
+                {["0s", "5s", "10s", "15s", "20s"].map((t) => (
+                  <span
+                    key={t}
+                    className="font-mono"
+                    style={{ fontSize: "7px", color: "rgba(80,140,255,0.3)" }}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+
+              {/* Bottom label */}
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[4]">
+                <div
+                  className="px-3 py-1.5 rounded-lg backdrop-blur-sm"
+                  style={{
+                    background: "rgba(0,0,0,0.55)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <span
+                    className="font-mono"
+                    style={{
+                      fontSize: "9px",
+                      color: "rgba(255,255,255,0.38)",
+                    }}
+                  >
+                    raw_recording.wav — signal buried in noise
                   </span>
                 </div>
               </div>
@@ -941,10 +1372,12 @@ export default function LandingPage() {
               <span className="text-sm font-semibold text-accent-savanna tracking-[0.2em] uppercase mb-4 block">
                 Our Solution
               </span>
-              <h2 className="text-4xl md:text-5xl font-display font-semibold text-ev-charcoal mb-6">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-ev-charcoal mb-6">
                 AI-Powered
                 <br />
-                Noise Removal
+                <span className="hero-text-outline text-[clamp(2.5rem,5.5vw,4.5rem)]">
+                  Noise Removal
+                </span>
               </h2>
               <p className="text-ev-elephant mb-8 leading-relaxed">
                 EchoField uses spectral gating and AI classification to identify
@@ -971,7 +1404,11 @@ export default function LandingPage() {
                     desc: "CSV, JSON, and ZIP exports for peer review",
                   },
                 ].map((item, i) => (
-                  <div key={i} data-sol-feature className="flex items-start gap-3">
+                  <div
+                    key={i}
+                    data-sol-feature
+                    className="flex items-start gap-3"
+                  >
                     <div className="w-6 h-6 rounded-full bg-accent-savanna/10 flex items-center justify-center mt-0.5 flex-shrink-0">
                       <svg
                         className="w-3.5 h-3.5 text-accent-savanna"
@@ -991,7 +1428,9 @@ export default function LandingPage() {
                       <div className="text-sm font-semibold text-ev-charcoal">
                         {item.label}
                       </div>
-                      <div className="text-xs text-ev-elephant">{item.desc}</div>
+                      <div className="text-xs text-ev-elephant">
+                        {item.desc}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1001,103 +1440,318 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Wave: Solution → Steps ── */}
-      <WaveDivider topColor="#F0EBE3" bottomColor="#F8F5F0" variant={1} />
+      {/* No wave — solution section gradient fades directly to dark steps */}
 
       {/* ═══════════════════════════════════════════
-          HOW IT WORKS
+          HOW IT WORKS — dark 3D glassmorphism
          ═══════════════════════════════════════════ */}
-      <section ref={stepsRef} className="py-20 md:py-28 bg-ev-ivory">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <span className="text-sm font-semibold text-accent-savanna tracking-[0.2em] uppercase mb-4 block">
-              How It Works
-            </span>
-            <h2 className="text-4xl md:text-5xl font-display font-semibold text-ev-charcoal">
-              Three Steps to Clarity
+      <section
+        ref={stepsRef}
+        className="relative py-28 md:py-44 overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(160deg, #171310 0%, #221D19 50%, #1A1512 100%)",
+        }}
+      >
+        {/* WebGL particle field */}
+        <LazyParticleField
+          className="z-0 opacity-25"
+          count={150}
+          color="#C4A46C"
+          speed={0.005}
+          size={0.022}
+        />
+
+        {/* Ambient center glow */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 75% 55% at 50% 45%, rgba(196,164,108,0.07) 0%, transparent 65%)",
+          }}
+        />
+
+        {/* Dot-grid texture */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, rgba(196,164,108,0.18) 1px, transparent 1px)",
+            backgroundSize: "52px 52px",
+            opacity: 0.18,
+          }}
+        />
+
+        <div className="relative z-[1] max-w-6xl mx-auto px-6">
+          {/* ── Header ── */}
+          <div className="text-center mb-24">
+            <div className="inline-flex items-center gap-4 mb-6">
+              <div
+                className="h-px w-14"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(196,164,108,0.55))",
+                }}
+              />
+              <span
+                className="font-semibold tracking-[0.35em] uppercase"
+                style={{ fontSize: "10px", color: "rgba(196,164,108,0.55)" }}
+              >
+                How It Works
+              </span>
+              <div
+                className="h-px w-14"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(196,164,108,0.55), transparent)",
+                }}
+              />
+            </div>
+            <h2
+              className="font-display font-bold leading-[0.87] tracking-[-0.03em]"
+              style={{ fontSize: "clamp(3.2rem,8vw,6.5rem)" }}
+            >
+              <span className="text-ev-cream">Three Steps</span>
+              <br />
+              <span
+                style={{
+                  WebkitTextStroke: "1px rgba(196,164,108,0.6)",
+                  color: "transparent",
+                }}
+              >
+                to Clarity
+              </span>
             </h2>
+            <p
+              className="mt-6 max-w-md mx-auto text-base leading-relaxed"
+              style={{ color: "rgba(181,173,164,0.5)" }}
+            >
+              From raw field recording to publishable research data — automated
+              end-to-end.
+            </p>
           </div>
 
-          <div className="relative grid md:grid-cols-3 gap-12">
-            {/* Connector lines */}
-            <div className="hidden md:block absolute top-[3.5rem] left-[33%] right-[33%] h-0.5">
+          {/* ── Steps grid ── */}
+          <div className="relative">
+            {/* Connector line — icon-center col-1 to icon-center col-3 */}
+            <div
+              className="hidden md:block absolute z-[2] pointer-events-none"
+              style={{
+                top: "27px",
+                left: "16.67%",
+                right: "16.67%",
+                height: "1px",
+              }}
+            >
               <div
                 data-step-line
-                className="absolute left-0 right-[50%] h-full bg-gradient-to-r from-accent-savanna to-accent-gold"
-              />
-              <div
-                data-step-line
-                className="absolute left-[50%] right-0 h-full bg-gradient-to-r from-accent-gold to-nature-sage"
+                className="w-full h-full"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(196,164,108,0.85) 0%, rgba(232,200,122,1) 50%, rgba(122,139,111,0.85) 100%)",
+                  boxShadow: "0 0 10px rgba(196,164,108,0.4)",
+                }}
               />
             </div>
 
-            {[
-              {
-                step: "01",
-                title: "Upload",
-                desc: "Drop your WAV, MP3, or FLAC field recordings. Any sample rate, any bit depth — we handle it all.",
-                color: "bg-accent-savanna",
-                icon: (
-                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                ),
-              },
-              {
-                step: "02",
-                title: "Process",
-                desc: "AI identifies noise types, applies spectral gating, and extracts clean elephant vocalizations in seconds.",
-                color: "bg-accent-gold",
-                icon: (
-                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                ),
-              },
-              {
-                step: "03",
-                title: "Analyze",
-                desc: "Compare spectrograms, listen to cleaned audio, review detected calls, and export research-grade data.",
-                color: "bg-nature-sage",
-                icon: (
-                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                ),
-              },
-            ].map((s, i) => (
-              <div key={i} data-step-card className="relative text-center" style={{ perspective: "600px" }}>
-                <div
-                  className={`w-14 h-14 ${s.color} rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl transition-shadow`}
-                >
-                  {s.icon}
-                </div>
-                <div data-step-num className="text-5xl font-display font-bold text-ev-sand/30 mb-3">
-                  {s.step}
-                </div>
-                <h3 className="text-xl font-bold text-ev-charcoal mb-3">
-                  {s.title}
-                </h3>
-                <p className="text-ev-elephant text-sm leading-relaxed">
-                  {s.desc}
-                </p>
-              </div>
+            {/* Connector node dots */}
+            {([
+              { pct: "16.67%", color: "#C4A46C", glow: "rgba(196,164,108,0.8)" },
+              { pct: "50%",    color: "#E0C07A", glow: "rgba(224,192,122,0.8)" },
+              { pct: "83.33%", color: "#7A8B6F", glow: "rgba(122,139,111,0.8)" },
+            ] as const).map(({ pct, color, glow }, ni) => (
+              <div
+                key={ni}
+                className="hidden md:block absolute z-[3] pointer-events-none"
+                style={{
+                  top: "21px",
+                  left: pct,
+                  transform: "translateX(-50%)",
+                  width: "13px",
+                  height: "13px",
+                  borderRadius: "50%",
+                  background: color,
+                  boxShadow: `0 0 14px ${glow}`,
+                }}
+              />
             ))}
+
+            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+              {[
+                {
+                  step: "01",
+                  title: "Upload",
+                  desc: "Drop your WAV, MP3, or FLAC field recordings. Any sample rate, any bit depth — we handle it all.",
+                  gradient: "linear-gradient(135deg, #C4A46C 0%, #A8873B 100%)",
+                  glow: "rgba(196,164,108,0.55)",
+                  icon: (
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                  ),
+                },
+                {
+                  step: "02",
+                  title: "Process",
+                  desc: "AI identifies noise types, applies spectral gating, and extracts clean elephant vocalizations in seconds.",
+                  gradient: "linear-gradient(135deg, #E0C07A 0%, #C4A46C 100%)",
+                  glow: "rgba(224,192,122,0.55)",
+                  icon: (
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                  ),
+                },
+                {
+                  step: "03",
+                  title: "Analyze",
+                  desc: "Compare spectrograms, listen to cleaned audio, review detected calls, and export research-grade data.",
+                  gradient: "linear-gradient(135deg, #7A8B6F 0%, #5A6B4F 100%)",
+                  glow: "rgba(122,139,111,0.55)",
+                  icon: (
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                      />
+                    </svg>
+                  ),
+                },
+              ].map((s, i) => (
+                <div
+                  key={i}
+                  data-step-card
+                  className="relative text-center group"
+                  style={{ perspective: "700px" }}
+                >
+                  {/* Ghost step number behind card */}
+                  <div
+                    data-step-num
+                    className="absolute left-1/2 -translate-x-1/2 font-display font-bold select-none pointer-events-none z-0"
+                    style={{
+                      top: "-2.5rem",
+                      fontSize: "clamp(5rem,11vw,8rem)",
+                      color: "rgba(196,164,108,0.045)",
+                      letterSpacing: "-0.05em",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {s.step}
+                  </div>
+
+                  {/* Icon with halo glow */}
+                  <div className="relative flex justify-center mb-8 z-[2]">
+                    <div className="relative">
+                      <div
+                        className="absolute inset-[-8px] rounded-3xl blur-2xl opacity-0 group-hover:opacity-70 transition-opacity duration-700"
+                        style={{ background: s.glow }}
+                      />
+                      <div
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl
+                          ring-1 ring-white/10
+                          group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500"
+                        style={{ background: s.gradient }}
+                      >
+                        {s.icon}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Glassmorphism card body */}
+                  <div
+                    className="relative rounded-2xl p-7 transition-all duration-500
+                      group-hover:-translate-y-4"
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(196,164,108,0.13)",
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
+                      boxShadow:
+                        "0 8px 48px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)",
+                      transformStyle: "preserve-3d",
+                    }}
+                  >
+                    {/* Hover shimmer overlay */}
+                    <div
+                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background: `linear-gradient(135deg, ${s.glow.replace("0.55", "0.09")} 0%, transparent 65%)`,
+                      }}
+                    />
+                    <div className="relative z-[1]">
+                      <div
+                        className="font-mono tracking-[0.22em] mb-3"
+                        style={{
+                          fontSize: "10px",
+                          color: "rgba(196,164,108,0.38)",
+                        }}
+                      >
+                        STEP {s.step}
+                      </div>
+                      <h3 className="text-2xl font-display font-bold text-ev-cream mb-3">
+                        {s.title}
+                      </h3>
+                      <p
+                        className="text-sm leading-relaxed"
+                        style={{ color: "rgba(181,173,164,0.62)" }}
+                      >
+                        {s.desc}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Wave: Steps → CTA ── */}
-      <WaveDivider topColor="#F8F5F0" bottomColor="#2C2926" variant={2} />
+      {/* No wave needed — steps flows directly into CTA (both dark) */}
 
       {/* ═══════════════════════════════════════════
-          CTA
+          CTA — with particle field
          ═══════════════════════════════════════════ */}
       <section
         ref={ctaRef}
-        className="relative py-20 md:py-28 bg-ev-charcoal overflow-hidden"
+        className="relative py-24 md:py-32 bg-ev-charcoal overflow-hidden"
       >
-        {/* Animated BG rings */}
+        {/* WebGL particles */}
+        <LazyParticleField
+          className="z-0 opacity-50"
+          count={200}
+          color="#C4A46C"
+          speed={0.01}
+          size={0.04}
+        />
+
+        {/* Animated rings */}
         <div className="absolute inset-0 flex items-center justify-center">
           {[90, 140, 200, 270, 350].map((r, i) => (
             <svg
@@ -1129,9 +1783,9 @@ export default function LandingPage() {
 
         <div
           data-cta-inner
-          className="relative max-w-3xl mx-auto px-6 text-center"
+          className="relative z-[1] max-w-3xl mx-auto px-6 text-center"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-semibold text-ev-cream mb-6">
+          <h2 className="text-4xl md:text-5xl lg:text-7xl font-display font-semibold text-ev-cream mb-6 leading-[0.95]">
             Help Protect{" "}
             <span className="text-accent-savanna">Their Voice</span>
           </h2>
@@ -1140,13 +1794,13 @@ export default function LandingPage() {
             removal. Every cleaned recording brings us closer to understanding
             — and protecting — these remarkable animals.
           </p>
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          <Link
+            href="/upload"
             className="group inline-flex items-center gap-3 px-10 py-5 bg-accent-savanna text-ev-ivory text-lg font-semibold rounded-full hover:bg-accent-gold transition-all duration-300 hover:shadow-xl hover:shadow-accent-savanna/20"
           >
-            Back to the Top
+            Upload a Recording
             <svg
-              className="w-5 h-5 transition-transform group-hover:-translate-y-1"
+              className="w-5 h-5 transition-transform group-hover:translate-x-1"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -1155,14 +1809,14 @@ export default function LandingPage() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M5 10l7-7m0 0l7 7m-7-7v18"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
               />
             </svg>
-          </button>
+          </Link>
           <p className="mt-10 text-sm text-ev-dust/35">
             Built in partnership with{" "}
-            <span className="text-accent-savanna/50">ElephantVoices</span>
-            {" "}for HackSMU 2026
+            <span className="text-accent-savanna/50">ElephantVoices</span> for
+            HackSMU 2026
           </p>
         </div>
       </section>

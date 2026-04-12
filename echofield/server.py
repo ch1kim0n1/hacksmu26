@@ -936,7 +936,14 @@ async def get_batch_summary(batch_id: str) -> BatchSummaryResponse:
 async def get_spectrogram(
     recording_id: str,
     type: str = Query(default="after"),
+    colormap: str = Query(default="viridis"),
 ) -> FileResponse:
+    if colormap not in SUPPORTED_COLORMAPS:
+        from fastapi import HTTPException as _HTTPException
+        raise HTTPException(
+            status_code=422,
+            detail=f"Unsupported colormap '{colormap}'. Supported: {sorted(SUPPORTED_COLORMAPS)}",
+        )
     recording = _get_store().get(recording_id)
     if recording is None:
         raise HTTPException(status_code=404, detail="Recording not found")
@@ -950,7 +957,49 @@ async def get_spectrogram(
     path = mapping.get(type)
     if not path or not Path(path).exists():
         raise HTTPException(status_code=404, detail="Spectrogram not found")
-    return FileResponse(path, media_type="image/png")
+
+    # Default colormap — serve the pre-generated PNG directly
+    if colormap == "viridis":
+        return FileResponse(path, media_type="image/png")
+
+    # Non-default colormap — check cache, then regenerate from audio if needed
+    cache: CacheManager = app.state.cache  # type: ignore[attr-defined]
+    cache_params = {"colormap": colormap, "type": type}
+    cached_path = cache.get_path(recording_id, "spectrogram_colormap", params=cache_params)
+    if cached_path:
+        return FileResponse(cached_path, media_type="image/png")
+
+    # Regenerate: load audio, compute STFT, render with requested colormap
+    audio_path_str = result.get("output_audio_path") if type == "after" else None
+    if not audio_path_str or not Path(audio_path_str).exists():
+        audio_path_str = str(_get_recording_path(recording))
+    if not Path(audio_path_str).exists():
+        raise HTTPException(status_code=404, detail="Source audio not found for colormap render")
+
+    y, sr = await asyncio.to_thread(load_audio, audio_path_str)
+    stft_data = await asyncio.to_thread(compute_stft, y, sr)
+
+    # Write to a temp file then store in cache
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+        tmp_path = tmp.name
+    await asyncio.to_thread(
+        generate_spectrogram_png,
+        stft_data["magnitude_db"],
+        sr,
+        512,
+        tmp_path,
+        cmap=colormap,
+    )
+    cached_path = cache.store_file(
+        recording_id,
+        "spectrogram_colormap",
+        tmp_path,
+        params=cache_params,
+        suffix=".png",
+    )
+    Path(tmp_path).unlink(missing_ok=True)
+    return FileResponse(cached_path, media_type="image/png")
 
 
 @app.get("/api/recordings/{recording_id}/audio")
