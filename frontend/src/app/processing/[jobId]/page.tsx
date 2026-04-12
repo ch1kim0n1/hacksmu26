@@ -31,6 +31,7 @@ import {
   AnalysisWindow,
 } from "@/components/research/AnalysisLabels";
 import { QualityRing } from "@/components/ui/motion-primitives";
+import SpeakerDiarizationView from "@/components/spectrogram/SpeakerDiarizationView";
 
 interface ProcessingMetrics {
   snr_before?: number;
@@ -44,6 +45,7 @@ const STAGES = [
   { key: "spectrogram", label: "Spectrogram", shortLabel: "Spectro" },
   { key: "noise_classification", label: "Noise Classification", shortLabel: "Classify" },
   { key: "noise_removal", label: "Noise Removal", shortLabel: "Denoise" },
+  { key: "speaker_separation", label: "Speaker Separation", shortLabel: "Speakers" },
   { key: "feature_extraction", label: "Feature Extraction", shortLabel: "Features" },
   { key: "quality_assessment", label: "Quality Assessment", shortLabel: "QA" },
   { key: "complete", label: "Complete", shortLabel: "Done" },
@@ -506,14 +508,23 @@ export default function ProcessingPage() {
             <div className="grid md:grid-cols-2 gap-5">
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2.5 font-medium">Original Recording</p>
-                <audio controls className="w-full" preload="metadata"><source src={audioOriginal} type="audio/wav" /></audio>
+                <audio controls className="w-full" preload="metadata" src={audioOriginal} />
               </div>
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2.5 font-medium">Cleaned Audio</p>
-                {isComplete ? <audio controls className="w-full" preload="metadata"><source src={audioCleaned} type="audio/wav" /></audio> : <div className="h-[54px] bg-ev-cream rounded-full animate-pulse" />}
+                {isComplete ? <audio controls className="w-full" preload="metadata" src={audioCleaned} /> : <div className="h-[54px] bg-ev-cream rounded-full animate-pulse" />}
               </div>
             </div>
           </motion.div>
+
+          {isComplete && (
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26 }}>
+              <SpeakerDiarizationView
+                recordingId={jobId}
+                initial={recording?.result?.speaker_separation}
+              />
+            </motion.div>
+          )}
         </div>
 
         {/* Metrics sidebar */}
@@ -570,6 +581,16 @@ export default function ProcessingPage() {
                 <Link href={`/export?recording=${jobId}`} aria-label="Export data" className="flex items-center justify-center gap-2 w-full px-5 py-2.5 glass border border-ev-sand/30 text-ev-charcoal text-sm font-medium rounded-xl card-hover">
                   <Download className="w-4 h-4" />
                   <span>Export Data</span>
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link href={`/recordings/${jobId}/conversation`} aria-label="View conversation timeline" className="flex items-center justify-center gap-2 w-full px-5 py-2.5 glass border border-ev-sand/30 text-ev-charcoal text-sm font-medium rounded-xl card-hover">
+                  <span>Conversation Timeline</span>
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Link href={`/recordings/${jobId}/summary`} aria-label="View research summary" className="flex items-center justify-center gap-2 w-full px-5 py-2.5 glass border border-ev-sand/30 text-ev-charcoal text-sm font-medium rounded-xl card-hover">
+                  <span>Research Summary</span>
                 </Link>
               </motion.div>
             </div>

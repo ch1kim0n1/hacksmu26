@@ -63,6 +63,11 @@ def validate_magic_bytes(header: bytes, suffix: str) -> tuple[bool, str]:
     expected = _MAGIC_BYTES.get(normalized)
     if expected is None:
         return False, f"Unsupported audio format: {suffix}"
+    if normalized == ".mp3" and (
+        header.startswith(b"ID3")
+        or (len(header) >= 2 and header[0] == 0xFF and (header[1] & 0xE0) == 0xE0)
+    ):
+        return True, ""
     if any(header.startswith(prefix) for prefix in expected):
         return True, ""
     expected_names = {

@@ -23,6 +23,7 @@ from echofield.pipeline.feature_extract import classify_call_type, extract_acous
 from echofield.pipeline.ingestion import IngestionResult, ingest_audio_file
 from echofield.pipeline.noise_classifier import classify_noise
 from echofield.pipeline.quality_check import assess_quality
+from echofield.pipeline.speaker_separation import get_speaker_metadata, separate_speakers
 from echofield.pipeline.spectral_gate import adaptive_gate_denoise, spectral_gate_denoise, wiener_filter_denoise
 from echofield.pipeline.spectrogram import (
     build_spectrogram_artifacts,
@@ -42,6 +43,7 @@ class PipelineStage(str, Enum):
     SPECTROGRAM = "spectrogram"
     CLASSIFICATION = "noise_classification"
     DENOISING = "noise_removal"
+    SPEAKER_SEPARATION = "speaker_separation"
     FEATURE_EXTRACTION = "feature_extraction"
     QUALITY_CHECK = "quality_assessment"
     COMPLETE = "complete"
@@ -130,6 +132,33 @@ class ProcessingPipeline:
         sequences = extract_sequences(annotated)
         patterns = find_recurring_patterns(sequences)
         return annotated, sequences, patterns
+
+    def _detect_calls_from_speakers(
+        self,
+        recording_id: str,
+        speaker_separation: dict[str, Any],
+        sr: int,
+        metadata: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        if int(speaker_separation.get("speaker_count") or 1) <= 1:
+            return []
+
+        calls: list[dict[str, Any]] = []
+        for speaker in list(speaker_separation.get("speakers") or []):
+            speaker_id = str(speaker.get("id") or "speaker")
+            speaker_audio = np.asarray(speaker.get("audio"), dtype=np.float32)
+            if speaker_audio.size == 0:
+                continue
+            speaker_calls = self._detect_calls(recording_id, speaker_audio, sr, metadata)
+            for call in speaker_calls:
+                item = dict(call)
+                item["id"] = f"{item.get('id')}-{speaker_id}"
+                item["speaker_id"] = speaker_id
+                item["speaker_fundamental_hz"] = speaker.get("fundamental_hz")
+                item["speaker_energy_ratio"] = speaker.get("energy_ratio")
+                calls.append(item)
+        calls.sort(key=lambda item: (float(item.get("start_ms") or 0.0), str(item.get("speaker_id") or "")))
+        return calls
 
     async def process_recording(
         self,
@@ -329,16 +358,45 @@ class ProcessingPipeline:
             {"spectrogram_url": after_viz.url, "variant": "after"},
         )
 
+        await self._notify(progress_callback, PipelineStage.SPEAKER_SEPARATION.value, "active", 74)
+        stage_start = time.perf_counter()
+        speaker_separation = await asyncio.to_thread(separate_speakers, cleaned_audio, sr)
+        speaker_metadata = [
+            get_speaker_metadata(speaker, sr)
+            for speaker in speaker_separation.get("speakers", [])
+        ]
+        speaker_result = {
+            "speaker_count": int(speaker_separation.get("speaker_count") or len(speaker_metadata) or 1),
+            "speakers": speaker_metadata,
+            "original_length": int(speaker_separation.get("original_length") or len(cleaned_audio)),
+        }
+        self._record_stage_duration(recording_id, PipelineStage.SPEAKER_SEPARATION, stage_start)
+        await self._notify(
+            progress_callback,
+            PipelineStage.SPEAKER_SEPARATION.value,
+            "complete",
+            78,
+            {"speaker_count": speaker_result["speaker_count"], "speakers": speaker_metadata},
+        )
+
         await self._notify(progress_callback, PipelineStage.FEATURE_EXTRACTION.value, "active", 80)
         await self._notify(progress_callback, "calls:detecting", "active", 80)
         stage_start = time.perf_counter()
         calls = await asyncio.to_thread(
-            self._detect_calls,
+            self._detect_calls_from_speakers,
             recording_id,
-            cleaned_audio,
+            speaker_separation,
             sr,
             ingestion.metadata,
         )
+        if not calls:
+            calls = await asyncio.to_thread(
+                self._detect_calls,
+                recording_id,
+                cleaned_audio,
+                sr,
+                ingestion.metadata,
+            )
         calls, sequences, recurring_patterns = self._annotate_calls(calls)
         self._record_stage_duration(recording_id, PipelineStage.FEATURE_EXTRACTION, stage_start)
         metrics.inc("echofield_calls_detected_total", len(calls))
@@ -449,6 +507,7 @@ class ProcessingPipeline:
                 PipelineStage.SPECTROGRAM.value,
                 PipelineStage.CLASSIFICATION.value,
                 PipelineStage.DENOISING.value,
+                PipelineStage.SPEAKER_SEPARATION.value,
                 PipelineStage.FEATURE_EXTRACTION.value,
                 PipelineStage.QUALITY_CHECK.value,
                 PipelineStage.COMPLETE.value,
@@ -466,6 +525,7 @@ class ProcessingPipeline:
             "markers": calls,
             "sequences": sequences,
             "recurring_patterns": recurring_patterns,
+            "speaker_separation": speaker_result,
             "processing_time_s": elapsed,
             "output_audio_path": str(cleaned_audio_path),
             "spectrogram_before_path": before_viz.url,

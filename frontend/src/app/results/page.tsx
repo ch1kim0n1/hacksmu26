@@ -224,7 +224,7 @@ export default function ResultsPage() {
                 {/* Spectrogram Thumbnail */}
                 <div className="relative h-40 bg-gradient-to-br from-spectrogram-low to-spectrogram-low/80 overflow-hidden">
                   <Image
-                    src={spectrogramUrl}
+                    src={`${API_BASE}/api/recordings/${rec.id}/spectrogram?type=after`}
                     alt={`Spectrogram for ${rec.filename}`}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"

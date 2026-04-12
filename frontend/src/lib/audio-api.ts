@@ -9,6 +9,10 @@ export interface RecordingMetadata {
   microphone_type?: string;
   notes?: string;
   species?: string;
+  original_filename?: string;
+  source_format?: string;
+  source_content_type?: string;
+  channels?: number;
   call_id?: string;
   animal_id?: string;
   noise_type_ref?: string;
@@ -31,6 +35,7 @@ export interface RecordingResult {
   status: string;
   quality?: QualityMetrics;
   calls?: Call[];
+  speaker_separation?: SpeakerSeparationResult;
   output_audio_path?: string;
   spectrogram_before_path?: string;
   spectrogram_after_path?: string;
@@ -102,6 +107,10 @@ export interface Call {
   color?: string | null;
   acoustic_features?: Record<string, unknown>;
   metadata?: RecordingMetadata;
+  ethology?: EthologyAnnotation | null;
+  reference_matches?: ReferenceMatch[];
+  publishability?: PublishabilityScore | null;
+  speaker_id?: string | null;
 }
 
 export interface CallListResponse {
@@ -115,12 +124,29 @@ export interface Stats {
   avg_snr_improvement: number;
   success_rate: number;
   processing_time_avg: number;
+  calls_recovered?: number;
+  publishable_calls?: number;
+  recordings_saved?: number;
+  noise_types_defeated?: Record<string, number>;
+  avg_snr_improvement_db?: number;
+  total_noise_energy_removed_percent?: number;
+  total_noise_energy_removed_pct?: number;
+  speakers_identified?: number;
+  hours_of_clean_audio?: number;
 }
 
 export interface UploadResponse {
   message: string;
   recording_ids: string[];
   count: number;
+  status?: string;
+  total_duration_s?: number;
+  duplicate?: boolean;
+  items?: Array<{
+    recording_id: string;
+    status: string;
+    duplicate?: boolean;
+  }>;
 }
 
 export interface RecordingStatusResponse {
@@ -271,6 +297,9 @@ export async function uploadFiles(
   metadata?: Record<string, unknown>
 ): Promise<UploadResponse> {
   const uploadedIds: string[] = [];
+  const uploadedItems: NonNullable<UploadResponse["items"]> = [];
+  let totalDuration = 0;
+  let duplicateCount = 0;
   for (const file of files) {
     const formData = new FormData();
     formData.append("file", file);
@@ -282,19 +311,43 @@ export async function uploadFiles(
     const query = params.toString();
     const response = await fetchAPI<{
       message: string;
+      status: string;
       recording_ids: string[];
       count: number;
+      total_duration_s: number;
+      duplicate?: boolean;
     }>(`/api/upload${query ? `?${query}` : ""}`, {
       method: "POST",
       body: formData,
     });
     uploadedIds.push(...response.recording_ids);
+    totalDuration += response.total_duration_s ?? 0;
+    if (response.duplicate) duplicateCount += response.recording_ids.length;
+    for (const recordingId of response.recording_ids) {
+      uploadedItems.push({
+        recording_id: recordingId,
+        status: response.status,
+        duplicate: response.duplicate,
+      });
+    }
   }
 
+  const freshCount = uploadedIds.length - duplicateCount;
+  const message =
+    duplicateCount > 0 && freshCount > 0
+      ? `Uploaded ${freshCount} new file(s); ${duplicateCount} duplicate file(s) already existed`
+      : duplicateCount > 0
+        ? `${duplicateCount} duplicate file(s) already existed`
+        : `Uploaded ${uploadedIds.length} file(s) successfully`;
+
   return {
-    message: `Uploaded ${uploadedIds.length} file(s) successfully`,
+    message,
     recording_ids: uploadedIds,
     count: uploadedIds.length,
+    status: uploadedItems.length === 1 ? uploadedItems[0].status : undefined,
+    total_duration_s: totalDuration,
+    duplicate: duplicateCount > 0 && duplicateCount === uploadedIds.length,
+    items: uploadedItems,
   };
 }
 
@@ -329,7 +382,7 @@ export async function getRecordingStatus(id: string): Promise<RecordingStatusRes
 export async function processRecording(
   id: string,
   options?: {
-    method?: "spectral" | "hybrid" | "deep";
+    method?: "spectral" | "hybrid" | "deep" | "adaptive" | "wiener";
     aggressiveness?: number;
     preset?: "demo";
   }
@@ -574,4 +627,257 @@ export async function retrainClassifier(): Promise<Record<string, unknown>> {
   return fetchAPI<Record<string, unknown>>("/api/classifier/retrain", {
     method: "POST",
   });
+}
+
+// ─── Research Features: Ethology, Reference Library, Profiles, Social Network ───
+
+export interface EthologyAnnotation {
+  label: string;
+  meaning: string;
+  behavioral_context: string;
+  social_function: string;
+  range_km: number;
+  typical_duration_s: [number, number];
+  typical_frequency_hz: [number, number];
+  caller_state: string;
+  common_response: string;
+  source: string;
+}
+
+export async function getEthologyAnnotations(): Promise<Record<string, EthologyAnnotation>> {
+  return fetchAPI<Record<string, EthologyAnnotation>>("/api/ethology");
+}
+
+export async function getCallEthology(callId: string): Promise<{ call_id: string; ethology: EthologyAnnotation | null }> {
+  return fetchAPI<{ call_id: string; ethology: EthologyAnnotation | null }>(`/api/calls/${callId}/ethology`);
+}
+
+export interface ReferenceRumble {
+  id: string;
+  label: string;
+  behavioral_context: string;
+  fundamental_hz: number;
+  harmonic_count: number;
+  typical_duration_s: number;
+  bandwidth_hz: number;
+  harmonicity: number;
+  spectral_centroid_hz: number;
+  spectral_entropy: number;
+  snr_db: number;
+  source: string;
+}
+
+export interface ReferenceMatch {
+  rumble_id: string;
+  label: string;
+  behavioral_context: string;
+  similarity_score: number;
+  fundamental_hz: number | null;
+}
+
+export async function getReferenceLibrary(): Promise<ReferenceRumble[]> {
+  return fetchAPI<ReferenceRumble[]>("/api/reference-library");
+}
+
+export async function getCallReferenceMatches(callId: string, topK?: number): Promise<ReferenceMatch[]> {
+  const params = topK ? `?top_k=${topK}` : "";
+  return fetchAPI<ReferenceMatch[]>(`/api/calls/${callId}/reference-matches${params}`);
+}
+
+export interface ElephantProfile {
+  individual_id: string;
+  call_count: number;
+  recording_count: number;
+  recordings: string[];
+  locations: string[];
+  dates: string[];
+  most_common_type: string;
+  call_type_distribution: Record<string, number>;
+  acoustic_signature: {
+    fundamental_frequency_hz: number;
+    harmonicity: number;
+    bandwidth_hz: number;
+    snr_db: number;
+    spectral_centroid_hz: number;
+    duration_s: number;
+    pitch_contour_slope: number;
+    spectral_entropy: number;
+  };
+  active_hours: Record<string, number>;
+  social_connections: string[];
+}
+
+export async function getElephants(): Promise<ElephantProfile[]> {
+  return fetchAPI<ElephantProfile[]>("/api/elephants");
+}
+
+export async function getElephant(id: string): Promise<ElephantProfile> {
+  return fetchAPI<ElephantProfile>(`/api/elephants/${encodeURIComponent(id)}`);
+}
+
+export async function getElephantCalls(id: string): Promise<CallListResponse> {
+  const response = await fetchAPI<{ items?: Call[]; total: number }>(
+    `/api/elephants/${encodeURIComponent(id)}/calls`
+  );
+  const calls = (response.items ?? []).map((call) => ({
+    ...call,
+    start_time: call.start_ms / 1000,
+    end_time: (call.start_ms + call.duration_ms) / 1000,
+    frequency_low: call.frequency_min_hz,
+    frequency_high: call.frequency_max_hz,
+  }));
+  return { calls, total: response.total };
+}
+
+export interface SocialNetworkData {
+  nodes: Array<{
+    id: string;
+    call_count: number;
+    most_common_type: string;
+    recordings: string[];
+    locations: string[];
+    dates: string[];
+  }>;
+  edges: Array<{
+    source: string;
+    target: string;
+    shared_recordings: number;
+    call_response_pairs: number;
+    weight: number;
+  }>;
+  stats: {
+    total_individuals: number;
+    total_connections: number;
+    most_connected: string;
+    avg_connections: number;
+  };
+}
+
+export async function getSocialNetwork(): Promise<SocialNetworkData> {
+  return fetchAPI<SocialNetworkData>("/api/social-network");
+}
+
+export interface ConversationData {
+  recording_id: string;
+  speakers: Array<{ id: string; call_count: number; dominant_type: string }>;
+  calls: Array<{
+    call_id: string;
+    speaker_id: string;
+    start_ms: number;
+    duration_ms: number;
+    call_type: string;
+    confidence: number;
+  }>;
+  response_pairs: Array<{
+    call_id: string;
+    response_id: string;
+    gap_ms: number;
+    speaker_a: string;
+    speaker_b: string;
+  }>;
+  total_exchanges: number;
+  longest_sequence_length: number;
+}
+
+export async function getRecordingConversation(recordingId: string): Promise<ConversationData> {
+  return fetchAPI<ConversationData>(`/api/recordings/${recordingId}/conversation`);
+}
+
+// ─── Speaker Separation ───
+
+export interface SpeakerData {
+  id: string;
+  fundamental_hz: number;
+  harmonic_count: number;
+  energy_ratio: number;
+  duration_s: number;
+}
+
+export interface SpeakerSeparationResult {
+  speaker_count: number;
+  speakers: SpeakerData[];
+}
+
+export async function getRecordingSpeakers(recordingId: string): Promise<SpeakerSeparationResult> {
+  return fetchAPI<SpeakerSeparationResult>(`/api/recordings/${recordingId}/speakers`);
+}
+
+export function getSpeakerAudioUrl(recordingId: string, speakerId: string): string {
+  return `${API_BASE}/api/recordings/${recordingId}/speakers/${speakerId}/download`;
+}
+
+// ─── Harmonic Decomposition ───
+
+export interface HarmonicBand {
+  order: number;
+  frequency_hz: number;
+  energy_before: number;
+  energy_after: number;
+  snr_before_db: number;
+  snr_after_db: number;
+  energy_preserved_pct: number;
+  spectrogram_slice_b64: string;
+}
+
+export interface HarmonicDecompositionData {
+  fundamental_hz: number;
+  harmonics: HarmonicBand[];
+  total_harmonics_detected: number;
+}
+
+export async function getCallHarmonics(callId: string): Promise<HarmonicDecompositionData> {
+  return fetchAPI<HarmonicDecompositionData>(`/api/calls/${callId}/harmonics`);
+}
+
+// ─── Publishability & Research Summary ───
+
+export interface PublishabilityScore {
+  score: number;
+  tier: string;
+  tier_label: string;
+  components: Record<string, { value: number; weight: number; contribution: number }>;
+}
+
+export interface RecordingSummary2 {
+  recording_id: string;
+  filename: string;
+  duration_s: number;
+  processing_date: string;
+  noise_environment: { primary_type: string; severity: string; pct_affected: number };
+  call_inventory: {
+    total_calls: number;
+    by_type: Record<string, number>;
+    by_tier: Record<string, number>;
+    individuals_detected: number;
+    individual_ids: string[];
+  };
+  quality_assessment: {
+    avg_publishability_score: number;
+    avg_snr_improvement_db: number;
+    best_call_id: string | null;
+    best_call_score: number;
+  };
+  notable_findings: string[];
+  recommended_actions: string[];
+}
+
+export async function getRecordingSummary(recordingId: string): Promise<RecordingSummary2> {
+  return fetchAPI<RecordingSummary2>(`/api/recordings/${recordingId}/summary`);
+}
+
+// ─── Research Impact Stats (extended) ───
+
+export interface ResearchImpactStats extends Stats {
+  calls_recovered: number;
+  publishable_calls: number;
+  recordings_saved: number;
+  noise_types_defeated: Record<string, number>;
+  avg_snr_improvement_db: number;
+  total_noise_energy_removed_pct: number;
+  speakers_identified: number;
+  hours_of_clean_audio: number;
+}
+
+export async function getResearchImpactStats(): Promise<ResearchImpactStats> {
+  return fetchAPI<ResearchImpactStats>("/api/stats/research-impact");
 }

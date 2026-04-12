@@ -13,9 +13,12 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
-import { getRecording, API_BASE, type Recording, type Call } from "@/lib/audio-api";
+import { getCall, getRecording, API_BASE, type Recording, type Call } from "@/lib/audio-api";
 import WaveformPlayer from "@/components/audio/WaveformPlayer";
 import { QualityRing } from "@/components/ui/motion-primitives";
+import CallResearchPanel from "@/components/research/CallResearchPanel";
+import HarmonicDecompositionPanel from "@/components/spectrogram/HarmonicDecompositionPanel";
+import SpeakerDiarizationView from "@/components/spectrogram/SpeakerDiarizationView";
 
 const CALL_TYPE_DESCRIPTIONS: Record<string, string> = {
   rumble: "Low-frequency contact call — carries up to 10 km through the ground",
@@ -75,15 +78,41 @@ export default function ResultsDetailPage() {
   const id = params?.id as string;
 
   const [recording, setRecording] = useState<Recording | null>(null);
+  const [selectedCall, setSelectedCall] = useState<Call | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    getRecording(id)
-      .then(setRecording)
-      .catch(() => setError("Recording not found."))
-      .finally(() => setLoading(false));
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+      setSelectedCall(null);
+      try {
+        const recordingResult = await getRecording(id);
+        if (!cancelled) setRecording(recordingResult);
+      } catch {
+        try {
+          const callResult = await getCall(id);
+          const recordingResult = await getRecording(callResult.recording_id);
+          if (!cancelled) {
+            setSelectedCall(callResult);
+            setRecording(recordingResult);
+          }
+        } catch {
+          if (!cancelled) setError("Recording or call not found.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   if (loading) {
@@ -113,13 +142,15 @@ export default function ResultsDetailPage() {
 
   const result = recording.result;
   const quality = result?.quality;
-  const calls: Call[] = result?.calls ?? [];
+  const calls: Call[] = selectedCall ? [selectedCall] : result?.calls ?? [];
   const isComplete = recording.status === "complete";
+  const recordingId = selectedCall?.recording_id ?? recording.id;
+  const primaryCall = calls[0];
 
-  const spectrogramBefore = `${API_BASE}/api/recordings/${id}/spectrogram?type=before`;
-  const spectrogramAfter = `${API_BASE}/api/recordings/${id}/spectrogram?type=after`;
-  const audioOriginal = `${API_BASE}/api/recordings/${id}/audio?type=original`;
-  const audioCleaned = `${API_BASE}/api/recordings/${id}/audio?type=cleaned`;
+  const spectrogramBefore = `${API_BASE}/api/recordings/${recordingId}/spectrogram?type=before`;
+  const spectrogramAfter = `${API_BASE}/api/recordings/${recordingId}/spectrogram?type=after`;
+  const audioOriginal = `${API_BASE}/api/recordings/${recordingId}/audio?type=original`;
+  const audioCleaned = `${API_BASE}/api/recordings/${recordingId}/audio?type=cleaned`;
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
@@ -135,9 +166,13 @@ export default function ResultsDetailPage() {
               Results
             </Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-ev-elephant truncate max-w-[200px]">{recording.filename}</span>
+            <span className="text-ev-elephant truncate max-w-[200px]">
+              {selectedCall ? selectedCall.id : recording.filename}
+            </span>
           </div>
-          <h1 className="text-2xl font-bold text-ev-charcoal">{recording.filename}</h1>
+          <h1 className="text-2xl font-bold text-ev-charcoal">
+            {selectedCall ? `Call ${selectedCall.id.slice(0, 12)}` : recording.filename}
+          </h1>
           <div className="flex items-center gap-2 mt-1">
             {isComplete ? (
               <span className="inline-flex items-center gap-1 text-xs text-success font-medium">
@@ -150,14 +185,26 @@ export default function ResultsDetailPage() {
         </div>
         <div className="flex items-center gap-3">
           <Link
-            href={`/export?recording=${id}`}
+            href={`/recordings/${recordingId}/conversation`}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-ev-sand/40 text-sm text-ev-elephant hover:bg-ev-sand/30 transition-colors"
+          >
+            Conversation
+          </Link>
+          <Link
+            href={`/recordings/${recordingId}/summary`}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-ev-sand/40 text-sm text-ev-elephant hover:bg-ev-sand/30 transition-colors"
+          >
+            Research Summary
+          </Link>
+          <Link
+            href={`/export?recording=${recordingId}`}
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-ev-sand/40 text-sm text-ev-elephant hover:bg-ev-sand/30 transition-colors"
           >
             <Download className="w-4 h-4" />
             Export Data
           </Link>
           <Link
-            href={`/processing/${id}`}
+            href={`/processing/${recordingId}`}
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-ev-sand/40 text-sm text-ev-elephant hover:bg-ev-sand/30 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -245,6 +292,31 @@ export default function ResultsDetailPage() {
               )}
             </motion.div>
           )}
+
+          {primaryCall && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.24 }}
+              className="space-y-4"
+            >
+              <CallResearchPanel call={primaryCall} />
+              <HarmonicDecompositionPanel callId={primaryCall.id} />
+            </motion.div>
+          )}
+
+          {isComplete && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28 }}
+            >
+              <SpeakerDiarizationView
+                recordingId={recordingId}
+                initial={result?.speaker_separation}
+              />
+            </motion.div>
+          )}
         </div>
 
         {/* Sidebar metrics */}
@@ -317,7 +389,7 @@ export default function ResultsDetailPage() {
             <dl className="space-y-2.5 text-xs">
               <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-ev-warm-gray shrink-0">ID</dt>
-                <dd className="text-ev-elephant font-mono text-[11px] truncate">{id.slice(0, 12)}&hellip;</dd>
+                <dd className="text-ev-elephant font-mono text-[11px] truncate">{recordingId.slice(0, 12)}&hellip;</dd>
               </div>
               {(recording.duration_s ?? recording.duration) != null && (
                 <div className="flex items-baseline justify-between gap-3">

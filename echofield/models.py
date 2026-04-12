@@ -25,6 +25,7 @@ class ProcessingStage(str, Enum):
     spectrogram = "spectrogram"
     noise_classification = "noise_classification"
     noise_removal = "noise_removal"
+    speaker_separation = "speaker_separation"
     feature_extraction = "feature_extraction"
     quality_assessment = "quality_assessment"
     complete = "complete"
@@ -44,6 +45,11 @@ class RecordingMetadata(EchoBaseModel):
     microphone_type: str | None = Field(default=None, examples=["Parabolic"])
     notes: str | None = None
     species: str | None = Field(default=None, examples=["African bush elephant"])
+    original_filename: str | None = None
+    source_format: str | None = Field(default=None, examples=["mp3"])
+    source_content_type: str | None = Field(default=None, examples=["audio/mpeg"])
+    sample_rate: int | None = Field(default=None, ge=1)
+    channels: int | None = Field(default=None, ge=1)
     call_id: str | None = None
     animal_id: str | None = None
     noise_type_ref: str | None = Field(default=None, examples=["vehicle"])
@@ -149,6 +155,10 @@ class CallDetail(EchoBaseModel):
     species: str | None = None
     acoustic_features: dict[str, Any] = Field(default_factory=dict)
     metadata: dict[str, Any] = Field(default_factory=dict)
+    ethology: dict[str, Any] | None = None
+    reference_matches: list[dict[str, Any]] = Field(default_factory=list)
+    publishability: dict[str, Any] | None = None
+    speaker_id: str | None = None
 
 
 class CallRecord(CallDetail):
@@ -178,6 +188,7 @@ class ProcessingResult(EchoBaseModel):
     markers: list[dict[str, Any]] = Field(default_factory=list)
     sequences: list[dict[str, Any]] = Field(default_factory=list)
     recurring_patterns: list[dict[str, Any]] = Field(default_factory=list)
+    speaker_separation: dict[str, Any] | None = None
     export_metadata: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -295,6 +306,15 @@ class StatsResponse(EchoBaseModel):
     success_rate: float = Field(ge=0.0, le=1.0)
     processing_time_avg: float = Field(ge=0.0)
     circuit_breakers: dict[str, Any] = Field(default_factory=dict)
+    calls_recovered: int = Field(default=0, ge=0)
+    publishable_calls: int = Field(default=0, ge=0)
+    recordings_saved: int = Field(default=0, ge=0)
+    noise_types_defeated: dict[str, int] = Field(default_factory=dict)
+    avg_snr_improvement_db: float = 0.0
+    total_noise_energy_removed_percent: float = 0.0
+    total_noise_energy_removed_pct: float = 0.0
+    speakers_identified: int = Field(default=0, ge=0)
+    hours_of_clean_audio: float = Field(default=0.0, ge=0.0)
 
 
 class ComponentHealth(EchoBaseModel):

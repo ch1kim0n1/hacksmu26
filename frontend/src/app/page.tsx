@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import HeroGlobe from "@/components/hero/HeroGlobe";
 import { useSceneTransition } from "@/components/transition/SceneTransitionProvider";
+import ImpactDashboard from "@/components/research/ImpactDashboard";
 
 const landingNavItems = [
   { href: "/upload", label: "Upload" },
@@ -1227,8 +1228,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Wave: Steps → CTA ── */}
+      {/* ── Wave: Steps → Impact ── */}
       <WaveDivider topColor="#1c1710" bottomColor="#2C2926" variant={2} />
+
+      {/* ═══════════════════════════════════════════
+          RESEARCH IMPACT DASHBOARD
+         ═══════════════════════════════════════════ */}
+      <ImpactDashboard />
 
       {/* ═══════════════════════════════════════════
           CTA

@@ -57,6 +57,23 @@ function CallTypeBadge({ type }: { type: string }) {
   );
 }
 
+function PublishabilityBadge({ score, tier }: { score?: number; tier?: string }) {
+  if (score == null) return null;
+  const classes =
+    score >= 85
+      ? "bg-success/10 text-success border-success/20"
+      : score >= 70
+        ? "bg-accent-savanna/10 text-accent-savanna border-accent-savanna/20"
+        : score >= 50
+          ? "bg-warning/10 text-warning border-warning/20"
+          : "bg-danger/10 text-danger border-danger/20";
+  return (
+    <span className={`rounded-md border px-2 py-0.5 text-[11px] font-semibold ${classes}`}>
+      {tier ? tier.replace("_", " ") : "score"} {score.toFixed(0)}
+    </span>
+  );
+}
+
 export default function DatabasePage() {
   const router = useRouter();
 
@@ -135,14 +152,34 @@ export default function DatabasePage() {
             Browse and search all detected elephant vocalizations.
           </p>
         </div>
-        <motion.span
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.15 }}
-          className="glass border border-ev-sand/30 px-3 py-1.5 rounded-xl tabular-nums text-sm text-ev-warm-gray font-medium"
-        >
-          {total} total calls
-        </motion.span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            href="/elephants"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-accent-savanna/30 bg-accent-savanna/5 text-xs font-medium text-accent-savanna hover:bg-accent-savanna/10 transition-colors"
+          >
+            Elephants
+          </Link>
+          <Link
+            href="/research/ethology"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-blue-400/30 bg-blue-400/5 text-xs font-medium text-blue-400 hover:bg-blue-400/10 transition-colors"
+          >
+            Call Guide
+          </Link>
+          <Link
+            href="/research/social-network"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-purple-400/30 bg-purple-400/5 text-xs font-medium text-purple-400 hover:bg-purple-400/10 transition-colors"
+          >
+            Social Network
+          </Link>
+          <motion.span
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.15 }}
+            className="glass border border-ev-sand/30 px-3 py-1.5 rounded-xl tabular-nums text-sm text-ev-warm-gray font-medium"
+          >
+            {total} total calls
+          </motion.span>
+        </div>
       </motion.div>
 
       {/* Search & Filters */}
@@ -273,6 +310,27 @@ export default function DatabasePage() {
                   )}
                 </div>
                 <CallTypeBadge type={call.call_type} />
+              </div>
+
+              <div className="mb-3 flex flex-wrap gap-1.5">
+                {call.reference_matches?.[0] && (
+                  <span className="rounded-md border border-accent-gold/25 bg-accent-gold/10 px-2 py-0.5 text-[11px] font-semibold text-accent-gold">
+                    Best Match: {call.reference_matches[0].label}{" "}
+                    {(call.reference_matches[0].similarity_score * 100).toFixed(0)}%
+                  </span>
+                )}
+                {call.ethology?.meaning && (
+                  <span
+                    title={`${call.ethology.behavioral_context ?? ""} ${call.ethology.common_response ?? ""}`.trim()}
+                    className="rounded-md border border-blue-400/20 bg-blue-400/10 px-2 py-0.5 text-[11px] font-semibold text-blue-500"
+                  >
+                    Meaning: {call.ethology.meaning}
+                  </span>
+                )}
+                <PublishabilityBadge
+                  score={call.publishability?.score}
+                  tier={call.publishability?.tier}
+                />
               </div>
 
               {/* Frequency range bar */}

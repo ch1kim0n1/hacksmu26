@@ -34,6 +34,10 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
     items: [
       { href: "/upload", label: "Upload", icon: Upload },
       { href: "/recordings", label: "Recordings", icon: Layers },
+      { href: "/elephants", label: "Elephants", icon: Users },
+      { href: "/research/ethology", label: "Call Guide", icon: BookOpen },
+      { href: "/research/social-network", label: "Social Network", icon: Network },
+      { href: "/field-monitor", label: "Field Monitor", icon: Monitor },
       { href: "/realtime", label: "Real-Time Filter", icon: Radio },
     ],
   },
