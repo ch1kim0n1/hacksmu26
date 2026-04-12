@@ -41,12 +41,17 @@ from echofield.models import (
     ComponentHealth,
     ContourMatch,
     ContourMatchResponse,
+    CrossSpeciesComparisonResponse,
+    CrossSpeciesRequest,
     EmbeddingResponse,
+    EmotionTimelineResponse,
     ErrorResponse,
     ExportRequest,
     HarmonicOverlayResponse,
     HealthResponse,
     IndividualCluster,
+    InfrasoundRevealRequest,
+    InfrasoundRevealResponse,
     IndividualMatch,
     IndividualProfile,
     MarkerResponse,
@@ -86,6 +91,7 @@ from echofield.pipeline.feature_extract import (
     load_classifier,
     train_classifier,
 )
+from echofield.pipeline.infrasound import create_infrasound_reveal
 from echofield.research.acoustic_analysis import (
     build_identity_signature,
     build_similarity_graph,
@@ -96,13 +102,15 @@ from echofield.research.acoustic_analysis import (
     SimilarityMatrixCache,
     track_frequency_contour,
 )
+from echofield.research.cross_species import REFERENCE_CALLS, compare_call_to_reference
+from echofield.research.emotion_classifier import build_emotion_timeline
 from echofield.research.exporter import export_csv, export_json, export_pdf, export_zip
 from echofield.research.call_fingerprint import top_k_similar
 from echofield.research.individual_id import IndividualIdentifier
 from echofield.research.sequence_analyzer import extract_sequences, find_recurring_patterns
 from echofield.research.site_profiler import build_activity_heatmap, build_site_profile, list_sites
 from echofield.research.voice_id import cluster_individuals, match_across_recordings
-from echofield.utils.audio_utils import get_duration, load_audio
+from echofield.utils.audio_utils import get_duration, load_audio, save_audio
 from echofield.utils.logging_config import get_logger, request_context
 from echofield.webhook_manager import WebhookManager
 from echofield.websocket import manager
@@ -913,6 +921,7 @@ async def get_spectrogram(
         "before": result.get("spectrogram_before_path"),
         "after": result.get("spectrogram_after_path"),
         "comparison": result.get("comparison_spectrogram_path"),
+        "infrasound": (result.get("export_metadata") or {}).get("infrasound_spectrogram_path"),
     }
     path = mapping.get(type)
     if not path or not Path(path).exists():
@@ -936,6 +945,86 @@ async def get_audio(
     if not path.exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
     return FileResponse(path, media_type=_audio_media_type(path))
+
+
+@app.post("/api/recordings/{recording_id}/infrasound-reveal", response_model=InfrasoundRevealResponse)
+async def create_recording_infrasound_reveal(
+    recording_id: str,
+    payload: InfrasoundRevealRequest,
+) -> InfrasoundRevealResponse:
+    recording = _get_store().get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    result = recording.get("result") or {}
+    audio_path = Path(result.get("output_audio_path") or _get_recording_path(recording))
+    if not audio_path.exists():
+        raise HTTPException(status_code=404, detail="Audio file not found")
+    y, sr = load_audio(audio_path)
+    reveal = create_infrasound_reveal(
+        y,
+        sr,
+        shift_octaves=payload.shift_octaves,
+        method=payload.method,
+        mix_mode=payload.mix_mode,
+    )
+    output_path = settings.processed_dir / f"{recording_id}_infrasound_shifted.wav"
+    await asyncio.to_thread(save_audio, reveal["audio"], reveal["sr"], output_path)
+
+    spectrogram_path = settings.spectrogram_dir / f"{recording_id}_infrasound.png"
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(8, 2.8), dpi=160)
+    ax.specgram(y, NFFT=min(16384, max(256, len(y) // 2)), Fs=sr, noverlap=128, cmap="viridis")
+    ax.set_ylim(0, 50)
+    ax.set_title("Infrasound 0-50Hz")
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Hz")
+    fig.tight_layout()
+    spectrogram_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(spectrogram_path)
+    plt.close(fig)
+
+    result = dict(result)
+    export_metadata = dict(result.get("export_metadata") or {})
+    export_metadata.update({
+        "infrasound_shifted_audio_path": str(output_path),
+        "infrasound_spectrogram_path": str(spectrogram_path),
+    })
+    result["export_metadata"] = export_metadata
+    _get_store().update_result(recording_id, result)
+
+    factor = 2 ** payload.shift_octaves
+    regions = [
+        {
+            **region,
+            "shifted_f0_hz": round(float(region.get("estimated_f0_hz") or 0.0) * factor, 2),
+        }
+        for region in reveal["regions"]
+    ]
+    return InfrasoundRevealResponse(
+        recording_id=recording_id,
+        infrasound_detected=bool(regions),
+        infrasound_regions=regions,
+        shifted_audio_url=f"/api/recordings/{recording_id}/audio/infrasound-shifted",
+        shift_octaves=payload.shift_octaves,
+        frequency_range_original_hz=tuple(reveal["frequency_range_original_hz"]),
+        frequency_range_shifted_hz=tuple(reveal["frequency_range_shifted_hz"]),
+        infrasound_energy_pct=float(reveal["infrasound_energy_pct"]),
+        method=payload.method,
+        mix_mode=payload.mix_mode,
+    )
+
+
+@app.get("/api/recordings/{recording_id}/audio/infrasound-shifted")
+async def get_infrasound_shifted_audio(recording_id: str) -> FileResponse:
+    recording = _get_store().get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    result = recording.get("result") or {}
+    path = Path((result.get("export_metadata") or {}).get("infrasound_shifted_audio_path") or settings.processed_dir / f"{recording_id}_infrasound_shifted.wav")
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Infrasound shifted audio not found")
+    return FileResponse(path, media_type="audio/wav")
 
 
 @app.get("/api/recordings/{recording_id}/download")
@@ -1026,6 +1115,19 @@ async def get_recording_sequences(recording_id: str, max_gap_ms: float = Query(d
         raise HTTPException(status_code=404, detail="Recording not found")
     sequences = extract_sequences(_calls_for_recording(recording_id), max_gap_ms=max_gap_ms)
     return [CallSequenceModel(**sequence) for sequence in sequences]
+
+
+@app.get("/api/recordings/{recording_id}/emotion-timeline", response_model=EmotionTimelineResponse)
+async def get_emotion_timeline(
+    recording_id: str,
+    resolution_ms: float = Query(default=500.0, ge=100.0, le=5000.0),
+) -> EmotionTimelineResponse:
+    recording = _get_store().get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    duration_ms = float(recording.get("duration_s") or 0.0) * 1000.0
+    payload = build_emotion_timeline(_calls_for_recording(recording_id), duration_ms, resolution_ms=resolution_ms)
+    return EmotionTimelineResponse(recording_id=recording_id, **payload)
 
 
 @app.get("/api/stats", response_model=StatsResponse)
@@ -1223,6 +1325,94 @@ async def compare_calls_overlay(
             ax.set_ylabel("Amplitude")
         ax.set_xlabel("Normalized time")
         ax.legend(fontsize=6, loc="upper right")
+    fig.tight_layout()
+    buffer = io.BytesIO()
+    fig.savefig(buffer, format="png")
+    plt.close(fig)
+    buffer.seek(0)
+    return StreamingResponse(iter([buffer.getvalue()]), media_type="image/png")
+
+
+@app.get("/api/reference-calls", response_model=list[dict[str, Any]])
+async def list_reference_calls() -> list[dict[str, Any]]:
+    return list(REFERENCE_CALLS.values())
+
+
+@app.post("/api/compare/cross-species", response_model=CrossSpeciesComparisonResponse)
+async def compare_cross_species(payload: CrossSpeciesRequest) -> CrossSpeciesComparisonResponse:
+    call = _get_call_database().get_call(payload.elephant_call_id)
+    if call is None:
+        raise HTTPException(status_code=404, detail="Elephant call not found")
+    try:
+        comparison = compare_call_to_reference(call, payload.reference_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail="Reference call not found") from exc
+    return CrossSpeciesComparisonResponse(**comparison)
+
+
+@app.post("/api/compare/cross-species/upload", response_model=CrossSpeciesComparisonResponse)
+async def compare_cross_species_upload(
+    elephant_call_id: str = Query(...),
+    file: UploadFile = File(...),
+) -> CrossSpeciesComparisonResponse:
+    call = _get_call_database().get_call(elephant_call_id)
+    if call is None:
+        raise HTTPException(status_code=404, detail="Elephant call not found")
+    suffix = Path(file.filename or "reference.wav").suffix or ".wav"
+    temp_path = settings.cache_dir / f"{uuid.uuid4().hex}{suffix}"
+    async with aiofiles.open(temp_path, "wb") as handle:
+        await handle.write(await file.read())
+    try:
+        y, sr = load_audio(temp_path)
+        features = extract_acoustic_features(y, sr)
+        reference_id = "uploaded_reference"
+        REFERENCE_CALLS[reference_id] = {
+            "id": reference_id,
+            "species": "Uploaded reference",
+            "call_type": file.filename or "uploaded audio",
+            "description": "User-uploaded cross-species reference.",
+            "frequency_range_hz": (
+                float(features.get("fundamental_frequency_hz") or 0.0),
+                float(features.get("spectral_rolloff_hz") or features.get("spectral_centroid_hz") or 1.0),
+            ),
+            "synthetic": False,
+        }
+        comparison = compare_call_to_reference(call, reference_id)
+    finally:
+        temp_path.unlink(missing_ok=True)
+    return CrossSpeciesComparisonResponse(**comparison)
+
+
+@app.get("/api/compare/viz/{elephant_call_id}/{reference_id}.png")
+async def get_cross_species_visualization(
+    elephant_call_id: str,
+    reference_id: str,
+    type: str = Query(default="overlay", pattern="^(overlay|side_by_side)$"),
+) -> StreamingResponse:
+    import matplotlib.pyplot as plt
+
+    call = _get_call_database().get_call(elephant_call_id)
+    if call is None or reference_id not in REFERENCE_CALLS:
+        raise HTTPException(status_code=404, detail="Comparison not found")
+    reference = REFERENCE_CALLS[reference_id]
+    comparison = compare_call_to_reference(call, reference_id)
+    elephant_range = (
+        float(call.get("frequency_min_hz") or 0.0),
+        float(call.get("frequency_max_hz") or (call.get("acoustic_features") or {}).get("spectral_rolloff_hz") or 1.0),
+    )
+    reference_range = tuple(float(value) for value in reference["frequency_range_hz"])
+    fig, ax = plt.subplots(figsize=(7, 2.8), dpi=160)
+    if type == "side_by_side":
+        ax.barh(["Elephant", "Reference"], [elephant_range[1] - elephant_range[0], reference_range[1] - reference_range[0]], left=[elephant_range[0], reference_range[0]], color=["#2563EB", "#F97316"])
+    else:
+        ax.axvspan(elephant_range[0], elephant_range[1], color="#2563EB", alpha=0.35, label="Elephant")
+        ax.axvspan(reference_range[0], reference_range[1], color="#F97316", alpha=0.35, label=reference["species"])
+        shared = comparison["comparison"]["shared_frequency_range_hz"]
+        if shared[1] > shared[0]:
+            ax.axvspan(shared[0], shared[1], color="#10B981", alpha=0.45, label="Shared")
+        ax.legend(fontsize=7)
+    ax.set_xlabel("Frequency (Hz)")
+    ax.set_title("Cross-species frequency comparison")
     fig.tight_layout()
     buffer = io.BytesIO()
     fig.savefig(buffer, format="png")

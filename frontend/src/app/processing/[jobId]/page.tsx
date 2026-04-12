@@ -4,8 +4,19 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import useProcessingJob from "@/hooks/useProcessingJob";
-import { getRecording, getRecordingMarkers, API_BASE, type MarkerResponse, type Recording } from "@/lib/audio-api";
+import {
+  getEmotionTimeline,
+  getRecording,
+  getRecordingMarkers,
+  revealInfrasound,
+  API_BASE,
+  type EmotionTimelineResponse,
+  type InfrasoundRevealResponse,
+  type MarkerResponse,
+  type Recording,
+} from "@/lib/audio-api";
 import { AnalysisLabels, AnalysisWindow } from "@/components/research/AnalysisLabels";
+import EmotionTimeline from "@/components/research/EmotionTimeline";
 
 interface ProcessingMetrics {
   snr_before?: number;
@@ -122,6 +133,9 @@ export default function ProcessingPage() {
 
   const [recording, setRecording] = useState<Recording | null>(null);
   const [markers, setMarkers] = useState<MarkerResponse | null>(null);
+  const [emotionTimeline, setEmotionTimeline] = useState<EmotionTimelineResponse | null>(null);
+  const [infrasound, setInfrasound] = useState<InfrasoundRevealResponse | null>(null);
+  const [revealingInfrasound, setRevealingInfrasound] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -136,6 +150,7 @@ export default function ProcessingPage() {
       setRecording(data);
       if (data.status === "complete") {
         getRecordingMarkers(jobId).then(setMarkers).catch(() => setMarkers(null));
+        getEmotionTimeline(jobId).then(setEmotionTimeline).catch(() => setEmotionTimeline(null));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load recording");
@@ -208,6 +223,7 @@ export default function ProcessingPage() {
   const spectrogramAfter = `${API_BASE}/api/recordings/${jobId}/spectrogram?type=after`;
   const audioOriginal = `${API_BASE}/api/recordings/${jobId}/audio?type=original`;
   const audioCleaned = `${API_BASE}/api/recordings/${jobId}/audio?type=cleaned`;
+  const audioInfrasound = infrasound ? `${API_BASE}${infrasound.shifted_audio_url}` : null;
 
   const metricsFromLive: ProcessingMetrics | null = processing.quality
     ? {
@@ -516,6 +532,8 @@ export default function ProcessingPage() {
                 </div>
               </div>
             )}
+
+            {emotionTimeline && <EmotionTimeline data={emotionTimeline} />}
           </div>
 
           {/* Right Sidebar - Metrics */}
@@ -697,6 +715,33 @@ export default function ProcessingPage() {
             {/* Actions */}
             {isComplete && (
               <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setRevealingInfrasound(true);
+                    revealInfrasound(jobId)
+                      .then(setInfrasound)
+                      .finally(() => setRevealingInfrasound(false));
+                  }}
+                  disabled={revealingInfrasound}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-danger px-6 py-3 font-semibold text-white transition-colors hover:bg-danger/90 disabled:opacity-50"
+                >
+                  {revealingInfrasound ? "Revealing..." : "Hear the Unhearable"}
+                </button>
+                {infrasound && (
+                  <div className="rounded-lg border border-danger/20 bg-danger/10 p-4">
+                    <p className="text-sm font-medium text-danger">
+                      {infrasound.infrasound_detected ? "Infrasound detected" : "No strong infrasound detected"}
+                    </p>
+                    <p className="mt-1 text-xs text-ev-elephant">
+                      Shifted +{infrasound.shift_octaves} octaves · {infrasound.infrasound_energy_pct.toFixed(1)}% infrasonic energy
+                    </p>
+                    {audioInfrasound && (
+                      <audio controls className="mt-3 w-full" preload="metadata">
+                        <source src={audioInfrasound} type="audio/wav" />
+                      </audio>
+                    )}
+                  </div>
+                )}
                 <Link
                   href={`/results/${jobId}`}
                   className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-accent-savanna text-ev-ivory font-semibold rounded-xl hover:bg-accent-savanna/90 transition-colors"

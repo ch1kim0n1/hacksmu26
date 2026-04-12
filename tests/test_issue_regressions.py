@@ -230,8 +230,19 @@ def test_research_timelines_profiles_patterns_and_exports(loaded_server, test_cl
     sites = test_client.get("/api/sites")
     profile = test_client.get("/api/sites/Amboseli/noise-profile")
     recommendations = test_client.get("/api/sites/Amboseli/recommendations")
+    emotion = test_client.get("/api/recordings/research-a/emotion-timeline")
+    infrasound = test_client.post(
+        "/api/recordings/research-a/infrasound-reveal",
+        json={"shift_octaves": 3, "method": "phase_vocoder", "mix_mode": "shifted_only"},
+    )
     individuals = test_client.get("/api/individuals", params={"min_confidence": 0.0})
     cross_match = test_client.get("/api/individuals/cross-match", params={"recording_ids": "research-a,research-b", "min_similarity": 0.0})
+    references = test_client.get("/api/reference-calls")
+    cross_species = test_client.post(
+        "/api/compare/cross-species",
+        json={"elephant_call_id": "research-a1", "reference_id": "blue_whale_call"},
+    )
+    cross_species_viz = test_client.get("/api/compare/viz/research-a1/blue_whale_call.png")
     batch_summary = test_client.get(f"/api/batch/{batch['batch_id']}/summary")
     export = test_client.post(
         "/api/export/research",
@@ -268,9 +279,21 @@ def test_research_timelines_profiles_patterns_and_exports(loaded_server, test_cl
     assert profile.json()["noise_sources"][0]["noise_type"] == "generator"
     assert recommendations.status_code == 200
     assert recommendations.json()["recommendations"]
+    assert emotion.status_code == 200
+    assert emotion.json()["recording_summary"]["dominant_state"]
+    assert infrasound.status_code == 200
+    assert infrasound.json()["shifted_audio_url"].endswith("/audio/infrasound-shifted")
+    shifted_audio = test_client.get("/api/recordings/research-a/audio/infrasound-shifted")
+    assert shifted_audio.status_code == 200
     assert individuals.status_code == 200
     assert individuals.json()
     assert cross_match.status_code == 200
+    assert references.status_code == 200
+    assert len(references.json()) >= 4
+    assert cross_species.status_code == 200
+    assert cross_species.json()["comparison"]["frequency_overlap_pct"] >= 0
+    assert cross_species_viz.status_code == 200
+    assert cross_species_viz.headers["content-type"] == "image/png"
     assert batch_summary.status_code == 200
     assert batch_summary.json()["total_calls_detected"] == 5
     assert batch_summary.json()["call_type_distribution"]["rumble"] == 3

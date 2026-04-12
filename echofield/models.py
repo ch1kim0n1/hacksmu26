@@ -378,6 +378,77 @@ class ReviewActionRequest(EchoBaseModel):
     reviewer: str | None = None
 
 
+class InfrasoundRevealRequest(EchoBaseModel):
+    shift_octaves: int = Field(default=3, ge=1, le=5)
+    method: str = Field(default="phase_vocoder", pattern="^(phase_vocoder|resample)$")
+    mix_mode: str = Field(default="shifted_only", pattern="^(shifted_only|blended|side_by_side)$")
+
+
+class InfrasoundRegion(EchoBaseModel):
+    start_ms: float = Field(ge=0.0)
+    end_ms: float = Field(ge=0.0)
+    estimated_f0_hz: float = Field(ge=0.0)
+    shifted_f0_hz: float | None = Field(default=None, ge=0.0)
+    energy_db: float
+
+
+class InfrasoundRevealResponse(EchoBaseModel):
+    recording_id: str
+    infrasound_detected: bool
+    infrasound_regions: list[InfrasoundRegion] = Field(default_factory=list)
+    shifted_audio_url: str
+    shift_octaves: int
+    frequency_range_original_hz: tuple[float, float]
+    frequency_range_shifted_hz: tuple[float, float]
+    infrasound_energy_pct: float
+    method: str
+    mix_mode: str
+
+
+class EmotionTimelinePoint(EchoBaseModel):
+    time_ms: float = Field(ge=0.0)
+    state: str
+    arousal: float = Field(ge=0.0, le=1.0)
+    valence: float = Field(ge=0.0, le=1.0)
+    color: str
+    call_id: str | None = None
+
+
+class EmotionEstimate(EchoBaseModel):
+    call_id: str | None = None
+    call_type: str | None = None
+    state: str
+    arousal: float = Field(ge=0.0, le=1.0)
+    valence: float = Field(ge=0.0, le=1.0)
+    confidence: float = Field(ge=0.0, le=1.0)
+    color: str
+    description: str
+    start_ms: float | None = None
+    end_ms: float | None = None
+
+
+class EmotionTimelineResponse(EchoBaseModel):
+    recording_id: str
+    duration_ms: float = Field(ge=0.0)
+    resolution_ms: float = Field(ge=100.0)
+    timeline: list[EmotionTimelinePoint] = Field(default_factory=list)
+    call_emotions: list[EmotionEstimate] = Field(default_factory=list)
+    recording_summary: dict[str, Any]
+
+
+class CrossSpeciesRequest(EchoBaseModel):
+    elephant_call_id: str
+    reference_id: str
+
+
+class CrossSpeciesComparisonResponse(EchoBaseModel):
+    elephant_call: dict[str, Any]
+    reference: dict[str, Any]
+    comparison: dict[str, Any]
+    visualizations: dict[str, str]
+    feature_comparison: dict[str, Any]
+
+
 class ReviewQueueResponse(EchoBaseModel):
     total: int = Field(ge=0)
     returned: int = Field(ge=0)

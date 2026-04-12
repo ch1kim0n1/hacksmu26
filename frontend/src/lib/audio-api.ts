@@ -168,6 +168,54 @@ export interface ReviewQueueResponse {
   items: Call[];
 }
 
+export interface InfrasoundRevealResponse {
+  recording_id: string;
+  infrasound_detected: boolean;
+  infrasound_regions: Array<{
+    start_ms: number;
+    end_ms: number;
+    estimated_f0_hz: number;
+    shifted_f0_hz?: number | null;
+    energy_db: number;
+  }>;
+  shifted_audio_url: string;
+  shift_octaves: number;
+  frequency_range_original_hz: [number, number];
+  frequency_range_shifted_hz: [number, number];
+  infrasound_energy_pct: number;
+  method: string;
+  mix_mode: string;
+}
+
+export interface EmotionTimelineResponse {
+  recording_id: string;
+  duration_ms: number;
+  resolution_ms: number;
+  timeline: Array<{
+    time_ms: number;
+    state: string;
+    arousal: number;
+    valence: number;
+    color: string;
+    call_id?: string | null;
+  }>;
+  call_emotions: Array<Record<string, unknown>>;
+  recording_summary: {
+    dominant_state?: string;
+    arousal_avg?: number;
+    valence_avg?: number;
+    state_distribution?: Record<string, number>;
+  };
+}
+
+export interface CrossSpeciesComparison {
+  elephant_call: Record<string, unknown>;
+  reference: Record<string, unknown>;
+  comparison: Record<string, unknown>;
+  visualizations: Record<string, string>;
+  feature_comparison: Record<string, unknown>;
+}
+
 function normalizeRecording(recording: Recording): Recording {
   const metadataSampleRate = Number(recording.metadata?.sample_rate ?? 0);
   const meta = recording.metadata;
@@ -281,6 +329,39 @@ export async function getBatchSummary(batchId: string): Promise<BatchSummary> {
 
 export async function getRecordingMarkers(id: string): Promise<MarkerResponse> {
   return fetchAPI<MarkerResponse>(`/api/recordings/${id}/markers`);
+}
+
+export async function revealInfrasound(id: string, params?: {
+  shift_octaves?: number;
+  method?: "phase_vocoder" | "resample";
+  mix_mode?: "shifted_only" | "blended" | "side_by_side";
+}): Promise<InfrasoundRevealResponse> {
+  return fetchAPI<InfrasoundRevealResponse>(`/api/recordings/${id}/infrasound-reveal`, {
+    method: "POST",
+    body: JSON.stringify({
+      shift_octaves: params?.shift_octaves ?? 3,
+      method: params?.method ?? "phase_vocoder",
+      mix_mode: params?.mix_mode ?? "shifted_only",
+    }),
+  });
+}
+
+export async function getEmotionTimeline(id: string): Promise<EmotionTimelineResponse> {
+  return fetchAPI<EmotionTimelineResponse>(`/api/recordings/${id}/emotion-timeline`);
+}
+
+export async function getReferenceCalls(): Promise<Array<Record<string, unknown>>> {
+  return fetchAPI<Array<Record<string, unknown>>>("/api/reference-calls");
+}
+
+export async function compareCrossSpecies(params: {
+  elephant_call_id: string;
+  reference_id: string;
+}): Promise<CrossSpeciesComparison> {
+  return fetchAPI<CrossSpeciesComparison>("/api/compare/cross-species", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
 }
 
 export function getRecordingSpectrogram(id: string, type: "before" | "after" | "comparison" = "after"): string {

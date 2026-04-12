@@ -138,6 +138,12 @@ export default function DatabasePage() {
             >
               Review Queue
             </Link>
+            <Link
+              href="/compare"
+              className="rounded-lg border border-ev-sand bg-ev-cream px-4 py-2 text-sm font-medium text-ev-charcoal transition-colors hover:border-ev-warm-gray"
+            >
+              Cross-Species Compare
+            </Link>
           </div>
         </div>
 
