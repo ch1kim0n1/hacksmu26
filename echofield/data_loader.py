@@ -7,6 +7,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import shutil
 import sqlite3
 import uuid
 from datetime import datetime, timezone
@@ -87,6 +88,11 @@ def discover_audio_files(directory: str | Path) -> list[str]:
     discovered: list[str] = []
     for search_root in search_roots:
         for current_root, _dirnames, filenames in os.walk(search_root):
+            # Skip demo subdirectories — they contain pre-computed results
+            # that are loaded separately via discover_demo_results().
+            rel = Path(current_root).relative_to(search_root)
+            if rel.parts and rel.parts[0] == "demo":
+                continue
             for filename in filenames:
                 if Path(filename).suffix.lower() in _AUDIO_EXTENSIONS:
                     discovered.append(str((Path(current_root) / filename).resolve()))
@@ -192,6 +198,105 @@ def list_recordings_with_metadata(
     metadata_rows = load_metadata_csv(metadata_path)
     audio_files = discover_audio_files(audio_dir)
     return match_metadata_to_audio(metadata_rows, audio_files)
+
+
+def _find_original_for_demo(audio_dir: Path, demo_name: str) -> Path | None:
+    """Find the original audio file matching a demo folder name.
+
+    Handles filename quirks like extra spaces (e.g. '2000-4 _airplane_01').
+    """
+    for subdir in ["original", "."]:
+        candidate = audio_dir / subdir / f"{demo_name}.wav"
+        if candidate.exists():
+            return candidate
+
+    normalized_demo = demo_name.replace(" ", "").lower()
+    for search_dir in [audio_dir / "original", audio_dir]:
+        if not search_dir.is_dir():
+            continue
+        for child in search_dir.iterdir():
+            if child.suffix.lower() not in _AUDIO_EXTENSIONS:
+                continue
+            if child.stem.replace(" ", "").lower() == normalized_demo:
+                return child
+    return None
+
+
+def discover_demo_results(
+    audio_dir: str | Path,
+    spectrogram_dir: str | Path,
+    processed_dir: str | Path,
+) -> list[dict[str, Any]]:
+    """Scan data/recordings/demo/ for pre-computed results.
+
+    Each demo folder contains original.wav, processed.wav,
+    before_spectrogram.png, after_spectrogram.png, and metadata.json.
+    Copies output files to canonical directories and returns result dicts.
+    """
+    demo_root = Path(audio_dir) / "demo"
+    if not demo_root.is_dir():
+        return []
+
+    spec_dir = Path(spectrogram_dir)
+    proc_dir = Path(processed_dir)
+    spec_dir.mkdir(parents=True, exist_ok=True)
+    proc_dir.mkdir(parents=True, exist_ok=True)
+
+    results: list[dict[str, Any]] = []
+    for entry in sorted(demo_root.iterdir()):
+        if not entry.is_dir():
+            continue
+        original = entry / "original.wav"
+        meta_file = entry / "metadata.json"
+        processed = entry / "processed.wav"
+        before_spec = entry / "before_spectrogram.png"
+        after_spec = entry / "after_spectrogram.png"
+
+        if not original.exists() or not meta_file.exists():
+            continue
+
+        demo_name = entry.name
+        original_file = _find_original_for_demo(Path(audio_dir), demo_name)
+        if original_file:
+            rec_id = stable_recording_id(str(original_file.resolve()), original_file.name)
+        else:
+            rec_id = stable_recording_id(None, f"{demo_name}.wav", demo_name)
+
+        try:
+            demo_meta = json.loads(meta_file.read_text(encoding="utf-8"))
+        except Exception:
+            logger.warning("Failed to read demo metadata: %s", meta_file)
+            continue
+
+        spec_before_dst = spec_dir / f"{rec_id}_before_spectrogram.png"
+        spec_after_dst = spec_dir / f"{rec_id}_after_spectrogram.png"
+        proc_dst = proc_dir / f"{rec_id}_cleaned.wav"
+
+        if before_spec.exists() and not spec_before_dst.exists():
+            shutil.copy2(str(before_spec), str(spec_before_dst))
+        if after_spec.exists() and not spec_after_dst.exists():
+            shutil.copy2(str(after_spec), str(spec_after_dst))
+        if processed.exists() and not proc_dst.exists():
+            shutil.copy2(str(processed), str(proc_dst))
+
+        result = {
+            "recording_id": rec_id,
+            "status": "complete",
+            "quality": demo_meta.get("quality", {}),
+            "noise_types": demo_meta.get("noise_types", []),
+            "call_count": demo_meta.get("call_count", 0),
+            "calls": demo_meta.get("calls", []),
+            "output_audio_path": str(proc_dst) if proc_dst.exists() else None,
+            "spectrogram_before_path": str(spec_before_dst) if spec_before_dst.exists() else None,
+            "spectrogram_after_path": str(spec_after_dst) if spec_after_dst.exists() else None,
+            "processing_time_s": 0.0,
+            "demo_source": str(entry),
+        }
+        results.append(result)
+        logger.info("Loaded demo result for %s (id=%s)", demo_name, rec_id)
+
+    logger.info("Discovered %d demo results in %s", len(results), demo_root)
+    return results
 
 
 class RecordingStore:

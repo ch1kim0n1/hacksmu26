@@ -13,7 +13,7 @@ const landingNavItems = [
   { href: "/upload", label: "Upload" },
   { href: "/recordings", label: "Recordings" },
   { href: "/database", label: "Database" },
-  { href: "#get-started", label: "Get Started" },
+  { href: "/upload", label: "Get Started" },
 ] as const;
 
 /* ────────────────────────────────────────────
@@ -129,7 +129,9 @@ export default function LandingPage() {
       gsap.set("[data-nav]", {
         backgroundColor: "rgba(44,41,38,0)",
         backdropFilter: "blur(0px)",
-        borderBottomColor: "rgba(255,255,255,0)",
+      });
+      gsap.set("[data-nav-wave]", {
+        fill: "rgba(44,41,38,0)",
       });
       gsap.set("[data-nav-brand]", {
         color: "#3f3121",
@@ -143,7 +145,16 @@ export default function LandingPage() {
       gsap.to("[data-nav]", {
         backgroundColor: "rgba(44,41,38,0.92)",
         backdropFilter: "blur(16px)",
-        borderBottomColor: "rgba(255,255,255,0.1)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "+=180",
+          scrub: true,
+        },
+      });
+      gsap.to("[data-nav-wave]", {
+        fill: "rgba(44,41,38,0.92)",
         ease: "none",
         scrollTrigger: {
           trigger: heroRef.current,
@@ -473,7 +484,8 @@ export default function LandingPage() {
          ═══════════════════════════════════════════ */}
       <nav
         data-nav
-        className="fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent"
+        className="fixed top-0 left-0 right-0 z-50 bg-transparent"
+        style={{ borderBottom: "none" }}
       >
           <div className="flex w-full items-center gap-6 px-3 py-4 sm:px-4 lg:px-5">
             <Link href="/" className="flex items-center gap-2">
@@ -508,6 +520,17 @@ export default function LandingPage() {
           </div>
 
         </div>
+        {/* SVG wave cutout — gives the navbar an organic bottom edge */}
+        <svg
+          className="pointer-events-none absolute bottom-0 left-0 w-full translate-y-full"
+          viewBox="0 0 1440 18"
+          preserveAspectRatio="none"
+          fill="currentColor"
+          style={{ color: "inherit" }}
+          data-nav-wave
+        >
+          <path d="M0,0 H1440 V6 C1320,16 1140,18 960,14 C780,10 600,16 420,18 C240,20 120,14 0,10 Z" />
+        </svg>
       </nav>
 
       {/* ═══════════════════════════════════════════
