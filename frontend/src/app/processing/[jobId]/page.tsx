@@ -6,6 +6,7 @@ import Link from "next/link";
 import useProcessingJob from "@/hooks/useProcessingJob";
 import { getRecording, API_BASE, type Recording } from "@/lib/audio-api";
 import { AnalysisLabels, AnalysisWindow } from "@/components/research/AnalysisLabels";
+import ConversationView from "@/components/research/ConversationView";
 
 interface ProcessingMetrics {
   snr_before?: number;
@@ -442,6 +443,14 @@ export default function ProcessingPage() {
                 </div>
               </div>
             </div>
+
+            {/* Elephant Conversation */}
+            <ConversationView
+              recordingId={jobId}
+              isComplete={isComplete}
+              location={recording?.location}
+              date={recording?.metadata?.date}
+            />
           </div>
 
           {/* Right Sidebar - Metrics */}
