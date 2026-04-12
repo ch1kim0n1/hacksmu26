@@ -110,9 +110,9 @@ export default function ResultsDetailPage() {
     );
   }
 
-  const result = recording.result ?? {};
-  const quality = result.quality;
-  const calls: Call[] = result.calls ?? [];
+  const result = recording.result;
+  const quality = result?.quality;
+  const calls: Call[] = result?.calls ?? [];
   const isComplete = recording.status === "complete";
 
   const spectrogramBefore = `${API_BASE}/api/recordings/${id}/spectrogram?type=before`;
