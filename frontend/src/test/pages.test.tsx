@@ -41,6 +41,13 @@ vi.mock("@/lib/audio-api", () => ({
     sample_rate: 44100,
     metadata: {},
   }),
+  getRecordingStatus: vi.fn().mockResolvedValue({
+    id: "test-job-123",
+    status: "pending",
+    progress_pct: 0,
+    stage: "ingestion",
+    message: "Pending processing",
+  }),
   getCalls: vi.fn().mockResolvedValue({ calls: [], total: 0 }),
   API_BASE: "http://localhost:8000",
 }));

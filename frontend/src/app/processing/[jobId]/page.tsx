@@ -14,7 +14,13 @@ import {
   ChevronRight,
 } from "lucide-react";
 import useProcessingJob from "@/hooks/useProcessingJob";
-import { getRecording, API_BASE, type Recording } from "@/lib/audio-api";
+import {
+  getRecording,
+  getRecordingStatus,
+  API_BASE,
+  type Recording,
+  type RecordingStatusResponse,
+} from "@/lib/audio-api";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import {
   COLORMAPS,
@@ -48,12 +54,19 @@ function ProcessingTimeline({ currentStage }: { currentStage: string }) {
   const activeIndex = currentIndex >= 0 ? currentIndex : 0;
 
   return (
-    <div className="flex items-center w-full overflow-x-auto pb-1" role="progressbar" aria-valuenow={activeIndex} aria-valuemin={0} aria-valuemax={STAGES.length - 1} aria-label="Processing progress">
+    <div
+      className="flex w-full items-center overflow-x-auto px-1 py-2"
+      role="progressbar"
+      aria-valuenow={activeIndex}
+      aria-valuemin={0}
+      aria-valuemax={STAGES.length - 1}
+      aria-label="Processing progress"
+    >
       {STAGES.map((stage, i) => {
         const isComplete = i < activeIndex || currentStage === "complete";
         const isCurrent = i === activeIndex && currentStage !== "complete";
         return (
-          <div key={stage.key} className="flex items-center flex-1 min-w-0">
+          <div key={stage.key} className="flex min-w-0 flex-1 items-center overflow-visible">
             <div className="flex flex-col items-center gap-1.5 shrink-0 w-10">
               <motion.div
                 initial={false}
@@ -115,6 +128,7 @@ export default function ProcessingPage() {
   const processing = useProcessingJob(jobId || null);
 
   const [recording, setRecording] = useState<Recording | null>(null);
+  const [backendStatus, setBackendStatus] = useState<RecordingStatusResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sliderPosition, setSliderPosition] = useState(50);
@@ -133,8 +147,37 @@ export default function ProcessingPage() {
     }
   }, [jobId]);
 
+  const fetchBackendStatus = useCallback(async () => {
+    try {
+      const status = await getRecordingStatus(jobId);
+      setBackendStatus(status);
+    } catch {
+      // Keep the last known status; websocket remains primary for live updates.
+    }
+  }, [jobId]);
+
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => { if (processing.status === "complete") fetchData(); }, [processing.status, fetchData]);
+  useEffect(() => { if (backendStatus?.status === "complete") fetchData(); }, [backendStatus?.status, fetchData]);
+  useEffect(() => {
+    fetchBackendStatus();
+  }, [fetchBackendStatus]);
+
+  useEffect(() => {
+    const isActiveRun =
+      processing.status === "processing" ||
+      processing.status === "connecting" ||
+      recording?.status === "processing" ||
+      backendStatus?.status === "processing";
+
+    if (!isActiveRun) return;
+
+    const intervalId = window.setInterval(() => {
+      void fetchBackendStatus();
+    }, 1200);
+
+    return () => window.clearInterval(intervalId);
+  }, [backendStatus?.status, fetchBackendStatus, processing.status, recording?.status]);
 
   const handleSliderMove = useCallback((clientX: number) => {
     if (!sliderRef.current || !isDraggingSlider.current) return;
@@ -155,11 +198,35 @@ export default function ProcessingPage() {
     return () => { window.removeEventListener("mousemove", onMM); window.removeEventListener("mouseup", onMU); window.removeEventListener("touchmove", onTM); window.removeEventListener("touchend", onTE); };
   }, [handleSliderMove]);
 
-  const currentStage = recording?.status === "complete" ? "complete" : processing.currentStage || recording?.processing?.current_stage || recording?.status || "pending";
-  const progress = recording?.status === "complete" ? 100 : Math.max(processing.progress, Number(recording?.processing?.progress_pct ?? 0));
-  const isComplete = recording?.status === "complete" || processing.status === "complete";
-  const isProcessing = !isComplete && (recording?.status === "processing" || processing.status === "processing" || processing.status === "connecting");
-  const isFailed = recording?.status === "failed" || processing.status === "error";
+  const currentStage =
+    recording?.status === "complete"
+      ? "complete"
+      : processing.currentStage ||
+        backendStatus?.stage ||
+        recording?.processing?.current_stage ||
+        recording?.status ||
+        "pending";
+  const progress =
+    recording?.status === "complete"
+      ? 100
+      : backendStatus?.progress_pct ??
+        (processing.progress > 0
+          ? processing.progress
+          : Number(recording?.processing?.progress_pct ?? 0));
+  const isComplete =
+    recording?.status === "complete" ||
+    backendStatus?.status === "complete" ||
+    processing.status === "complete";
+  const isProcessing =
+    !isComplete &&
+    (backendStatus?.status === "processing" ||
+      recording?.status === "processing" ||
+      processing.status === "processing" ||
+      processing.status === "connecting");
+  const isFailed =
+    recording?.status === "failed" ||
+    backendStatus?.status === "failed" ||
+    processing.status === "error";
 
   const [colormap, setColormap] = useLocalStorage<SpectrogramColormap>("echofield.colormap", "viridis");
   const spectrogramBefore = `${API_BASE}/api/recordings/${jobId}/spectrogram?type=before&colormap=${colormap}`;

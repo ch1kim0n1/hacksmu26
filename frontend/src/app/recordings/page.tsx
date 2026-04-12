@@ -202,7 +202,7 @@ export default function RecordingsPage() {
         <SoundWave
           bars={6}
           className="hidden h-6 sm:flex"
-          color="bg-accent-savanna/25"
+          color="bg-ev-elephant/55"
         />
       </motion.div>
 

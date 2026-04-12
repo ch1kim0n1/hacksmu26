@@ -343,7 +343,7 @@ def _elapsed_seconds(started_at: str | None) -> float | None:
 def _status_payload(recording: dict[str, Any]) -> dict[str, Any]:
     processing = recording.get("processing") or {}
     progress = float(processing.get("progress", 0.0))
-    stage = processing.get("current_stage")
+    stage = _canonical_processing_stage(processing.get("current_stage"))
     elapsed = _elapsed_seconds(processing.get("started_at"))
     estimated_remaining = None
     if elapsed is not None and progress > 0 and progress < 100:
@@ -368,6 +368,37 @@ def _status_payload(recording: dict[str, Any]) -> dict[str, Any]:
         "estimated_remaining_s": estimated_remaining,
         "message": message,
     }
+
+
+def _canonical_processing_stage(stage: str | None) -> str | None:
+    if not stage:
+        return stage
+    if stage.startswith("spectrogram:"):
+        return "spectrogram"
+    if stage.startswith("denoising:"):
+        return "noise_removal"
+    if stage.startswith("calls:"):
+        return "feature_extraction"
+    if stage.startswith("quality:"):
+        return "quality_assessment"
+    return stage
+
+
+_PROCESSING_STAGE_ORDER = [
+    "ingestion",
+    "spectrogram",
+    "noise_classification",
+    "noise_removal",
+    "feature_extraction",
+    "quality_assessment",
+    "complete",
+]
+
+
+def _stage_rank(stage: str | None) -> int:
+    if stage in _PROCESSING_STAGE_ORDER:
+        return _PROCESSING_STAGE_ORDER.index(stage)
+    return -1
 
 
 def _enrich_call(call: dict[str, Any], recording: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -549,20 +580,35 @@ async def _progress_callback(
     data: dict[str, Any] | None = None,
 ) -> None:
     store = _get_store()
+    canonical_stage = _canonical_processing_stage(stage)
+    previous_record = store.get(recording_id) or {}
+    previous_stage = _canonical_processing_stage(
+        ((previous_record.get("processing") or {}).get("current_stage"))
+    )
+    effective_stage = canonical_stage
+    if _stage_rank(previous_stage) > _stage_rank(canonical_stage):
+        effective_stage = previous_stage
     if status == "failed":
-        store.update_status(recording_id, "failed", progress=progress, current_stage=stage)
+        store.update_status(recording_id, "failed", progress=progress, current_stage=effective_stage)
         await manager.send_processing_failed(recording_id, (data or {}).get("error", "Processing failed"))
         return
 
-    store.update_status(recording_id, "processing" if stage != "complete" else "complete", progress=progress, current_stage=stage)
-    await manager.send_stage_update(recording_id, stage, status, progress, data)
+    store.update_status(
+        recording_id,
+        "processing" if effective_stage != "complete" else "complete",
+        progress=progress,
+        current_stage=effective_stage,
+    )
+    payload = dict(data or {})
+    payload.setdefault("raw_stage", stage)
+    await manager.send_stage_update(recording_id, effective_stage or stage, status, progress, payload)
     if data and data.get("spectrogram_url"):
         await manager.send_spectrogram_update(
             recording_id,
             str(data["spectrogram_url"]),
             str(data.get("variant", "default")),
         )
-    if stage == "noise_classification" and data:
+    if effective_stage == "noise_classification" and data:
         await manager.send_noise_classified(
             recording_id,
             str(data.get("noise_type", "other")),

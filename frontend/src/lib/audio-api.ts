@@ -123,6 +123,16 @@ export interface UploadResponse {
   count: number;
 }
 
+export interface RecordingStatusResponse {
+  id: string;
+  status: string;
+  progress_pct: number;
+  stage?: string | null;
+  elapsed_s?: number | null;
+  estimated_remaining_s?: number | null;
+  message: string;
+}
+
 export interface MarkerResponse {
   recording_id: string;
   total_markers: number;
@@ -310,6 +320,10 @@ export async function getRecordings(params?: {
 export async function getRecording(id: string): Promise<Recording> {
   const recording = await fetchAPI<Recording>(`/api/recordings/${id}`);
   return normalizeRecording(recording);
+}
+
+export async function getRecordingStatus(id: string): Promise<RecordingStatusResponse> {
+  return fetchAPI<RecordingStatusResponse>(`/api/recordings/${id}/status`);
 }
 
 export async function processRecording(
