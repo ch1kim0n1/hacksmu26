@@ -21,6 +21,10 @@ export interface ProcessingState {
   progress: number;
   stages: StageInfo[];
   quality: QualityInfo | null;
+  noiseType: string | null;
+  callCount: number | null;
+  spectrograms: { before?: string; after?: string };
+  liveEvents: string[];
   error: string | null;
 }
 
@@ -56,6 +60,10 @@ export default function useProcessingJob(
     progress: 0,
     stages: INITIAL_STAGES.map((s) => ({ ...s })),
     quality: null,
+    noiseType: null,
+    callCount: null,
+    spectrograms: {},
+    liveEvents: [],
     error: null,
   });
 
@@ -68,6 +76,10 @@ export default function useProcessingJob(
         progress: 0,
         stages: INITIAL_STAGES.map((s) => ({ ...s })),
         quality: null,
+        noiseType: null,
+        callCount: null,
+        spectrograms: {},
+        liveEvents: [],
         error: null,
       });
       return;
@@ -127,6 +139,15 @@ export default function useProcessingJob(
             currentStage: stageName,
             progress,
             stages: newStages,
+            noiseType: typeof msg.data.noise_type === "string" ? msg.data.noise_type : prev.noiseType,
+            callCount: typeof msg.data.call_count === "number" ? msg.data.call_count : prev.callCount,
+            spectrograms: typeof msg.data.spectrogram_url === "string"
+              ? {
+                  ...prev.spectrograms,
+                  [msg.data.variant === "before" ? "before" : "after"]: msg.data.spectrogram_url,
+                }
+              : prev.spectrograms,
+            liveEvents: [stageName, ...prev.liveEvents.filter((event) => event !== stageName)].slice(0, 8),
           };
         });
         break;
@@ -172,6 +193,9 @@ export default function useProcessingJob(
           currentStage: "complete",
           stages: prev.stages.map((s) => ({ ...s, status: "complete" as const })),
           quality: quality ?? prev.quality,
+          noiseType: typeof msg.data.noise_type === "string" ? msg.data.noise_type : prev.noiseType,
+          callCount: typeof msg.data.call_count === "number" ? msg.data.call_count : prev.callCount,
+          liveEvents: ["complete", ...prev.liveEvents.filter((event) => event !== "complete")].slice(0, 8),
         }));
         break;
       }

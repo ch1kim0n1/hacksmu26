@@ -8,12 +8,14 @@ import io
 import json
 import shutil
 import uuid
+from collections import Counter
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import aiofiles
+import numpy as np
 from fastapi import BackgroundTasks, FastAPI, File, Header, HTTPException, Query, Request, Response, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
@@ -26,11 +28,16 @@ from echofield.metrics import metrics
 from echofield.model_registry import ModelRegistry
 from echofield.models import (
     AnnotationRequest,
+    ActivityHeatmapResponse,
+    BatchRecordingSummary,
+    BatchSummaryResponse,
     BatchStatusResponse,
     BatchSubmitResponse,
     CallAnnotation,
     CallListResponse,
+    CallMarker,
     CallRecord,
+    CallSequenceModel,
     ComponentHealth,
     ContourMatch,
     ContourMatchResponse,
@@ -39,9 +46,13 @@ from echofield.models import (
     ExportRequest,
     HarmonicOverlayResponse,
     HealthResponse,
+    IndividualCluster,
+    IndividualMatch,
     IndividualProfile,
+    MarkerResponse,
     MetadataPatchRequest,
     ModelVersionInfo,
+    PatternModel,
     ProcessingResult,
     ProcessingStatusModel,
     RecordingDetail,
@@ -50,11 +61,15 @@ from echofield.models import (
     RecordingSummary,
     RecordingStatus,
     ResearchStatsResponse,
+    ReviewActionRequest,
     ReviewLabelRequest,
     ReviewQueueResponse,
+    SimilarCallsResponse,
     SimilarityEdge,
     SimilarityGraphResponse,
     SimilarityNode,
+    SiteNoiseProfile,
+    SiteSummary,
     StatsRequest,
     StatsResponse,
     UploadResponse,
@@ -82,7 +97,11 @@ from echofield.research.acoustic_analysis import (
     track_frequency_contour,
 )
 from echofield.research.exporter import export_csv, export_json, export_pdf, export_zip
+from echofield.research.call_fingerprint import top_k_similar
 from echofield.research.individual_id import IndividualIdentifier
+from echofield.research.sequence_analyzer import extract_sequences, find_recurring_patterns
+from echofield.research.site_profiler import build_activity_heatmap, build_site_profile, list_sites
+from echofield.research.voice_id import cluster_individuals, match_across_recordings
 from echofield.utils.audio_utils import get_duration, load_audio
 from echofield.utils.logging_config import get_logger, request_context
 from echofield.webhook_manager import WebhookManager
@@ -360,13 +379,141 @@ def _recordings_with_call_database_fields(recordings: list[dict[str, Any]]) -> l
             enriched = dict(call)
             db_call = call_database.get_call(str(call.get("id") or call.get("call_id") or ""))
             if db_call is not None:
-                for key in ("annotations", "individual_id", "review_label", "reviewed_by", "reviewed_at"):
+                for key in (
+                    "annotations",
+                    "individual_id",
+                    "cluster_id",
+                    "fingerprint",
+                    "fingerprint_version",
+                    "sequence_id",
+                    "sequence_position",
+                    "color",
+                    "review_label",
+                    "review_status",
+                    "original_call_type",
+                    "corrected_call_type",
+                    "reviewed_by",
+                    "reviewed_at",
+                ):
                     enriched[key] = db_call.get(key)
             calls.append(enriched)
         result["calls"] = calls
         item["result"] = result
         merged.append(item)
     return merged
+
+
+def _all_calls(limit: int = 10000) -> list[dict[str, Any]]:
+    calls, _ = _get_call_database().search(limit=limit)
+    return calls
+
+
+def _calls_for_recording(recording_id: str) -> list[dict[str, Any]]:
+    calls, _ = _get_call_database().search(recording_id=recording_id, limit=10000)
+    if calls:
+        return calls
+    recording = _get_store().get(recording_id)
+    result = (recording or {}).get("result") or {}
+    return list(result.get("calls") or [])
+
+
+def _marker_payload(recording_id: str) -> dict[str, Any]:
+    calls = _calls_for_recording(recording_id)
+    markers = []
+    summary: Counter[str] = Counter()
+    for call in calls:
+        start_ms = float(call.get("start_ms") or 0.0)
+        duration_ms = float(call.get("duration_ms") or 0.0)
+        call_type = str(call.get("call_type") or "unknown")
+        summary[call_type] += 1
+        markers.append({
+            "id": str(call.get("id")),
+            "start_ms": round(start_ms, 2),
+            "end_ms": round(float(call.get("end_ms") or start_ms + duration_ms), 2),
+            "duration_ms": round(duration_ms, 2),
+            "call_type": call_type,
+            "confidence": float(call.get("confidence") or 0.0),
+            "color": call.get("color") or "#6B7280",
+            "acoustic_features": call.get("acoustic_features") or {},
+        })
+    return {
+        "recording_id": recording_id,
+        "total_markers": len(markers),
+        "markers": markers,
+        "summary": dict(summary),
+    }
+
+
+def _batch_summary(batch_id: str) -> dict[str, Any]:
+    batch = _get_batch_store().get(batch_id)
+    if batch is None:
+        raise HTTPException(status_code=404, detail="Batch not found")
+    summaries = []
+    call_type_distribution: Counter[str] = Counter()
+    quality_scores = []
+    snr_values = []
+    total_processing_time = 0.0
+    all_calls = []
+    for item in batch["results"]:
+        recording_id = item["recording_id"]
+        recording = _get_store().get(recording_id) or {}
+        result = recording.get("result") or {}
+        calls = list(result.get("calls") or [])
+        all_calls.extend(calls)
+        for call in calls:
+            call_type_distribution[str(call.get("call_type") or "unknown")] += 1
+        quality = result.get("quality") or {}
+        if quality.get("quality_score") is not None:
+            quality_scores.append(float(quality["quality_score"]))
+        if quality.get("snr_improvement_db") is not None:
+            snr_values.append(float(quality["snr_improvement_db"]))
+        total_processing_time += float(result.get("processing_time_s") or 0.0)
+        dominant = Counter(str(call.get("call_type") or "unknown") for call in calls).most_common(1)
+        summaries.append({
+            "recording_id": recording_id,
+            "filename": recording.get("filename"),
+            "calls_detected": len(calls),
+            "dominant_call_type": dominant[0][0] if dominant else None,
+            "quality_score": quality.get("quality_score"),
+            "snr_improvement_db": quality.get("snr_improvement_db"),
+            "status": item.get("status"),
+        })
+    sequences = extract_sequences(all_calls)
+    return {
+        "batch_id": batch_id,
+        "status": batch["status"],
+        "recordings": batch["total"],
+        "total_calls_detected": len(all_calls),
+        "call_type_distribution": dict(call_type_distribution),
+        "quality_scores": {
+            "avg": round(sum(quality_scores) / len(quality_scores), 2) if quality_scores else None,
+            "min": min(quality_scores) if quality_scores else None,
+            "max": max(quality_scores) if quality_scores else None,
+        },
+        "avg_snr_improvement_db": round(sum(snr_values) / len(snr_values), 2) if snr_values else None,
+        "total_processing_time_s": round(total_processing_time, 2),
+        "recordings_summary": summaries,
+        "shared_patterns": find_recurring_patterns(sequences),
+    }
+
+
+def _filter_export_recordings(recordings: list[dict[str, Any]], request: ExportRequest) -> list[dict[str, Any]]:
+    allowed_types = {call_type.lower() for call_type in request.call_types}
+    filtered = []
+    for recording in recordings:
+        item = dict(recording)
+        result = dict(item.get("result") or {})
+        calls = []
+        for call in result.get("calls", []):
+            if allowed_types and str(call.get("call_type") or "").lower() not in allowed_types:
+                continue
+            if request.min_confidence is not None and float(call.get("confidence") or 0.0) < request.min_confidence:
+                continue
+            calls.append(call)
+        result["calls"] = calls
+        item["result"] = result
+        filtered.append(item)
+    return filtered
 
 
 async def _progress_callback(
@@ -415,6 +562,7 @@ async def _run_processing(
     method: str,
     aggressiveness: float,
     batch_id: str | None = None,
+    preset: str | None = None,
 ) -> None:
     store = _get_store()
     recording = store.get(recording_id)
@@ -435,7 +583,7 @@ async def _run_processing(
                 str(source_path),
                 str(settings.processed_dir),
                 str(settings.spectrogram_dir),
-                method=method,
+                method="demo" if preset == "demo" else method,
                 aggressiveness=aggressiveness,
                 progress_callback=lambda stage, status, progress, data=None: _progress_callback(
                     recording_id,
@@ -571,6 +719,7 @@ async def upload_recording(
     file: UploadFile = File(...),
     location: str | None = Query(default=None),
     date: str | None = Query(default=None),
+    recorded_at: str | None = Query(default=None),
     notes: str | None = Query(default=None),
 ) -> UploadResponse:
     if not file.filename:
@@ -609,7 +758,7 @@ async def upload_recording(
         destination.unlink(missing_ok=True)
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     duration_s = round(get_duration(y, sr), 3)
-    metadata = {k: v for k, v in {"location": location, "date": date, "notes": notes, "file_hash": file_hash}.items() if v}
+    metadata = {k: v for k, v in {"location": location, "date": date, "recorded_at": recorded_at, "notes": notes, "file_hash": file_hash}.items() if v}
     _get_store().add(
         recording_id,
         destination.name,
@@ -674,17 +823,21 @@ async def process_recording(
     recording_id: str,
     background_tasks: BackgroundTasks,
     method: str = Query(default=settings.DENOISE_METHOD),
-    aggressiveness: float = Query(default=1.5, ge=0.1, le=5.0),
+    aggressiveness: float = Query(default=1.0, ge=0.1, le=5.0),
+    preset: str | None = Query(default=None, pattern="^(demo)$"),
 ) -> dict[str, Any]:
     recording = _get_store().get(recording_id)
     if recording is None:
         raise HTTPException(status_code=404, detail="Recording not found")
     if recording["status"] == "processing":
         raise HTTPException(status_code=409, detail="Recording already processing")
+    if preset == "demo":
+        method = "demo"
+        aggressiveness = min(aggressiveness, 1.0)
     _get_store().update_status(recording_id, "processing", progress=0, current_stage="ingestion")
-    task = asyncio.create_task(_run_processing(recording_id, method, aggressiveness))
+    task = asyncio.create_task(_run_processing(recording_id, method, aggressiveness, preset=preset))
     _get_tasks()[recording_id] = task
-    return {"id": recording_id, "status": "processing", "method": method}
+    return {"id": recording_id, "status": "processing", "method": method, "preset": preset}
 
 
 @app.post("/api/recordings/{recording_id}/cancel", response_model=dict)
@@ -726,12 +879,25 @@ async def process_batch(
     return BatchSubmitResponse(batch_id=batch["batch_id"], queued=len(recording_ids), status="processing")
 
 
+@app.post("/api/recordings/batch-process", response_model=BatchSubmitResponse)
+async def process_recordings_batch(
+    payload: dict[str, Any],
+    background_tasks: BackgroundTasks,
+) -> BatchSubmitResponse:
+    return await process_batch(payload, background_tasks)
+
+
 @app.get("/api/batch/{batch_id}/status", response_model=BatchStatusResponse)
 async def get_batch_status(batch_id: str) -> BatchStatusResponse:
     batch = _get_batch_store().get(batch_id)
     if batch is None:
         raise HTTPException(status_code=404, detail="Batch not found")
     return BatchStatusResponse(**batch)
+
+
+@app.get("/api/batch/{batch_id}/summary", response_model=BatchSummaryResponse)
+async def get_batch_summary(batch_id: str) -> BatchSummaryResponse:
+    return BatchSummaryResponse(**_batch_summary(batch_id))
 
 
 @app.get("/api/recordings/{recording_id}/spectrogram")
@@ -847,11 +1013,86 @@ async def get_harmonics(recording_id: str) -> HarmonicOverlayResponse:
     )
 
 
+@app.get("/api/recordings/{recording_id}/markers", response_model=MarkerResponse)
+async def get_recording_markers(recording_id: str) -> MarkerResponse:
+    if _get_store().get(recording_id) is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    return MarkerResponse(**_marker_payload(recording_id))
+
+
+@app.get("/api/recordings/{recording_id}/sequences", response_model=list[CallSequenceModel])
+async def get_recording_sequences(recording_id: str, max_gap_ms: float = Query(default=5000.0, ge=0.0)) -> list[CallSequenceModel]:
+    if _get_store().get(recording_id) is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    sequences = extract_sequences(_calls_for_recording(recording_id), max_gap_ms=max_gap_ms)
+    return [CallSequenceModel(**sequence) for sequence in sequences]
+
+
 @app.get("/api/stats", response_model=StatsResponse)
 async def get_stats() -> StatsResponse:
     stats = _get_store().get_stats()
     stats["circuit_breakers"] = get_circuit_breaker_registry().snapshot()
     return StatsResponse(**stats)
+
+
+@app.get("/api/stats/activity-heatmap", response_model=ActivityHeatmapResponse)
+async def get_activity_heatmap(
+    location: str | None = Query(default=None),
+    date_from: str | None = Query(default=None),
+    date_to: str | None = Query(default=None),
+) -> ActivityHeatmapResponse:
+    payload = build_activity_heatmap(_all_calls(), location=location, date_from=date_from, date_to=date_to)
+    return ActivityHeatmapResponse(**payload)
+
+
+@app.get("/api/stats/activity-heatmap.png")
+async def get_activity_heatmap_png(
+    location: str | None = Query(default=None),
+    date_from: str | None = Query(default=None),
+    date_to: str | None = Query(default=None),
+) -> StreamingResponse:
+    import matplotlib.pyplot as plt
+
+    payload = build_activity_heatmap(_all_calls(), location=location, date_from=date_from, date_to=date_to)
+    heatmap = payload["heatmap"]
+    fig, ax = plt.subplots(figsize=(10, 4), dpi=160)
+    ax.imshow(heatmap["matrix"], aspect="auto", cmap="viridis")
+    ax.set_xticks(list(range(24)))
+    ax.set_yticks(list(range(len(heatmap["call_types"]))))
+    ax.set_yticklabels(heatmap["call_types"])
+    ax.set_xlabel("Hour of day")
+    ax.set_ylabel("Call type")
+    fig.tight_layout()
+    buffer = io.BytesIO()
+    fig.savefig(buffer, format="png")
+    plt.close(fig)
+    buffer.seek(0)
+    return StreamingResponse(iter([buffer.getvalue()]), media_type="image/png")
+
+
+@app.get("/api/sites", response_model=list[SiteSummary])
+async def get_sites() -> list[SiteSummary]:
+    return [SiteSummary(**site) for site in list_sites(list(_get_store()._recordings.values()))]
+
+
+@app.get("/api/sites/{location}/noise-profile", response_model=SiteNoiseProfile)
+async def get_site_noise_profile(location: str) -> SiteNoiseProfile:
+    profile = build_site_profile(list(_get_store()._recordings.values()), location)
+    if profile["recordings_analyzed"] == 0:
+        raise HTTPException(status_code=404, detail="No recordings found for site")
+    return SiteNoiseProfile(**profile)
+
+
+@app.get("/api/sites/{location}/recommendations", response_model=dict)
+async def get_site_recommendations(location: str) -> dict[str, Any]:
+    profile = build_site_profile(list(_get_store()._recordings.values()), location)
+    if profile["recordings_analyzed"] == 0:
+        raise HTTPException(status_code=404, detail="No recordings found for site")
+    return {
+        "location": location,
+        "optimal_windows": profile["optimal_windows"],
+        "recommendations": profile["recommendations"],
+    }
 
 
 @app.get("/api/calls", response_model=CallListResponse)
@@ -901,6 +1142,124 @@ async def get_call_similarity(
     )
 
 
+@app.get("/api/calls/compare", response_model=dict)
+async def compare_calls(call_a: str = Query(...), call_b: str = Query(...)) -> dict[str, Any]:
+    calls_by_id = _get_call_database().get_many([call_a, call_b])
+    if call_a not in calls_by_id or call_b not in calls_by_id:
+        raise HTTPException(status_code=404, detail="Call not found")
+    matches = top_k_similar([calls_by_id[call_a], calls_by_id[call_b]], call_a, k=1)
+    similarity = matches[0]["similarity"] if matches else 0.0
+    return {
+        "call_a_id": call_a,
+        "call_b_id": call_b,
+        "similarity_score": similarity,
+        "fingerprint_distance": round(1.0 - similarity, 4),
+        "overlay": {
+            "spectrogram_overlay_url": f"/api/calls/compare-overlay.png?call_a={call_a}&call_b={call_b}&type=spectrogram",
+            "waveform_overlay_url": f"/api/calls/compare-overlay.png?call_a={call_a}&call_b={call_b}&type=waveform",
+            "difference_heatmap_url": f"/api/calls/compare-overlay.png?call_a={call_a}&call_b={call_b}&type=difference",
+            "aligned": True,
+            "time_stretch_factor": 1.0,
+        },
+        "dimension_breakdown": {
+            "timbral_similarity": similarity,
+            "pitch_contour_similarity": similarity,
+            "temporal_dynamics_similarity": similarity,
+            "energy_profile_similarity": similarity,
+        },
+    }
+
+
+@app.get("/api/calls/compare-overlay.png")
+async def compare_calls_overlay(
+    call_a: str = Query(...),
+    call_b: str = Query(...),
+    type: str = Query(default="spectrogram", pattern="^(spectrogram|waveform|difference)$"),
+) -> StreamingResponse:
+    import matplotlib.pyplot as plt
+
+    calls_by_id = _get_call_database().get_many([call_a, call_b])
+    if call_a not in calls_by_id or call_b not in calls_by_id:
+        raise HTTPException(status_code=404, detail="Call not found")
+    left = calls_by_id[call_a]
+    right = calls_by_id[call_b]
+
+    def _contour(call: dict[str, Any]) -> np.ndarray:
+        features = call.get("acoustic_features") or {}
+        contour = features.get("frequency_contour_hz") or []
+        if not contour:
+            f0 = float(features.get("fundamental_frequency_hz") or 0.0)
+            contour = [f0, f0, f0]
+        return np.asarray(contour, dtype=np.float32)
+
+    left_contour = _contour(left)
+    right_contour = _contour(right)
+    width = max(len(left_contour), len(right_contour), 2)
+    x = np.linspace(0.0, 1.0, width)
+    left_interp = np.interp(x, np.linspace(0.0, 1.0, len(left_contour)), left_contour)
+    right_interp = np.interp(x, np.linspace(0.0, 1.0, len(right_contour)), right_contour)
+
+    fig, ax = plt.subplots(figsize=(6, 2.5), dpi=160)
+    if type == "difference":
+        diff = np.abs(left_interp - right_interp).reshape(1, -1)
+        ax.imshow(diff, aspect="auto", cmap="magma")
+        ax.set_yticks([])
+        ax.set_title("Fingerprint contour difference")
+    else:
+        ax.plot(x, left_interp, label=call_a, color="#2563EB", linewidth=2, alpha=0.85)
+        ax.plot(x, right_interp, label=call_b, color="#F97316", linewidth=2, alpha=0.85)
+        if type == "spectrogram":
+            ax.fill_between(x, 0, left_interp, color="#2563EB", alpha=0.18)
+            ax.fill_between(x, 0, right_interp, color="#F97316", alpha=0.18)
+            ax.set_title("Aligned frequency contour overlay")
+            ax.set_ylabel("Hz")
+        else:
+            left_wave = np.sin(2 * np.pi * np.cumsum(left_interp / max(float(np.max(left_interp)), 1.0)) / width)
+            right_wave = np.sin(2 * np.pi * np.cumsum(right_interp / max(float(np.max(right_interp)), 1.0)) / width)
+            ax.clear()
+            ax.plot(x, left_wave, label=call_a, color="#2563EB", linewidth=1.5, alpha=0.85)
+            ax.plot(x, right_wave, label=call_b, color="#F97316", linewidth=1.5, alpha=0.85)
+            ax.set_title("Aligned waveform proxy")
+            ax.set_ylabel("Amplitude")
+        ax.set_xlabel("Normalized time")
+        ax.legend(fontsize=6, loc="upper right")
+    fig.tight_layout()
+    buffer = io.BytesIO()
+    fig.savefig(buffer, format="png")
+    plt.close(fig)
+    buffer.seek(0)
+    return StreamingResponse(iter([buffer.getvalue()]), media_type="image/png")
+
+
+@app.get("/api/patterns", response_model=list[PatternModel])
+async def get_patterns(min_occurrences: int = Query(default=2, ge=1)) -> list[PatternModel]:
+    sequences = extract_sequences(_all_calls())
+    return [PatternModel(**pattern) for pattern in find_recurring_patterns(sequences, min_occurrences=min_occurrences)]
+
+
+@app.get("/api/patterns/{pattern_id}/instances", response_model=dict)
+async def get_pattern_instances(pattern_id: str) -> dict[str, Any]:
+    sequences = extract_sequences(_all_calls())
+    patterns = find_recurring_patterns(sequences, min_occurrences=1)
+    pattern = next((item for item in patterns if item["pattern_id"] == pattern_id), None)
+    if pattern is None:
+        raise HTTPException(status_code=404, detail="Pattern not found")
+    motif = pattern["motif"]
+    instances = [sequence for sequence in sequences if " -> ".join(motif) in sequence.get("pattern", "")]
+    return {"pattern": pattern, "instances": instances}
+
+
+@app.get("/api/calls/{call_id}/similar", response_model=SimilarCallsResponse)
+async def get_similar_calls(
+    call_id: str,
+    limit: int = Query(default=10, ge=1, le=100),
+) -> SimilarCallsResponse:
+    matches = top_k_similar(_all_calls(), call_id, k=limit)
+    if not matches and _get_call_database().get_call(call_id) is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    return SimilarCallsResponse(query_call_id=call_id, matches=matches)
+
+
 @app.get("/api/calls/{call_id}", response_model=CallRecord)
 async def get_call(call_id: str) -> CallRecord:
     call = _get_call_database().get_call(call_id)
@@ -945,10 +1304,65 @@ async def delete_call_annotation(call_id: str, annotation_id: str) -> dict[str, 
 
 
 @app.get("/api/individuals", response_model=list[IndividualProfile])
-async def list_individuals(call_type: str | None = Query(default=None)) -> list[IndividualProfile]:
-    calls, _ = _identify_calls(call_type=call_type)
-    profiles = _get_individual_identifier().profiles(calls)
+async def list_individuals(
+    call_type: str | None = Query(default=None),
+    recording_id: str | None = Query(default=None),
+    min_confidence: float = Query(default=0.0, ge=0.0, le=1.0),
+) -> list[IndividualProfile]:
+    if recording_id:
+        calls = _calls_for_recording(recording_id)
+    else:
+        calls, _ = _identify_calls(call_type=call_type)
+    if call_type:
+        calls = [call for call in calls if str(call.get("call_type") or "").lower() == call_type.lower()]
+    clusters = [cluster for cluster in cluster_individuals(calls) if cluster["confidence"] >= min_confidence]
+    profiles = [
+        {
+            "individual_id": cluster["cluster_id"],
+            "cluster_id": cluster["cluster_id"],
+            "suggested_label": cluster["suggested_label"],
+            "confidence": cluster["confidence"],
+            "call_count": len(cluster["call_ids"]),
+            "call_ids": cluster["call_ids"],
+            "recording_ids": cluster["recording_ids"],
+            "dates": sorted({str(call.get("date")) for call in calls if call.get("id") in cluster["call_ids"] and call.get("date")}),
+            "signature_mean": cluster["centroid"],
+            "signature_std": [],
+            "acoustic_profile": cluster["acoustic_profile"],
+            "call_type_distribution": cluster["call_type_distribution"],
+        }
+        for cluster in clusters
+    ]
     return [IndividualProfile(**profile) for profile in profiles]
+
+
+@app.get("/api/individuals/cross-match", response_model=list[IndividualMatch])
+async def cross_match_individuals(
+    recording_ids: str | None = Query(default=None),
+    min_similarity: float = Query(default=0.85, ge=0.0, le=1.0),
+) -> list[IndividualMatch]:
+    requested = [item.strip() for item in (recording_ids or "").split(",") if item.strip()]
+    if not requested:
+        requested = sorted({str(call.get("recording_id")) for call in _all_calls() if call.get("recording_id")})
+    clusters_by_recording = {
+        recording_id: cluster_individuals(_calls_for_recording(recording_id))
+        for recording_id in requested
+    }
+    return [IndividualMatch(**match) for match in match_across_recordings(clusters_by_recording, min_similarity=min_similarity)]
+
+
+@app.get("/api/individuals/{cluster_id}", response_model=IndividualProfile)
+async def get_individual_cluster(cluster_id: str) -> IndividualProfile:
+    profiles = await list_individuals()
+    for profile in profiles:
+        if profile.individual_id == cluster_id or profile.cluster_id == cluster_id:
+            return profile
+    raise HTTPException(status_code=404, detail="Individual cluster not found")
+
+
+@app.get("/api/individuals/{cluster_id}/profile", response_model=IndividualProfile)
+async def get_individual_profile(cluster_id: str) -> IndividualProfile:
+    return await get_individual_cluster(cluster_id)
 
 
 @app.get("/api/individuals/{individual_id}/calls", response_model=CallListResponse)
@@ -957,11 +1371,25 @@ async def list_individual_calls(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
 ) -> CallListResponse:
+    all_calls = _all_calls()
+    clusters = cluster_individuals(all_calls)
+    cluster_call_ids = {
+        call_id
+        for cluster in clusters
+        if cluster["cluster_id"] == individual_id
+        for call_id in cluster["call_ids"]
+    }
     calls, assignments = _identify_calls()
     matched = [
-        {**call, "individual_id": assignments.get(str(call.get("id")), call.get("individual_id"))}
+        {
+            **call,
+            "individual_id": individual_id
+            if str(call.get("id")) in cluster_call_ids
+            else assignments.get(str(call.get("id")), call.get("individual_id")),
+        }
         for call in calls
         if assignments.get(str(call.get("id")), call.get("individual_id")) == individual_id
+        or str(call.get("id")) in cluster_call_ids
     ]
     total = len(matched)
     records = [CallRecord(**_enrich_call(item)) for item in matched[offset : offset + limit]]
@@ -1058,6 +1486,7 @@ async def export_research(request: ExportRequest):
     if not recordings:
         raise HTTPException(status_code=404, detail="No recordings available for export")
     recordings = _recordings_with_call_database_fields(recordings)
+    recordings = _filter_export_recordings(recordings, request)
 
     if request.format == "csv":
         content = export_csv(recordings)
@@ -1080,6 +1509,8 @@ async def export_research(request: ExportRequest):
             spectrogram_dir=settings.spectrogram_dir,
             include_audio=request.include_audio,
             include_spectrograms=request.include_spectrograms,
+            include_fingerprints=request.include_fingerprints,
+            include_audio_clips=request.include_audio_clips,
         )
         return StreamingResponse(
             iter([payload.getvalue()]),
@@ -1113,6 +1544,11 @@ async def train_call_classifier() -> dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(exc))
 
 
+@app.post("/api/classifier/retrain", response_model=dict)
+async def retrain_call_classifier() -> dict[str, Any]:
+    return await train_call_classifier()
+
+
 @app.get("/api/models", response_model=list[ModelVersionInfo])
 async def list_model_versions() -> list[ModelVersionInfo]:
     return [ModelVersionInfo(**item) for item in _get_model_registry().list_versions()]
@@ -1132,12 +1568,32 @@ async def activate_model_version(version: str) -> ModelVersionInfo:
 
 @app.get("/api/review/queue", response_model=ReviewQueueResponse)
 async def review_queue(
+    status: str | None = Query(default="pending"),
+    max_confidence: float | None = Query(default=0.5, ge=0.0, le=1.0),
+    call_type: str | None = Query(default=None),
     limit: int = Query(default=100, ge=1, le=500),
     offset: int = Query(default=0, ge=0),
 ) -> ReviewQueueResponse:
-    items, total = _get_call_database().review_queue(limit=limit, offset=offset)
+    items, total = _get_call_database().review_queue(
+        status=status,
+        max_confidence=max_confidence,
+        call_type=call_type,
+        limit=limit,
+        offset=offset,
+    )
     records = [CallRecord(**_enrich_call(item)) for item in items]
     return ReviewQueueResponse(total=total, returned=len(records), items=records)
+
+
+@app.get("/api/review-queue", response_model=ReviewQueueResponse)
+async def review_queue_alias(
+    status: str | None = Query(default="pending"),
+    max_confidence: float | None = Query(default=0.5, ge=0.0, le=1.0),
+    call_type: str | None = Query(default=None),
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+) -> ReviewQueueResponse:
+    return await review_queue(status=status, max_confidence=max_confidence, call_type=call_type, limit=limit, offset=offset)
 
 
 @app.post("/api/review/{call_id}/label", response_model=CallRecord)
@@ -1147,6 +1603,24 @@ async def label_review_call(call_id: str, payload: ReviewLabelRequest) -> CallRe
         raise HTTPException(status_code=404, detail="Call not found")
     app.state.embedding_cache = {}
     metrics.inc("echofield_review_labels_total")
+    return CallRecord(**_enrich_call(call))
+
+
+@app.post("/api/calls/{call_id}/review", response_model=CallRecord)
+async def review_call_action(call_id: str, payload: ReviewActionRequest) -> CallRecord:
+    try:
+        call = _get_call_database().review_call(
+            call_id,
+            payload.action,
+            corrected_call_type=payload.corrected_call_type,
+            reviewer=payload.reviewer,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    if call is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    app.state.embedding_cache = {}
+    metrics.inc("echofield_review_actions_total", labels={"action": payload.action})
     return CallRecord(**_enrich_call(call))
 
 

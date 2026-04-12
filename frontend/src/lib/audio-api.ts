@@ -5,6 +5,7 @@ export { API_BASE };
 export interface RecordingMetadata {
   location?: string;
   date?: string;
+  recorded_at?: string;
   microphone_type?: string;
   notes?: string;
   species?: string;
@@ -91,6 +92,14 @@ export interface Call {
   frequency_low?: number;
   frequency_high?: number;
   confidence?: number;
+  review_status?: string;
+  original_call_type?: string;
+  corrected_call_type?: string | null;
+  sequence_id?: string | null;
+  sequence_position?: number | null;
+  cluster_id?: string | null;
+  fingerprint?: number[];
+  color?: string | null;
   acoustic_features?: Record<string, unknown>;
   metadata?: RecordingMetadata;
 }
@@ -112,6 +121,51 @@ export interface UploadResponse {
   message: string;
   recording_ids: string[];
   count: number;
+}
+
+export interface MarkerResponse {
+  recording_id: string;
+  total_markers: number;
+  markers: Array<Call & { end_ms: number; color: string }>;
+  summary: Record<string, number>;
+}
+
+export interface ActivityHeatmapResponse {
+  heatmap: {
+    hours: number[];
+    call_types: string[];
+    matrix: number[][];
+  };
+  total_calls: number;
+  recordings_analyzed: number;
+  date_range: { from?: string | null; to?: string | null };
+}
+
+export interface BatchSummary {
+  batch_id: string;
+  status: string;
+  recordings: number;
+  total_calls_detected: number;
+  call_type_distribution: Record<string, number>;
+  quality_scores: Record<string, number | null>;
+  avg_snr_improvement_db?: number | null;
+  total_processing_time_s: number;
+  recordings_summary: Array<{
+    recording_id: string;
+    filename?: string | null;
+    calls_detected: number;
+    dominant_call_type?: string | null;
+    quality_score?: number | null;
+    snr_improvement_db?: number | null;
+    status?: string | null;
+  }>;
+  shared_patterns: Array<Record<string, unknown>>;
+}
+
+export interface ReviewQueueResponse {
+  total: number;
+  returned: number;
+  items: Call[];
 }
 
 function normalizeRecording(recording: Recording): Recording {
@@ -145,6 +199,7 @@ export async function uploadFiles(
     const params = new URLSearchParams();
     if (typeof metadata?.location === "string") params.set("location", metadata.location);
     if (typeof metadata?.date === "string") params.set("date", metadata.date);
+    if (typeof metadata?.recorded_at === "string") params.set("recorded_at", metadata.recorded_at);
     if (typeof metadata?.notes === "string") params.set("notes", metadata.notes);
     const query = params.toString();
     const response = await fetchAPI<{
@@ -194,17 +249,38 @@ export async function processRecording(
   options?: {
     method?: "spectral" | "hybrid" | "deep";
     aggressiveness?: number;
+    preset?: "demo";
   }
-): Promise<{ id: string; status: string; method: string }> {
+): Promise<{ id: string; status: string; method: string; preset?: string | null }> {
   const params = new URLSearchParams();
   if (options?.method) params.set("method", options.method);
   if (typeof options?.aggressiveness === "number") {
     params.set("aggressiveness", String(options.aggressiveness));
   }
+  if (options?.preset) params.set("preset", options.preset);
   const query = params.toString();
   return fetchAPI(`/api/recordings/${id}/process${query ? `?${query}` : ""}`, {
     method: "POST",
   });
+}
+
+export async function processBatch(params: {
+  recording_ids: string[];
+  method?: "spectral" | "hybrid" | "deep";
+  aggressiveness?: number;
+}): Promise<{ batch_id: string; queued: number; status: string }> {
+  return fetchAPI("/api/recordings/batch-process", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
+export async function getBatchSummary(batchId: string): Promise<BatchSummary> {
+  return fetchAPI<BatchSummary>(`/api/batch/${batchId}/summary`);
+}
+
+export async function getRecordingMarkers(id: string): Promise<MarkerResponse> {
+  return fetchAPI<MarkerResponse>(`/api/recordings/${id}/markers`);
 }
 
 export function getRecordingSpectrogram(id: string, type: "before" | "after" | "comparison" = "after"): string {
@@ -270,6 +346,12 @@ export async function getCall(id: string): Promise<Call> {
 export async function exportResearch(params: {
   format: string;
   recording_ids: string[];
+  call_types?: string[];
+  min_confidence?: number | null;
+  include_audio?: boolean;
+  include_spectrograms?: boolean;
+  include_fingerprints?: boolean;
+  include_audio_clips?: boolean;
 }): Promise<Blob> {
   const response = await fetch(`${API_BASE}/api/export/research`, {
     method: "POST",
@@ -280,4 +362,60 @@ export async function exportResearch(params: {
     throw new Error(`Export failed: ${response.status} ${response.statusText}`);
   }
   return response.blob();
+}
+
+export async function getActivityHeatmap(params?: {
+  location?: string;
+  date_from?: string;
+  date_to?: string;
+}): Promise<ActivityHeatmapResponse> {
+  const searchParams = new URLSearchParams();
+  if (params?.location) searchParams.set("location", params.location);
+  if (params?.date_from) searchParams.set("date_from", params.date_from);
+  if (params?.date_to) searchParams.set("date_to", params.date_to);
+  const query = searchParams.toString();
+  return fetchAPI<ActivityHeatmapResponse>(`/api/stats/activity-heatmap${query ? `?${query}` : ""}`);
+}
+
+export async function getReviewQueue(params?: {
+  status?: string;
+  max_confidence?: number;
+  call_type?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<ReviewQueueResponse> {
+  const searchParams = new URLSearchParams();
+  if (params?.status) searchParams.set("status", params.status);
+  if (typeof params?.max_confidence === "number") searchParams.set("max_confidence", String(params.max_confidence));
+  if (params?.call_type) searchParams.set("call_type", params.call_type);
+  if (typeof params?.limit === "number") searchParams.set("limit", String(params.limit));
+  if (typeof params?.offset === "number") searchParams.set("offset", String(params.offset));
+  const query = searchParams.toString();
+  const response = await fetchAPI<ReviewQueueResponse>(`/api/review-queue${query ? `?${query}` : ""}`);
+  return {
+    ...response,
+    items: response.items.map((call) => ({
+      ...call,
+      start_time: call.start_ms / 1000,
+      end_time: (call.start_ms + call.duration_ms) / 1000,
+      frequency_low: call.frequency_min_hz,
+      frequency_high: call.frequency_max_hz,
+    })),
+  };
+}
+
+export async function reviewCall(
+  callId: string,
+  payload: { action: "confirm" | "reclassify" | "discard"; corrected_call_type?: string; reviewer?: string }
+): Promise<Call> {
+  return fetchAPI<Call>(`/api/calls/${callId}/review`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function retrainClassifier(): Promise<Record<string, unknown>> {
+  return fetchAPI<Record<string, unknown>>("/api/classifier/retrain", {
+    method: "POST",
+  });
 }

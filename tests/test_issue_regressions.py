@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import io
 import json
+import zipfile
 from pathlib import Path
 
 import numpy as np
@@ -47,6 +49,65 @@ def _call_payload(call_id: str = "call-regression") -> dict:
             "harmonicity": 0.8,
         },
     }
+
+
+def _research_call(call_id: str, recording_id: str, start_ms: float, call_type: str, confidence: float) -> dict:
+    fundamental = 18.0 if call_type == "rumble" else 45.0
+    return {
+        "id": call_id,
+        "recording_id": recording_id,
+        "start_ms": start_ms,
+        "duration_ms": 700.0,
+        "frequency_min_hz": 12.0,
+        "frequency_max_hz": 95.0,
+        "call_type": call_type,
+        "confidence": confidence,
+        "acoustic_features": {
+            "mfcc": [fundamental / 100.0, 0.2, 0.3, 0.4, 0.5],
+            "mfcc_delta": [0.01, 0.02, 0.03],
+            "fundamental_frequency_hz": fundamental,
+            "spectral_centroid_hz": fundamental * 2.0,
+            "bandwidth_hz": 80.0,
+            "harmonicity": 0.82,
+            "snr_db": 8.0,
+            "frequency_contour_hz": [fundamental, fundamental + 2.0, fundamental + 1.0],
+        },
+    }
+
+
+def _seed_research_recording(loaded_server, sample_wav_file: Path, recording_id: str, calls: list[dict]) -> None:
+    metadata = {
+        "location": "Amboseli",
+        "date": "2026-04-11",
+        "recorded_at": "2026-04-11T05:30:00Z",
+        "animal_id": "E-1",
+    }
+    store = loaded_server.app.state.store
+    store.add(
+        recording_id,
+        f"{recording_id}.wav",
+        1.0,
+        0.001,
+        metadata=metadata,
+        source_path=str(sample_wav_file),
+    )
+    store.update_result(
+        recording_id,
+        {
+            "recording_id": recording_id,
+            "status": "complete",
+            "stages_completed": ["complete"],
+            "noise_types": [{"type": "generator", "percentage": 80.0, "frequency_range": [50.0, 250.0]}],
+            "quality": _quality_payload(),
+            "calls": calls,
+            "processing_time_s": 0.25,
+            "output_audio_path": str(sample_wav_file),
+            "spectrogram_before_path": "",
+            "spectrogram_after_path": "",
+        },
+    )
+    store.update_status(recording_id, "complete", progress=100, current_stage="complete")
+    loaded_server.app.state.call_database.upsert_processed_calls(recording_id, calls, metadata=metadata)
 
 
 def test_upload_content_hash_dedupes(test_client, sample_wav_file: Path) -> None:
@@ -136,6 +197,131 @@ def test_annotations_tags_individuals_and_export(loaded_server, test_client, sam
     assert "reviewed" in export.text
     assert deleted.status_code == 200
     assert deleted.json()["deleted"] is True
+
+
+def test_research_timelines_profiles_patterns_and_exports(loaded_server, test_client, sample_wav_file: Path) -> None:
+    rec_a_calls = [
+        _research_call("research-a1", "research-a", 0.0, "rumble", 0.4),
+        _research_call("research-a2", "research-a", 1_200.0, "bark", 0.82),
+        _research_call("research-a3", "research-a", 2_400.0, "rumble", 0.91),
+    ]
+    rec_b_calls = [
+        _research_call("research-b1", "research-b", 0.0, "rumble", 0.88),
+        _research_call("research-b2", "research-b", 1_200.0, "bark", 0.86),
+    ]
+    _seed_research_recording(loaded_server, sample_wav_file, "research-a", rec_a_calls)
+    _seed_research_recording(loaded_server, sample_wav_file, "research-b", rec_b_calls)
+
+    batch = loaded_server.app.state.batch_store.create(["research-a", "research-b"])
+    loaded_server.app.state.batch_store.update(batch["batch_id"], "research-a", status="complete", progress_pct=100)
+    loaded_server.app.state.batch_store.update(batch["batch_id"], "research-b", status="complete", progress_pct=100)
+
+    markers = test_client.get("/api/recordings/research-a/markers")
+    sequences = test_client.get("/api/recordings/research-a/sequences")
+    similar = test_client.get("/api/calls/research-a1/similar")
+    compare = test_client.get("/api/calls/compare", params={"call_a": "research-a1", "call_b": "research-a3"})
+    overlay = test_client.get(
+        "/api/calls/compare-overlay.png",
+        params={"call_a": "research-a1", "call_b": "research-a3", "type": "spectrogram"},
+    )
+    patterns = test_client.get("/api/patterns", params={"min_occurrences": 1})
+    heatmap = test_client.get("/api/stats/activity-heatmap", params={"location": "Amboseli"})
+    heatmap_png = test_client.get("/api/stats/activity-heatmap.png", params={"location": "Amboseli"})
+    sites = test_client.get("/api/sites")
+    profile = test_client.get("/api/sites/Amboseli/noise-profile")
+    recommendations = test_client.get("/api/sites/Amboseli/recommendations")
+    individuals = test_client.get("/api/individuals", params={"min_confidence": 0.0})
+    cross_match = test_client.get("/api/individuals/cross-match", params={"recording_ids": "research-a,research-b", "min_similarity": 0.0})
+    batch_summary = test_client.get(f"/api/batch/{batch['batch_id']}/summary")
+    export = test_client.post(
+        "/api/export/research",
+        json={
+            "format": "zip",
+            "recording_ids": ["research-a", "research-b"],
+            "include_audio": False,
+            "include_spectrograms": False,
+            "include_fingerprints": True,
+            "include_audio_clips": False,
+        },
+    )
+
+    assert markers.status_code == 200
+    assert markers.json()["total_markers"] == 3
+    assert markers.json()["summary"]["rumble"] == 2
+    assert sequences.status_code == 200
+    assert sequences.json()[0]["pattern"] == "rumble -> bark -> rumble"
+    assert similar.status_code == 200
+    assert similar.json()["matches"]
+    assert compare.status_code == 200
+    assert compare.json()["similarity_score"] > 0.0
+    assert overlay.status_code == 200
+    assert overlay.headers["content-type"] == "image/png"
+    assert patterns.status_code == 200
+    assert patterns.json()[0]["occurrences"] >= 1
+    assert heatmap.status_code == 200
+    assert heatmap.json()["total_calls"] == 5
+    assert heatmap_png.status_code == 200
+    assert heatmap_png.headers["content-type"] == "image/png"
+    assert sites.status_code == 200
+    assert {"location": "Amboseli", "recording_count": 2} in sites.json()
+    assert profile.status_code == 200
+    assert profile.json()["noise_sources"][0]["noise_type"] == "generator"
+    assert recommendations.status_code == 200
+    assert recommendations.json()["recommendations"]
+    assert individuals.status_code == 200
+    assert individuals.json()
+    assert cross_match.status_code == 200
+    assert batch_summary.status_code == 200
+    assert batch_summary.json()["total_calls_detected"] == 5
+    assert batch_summary.json()["call_type_distribution"]["rumble"] == 3
+    assert export.status_code == 200
+
+    with zipfile.ZipFile(io.BytesIO(export.content)) as archive:
+        names = set(archive.namelist())
+    assert {"DATA_DICTIONARY.md", "calls.csv", "fingerprints.npy", "fingerprint_ids.json"}.issubset(names)
+
+
+def test_review_queue_actions_and_classifier_retrain(loaded_server, test_client, sample_wav_file: Path, monkeypatch) -> None:
+    calls = [
+        _research_call("review-a1", "review-a", 0.0, "rumble", 0.32),
+        _research_call("review-a2", "review-a", 1_000.0, "rumble", 0.78),
+        _research_call("review-a3", "review-a", 2_000.0, "bark", 0.81),
+        _research_call("review-a4", "review-a", 3_000.0, "rumble", 0.83),
+        _research_call("review-a5", "review-a", 4_000.0, "bark", 0.84),
+    ]
+    _seed_research_recording(loaded_server, sample_wav_file, "review-a", calls)
+
+    queue = test_client.get("/api/review-queue", params={"max_confidence": 0.5})
+    reviewed = test_client.post(
+        "/api/calls/review-a1/review",
+        json={"action": "reclassify", "corrected_call_type": "bark", "reviewer": "analyst-1"},
+    )
+
+    def fake_train_classifier(training_data: list[dict], model_path: Path) -> dict:
+        Path(model_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(model_path).write_bytes(b"fake-model")
+        return {
+            "samples": len(training_data),
+            "classes": 2,
+            "accuracy": 1.0,
+            "ece": 0.0,
+            "class_distribution": {"rumble": 3, "bark": 2},
+        }
+
+    monkeypatch.setattr(loaded_server, "train_classifier", fake_train_classifier)
+    monkeypatch.setattr(loaded_server, "load_classifier", lambda path: None)
+    retrained = test_client.post("/api/classifier/retrain")
+
+    assert queue.status_code == 200
+    assert queue.json()["total"] == 1
+    assert queue.json()["items"][0]["id"] == "review-a1"
+    assert reviewed.status_code == 200
+    assert reviewed.json()["review_status"] == "corrected"
+    assert reviewed.json()["corrected_call_type"] == "bark"
+    assert retrained.status_code == 200
+    assert retrained.json()["status"] == "trained"
+    assert retrained.json()["samples"] == 5
+    assert retrained.json()["registry_version"]["active"] is True
 
 
 def test_webhook_registration_and_delivery(tmp_path: Path, test_client) -> None:

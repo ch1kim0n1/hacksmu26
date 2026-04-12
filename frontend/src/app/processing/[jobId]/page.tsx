@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import useProcessingJob from "@/hooks/useProcessingJob";
-import { getRecording, API_BASE, type Recording } from "@/lib/audio-api";
+import { getRecording, getRecordingMarkers, API_BASE, type MarkerResponse, type Recording } from "@/lib/audio-api";
 import { AnalysisLabels, AnalysisWindow } from "@/components/research/AnalysisLabels";
 
 interface ProcessingMetrics {
@@ -121,6 +121,7 @@ export default function ProcessingPage() {
   const processing = useProcessingJob(jobId || null);
 
   const [recording, setRecording] = useState<Recording | null>(null);
+  const [markers, setMarkers] = useState<MarkerResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -133,6 +134,9 @@ export default function ProcessingPage() {
       setLoading(true);
       const data = await getRecording(jobId);
       setRecording(data);
+      if (data.status === "complete") {
+        getRecordingMarkers(jobId).then(setMarkers).catch(() => setMarkers(null));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load recording");
     } finally {
@@ -224,6 +228,18 @@ export default function ProcessingPage() {
     : null;
   const metrics = metricsFromLive || metricsFromResult;
   const currentStageLabel = STAGES.find((stage) => stage.key === currentStage)?.label || "Processing";
+  const liveEvents = processing.liveEvents ?? [];
+  const liveNoiseType = processing.noiseType ?? null;
+  const liveCallCount = processing.callCount ?? null;
+  const eventLabels: Record<string, string> = {
+    "spectrogram:rendering": "Rendering spectrogram",
+    "spectrogram:before_complete": "Original spectrogram ready",
+    "spectrogram:after_complete": "Cleaned spectrogram ready",
+    "denoising:started": "Denoising started",
+    "denoising:complete": "Denoising complete",
+    "calls:detecting": "Detecting calls",
+    "calls:detected": "Calls detected",
+  };
 
   if (loading) {
     return (
@@ -300,6 +316,28 @@ export default function ProcessingPage() {
               <p className="text-xs text-ev-warm-gray mt-2">
                 Current stage: {currentStageLabel}
               </p>
+            </div>
+          )}
+          {(liveEvents.length > 0 || liveNoiseType || liveCallCount !== null) && (
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              <div className="rounded-lg bg-background-elevated p-4">
+                <p className="text-xs uppercase tracking-wide text-ev-warm-gray">Live event</p>
+                <p className="mt-1 text-sm font-medium text-ev-charcoal">
+                  {eventLabels[liveEvents[0]] || liveEvents[0] || currentStageLabel}
+                </p>
+              </div>
+              <div className="rounded-lg bg-background-elevated p-4">
+                <p className="text-xs uppercase tracking-wide text-ev-warm-gray">Noise</p>
+                <p className="mt-1 text-sm font-medium capitalize text-ev-charcoal">
+                  {liveNoiseType || "Analyzing"}
+                </p>
+              </div>
+              <div className="rounded-lg bg-background-elevated p-4">
+                <p className="text-xs uppercase tracking-wide text-ev-warm-gray">Call count</p>
+                <p className="mt-1 text-sm font-medium text-ev-charcoal">
+                  {liveCallCount ?? markers?.total_markers ?? "Waiting"}
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -442,6 +480,42 @@ export default function ProcessingPage() {
                 </div>
               </div>
             </div>
+
+            {markers && markers.markers.length > 0 && (
+              <div className="p-6 rounded-xl bg-ev-cream border border-ev-sand">
+                <h2 className="text-lg font-semibold text-ev-charcoal mb-4">
+                  Call Timeline
+                </h2>
+                <div className="relative h-16 rounded-lg bg-background-elevated">
+                  {markers.markers.map((marker) => {
+                    const duration = Math.max(recording?.duration_s ? recording.duration_s * 1000 : marker.end_ms, 1);
+                    const left = Math.min(100, (marker.start_ms / duration) * 100);
+                    const width = Math.max(2, ((marker.duration_ms || 1) / duration) * 100);
+                    return (
+                      <div
+                        key={marker.id}
+                        title={`${marker.call_type} · ${Math.round((marker.confidence ?? 0) * 100)}%`}
+                        className="absolute top-3 h-10 rounded-md px-1 text-[10px] font-semibold text-white"
+                        style={{
+                          left: `${left}%`,
+                          width: `${Math.min(width, 100 - left)}%`,
+                          backgroundColor: marker.color,
+                        }}
+                      >
+                        <span className="block truncate capitalize">{marker.call_type}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2 text-xs text-ev-warm-gray">
+                  {Object.entries(markers.summary).map(([type, count]) => (
+                    <span key={type} className="rounded-md bg-background-elevated px-2 py-1 capitalize">
+                      {type}: {count}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Sidebar - Metrics */}

@@ -82,7 +82,7 @@ describe("Sidebar", () => {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     });
-    window.matchMedia = matchMediaMock;
+    window.matchMedia = matchMediaMock as unknown as typeof window.matchMedia;
   });
 
   it("renders navigation links", () => {
