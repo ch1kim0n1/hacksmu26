@@ -72,7 +72,7 @@ describe("Upload Page", () => {
 
   it("renders AI enhancement toggle", () => {
     render(<UploadPage />);
-    expect(screen.getByText("Enhance with AI")).toBeInTheDocument();
+    expect(screen.getByText("AI Enhance")).toBeInTheDocument();
     expect(screen.getByLabelText("Toggle AI enhancement")).toBeInTheDocument();
   });
 
@@ -86,8 +86,8 @@ describe("Upload Page", () => {
   it("toggles AI enhancement on click", () => {
     render(<UploadPage />);
     const toggle = screen.getByLabelText("Toggle AI enhancement");
-    expect(toggle.getAttribute("aria-pressed")).toBe("true");
+    expect(toggle.getAttribute("aria-checked")).toBe("true");
     fireEvent.click(toggle);
-    expect(toggle.getAttribute("aria-pressed")).toBe("false");
+    expect(toggle.getAttribute("aria-checked")).toBe("false");
   });
 });

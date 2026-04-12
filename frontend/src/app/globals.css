@@ -71,6 +71,10 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 /* ─── Skeleton Loading Shimmer ─── */
@@ -92,4 +96,220 @@ body {
     background-size: 200% 100%;
     animation: shimmer 2s ease-in-out infinite;
   }
+}
+
+/* ─── Landing Page ─── */
+
+@keyframes ripple {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+}
+
+@keyframes globe-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(196, 164, 108, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(196, 164, 108, 0.6));
+  }
+}
+
+.globe-pulse {
+  animation: globe-pulse 3s ease-in-out infinite;
+}
+
+.landing-page {
+  overflow-x: hidden;
+}
+
+/* Wave divider between sections */
+.wave-divider {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.wave-divider svg {
+  display: block;
+  width: 100%;
+  height: clamp(60px, 10vw, 140px);
+}
+
+/* Background dot pattern for visual richness */
+.dot-pattern {
+  background-image: radial-gradient(circle, var(--ev-sand) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Threat card shimmer on hover */
+.threat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.5s;
+  background: linear-gradient(135deg, transparent 40%, rgba(196, 164, 108, 0.06) 50%, transparent 60%);
+}
+.threat-card:hover::before {
+  opacity: 1;
+}
+
+/* Animated gradient border for active elements */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Ring pulse for CTA */
+@keyframes ring-expand {
+  0% { transform: scale(0.8); opacity: 0.15; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.ring-pulse {
+  animation: ring-expand 3s ease-out infinite;
+}
+.ring-pulse-delay-1 { animation-delay: 1s; }
+.ring-pulse-delay-2 { animation-delay: 2s; }
+
+/* ─── Dashboard & App Shell ─── */
+
+@keyframes sound-bar {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes border-flow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+@keyframes card-enter {
+  0% { opacity: 0; transform: translateY(12px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes glow-breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 164, 108, 0); }
+  50% { box-shadow: 0 0 24px 4px rgba(196, 164, 108, 0.12); }
+}
+
+/* Glassmorphism layers */
+.glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+}
+
+/* Ambient background orbs (dashboard) */
+.bg-orbs::before {
+  content: '';
+  position: fixed;
+  top: 8%;
+  right: -6%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(196, 164, 108, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-orbs::after {
+  content: '';
+  position: fixed;
+  bottom: 5%;
+  left: -8%;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(122, 139, 111, 0.04) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(44, 41, 38, 0.08), 0 2px 8px rgba(44, 41, 38, 0.04);
+}
+
+/* Upload zone animated border */
+.upload-zone-glow {
+  position: relative;
+}
+
+.upload-zone-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 2px;
+  background: linear-gradient(90deg, var(--ev-savanna), var(--ev-gold), var(--ev-sunset), var(--ev-savanna));
+  background-size: 200% 100%;
+  animation: border-flow 4s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.upload-zone-glow:hover::before,
+.upload-zone-glow.active::before {
+  opacity: 1;
+}
+
+/* Spectrogram overlay gradient */
+.spec-overlay {
+  background: linear-gradient(to top, rgba(44, 41, 38, 0.5) 0%, rgba(44, 41, 38, 0.05) 40%, transparent 100%);
+}
+
+/* Custom audio controls */
+audio::-webkit-media-controls-panel {
+  background: var(--ev-cream);
+  border-radius: 12px;
+}
+
+/* Quality ring animation */
+.quality-ring-stroke {
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Layout stability fixes ─── */
+
+/* Prevent layout shift from page transitions */
+.bg-orbs > div {
+  will-change: opacity, transform;
+}
+
+/* Consistent input heights across the dashboard */
+input[type="text"],
+select {
+  min-height: 40px;
+}
+
+/* Audio player consistent sizing */
+audio {
+  height: 40px;
+  border-radius: 12px;
+}
+
+/* Native select — hide default chevron for custom styling */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
