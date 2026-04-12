@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 
 _NOISE_ADAPTIVE_PROFILES: dict[str, dict[str, Any]] = {
     "airplane": {"aggressiveness_mult": 1.1, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": None},
-    "car": {"aggressiveness_mult": 1.0, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": None},
+    "vehicle": {"aggressiveness_mult": 1.0, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": None},
     "generator": {"aggressiveness_mult": 0.9, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": [50.0, 100.0, 150.0, 200.0]},
     "wind": {"aggressiveness_mult": 0.7, "low_hz": 8.0, "high_hz": 1200.0, "multi_pass": False, "notch_freqs": None},
 }

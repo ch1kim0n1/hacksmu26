@@ -4,7 +4,7 @@
     "filename": "04-040920-02_vehicle_1.wav",
     "animal_id": "04-040920-02",
     "location": "",
-    "date": "",
+    "date": "2004-09-20",
     "start_sec": 0.0,
     "end_sec": 57.53,
     "duration_s": 57.53,
@@ -13,8 +13,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 57.53,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.393,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.535,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -52,43 +52,77 @@
         3.8025,
         5.4771
       ],
+      "mfcc_delta": [
+        0.0076,
+        -0.0084,
+        -0.0029,
+        -0.0005,
+        -0.0004,
+        0.0038,
+        0.0014,
+        0.0019,
+        -0.0022,
+        -0.0002,
+        0.004,
+        0.0103,
+        0.0086
+      ],
+      "mfcc_delta2": [
+        -0.0001,
+        0.0016,
+        -0.0005,
+        -0.0017,
+        -0.0015,
+        -0.0019,
+        -0.0012,
+        0.0001,
+        0.0,
+        -0.0001,
+        0.0,
+        -0.0007,
+        -0.0004
+      ],
+      "pitch_contour_slope": 0.7912,
+      "temporal_energy_variance": 0.00605426,
+      "spectral_entropy": 0.385293,
       "zero_crossing_rate": 0.025317,
-      "snr_db": 28.4
+      "snr_db": 28.4,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.393,
+      "primary_type": "vehicle",
+      "confidence": 0.535,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 39.3,
+          "type": "vehicle",
+          "percentage": 53.5,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 34.4,
+          "type": "wind",
+          "percentage": 30.4,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 24.7,
+          "percentage": 12.8,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "wind",
-          "percentage": 1.6,
+          "type": "airplane",
+          "percentage": 3.3,
           "frequency_range_hz": [
-            200.0,
-            2000.0
+            50.0,
+            4000.0
           ]
         }
       ],
@@ -100,7 +134,7 @@
     "filename": "04-040920-02_vehicle_2.wav",
     "animal_id": "04-040920-02",
     "location": "",
-    "date": "",
+    "date": "2004-09-20",
     "start_sec": 0.0,
     "end_sec": 51.474,
     "duration_s": 51.474,
@@ -109,8 +143,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 51.474,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.414,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.309,
     "dominant_frequency_hz": 26.2,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -150,35 +184,77 @@
         8.364,
         4.3528
       ],
+      "mfcc_delta": [
+        -0.0292,
+        0.0011,
+        0.0094,
+        0.0047,
+        0.0024,
+        -0.0012,
+        0.0012,
+        -0.0035,
+        -0.0036,
+        0.0005,
+        -0.0,
+        0.0006,
+        -0.0003
+      ],
+      "mfcc_delta2": [
+        -0.0009,
+        0.0003,
+        0.0001,
+        -0.0001,
+        -0.0006,
+        -0.0002,
+        -0.0007,
+        -0.0003,
+        0.0007,
+        0.001,
+        0.0004,
+        0.0002,
+        -0.0001
+      ],
+      "pitch_contour_slope": 8.4919,
+      "temporal_energy_variance": 0.00113173,
+      "spectral_entropy": 0.337382,
       "zero_crossing_rate": 0.02263,
-      "snr_db": 21.0
+      "snr_db": 21.0,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.414,
+      "primary_type": "generator",
+      "confidence": 0.309,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 41.4,
+          "type": "generator",
+          "percentage": 30.9,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 28.9,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 37.4,
+          "type": "airplane",
+          "percentage": 22.6,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            50.0,
+            4000.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 20.4,
+          "type": "wind",
+          "percentage": 17.6,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            20.0,
+            2000.0
           ]
         }
       ],
@@ -190,7 +266,7 @@
     "filename": "04-040920-03_vehicle_noise_1.wav",
     "animal_id": "04-040920-03",
     "location": "",
-    "date": "",
+    "date": "2004-09-20",
     "start_sec": 0.0,
     "end_sec": 168.979,
     "duration_s": 168.979,
@@ -199,8 +275,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.361,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.543,
     "dominant_frequency_hz": 104.8,
     "call_type": "rumble",
     "call_type_confidence": 0.8,
@@ -240,35 +316,77 @@
         8.0134,
         6.577
       ],
+      "mfcc_delta": [
+        -0.0008,
+        -0.0108,
+        -0.0035,
+        0.0005,
+        0.0023,
+        0.0061,
+        0.0062,
+        0.0019,
+        -0.0005,
+        0.0003,
+        0.0002,
+        0.0035,
+        0.0047
+      ],
+      "mfcc_delta2": [
+        -0.0009,
+        0.001,
+        -0.0,
+        -0.0001,
+        0.0001,
+        -0.0009,
+        -0.0009,
+        -0.0006,
+        -0.0001,
+        0.0,
+        -0.0003,
+        -0.0005,
+        -0.0001
+      ],
+      "pitch_contour_slope": -3.3087,
+      "temporal_energy_variance": 0.00101978,
+      "spectral_entropy": 0.365632,
       "zero_crossing_rate": 0.020982,
-      "snr_db": 24.0
+      "snr_db": 24.0,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.361,
+      "primary_type": "vehicle",
+      "confidence": 0.543,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 36.1,
+          "type": "vehicle",
+          "percentage": 54.3,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 32.7,
+          "type": "wind",
+          "percentage": 27.0,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 31.0,
+          "percentage": 17.2,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 1.5,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         }
       ],
@@ -280,7 +398,7 @@
     "filename": "04-061218-25_vehicle_noise_1.wav",
     "animal_id": "04-061218-25",
     "location": "",
-    "date": "",
+    "date": "2006-12-18",
     "start_sec": 0.0,
     "end_sec": 152.893,
     "duration_s": 152.893,
@@ -289,8 +407,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.381,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.427,
     "dominant_frequency_hz": 26.2,
     "call_type": "rumble",
     "call_type_confidence": 0.85,
@@ -330,43 +448,77 @@
         7.7743,
         2.5241
       ],
+      "mfcc_delta": [
+        0.0381,
+        0.0132,
+        -0.0083,
+        -0.0048,
+        -0.0021,
+        -0.0017,
+        -0.0022,
+        -0.0019,
+        -0.0002,
+        -0.0037,
+        0.0015,
+        0.0001,
+        0.001
+      ],
+      "mfcc_delta2": [
+        -0.002,
+        0.0004,
+        -0.0001,
+        -0.0013,
+        -0.0005,
+        0.0002,
+        -0.0002,
+        -0.0004,
+        -0.0007,
+        -0.0003,
+        0.0001,
+        -0.0002,
+        -0.0006
+      ],
+      "pitch_contour_slope": -0.2438,
+      "temporal_energy_variance": 0.00021878,
+      "spectral_entropy": 0.427909,
       "zero_crossing_rate": 0.045786,
-      "snr_db": 14.8
+      "snr_db": 14.8,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.381,
+      "primary_type": "generator",
+      "confidence": 0.427,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 38.1,
+          "type": "generator",
+          "percentage": 42.7,
           "frequency_range_hz": [
-            20.0,
+            40.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 33.7,
-          "frequency_range_hz": [
-            20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 25.5,
+          "type": "airplane",
+          "percentage": 32.7,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 2.2,
+          "percentage": 13.7,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 11.0,
+          "frequency_range_hz": [
+            20.0,
+            500.0
           ]
         }
       ],
@@ -378,7 +530,7 @@
     "filename": "061220-24_airplane_01.wav",
     "animal_id": "061220-24",
     "location": "",
-    "date": "",
+    "date": "2006-12-20",
     "start_sec": 0.0,
     "end_sec": 45.833,
     "duration_s": 45.833,
@@ -387,8 +539,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 45.833,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.37,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.311,
     "dominant_frequency_hz": 0.0,
     "call_type": "trumpet",
     "call_type_confidence": 0.6,
@@ -428,42 +580,76 @@
         10.233,
         7.4457
       ],
+      "mfcc_delta": [
+        -0.0018,
+        -0.0082,
+        0.0072,
+        -0.0002,
+        0.0012,
+        0.0042,
+        -0.0023,
+        0.0004,
+        0.002,
+        -0.0043,
+        0.0005,
+        0.0028,
+        -0.0006
+      ],
+      "mfcc_delta2": [
+        -0.0054,
+        0.0014,
+        0.0025,
+        0.0011,
+        0.0016,
+        -0.0003,
+        0.0009,
+        0.0008,
+        0.0005,
+        -0.0001,
+        -0.0006,
+        -0.0001,
+        0.0001
+      ],
+      "pitch_contour_slope": -39.9125,
+      "temporal_energy_variance": 0.00042793,
+      "spectral_entropy": 0.380184,
       "zero_crossing_rate": 0.029024,
-      "snr_db": 27.8
+      "snr_db": 27.8,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.37,
+      "primary_type": "vehicle",
+      "confidence": 0.311,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 37.0,
+          "type": "vehicle",
+          "percentage": 31.1,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 31.1,
+          "type": "generator",
+          "percentage": 28.0,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 28.1,
+          "type": "airplane",
+          "percentage": 20.5,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 3.6,
+          "percentage": 20.3,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
           ]
         }
@@ -476,7 +662,7 @@
     "filename": "090224-09_generator_01.wav",
     "animal_id": "090224-09",
     "location": "",
-    "date": "",
+    "date": "2009-02-24",
     "start_sec": 0.0,
     "end_sec": 411.058,
     "duration_s": 411.058,
@@ -485,8 +671,8 @@
     "noise_type_ref": "generator",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.423,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.441,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -526,35 +712,77 @@
         10.6409,
         4.7719
       ],
+      "mfcc_delta": [
+        -0.0099,
+        -0.0033,
+        0.0017,
+        -0.0002,
+        0.0031,
+        0.001,
+        0.0035,
+        0.0003,
+        -0.0025,
+        -0.0022,
+        -0.0009,
+        -0.0023,
+        -0.004
+      ],
+      "mfcc_delta2": [
+        -0.0037,
+        0.0021,
+        0.0011,
+        -0.0007,
+        0.0001,
+        -0.0003,
+        -0.0004,
+        -0.0012,
+        -0.0008,
+        -0.0005,
+        -0.0009,
+        -0.0006,
+        -0.0004
+      ],
+      "pitch_contour_slope": 19.9785,
+      "temporal_energy_variance": 0.00018455,
+      "spectral_entropy": 0.339149,
       "zero_crossing_rate": 0.029363,
-      "snr_db": 17.5
+      "snr_db": 17.5,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.423,
+      "primary_type": "generator",
+      "confidence": 0.441,
       "noise_types": [
         {
+          "type": "generator",
+          "percentage": 44.1,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
           "type": "airplane",
-          "percentage": 42.3,
+          "percentage": 28.5,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 16.7,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 38.3,
+          "type": "wind",
+          "percentage": 10.7,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 18.3,
-          "frequency_range_hz": [
-            50.0,
-            250.0
+            2000.0
           ]
         }
       ],
@@ -566,7 +794,7 @@
     "filename": "1989-06_airplane_01.wav",
     "animal_id": "1989-06",
     "location": "",
-    "date": "",
+    "date": "1989",
     "start_sec": 0.0,
     "end_sec": 83.038,
     "duration_s": 83.038,
@@ -575,8 +803,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.406,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.433,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -616,35 +844,77 @@
         10.3149,
         7.3125
       ],
+      "mfcc_delta": [
+        0.0309,
+        0.0257,
+        0.0066,
+        0.0039,
+        0.0007,
+        0.0007,
+        0.0018,
+        0.0007,
+        0.0012,
+        0.0007,
+        0.0002,
+        -0.0001,
+        -0.0001
+      ],
+      "mfcc_delta2": [
+        0.002,
+        0.001,
+        -0.0008,
+        -0.0007,
+        -0.0006,
+        -0.0002,
+        0.0002,
+        -0.0,
+        -0.0001,
+        -0.0002,
+        -0.0,
+        0.0001,
+        -0.0002
+      ],
+      "pitch_contour_slope": -30.483,
+      "temporal_energy_variance": 0.00018037,
+      "spectral_entropy": 0.30696,
       "zero_crossing_rate": 0.011654,
-      "snr_db": 29.0
+      "snr_db": 29.0,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.406,
+      "primary_type": "vehicle",
+      "confidence": 0.433,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 40.6,
+          "type": "vehicle",
+          "percentage": 43.3,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 36.7,
+          "type": "generator",
+          "percentage": 24.7,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 22.3,
+          "type": "wind",
+          "percentage": 20.9,
+          "frequency_range_hz": [
+            20.0,
+            2000.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 11.0,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         }
       ],
@@ -656,7 +926,7 @@
     "filename": "1989-08_airplane_01.wav",
     "animal_id": "1989-08",
     "location": "",
-    "date": "",
+    "date": "1989",
     "start_sec": 0.0,
     "end_sec": 115.023,
     "duration_s": 115.023,
@@ -665,8 +935,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.39,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.544,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -706,35 +976,77 @@
         9.5554,
         5.9361
       ],
+      "mfcc_delta": [
+        -0.0032,
+        -0.0099,
+        -0.0024,
+        -0.001,
+        -0.0005,
+        0.0008,
+        0.0019,
+        0.0007,
+        0.0021,
+        0.0017,
+        0.0022,
+        0.0024,
+        0.0025
+      ],
+      "mfcc_delta2": [
+        0.0023,
+        0.0018,
+        -0.0013,
+        -0.0014,
+        -0.0016,
+        -0.0008,
+        -0.0006,
+        -0.0003,
+        -0.0004,
+        0.0,
+        0.0,
+        -0.0001,
+        -0.0004
+      ],
+      "pitch_contour_slope": -76.7636,
+      "temporal_energy_variance": 2.035e-05,
+      "spectral_entropy": 0.279618,
       "zero_crossing_rate": 0.01211,
-      "snr_db": 27.5
+      "snr_db": 27.5,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.39,
+      "primary_type": "vehicle",
+      "confidence": 0.544,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 39.0,
+          "type": "vehicle",
+          "percentage": 54.4,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 35.0,
+          "type": "wind",
+          "percentage": 24.6,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 25.5,
+          "percentage": 19.5,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 1.5,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         }
       ],
@@ -746,7 +1058,7 @@
     "filename": "1989-08_airplane_02.wav",
     "animal_id": "1989-08",
     "location": "",
-    "date": "",
+    "date": "1989",
     "start_sec": 0.0,
     "end_sec": 44.432,
     "duration_s": 44.432,
@@ -755,8 +1067,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 44.432,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.385,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.572,
     "dominant_frequency_hz": 0.0,
     "call_type": "unknown",
     "call_type_confidence": 0.1,
@@ -796,35 +1108,77 @@
         7.5354,
         6.6379
       ],
+      "mfcc_delta": [
+        -0.1199,
+        -0.0259,
+        0.0163,
+        0.0052,
+        0.0105,
+        0.0046,
+        0.0054,
+        -0.0006,
+        -0.0005,
+        -0.0031,
+        -0.0012,
+        -0.0028,
+        -0.002
+      ],
+      "mfcc_delta2": [
+        0.0234,
+        0.0052,
+        -0.0014,
+        0.0011,
+        0.0008,
+        0.0017,
+        0.0008,
+        0.0007,
+        -0.0,
+        0.0003,
+        0.0001,
+        0.0003,
+        -0.0003
+      ],
+      "pitch_contour_slope": -84.4408,
+      "temporal_energy_variance": 0.00544529,
+      "spectral_entropy": 0.139548,
       "zero_crossing_rate": 0.012081,
-      "snr_db": 43.0
+      "snr_db": 43.0,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.385,
+      "primary_type": "vehicle",
+      "confidence": 0.572,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 38.5,
+          "type": "vehicle",
+          "percentage": 57.2,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 34.6,
+          "type": "wind",
+          "percentage": 29.3,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 26.2,
+          "percentage": 11.9,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 1.7,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         }
       ],
@@ -836,7 +1190,7 @@
     "filename": "1989-08_airplane_03.wav",
     "animal_id": "1989-08",
     "location": "",
-    "date": "",
+    "date": "1989",
     "start_sec": 0.0,
     "end_sec": 192.056,
     "duration_s": 192.056,
@@ -845,8 +1199,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.391,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.534,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -886,35 +1240,77 @@
         9.6036,
         6.0104
       ],
+      "mfcc_delta": [
+        -0.0377,
+        -0.0162,
+        0.0052,
+        0.0038,
+        0.0038,
+        0.0007,
+        0.0031,
+        -0.0003,
+        0.0008,
+        0.0015,
+        0.0001,
+        0.0003,
+        -0.0017
+      ],
+      "mfcc_delta2": [
+        0.0066,
+        0.0006,
+        -0.0023,
+        -0.0006,
+        -0.0011,
+        -0.0,
+        -0.0001,
+        -0.0001,
+        -0.0001,
+        -0.0001,
+        -0.0001,
+        0.0003,
+        0.0001
+      ],
+      "pitch_contour_slope": -71.9655,
+      "temporal_energy_variance": 0.00033456,
+      "spectral_entropy": 0.344288,
       "zero_crossing_rate": 0.012234,
-      "snr_db": 25.9
+      "snr_db": 25.9,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.391,
+      "primary_type": "vehicle",
+      "confidence": 0.534,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 39.1,
+          "type": "vehicle",
+          "percentage": 53.4,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 35.1,
+          "type": "wind",
+          "percentage": 22.8,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 25.2,
+          "percentage": 22.3,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 1.5,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         }
       ],
@@ -926,7 +1322,7 @@
     "filename": "2000-23_background_and_vehicle_noise_2.wav",
     "animal_id": "2000-23",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 66.255,
     "duration_s": 66.255,
@@ -936,7 +1332,7 @@
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
     "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.353,
+    "classifier_confidence": 0.355,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 0.85,
@@ -976,51 +1372,77 @@
         18.2862,
         5.9703
       ],
+      "mfcc_delta": [
+        0.0041,
+        -0.0049,
+        -0.0047,
+        0.0046,
+        -0.0012,
+        -0.0026,
+        0.0022,
+        -0.001,
+        -0.0049,
+        -0.0012,
+        -0.0006,
+        -0.0012,
+        0.0014
+      ],
+      "mfcc_delta2": [
+        -0.0016,
+        0.0002,
+        0.0007,
+        -0.0,
+        -0.0005,
+        -0.0012,
+        0.0002,
+        -0.0004,
+        -0.0014,
+        -0.0004,
+        -0.0003,
+        -0.0005,
+        -0.0001
+      ],
+      "pitch_contour_slope": -2.4935,
+      "temporal_energy_variance": 0.00571068,
+      "spectral_entropy": 0.58523,
       "zero_crossing_rate": 0.023347,
-      "snr_db": 32.6
+      "snr_db": 32.6,
+      "feature_vector_dim": 54
     },
     "noise": {
       "primary_type": "airplane",
-      "confidence": 0.353,
+      "confidence": 0.355,
       "noise_types": [
         {
           "type": "airplane",
-          "percentage": 35.3,
+          "percentage": 35.5,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 34.7,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 17.3,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 31.6,
+          "type": "wind",
+          "percentage": 12.6,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "wind",
-          "percentage": 16.7,
-          "frequency_range_hz": [
-            200.0,
             2000.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 10.7,
-          "frequency_range_hz": [
-            50.0,
-            250.0
-          ]
-        },
-        {
-          "type": "other",
-          "percentage": 5.6,
-          "frequency_range_hz": [
-            0.0,
-            4000.0
           ]
         }
       ],
@@ -1032,7 +1454,7 @@
     "filename": "2000-23_background_noise_1.wav",
     "animal_id": "2000-23",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 38.747,
     "duration_s": 38.747,
@@ -1041,8 +1463,8 @@
     "noise_type_ref": "background",
     "species": "African bush elephant",
     "analysis_clip_seconds": 38.747,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.477,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.361,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -1080,35 +1502,77 @@
         18.4532,
         6.0648
       ],
+      "mfcc_delta": [
+        -0.0474,
+        -0.0228,
+        0.0056,
+        -0.0001,
+        0.002,
+        -0.001,
+        0.0056,
+        0.0028,
+        0.003,
+        0.0006,
+        0.0001,
+        0.0016,
+        -0.0014
+      ],
+      "mfcc_delta2": [
+        0.0081,
+        0.0052,
+        -0.0001,
+        -0.0003,
+        -0.001,
+        -0.0012,
+        -0.0002,
+        -0.0009,
+        -0.0017,
+        -0.002,
+        -0.0018,
+        -0.0014,
+        -0.001
+      ],
+      "pitch_contour_slope": 0.8652,
+      "temporal_energy_variance": 0.00030609,
+      "spectral_entropy": 0.279104,
       "zero_crossing_rate": 0.01388,
-      "snr_db": 14.8
+      "snr_db": 14.8,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.477,
+      "primary_type": "generator",
+      "confidence": 0.361,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 47.7,
+          "type": "generator",
+          "percentage": 36.1,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 26.8,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 43.3,
+          "type": "airplane",
+          "percentage": 24.8,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            50.0,
+            4000.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 8.6,
+          "type": "wind",
+          "percentage": 12.3,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            20.0,
+            2000.0
           ]
         }
       ],
@@ -1120,7 +1584,7 @@
     "filename": "2000-23_background_vehicle_noise.wav",
     "animal_id": "2000-23",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 45.838,
     "duration_s": 45.838,
@@ -1129,8 +1593,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 45.838,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.487,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.467,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -1168,35 +1632,77 @@
         17.904,
         7.6095
       ],
+      "mfcc_delta": [
+        0.036,
+        0.0085,
+        0.0016,
+        -0.0036,
+        -0.0001,
+        -0.0034,
+        -0.0012,
+        -0.0003,
+        0.0001,
+        -0.0017,
+        -0.0008,
+        -0.0027,
+        0.0003
+      ],
+      "mfcc_delta2": [
+        0.0048,
+        0.0046,
+        0.0012,
+        -0.0007,
+        -0.0001,
+        -0.0008,
+        -0.0008,
+        -0.0018,
+        -0.0012,
+        -0.001,
+        -0.0007,
+        -0.0013,
+        -0.0004
+      ],
+      "pitch_contour_slope": 2.7723,
+      "temporal_energy_variance": 0.00027658,
+      "spectral_entropy": 0.255134,
       "zero_crossing_rate": 0.011968,
-      "snr_db": 13.7
+      "snr_db": 13.7,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.487,
+      "primary_type": "generator",
+      "confidence": 0.467,
       "noise_types": [
         {
+          "type": "generator",
+          "percentage": 46.7,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
           "type": "airplane",
-          "percentage": 48.7,
+          "percentage": 25.6,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 20.4,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 44.3,
+          "type": "wind",
+          "percentage": 7.4,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 6.9,
-          "frequency_range_hz": [
-            50.0,
-            250.0
+            2000.0
           ]
         }
       ],
@@ -1208,7 +1714,7 @@
     "filename": "2000-23_vehicle_noise_1.wav",
     "animal_id": "2000-23",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 210.502,
     "duration_s": 210.502,
@@ -1217,8 +1723,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.395,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.319,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 0.85,
@@ -1256,42 +1762,76 @@
         11.9821,
         3.3931
       ],
+      "mfcc_delta": [
+        0.0105,
+        0.0275,
+        0.0191,
+        -0.0039,
+        0.0048,
+        0.0077,
+        0.0059,
+        -0.0054,
+        -0.0008,
+        0.0071,
+        -0.0029,
+        -0.003,
+        -0.0005
+      ],
+      "mfcc_delta2": [
+        0.0013,
+        -0.002,
+        -0.0007,
+        -0.0005,
+        -0.0003,
+        0.0002,
+        0.0003,
+        0.0003,
+        0.0009,
+        -0.0012,
+        -0.0003,
+        0.0,
+        0.0001
+      ],
+      "pitch_contour_slope": -9.2189,
+      "temporal_energy_variance": 0.00028175,
+      "spectral_entropy": 0.384399,
       "zero_crossing_rate": 0.024729,
-      "snr_db": 19.1
+      "snr_db": 19.1,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.395,
+      "primary_type": "vehicle",
+      "confidence": 0.319,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 39.5,
+          "type": "vehicle",
+          "percentage": 31.9,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 35.4,
+          "type": "generator",
+          "percentage": 31.3,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 23.8,
+          "type": "airplane",
+          "percentage": 19.0,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 1.3,
+          "percentage": 17.8,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
           ]
         }
@@ -1304,7 +1844,7 @@
     "filename": "2000-23_vehicle_noise_2.wav",
     "animal_id": "2000-23",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 21.552,
     "duration_s": 21.552,
@@ -1314,7 +1854,7 @@
     "species": "African bush elephant",
     "analysis_clip_seconds": 21.552,
     "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.44,
+    "classifier_confidence": 0.299,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -1352,43 +1892,77 @@
         15.8681,
         5.0212
       ],
+      "mfcc_delta": [
+        0.0255,
+        0.0153,
+        0.0128,
+        0.0066,
+        -0.0024,
+        0.0064,
+        -0.0046,
+        -0.0074,
+        -0.0009,
+        0.0045,
+        -0.0048,
+        -0.0089,
+        -0.0008
+      ],
+      "mfcc_delta2": [
+        -0.0062,
+        0.0084,
+        0.0038,
+        0.0005,
+        0.0016,
+        -0.0008,
+        -0.0008,
+        -0.0013,
+        -0.0029,
+        -0.0004,
+        0.0003,
+        -0.0022,
+        -0.002
+      ],
+      "pitch_contour_slope": -5.6708,
+      "temporal_energy_variance": 0.00042331,
+      "spectral_entropy": 0.39374,
       "zero_crossing_rate": 0.024413,
-      "snr_db": 26.0
+      "snr_db": 26.0,
+      "feature_vector_dim": 54
     },
     "noise": {
       "primary_type": "airplane",
-      "confidence": 0.44,
+      "confidence": 0.299,
       "noise_types": [
         {
           "type": "airplane",
-          "percentage": 44.0,
+          "percentage": 29.9,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 28.9,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 24.8,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 39.8,
+          "type": "wind",
+          "percentage": 16.3,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "wind",
-          "percentage": 8.9,
-          "frequency_range_hz": [
-            200.0,
             2000.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 7.1,
-          "frequency_range_hz": [
-            50.0,
-            250.0
           ]
         }
       ],
@@ -1400,7 +1974,7 @@
     "filename": "2000-23_vehicle_noise_3.wav",
     "animal_id": "2000-23",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 37.142,
     "duration_s": 37.142,
@@ -1409,8 +1983,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 37.142,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.495,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.353,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -1448,35 +2022,77 @@
         20.5529,
         2.3354
       ],
+      "mfcc_delta": [
+        0.0642,
+        -0.0229,
+        -0.0053,
+        -0.0096,
+        -0.0091,
+        0.0098,
+        0.0043,
+        0.0013,
+        0.0053,
+        0.0002,
+        -0.007,
+        0.006,
+        -0.0015
+      ],
+      "mfcc_delta2": [
+        -0.0059,
+        -0.0007,
+        0.0028,
+        0.0009,
+        -0.0015,
+        -0.0001,
+        0.0008,
+        -0.0007,
+        -0.0011,
+        -0.0011,
+        -0.0011,
+        -0.0007,
+        -0.0005
+      ],
+      "pitch_contour_slope": -3.283,
+      "temporal_energy_variance": 0.00158807,
+      "spectral_entropy": 0.235364,
       "zero_crossing_rate": 0.043892,
-      "snr_db": 22.1
+      "snr_db": 22.1,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.495,
+      "primary_type": "generator",
+      "confidence": 0.353,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 49.5,
+          "type": "generator",
+          "percentage": 35.3,
           "frequency_range_hz": [
-            20.0,
+            40.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 45.0,
+          "type": "airplane",
+          "percentage": 29.4,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            50.0,
+            4000.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 5.1,
+          "type": "wind",
+          "percentage": 18.3,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            20.0,
+            2000.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 17.0,
+          "frequency_range_hz": [
+            20.0,
+            500.0
           ]
         }
       ],
@@ -1488,7 +2104,7 @@
     "filename": "2000-23_vehicle_noise_4.wav",
     "animal_id": "2000-23",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 72.087,
     "duration_s": 72.087,
@@ -1497,8 +2113,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.485,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.304,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -1536,35 +2152,77 @@
         18.2651,
         1.6757
       ],
+      "mfcc_delta": [
+        -0.0171,
+        -0.0138,
+        -0.0023,
+        0.0015,
+        -0.0015,
+        0.0007,
+        0.0012,
+        0.0029,
+        0.0014,
+        0.0013,
+        0.0008,
+        -0.0027,
+        -0.0004
+      ],
+      "mfcc_delta2": [
+        -0.0031,
+        -0.0015,
+        0.0009,
+        0.0006,
+        0.0001,
+        0.0003,
+        0.0005,
+        0.0002,
+        0.0005,
+        0.0004,
+        0.0,
+        0.0004,
+        -0.0004
+      ],
+      "pitch_contour_slope": -20.6767,
+      "temporal_energy_variance": 0.0029861,
+      "spectral_entropy": 0.265595,
       "zero_crossing_rate": 0.032269,
-      "snr_db": 25.4
+      "snr_db": 25.4,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.485,
+      "primary_type": "generator",
+      "confidence": 0.304,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 48.5,
+          "type": "generator",
+          "percentage": 30.4,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 28.5,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 44.1,
+          "type": "wind",
+          "percentage": 21.0,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 7.2,
+          "type": "airplane",
+          "percentage": 20.1,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         }
       ],
@@ -1576,7 +2234,7 @@
     "filename": "2000-24_generator_noise_1.wav",
     "animal_id": "2000-24",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 101.235,
     "duration_s": 101.235,
@@ -1585,8 +2243,8 @@
     "noise_type_ref": "generator",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.437,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.479,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -1624,35 +2282,77 @@
         12.9947,
         5.9766
       ],
+      "mfcc_delta": [
+        0.0125,
+        -0.0005,
+        -0.0003,
+        0.0009,
+        0.0012,
+        -0.0,
+        -0.0015,
+        0.0005,
+        0.0004,
+        -0.0013,
+        -0.002,
+        0.0004,
+        -0.0009
+      ],
+      "mfcc_delta2": [
+        -0.0009,
+        0.0013,
+        0.0002,
+        -0.0007,
+        -0.0004,
+        -0.0002,
+        -0.0001,
+        -0.0005,
+        -0.0004,
+        -0.0,
+        0.0001,
+        0.0001,
+        0.0006
+      ],
+      "pitch_contour_slope": -3.4857,
+      "temporal_energy_variance": 6.184e-05,
+      "spectral_entropy": 0.339968,
       "zero_crossing_rate": 0.027554,
-      "snr_db": 16.5
+      "snr_db": 16.5,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.437,
+      "primary_type": "generator",
+      "confidence": 0.479,
       "noise_types": [
         {
+          "type": "generator",
+          "percentage": 47.9,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
           "type": "airplane",
-          "percentage": 43.7,
+          "percentage": 30.8,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 13.0,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 39.6,
+          "type": "wind",
+          "percentage": 8.3,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 15.5,
-          "frequency_range_hz": [
-            50.0,
-            250.0
+            2000.0
           ]
         }
       ],
@@ -1664,7 +2364,7 @@
     "filename": "2000-24_generator_noise_2.wav",
     "animal_id": "2000-24",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 369.59,
     "duration_s": 369.59,
@@ -1673,8 +2373,8 @@
     "noise_type_ref": "generator",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.409,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.37,
     "dominant_frequency_hz": 0.0,
     "call_type": "unknown",
     "call_type_confidence": 0.1,
@@ -1712,35 +2412,77 @@
         11.9581,
         5.2203
       ],
+      "mfcc_delta": [
+        0.0038,
+        -0.0022,
+        0.0011,
+        0.0007,
+        -0.0002,
+        0.0021,
+        0.0034,
+        0.0016,
+        0.0015,
+        0.0021,
+        0.002,
+        0.0017,
+        -0.0009
+      ],
+      "mfcc_delta2": [
+        0.0006,
+        0.0021,
+        0.0001,
+        -0.0011,
+        -0.0004,
+        -0.0002,
+        -0.0007,
+        -0.001,
+        -0.0009,
+        -0.001,
+        -0.0002,
+        0.0003,
+        -0.0004
+      ],
+      "pitch_contour_slope": 2.4092,
+      "temporal_energy_variance": 0.00017918,
+      "spectral_entropy": 0.216571,
       "zero_crossing_rate": 0.016501,
-      "snr_db": 19.8
+      "snr_db": 19.8,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.409,
+      "primary_type": "generator",
+      "confidence": 0.37,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 40.9,
+          "type": "generator",
+          "percentage": 37.0,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 26.8,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 37.0,
+          "type": "airplane",
+          "percentage": 23.1,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            50.0,
+            4000.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 21.4,
+          "type": "wind",
+          "percentage": 13.0,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            20.0,
+            2000.0
           ]
         }
       ],
@@ -1752,7 +2494,7 @@
     "filename": "2000-24_generator_noise_3.wav",
     "animal_id": "2000-24",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 41.816,
     "duration_s": 41.816,
@@ -1761,8 +2503,8 @@
     "noise_type_ref": "generator",
     "species": "African bush elephant",
     "analysis_clip_seconds": 41.816,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.42,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.514,
     "dominant_frequency_hz": 0.0,
     "call_type": "unknown",
     "call_type_confidence": 0.1,
@@ -1800,43 +2542,77 @@
         10.8096,
         5.4692
       ],
+      "mfcc_delta": [
+        -0.004,
+        -0.0135,
+        -0.0032,
+        -0.0035,
+        -0.0002,
+        0.0035,
+        0.0011,
+        -0.0053,
+        -0.0031,
+        -0.0005,
+        -0.0019,
+        -0.0031,
+        -0.0027
+      ],
+      "mfcc_delta2": [
+        -0.0034,
+        0.0002,
+        0.0002,
+        0.0003,
+        0.0002,
+        -0.001,
+        -0.0013,
+        -0.0004,
+        -0.0002,
+        -0.0009,
+        -0.0002,
+        0.0003,
+        -0.0
+      ],
+      "pitch_contour_slope": -19.3575,
+      "temporal_energy_variance": 0.00126231,
+      "spectral_entropy": 0.162364,
       "zero_crossing_rate": 0.018973,
-      "snr_db": 29.6
+      "snr_db": 29.6,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.42,
+      "primary_type": "vehicle",
+      "confidence": 0.514,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 42.0,
+          "type": "vehicle",
+          "percentage": 51.4,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 37.8,
+          "type": "wind",
+          "percentage": 26.4,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 18.2,
+          "percentage": 17.3,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "wind",
-          "percentage": 2.0,
+          "type": "airplane",
+          "percentage": 4.9,
           "frequency_range_hz": [
-            200.0,
-            2000.0
+            50.0,
+            4000.0
           ]
         }
       ],
@@ -1848,7 +2624,7 @@
     "filename": "2000-24_generator_noise_4.wav",
     "animal_id": "2000-24",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 230.662,
     "duration_s": 230.662,
@@ -1857,8 +2633,8 @@
     "noise_type_ref": "generator",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.432,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.343,
     "dominant_frequency_hz": 0.0,
     "call_type": "trumpet",
     "call_type_confidence": 0.5,
@@ -1898,35 +2674,77 @@
         11.1435,
         5.1673
       ],
+      "mfcc_delta": [
+        0.0162,
+        0.0033,
+        -0.0009,
+        -0.0003,
+        -0.0008,
+        -0.0002,
+        -0.001,
+        -0.0013,
+        -0.0012,
+        -0.0012,
+        0.001,
+        -0.0037,
+        -0.0033
+      ],
+      "mfcc_delta2": [
+        -0.0009,
+        0.0018,
+        0.0015,
+        0.0005,
+        -0.0001,
+        -0.0004,
+        -0.0008,
+        -0.0014,
+        -0.0011,
+        -0.0005,
+        0.0001,
+        -0.0,
+        0.0004
+      ],
+      "pitch_contour_slope": 1.0193,
+      "temporal_energy_variance": 7.818e-05,
+      "spectral_entropy": 0.334951,
       "zero_crossing_rate": 0.034114,
-      "snr_db": 16.5
+      "snr_db": 16.5,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.432,
+      "primary_type": "generator",
+      "confidence": 0.343,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 43.2,
+          "type": "generator",
+          "percentage": 34.3,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 29.8,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 39.2,
+          "type": "airplane",
+          "percentage": 19.0,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            50.0,
+            4000.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 17.0,
+          "type": "wind",
+          "percentage": 16.9,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            20.0,
+            2000.0
           ]
         }
       ],
@@ -1938,7 +2756,7 @@
     "filename": "2000-24_vehicle_and_generator_noise_1.wav",
     "animal_id": "2000-24",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 107.642,
     "duration_s": 107.642,
@@ -1947,8 +2765,8 @@
     "noise_type_ref": "vehicle+generator",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.408,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.383,
     "dominant_frequency_hz": 26.2,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -1988,35 +2806,77 @@
         13.3034,
         6.2918
       ],
+      "mfcc_delta": [
+        0.0155,
+        0.0036,
+        0.0004,
+        0.0025,
+        0.0002,
+        0.0021,
+        0.0026,
+        -0.0002,
+        0.0024,
+        0.0007,
+        -0.0028,
+        -0.0,
+        0.0003
+      ],
+      "mfcc_delta2": [
+        -0.0028,
+        0.0006,
+        0.0005,
+        0.0004,
+        0.0004,
+        0.0,
+        -0.0007,
+        -0.0011,
+        -0.0007,
+        -0.0007,
+        0.0002,
+        0.0009,
+        0.0006
+      ],
+      "pitch_contour_slope": 4.2091,
+      "temporal_energy_variance": 0.0001842,
+      "spectral_entropy": 0.30116,
       "zero_crossing_rate": 0.014866,
-      "snr_db": 16.5
+      "snr_db": 16.5,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.408,
+      "primary_type": "generator",
+      "confidence": 0.383,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 40.8,
+          "type": "generator",
+          "percentage": 38.3,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 32.3,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 36.9,
+          "type": "airplane",
+          "percentage": 16.1,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            50.0,
+            4000.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 22.0,
+          "type": "wind",
+          "percentage": 13.4,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            20.0,
+            2000.0
           ]
         }
       ],
@@ -2028,7 +2888,7 @@
     "filename": "2000-24_vehicle_noise_1.wav",
     "animal_id": "2000-24",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 302.702,
     "duration_s": 302.702,
@@ -2037,8 +2897,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.461,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.408,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -2076,35 +2936,77 @@
         10.6845,
         4.0666
       ],
+      "mfcc_delta": [
+        0.0114,
+        0.0017,
+        0.0011,
+        0.0013,
+        0.0016,
+        0.0004,
+        0.0,
+        0.0047,
+        0.0012,
+        0.0011,
+        0.0005,
+        0.0025,
+        0.0032
+      ],
+      "mfcc_delta2": [
+        -0.0026,
+        0.0001,
+        -0.0001,
+        -0.0004,
+        0.0001,
+        0.0008,
+        0.0007,
+        0.0001,
+        0.0,
+        -0.0003,
+        -0.0003,
+        -0.0009,
+        -0.0007
+      ],
+      "pitch_contour_slope": -1.4649,
+      "temporal_energy_variance": 7.935e-05,
+      "spectral_entropy": 0.313705,
       "zero_crossing_rate": 0.034312,
-      "snr_db": 18.7
+      "snr_db": 18.7,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.461,
+      "primary_type": "generator",
+      "confidence": 0.408,
       "noise_types": [
         {
+          "type": "generator",
+          "percentage": 40.8,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
           "type": "airplane",
-          "percentage": 46.1,
+          "percentage": 27.6,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 18.0,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 41.7,
+          "type": "wind",
+          "percentage": 13.6,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 11.4,
-          "frequency_range_hz": [
-            50.0,
-            250.0
+            2000.0
           ]
         }
       ],
@@ -2116,7 +3018,7 @@
     "filename": "2000-24_vehicle_noise_2.wav",
     "animal_id": "2000-24",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 50.756,
     "duration_s": 50.756,
@@ -2125,8 +3027,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 50.756,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.433,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.442,
     "dominant_frequency_hz": 26.2,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -2166,42 +3068,76 @@
         11.4805,
         4.3247
       ],
+      "mfcc_delta": [
+        0.0198,
+        0.0107,
+        0.0001,
+        -0.0054,
+        -0.005,
+        -0.0018,
+        0.0003,
+        0.0002,
+        0.001,
+        0.0,
+        -0.0015,
+        -0.0002,
+        -0.0016
+      ],
+      "mfcc_delta2": [
+        -0.003,
+        -0.0006,
+        -0.0003,
+        0.0003,
+        0.0001,
+        -0.0004,
+        -0.0004,
+        0.0002,
+        0.0003,
+        -0.0001,
+        -0.0002,
+        -0.0006,
+        -0.0009
+      ],
+      "pitch_contour_slope": -5.6716,
+      "temporal_energy_variance": 2.259e-05,
+      "spectral_entropy": 0.328204,
       "zero_crossing_rate": 0.030449,
-      "snr_db": 14.9
+      "snr_db": 14.9,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.433,
+      "primary_type": "generator",
+      "confidence": 0.442,
       "noise_types": [
         {
+          "type": "generator",
+          "percentage": 44.2,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
           "type": "airplane",
-          "percentage": 43.3,
+          "percentage": 35.4,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 11.8,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 38.9,
+          "type": "wind",
+          "percentage": 8.5,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 16.6,
-          "frequency_range_hz": [
-            50.0,
-            250.0
-          ]
-        },
-        {
-          "type": "wind",
-          "percentage": 1.0,
-          "frequency_range_hz": [
-            200.0,
             2000.0
           ]
         }
@@ -2214,7 +3150,7 @@
     "filename": "2000-27_airplane_01.wav",
     "animal_id": "2000-27",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 308.157,
     "duration_s": 308.157,
@@ -2223,8 +3159,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.389,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.315,
     "dominant_frequency_hz": 0.0,
     "call_type": "unknown",
     "call_type_confidence": 0.1,
@@ -2262,42 +3198,76 @@
         11.3002,
         3.6969
       ],
+      "mfcc_delta": [
+        0.0066,
+        -0.0011,
+        0.0026,
+        0.003,
+        0.0027,
+        0.0035,
+        0.0018,
+        0.0007,
+        -0.0014,
+        -0.0,
+        -0.0025,
+        -0.0038,
+        -0.0026
+      ],
+      "mfcc_delta2": [
+        -0.001,
+        0.0012,
+        0.0002,
+        -0.0009,
+        -0.0008,
+        0.0001,
+        0.0005,
+        -0.0002,
+        -0.0005,
+        -0.0005,
+        -0.0006,
+        -0.0008,
+        0.0001
+      ],
+      "pitch_contour_slope": 48.15,
+      "temporal_energy_variance": 0.00014305,
+      "spectral_entropy": 0.145571,
       "zero_crossing_rate": 0.017451,
-      "snr_db": 24.7
+      "snr_db": 24.7,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.389,
+      "primary_type": "vehicle",
+      "confidence": 0.315,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 38.9,
+          "type": "vehicle",
+          "percentage": 31.5,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 34.8,
+          "type": "generator",
+          "percentage": 31.1,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 23.9,
+          "type": "airplane",
+          "percentage": 19.9,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 2.2,
+          "percentage": 17.5,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
           ]
         }
@@ -2310,7 +3280,7 @@
     "filename": "2000-3_airplane_01.wav",
     "animal_id": "2000-3",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 136.238,
     "duration_s": 136.238,
@@ -2319,8 +3289,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.405,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.297,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -2358,42 +3328,76 @@
         5.6558,
         0.7992
       ],
+      "mfcc_delta": [
+        -0.0476,
+        -0.0002,
+        0.0106,
+        0.0001,
+        0.003,
+        0.0001,
+        0.0035,
+        0.0007,
+        0.0026,
+        -0.0022,
+        0.0011,
+        -0.0046,
+        -0.0003
+      ],
+      "mfcc_delta2": [
+        -0.0024,
+        0.0006,
+        0.0005,
+        -0.0002,
+        -0.0001,
+        0.0,
+        0.0003,
+        0.0009,
+        0.0005,
+        -0.0001,
+        -0.0002,
+        0.0008,
+        0.0001
+      ],
+      "pitch_contour_slope": 8.125,
+      "temporal_energy_variance": 0.00027248,
+      "spectral_entropy": 0.248658,
       "zero_crossing_rate": 0.023632,
-      "snr_db": 25.8
+      "snr_db": 25.8,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.405,
+      "primary_type": "vehicle",
+      "confidence": 0.297,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 40.5,
+          "type": "vehicle",
+          "percentage": 29.7,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 31.9,
+          "type": "generator",
+          "percentage": 28.2,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 19.2,
+          "type": "airplane",
+          "percentage": 24.4,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 8.2,
+          "percentage": 17.8,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
           ]
         }
@@ -2406,7 +3410,7 @@
     "filename": "2000-3_airplane_02.wav",
     "animal_id": "2000-3",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 66.028,
     "duration_s": 66.028,
@@ -2416,7 +3420,7 @@
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
     "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.412,
+    "classifier_confidence": 0.399,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -2454,51 +3458,77 @@
         11.384,
         -0.4575
       ],
+      "mfcc_delta": [
+        -0.0398,
+        0.0088,
+        0.0113,
+        0.0057,
+        0.0014,
+        0.0021,
+        0.0044,
+        -0.0001,
+        0.0037,
+        -0.0,
+        0.0038,
+        0.0019,
+        0.0007
+      ],
+      "mfcc_delta2": [
+        -0.0032,
+        -0.001,
+        0.0005,
+        0.0009,
+        -0.0002,
+        -0.0003,
+        -0.0002,
+        -0.0001,
+        0.0006,
+        -0.0002,
+        -0.0002,
+        0.0005,
+        0.0004
+      ],
+      "pitch_contour_slope": -3.5415,
+      "temporal_energy_variance": 3.089e-05,
+      "spectral_entropy": 0.445122,
       "zero_crossing_rate": 0.082705,
-      "snr_db": 16.4
+      "snr_db": 16.4,
+      "feature_vector_dim": 54
     },
     "noise": {
       "primary_type": "airplane",
-      "confidence": 0.412,
+      "confidence": 0.399,
       "noise_types": [
         {
           "type": "airplane",
-          "percentage": 41.2,
-          "frequency_range_hz": [
-            20.0,
-            500.0
-          ]
-        },
-        {
-          "type": "car",
-          "percentage": 37.0,
-          "frequency_range_hz": [
-            20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 17.4,
+          "percentage": 39.9,
           "frequency_range_hz": [
             50.0,
-            250.0
-          ]
-        },
-        {
-          "type": "other",
-          "percentage": 2.3,
-          "frequency_range_hz": [
-            0.0,
             4000.0
           ]
         },
         {
-          "type": "wind",
-          "percentage": 2.0,
+          "type": "generator",
+          "percentage": 30.1,
           "frequency_range_hz": [
-            200.0,
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "wind",
+          "percentage": 25.3,
+          "frequency_range_hz": [
+            20.0,
             2000.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 4.7,
+          "frequency_range_hz": [
+            20.0,
+            500.0
           ]
         }
       ],
@@ -2510,7 +3540,7 @@
     "filename": "2000-3_airplane_03.wav",
     "animal_id": "2000-3",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 197.032,
     "duration_s": 197.032,
@@ -2520,7 +3550,7 @@
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
     "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.42,
+    "classifier_confidence": 0.409,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -2558,51 +3588,77 @@
         7.3447,
         0.8582
       ],
+      "mfcc_delta": [
+        0.005,
+        -0.0087,
+        0.0118,
+        -0.0049,
+        -0.0036,
+        0.0055,
+        0.0024,
+        -0.0025,
+        0.0028,
+        0.0057,
+        -0.0031,
+        0.0001,
+        0.002
+      ],
+      "mfcc_delta2": [
+        -0.0029,
+        0.0009,
+        0.0011,
+        -0.0003,
+        -0.0002,
+        0.0003,
+        -0.0015,
+        -0.0013,
+        0.0001,
+        -0.001,
+        -0.0,
+        0.0007,
+        -0.0003
+      ],
+      "pitch_contour_slope": -1.2228,
+      "temporal_energy_variance": 1.025e-05,
+      "spectral_entropy": 0.421102,
       "zero_crossing_rate": 0.064756,
-      "snr_db": 15.7
+      "snr_db": 15.7,
+      "feature_vector_dim": 54
     },
     "noise": {
       "primary_type": "airplane",
-      "confidence": 0.42,
+      "confidence": 0.409,
       "noise_types": [
         {
           "type": "airplane",
-          "percentage": 42.0,
+          "percentage": 40.9,
           "frequency_range_hz": [
-            20.0,
-            500.0
-          ]
-        },
-        {
-          "type": "car",
-          "percentage": 37.8,
-          "frequency_range_hz": [
-            20.0,
-            250.0
+            50.0,
+            4000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 15.7,
+          "percentage": 35.6,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 2.5,
+          "percentage": 18.2,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
           ]
         },
         {
-          "type": "other",
-          "percentage": 1.9,
+          "type": "vehicle",
+          "percentage": 5.3,
           "frequency_range_hz": [
-            0.0,
-            4000.0
+            20.0,
+            500.0
           ]
         }
       ],
@@ -2614,7 +3670,7 @@
     "filename": "2000-3_vehicle_01.wav",
     "animal_id": "2000-3",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 145.321,
     "duration_s": 145.321,
@@ -2623,8 +3679,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.382,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.437,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -2662,42 +3718,76 @@
         6.5259,
         1.2772
       ],
+      "mfcc_delta": [
+        0.0123,
+        -0.0002,
+        -0.0036,
+        0.002,
+        0.0052,
+        -0.0004,
+        0.0006,
+        0.0018,
+        0.0027,
+        0.0055,
+        0.004,
+        -0.0014,
+        -0.0021
+      ],
+      "mfcc_delta2": [
+        -0.0022,
+        0.0003,
+        0.0005,
+        -0.001,
+        -0.001,
+        0.0002,
+        0.0002,
+        -0.0003,
+        0.0,
+        -0.0002,
+        -0.0005,
+        -0.0001,
+        0.0009
+      ],
+      "pitch_contour_slope": 20.9061,
+      "temporal_energy_variance": 3.731e-05,
+      "spectral_entropy": 0.3378,
       "zero_crossing_rate": 0.022995,
-      "snr_db": 17.2
+      "snr_db": 17.2,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.382,
+      "primary_type": "generator",
+      "confidence": 0.437,
       "noise_types": [
         {
+          "type": "generator",
+          "percentage": 43.7,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
           "type": "airplane",
-          "percentage": 38.2,
+          "percentage": 37.3,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 12.4,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 34.7,
+          "type": "wind",
+          "percentage": 6.5,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 19.3,
-          "frequency_range_hz": [
-            50.0,
-            250.0
-          ]
-        },
-        {
-          "type": "wind",
-          "percentage": 7.3,
-          "frequency_range_hz": [
-            200.0,
             2000.0
           ]
         }
@@ -2710,7 +3800,7 @@
     "filename": "2000-4 _airplane_01.wav",
     "animal_id": "2000-4",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 80.827,
     "duration_s": 80.827,
@@ -2719,8 +3809,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.363,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.405,
     "dominant_frequency_hz": 78.6,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -2763,42 +3853,76 @@
         6.5424,
         1.6708
       ],
+      "mfcc_delta": [
+        -0.0202,
+        -0.0008,
+        0.0197,
+        -0.0061,
+        0.0092,
+        -0.0032,
+        -0.0122,
+        0.005,
+        -0.0097,
+        0.0023,
+        0.0083,
+        0.0007,
+        0.0019
+      ],
+      "mfcc_delta2": [
+        -0.005,
+        0.0023,
+        0.0029,
+        -0.0016,
+        0.0006,
+        0.001,
+        -0.0008,
+        -0.0004,
+        -0.0005,
+        0.0002,
+        -0.0014,
+        0.0009,
+        0.0012
+      ],
+      "pitch_contour_slope": 28.6381,
+      "temporal_energy_variance": 0.00019561,
+      "spectral_entropy": 0.374809,
       "zero_crossing_rate": 0.039562,
-      "snr_db": 22.2
+      "snr_db": 22.2,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.363,
+      "primary_type": "generator",
+      "confidence": 0.405,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 36.3,
+          "type": "generator",
+          "percentage": 40.5,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 24.1,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 31.5,
-          "frequency_range_hz": [
-            20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 26.8,
+          "type": "airplane",
+          "percentage": 22.2,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 4.7,
+          "percentage": 13.2,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
           ]
         }
@@ -2811,7 +3935,7 @@
     "filename": "2000-4_airplane_02.wav",
     "animal_id": "2000-4",
     "location": "",
-    "date": "",
+    "date": "2000",
     "start_sec": 0.0,
     "end_sec": 143.317,
     "duration_s": 143.317,
@@ -2820,8 +3944,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "generator",
-    "classifier_confidence": 0.355,
+    "classifier_primary_noise": "wind",
+    "classifier_confidence": 0.294,
     "dominant_frequency_hz": 78.6,
     "call_type": "trumpet",
     "call_type_confidence": 0.75,
@@ -2861,43 +3985,77 @@
         10.0509,
         2.6265
       ],
+      "mfcc_delta": [
+        0.0443,
+        0.0274,
+        0.0008,
+        -0.0076,
+        -0.0044,
+        -0.0001,
+        0.0021,
+        -0.0012,
+        0.0019,
+        0.0016,
+        0.0039,
+        -0.001,
+        -0.0018
+      ],
+      "mfcc_delta2": [
+        0.0026,
+        -0.0008,
+        -0.0012,
+        0.0002,
+        0.0008,
+        -0.0004,
+        -0.0004,
+        -0.0006,
+        -0.0003,
+        -0.0007,
+        -0.0001,
+        -0.0006,
+        0.0008
+      ],
+      "pitch_contour_slope": 59.7486,
+      "temporal_energy_variance": 0.00034153,
+      "spectral_entropy": 0.289834,
       "zero_crossing_rate": 0.062382,
-      "snr_db": 25.6
+      "snr_db": 25.6,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "generator",
-      "confidence": 0.355,
+      "primary_type": "wind",
+      "confidence": 0.294,
       "noise_types": [
         {
-          "type": "generator",
-          "percentage": 35.5,
+          "type": "wind",
+          "percentage": 29.4,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            20.0,
+            2000.0
           ]
         },
         {
           "type": "airplane",
-          "percentage": 33.4,
+          "percentage": 26.8,
           "frequency_range_hz": [
-            20.0,
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 22.6,
+          "frequency_range_hz": [
+            40.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 29.8,
+          "type": "vehicle",
+          "percentage": 21.1,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "wind",
-          "percentage": 1.1,
-          "frequency_range_hz": [
-            200.0,
-            2000.0
+            500.0
           ]
         }
       ],
@@ -2909,7 +4067,7 @@
     "filename": "2002-2_airplane_01.wav",
     "animal_id": "2002-2",
     "location": "",
-    "date": "",
+    "date": "2002",
     "start_sec": 0.0,
     "end_sec": 207.858,
     "duration_s": 207.858,
@@ -2918,8 +4076,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "generator",
-    "classifier_confidence": 0.344,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.325,
     "dominant_frequency_hz": 78.6,
     "call_type": "unknown",
     "call_type_confidence": 0.1,
@@ -2960,43 +4118,77 @@
         6.1833,
         -0.7506
       ],
+      "mfcc_delta": [
+        0.0046,
+        0.0068,
+        0.0047,
+        0.0014,
+        0.0004,
+        0.0012,
+        0.0019,
+        -0.0012,
+        -0.0014,
+        0.001,
+        -0.0006,
+        0.0017,
+        0.0051
+      ],
+      "mfcc_delta2": [
+        -0.0032,
+        -0.001,
+        -0.0007,
+        -0.0006,
+        -0.0003,
+        -0.0002,
+        0.0002,
+        -0.0001,
+        -0.0005,
+        0.0002,
+        0.0001,
+        0.0005,
+        0.0004
+      ],
+      "pitch_contour_slope": 50.4685,
+      "temporal_energy_variance": 0.00126596,
+      "spectral_entropy": 0.415264,
       "zero_crossing_rate": 0.041834,
-      "snr_db": 21.1
+      "snr_db": 21.1,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "generator",
-      "confidence": 0.344,
+      "primary_type": "vehicle",
+      "confidence": 0.325,
       "noise_types": [
         {
-          "type": "generator",
-          "percentage": 34.4,
-          "frequency_range_hz": [
-            50.0,
-            250.0
-          ]
-        },
-        {
-          "type": "airplane",
-          "percentage": 32.8,
+          "type": "vehicle",
+          "percentage": 32.5,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 28.5,
+          "type": "generator",
+          "percentage": 24.8,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 4.1,
+          "percentage": 24.6,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 18.2,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
           ]
         }
       ],
@@ -3008,7 +4200,7 @@
     "filename": "2003-7_airplane_01.wav",
     "animal_id": "2003-7",
     "location": "",
-    "date": "",
+    "date": "2003",
     "start_sec": 0.0,
     "end_sec": 109.405,
     "duration_s": 109.405,
@@ -3017,8 +4209,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.408,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.474,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -3056,35 +4248,77 @@
         6.0389,
         3.7602
       ],
+      "mfcc_delta": [
+        -0.0026,
+        0.001,
+        0.0048,
+        0.0046,
+        0.0026,
+        -0.0016,
+        0.0012,
+        0.0025,
+        0.0003,
+        -0.002,
+        -0.0036,
+        -0.0009,
+        0.0005
+      ],
+      "mfcc_delta2": [
+        -0.0017,
+        0.0016,
+        0.0009,
+        0.0004,
+        0.0001,
+        -0.0012,
+        -0.0007,
+        -0.0001,
+        -0.0,
+        0.0004,
+        0.0006,
+        0.0004,
+        0.0001
+      ],
+      "pitch_contour_slope": 24.1429,
+      "temporal_energy_variance": 0.00173745,
+      "spectral_entropy": 0.328185,
       "zero_crossing_rate": 0.024743,
-      "snr_db": 28.8
+      "snr_db": 28.8,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.408,
+      "primary_type": "vehicle",
+      "confidence": 0.474,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 40.8,
+          "type": "vehicle",
+          "percentage": 47.4,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 36.9,
+          "type": "wind",
+          "percentage": 25.8,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 21.7,
+          "percentage": 20.6,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 6.1,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         }
       ],
@@ -3096,7 +4330,7 @@
     "filename": "99-22A_airplane_01.wav",
     "animal_id": "99-22A",
     "location": "",
-    "date": "",
+    "date": "1999",
     "start_sec": 0.0,
     "end_sec": 288.332,
     "duration_s": 288.332,
@@ -3106,7 +4340,7 @@
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
     "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.367,
+    "classifier_confidence": 0.324,
     "dominant_frequency_hz": 0.0,
     "call_type": "trumpet",
     "call_type_confidence": 0.6,
@@ -3146,42 +4380,76 @@
         4.4475,
         2.8897
       ],
+      "mfcc_delta": [
+        0.0368,
+        -0.0083,
+        0.0084,
+        0.0142,
+        -0.0029,
+        0.0054,
+        0.009,
+        0.0,
+        0.0006,
+        0.007,
+        -0.0018,
+        0.0043,
+        0.0035
+      ],
+      "mfcc_delta2": [
+        0.0028,
+        -0.0016,
+        -0.0002,
+        0.0004,
+        -0.0007,
+        -0.0001,
+        0.0003,
+        -0.0002,
+        0.0,
+        0.0005,
+        -0.0007,
+        -0.0001,
+        -0.0005
+      ],
+      "pitch_contour_slope": -84.973,
+      "temporal_energy_variance": 0.00168282,
+      "spectral_entropy": 0.167975,
       "zero_crossing_rate": 0.037556,
-      "snr_db": 33.8
+      "snr_db": 33.8,
+      "feature_vector_dim": 54
     },
     "noise": {
       "primary_type": "airplane",
-      "confidence": 0.367,
+      "confidence": 0.324,
       "noise_types": [
         {
           "type": "airplane",
-          "percentage": 36.7,
+          "percentage": 32.4,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
+          ]
+        },
+        {
+          "type": "generator",
+          "percentage": 28.0,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 21.3,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 32.7,
+          "type": "wind",
+          "percentage": 18.2,
           "frequency_range_hz": [
             20.0,
-            250.0
-          ]
-        },
-        {
-          "type": "generator",
-          "percentage": 20.1,
-          "frequency_range_hz": [
-            50.0,
-            250.0
-          ]
-        },
-        {
-          "type": "wind",
-          "percentage": 9.8,
-          "frequency_range_hz": [
-            200.0,
             2000.0
           ]
         }
@@ -3194,7 +4462,7 @@
     "filename": "99-24_airplane_01.wav",
     "animal_id": "99-24",
     "location": "",
-    "date": "",
+    "date": "1999",
     "start_sec": 0.0,
     "end_sec": 68.98,
     "duration_s": 68.98,
@@ -3203,8 +4471,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.355,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.431,
     "dominant_frequency_hz": 0.0,
     "call_type": "trumpet",
     "call_type_confidence": 0.6,
@@ -3246,43 +4514,77 @@
         5.4811,
         -1.3035
       ],
+      "mfcc_delta": [
+        0.0002,
+        -0.0028,
+        0.0016,
+        -0.0021,
+        0.0001,
+        0.0031,
+        0.0028,
+        0.0005,
+        -0.0017,
+        -0.0002,
+        0.0018,
+        0.0013,
+        -0.0018
+      ],
+      "mfcc_delta2": [
+        -0.0011,
+        0.0005,
+        -0.0009,
+        -0.0003,
+        0.0006,
+        0.0003,
+        0.0003,
+        -0.0002,
+        -0.0003,
+        0.0003,
+        0.0007,
+        0.0002,
+        0.0
+      ],
+      "pitch_contour_slope": 25.2194,
+      "temporal_energy_variance": 3.625e-05,
+      "spectral_entropy": 0.380539,
       "zero_crossing_rate": 0.035825,
-      "snr_db": 21.9
+      "snr_db": 21.9,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.355,
+      "primary_type": "vehicle",
+      "confidence": 0.431,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 35.5,
+          "type": "vehicle",
+          "percentage": 43.1,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 29.5,
-          "frequency_range_hz": [
-            20.0,
-            250.0
-          ]
-        },
-        {
           "type": "generator",
-          "percentage": 28.2,
+          "percentage": 25.7,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 6.7,
+          "percentage": 23.1,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 8.0,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
           ]
         }
       ],
@@ -3294,7 +4596,7 @@
     "filename": "99-37_airplane_02.wav",
     "animal_id": "99-37",
     "location": "",
-    "date": "",
+    "date": "1999",
     "start_sec": 0.0,
     "end_sec": 41.129,
     "duration_s": 41.129,
@@ -3303,8 +4605,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 41.129,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.479,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.356,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -3342,35 +4644,77 @@
         9.7877,
         4.1811
       ],
+      "mfcc_delta": [
+        -0.0614,
+        -0.025,
+        -0.0016,
+        -0.0133,
+        -0.0092,
+        -0.0121,
+        -0.0062,
+        -0.008,
+        -0.0071,
+        -0.0059,
+        -0.0018,
+        -0.0031,
+        0.0011
+      ],
+      "mfcc_delta2": [
+        -0.0484,
+        -0.0157,
+        0.0016,
+        0.0032,
+        0.002,
+        -0.0019,
+        -0.0008,
+        -0.0018,
+        0.0011,
+        0.0015,
+        0.0003,
+        0.0,
+        0.0012
+      ],
+      "pitch_contour_slope": -17.4445,
+      "temporal_energy_variance": 0.06835061,
+      "spectral_entropy": 0.116118,
       "zero_crossing_rate": 0.015719,
-      "snr_db": 27.2
+      "snr_db": 27.2,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.479,
+      "primary_type": "vehicle",
+      "confidence": 0.356,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 47.9,
+          "type": "vehicle",
+          "percentage": 35.6,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 43.3,
+          "type": "generator",
+          "percentage": 27.9,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 8.2,
+          "type": "wind",
+          "percentage": 19.8,
+          "frequency_range_hz": [
+            20.0,
+            2000.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 16.6,
           "frequency_range_hz": [
             50.0,
-            250.0
+            4000.0
           ]
         }
       ],
@@ -3382,7 +4726,7 @@
     "filename": "99-37_airplane_and_vehicle_01.wav",
     "animal_id": "99-37",
     "location": "",
-    "date": "",
+    "date": "1999",
     "start_sec": 0.0,
     "end_sec": 229.434,
     "duration_s": 229.434,
@@ -3391,8 +4735,8 @@
     "noise_type_ref": "airplane+vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "generator",
-    "classifier_confidence": 0.361,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.562,
     "dominant_frequency_hz": 52.4,
     "call_type": "unknown",
     "call_type_confidence": 0.1,
@@ -3432,43 +4776,77 @@
         4.3531,
         3.8192
       ],
+      "mfcc_delta": [
+        -0.0129,
+        -0.0087,
+        0.0019,
+        0.0009,
+        -0.0003,
+        -0.0,
+        0.0001,
+        0.0018,
+        0.0013,
+        0.001,
+        0.0032,
+        0.0037,
+        0.0033
+      ],
+      "mfcc_delta2": [
+        0.0006,
+        0.0001,
+        -0.0004,
+        0.0005,
+        0.0008,
+        0.0003,
+        0.0003,
+        0.0002,
+        0.0005,
+        0.0006,
+        -0.0,
+        -0.0003,
+        -0.0004
+      ],
+      "pitch_contour_slope": -13.2742,
+      "temporal_energy_variance": 0.00906666,
+      "spectral_entropy": 0.365033,
       "zero_crossing_rate": 0.018664,
-      "snr_db": 34.4
+      "snr_db": 34.4,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "generator",
-      "confidence": 0.361,
+      "primary_type": "vehicle",
+      "confidence": 0.562,
       "noise_types": [
         {
-          "type": "generator",
-          "percentage": 36.1,
-          "frequency_range_hz": [
-            50.0,
-            250.0
-          ]
-        },
-        {
-          "type": "airplane",
-          "percentage": 33.1,
+          "type": "vehicle",
+          "percentage": 56.2,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 29.3,
+          "type": "wind",
+          "percentage": 29.0,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
-          "type": "wind",
-          "percentage": 1.5,
+          "type": "generator",
+          "percentage": 13.0,
           "frequency_range_hz": [
-            200.0,
-            2000.0
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 1.9,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
           ]
         }
       ],
@@ -3480,7 +4858,7 @@
     "filename": "99-37_vehicle_01.wav",
     "animal_id": "99-37",
     "location": "",
-    "date": "",
+    "date": "1999",
     "start_sec": 0.0,
     "end_sec": 38.664,
     "duration_s": 38.664,
@@ -3490,7 +4868,7 @@
     "species": "African bush elephant",
     "analysis_clip_seconds": 38.664,
     "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.384,
+    "classifier_confidence": 0.421,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -3528,51 +4906,77 @@
         5.5032,
         4.8236
       ],
+      "mfcc_delta": [
+        -0.0074,
+        0.0148,
+        0.001,
+        -0.0006,
+        0.006,
+        0.0007,
+        -0.0019,
+        0.0055,
+        -0.0005,
+        0.0011,
+        0.0035,
+        0.0005,
+        0.0023
+      ],
+      "mfcc_delta2": [
+        -0.0027,
+        0.0027,
+        0.002,
+        0.0005,
+        -0.0004,
+        -0.0018,
+        -0.0015,
+        -0.0005,
+        -0.0001,
+        -0.0003,
+        -0.0001,
+        -0.0009,
+        -0.0004
+      ],
+      "pitch_contour_slope": 2.7937,
+      "temporal_energy_variance": 7.55e-06,
+      "spectral_entropy": 0.448724,
       "zero_crossing_rate": 0.09442,
-      "snr_db": 14.3
+      "snr_db": 14.3,
+      "feature_vector_dim": 54
     },
     "noise": {
       "primary_type": "airplane",
-      "confidence": 0.384,
+      "confidence": 0.421,
       "noise_types": [
         {
           "type": "airplane",
-          "percentage": 38.4,
+          "percentage": 42.1,
           "frequency_range_hz": [
-            20.0,
-            500.0
-          ]
-        },
-        {
-          "type": "car",
-          "percentage": 33.9,
-          "frequency_range_hz": [
-            20.0,
-            250.0
+            50.0,
+            4000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 21.2,
+          "percentage": 31.1,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 3.6,
+          "percentage": 23.9,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
           ]
         },
         {
-          "type": "other",
+          "type": "vehicle",
           "percentage": 2.9,
           "frequency_range_hz": [
-            0.0,
-            4000.0
+            20.0,
+            500.0
           ]
         }
       ],
@@ -3584,7 +4988,7 @@
     "filename": "99-45_airplane_01.wav",
     "animal_id": "99-45",
     "location": "",
-    "date": "",
+    "date": "1999",
     "start_sec": 0.0,
     "end_sec": 239.413,
     "duration_s": 239.413,
@@ -3593,8 +4997,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.344,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.374,
     "dominant_frequency_hz": 78.6,
     "call_type": "unknown",
     "call_type_confidence": 0.1,
@@ -3634,16 +5038,50 @@
         7.375,
         0.7012
       ],
+      "mfcc_delta": [
+        0.0049,
+        0.0053,
+        0.0123,
+        0.0129,
+        0.0092,
+        0.002,
+        -0.0015,
+        -0.0002,
+        0.0027,
+        0.0038,
+        0.0018,
+        -0.0007,
+        0.0009
+      ],
+      "mfcc_delta2": [
+        -0.0015,
+        0.0004,
+        -0.0005,
+        -0.0005,
+        -0.0,
+        -0.0004,
+        0.0001,
+        -0.001,
+        -0.0008,
+        -0.0,
+        0.0004,
+        -0.0001,
+        -0.0001
+      ],
+      "pitch_contour_slope": 54.5986,
+      "temporal_energy_variance": 0.00022197,
+      "spectral_entropy": 0.220605,
       "zero_crossing_rate": 0.015899,
-      "snr_db": 18.8
+      "snr_db": 18.8,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.344,
+      "primary_type": "vehicle",
+      "confidence": 0.374,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 34.4,
+          "type": "vehicle",
+          "percentage": 37.4,
           "frequency_range_hz": [
             20.0,
             500.0
@@ -3651,18 +5089,26 @@
         },
         {
           "type": "generator",
-          "percentage": 33.8,
+          "percentage": 32.4,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 30.9,
+          "type": "wind",
+          "percentage": 17.0,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 13.2,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
           ]
         }
       ],
@@ -3674,7 +5120,7 @@
     "filename": "99-45_airplane_03.wav",
     "animal_id": "99-45",
     "location": "",
-    "date": "",
+    "date": "1999",
     "start_sec": 0.0,
     "end_sec": 262.077,
     "duration_s": 262.077,
@@ -3683,8 +5129,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.346,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.357,
     "dominant_frequency_hz": 78.6,
     "call_type": "unknown",
     "call_type_confidence": 0.1,
@@ -3724,16 +5170,50 @@
         7.4228,
         0.8413
       ],
+      "mfcc_delta": [
+        0.0137,
+        0.0004,
+        0.0011,
+        0.0002,
+        -0.0035,
+        0.0028,
+        0.0047,
+        0.0011,
+        -0.0012,
+        -0.0009,
+        0.0011,
+        0.0007,
+        -0.0001
+      ],
+      "mfcc_delta2": [
+        -0.0016,
+        -0.0004,
+        0.0004,
+        -0.0004,
+        -0.0008,
+        -0.0006,
+        -0.0009,
+        0.0002,
+        0.0004,
+        -0.0004,
+        0.0004,
+        0.0,
+        -0.0003
+      ],
+      "pitch_contour_slope": 54.6768,
+      "temporal_energy_variance": 0.0001185,
+      "spectral_entropy": 0.213114,
       "zero_crossing_rate": 0.016258,
-      "snr_db": 19.3
+      "snr_db": 19.3,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.346,
+      "primary_type": "vehicle",
+      "confidence": 0.357,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 34.6,
+          "type": "vehicle",
+          "percentage": 35.7,
           "frequency_range_hz": [
             20.0,
             500.0
@@ -3741,18 +5221,26 @@
         },
         {
           "type": "generator",
-          "percentage": 33.3,
+          "percentage": 32.6,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 31.0,
+          "type": "wind",
+          "percentage": 16.9,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 14.8,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
           ]
         }
       ],
@@ -3764,7 +5252,7 @@
     "filename": "99-45_vehicle_01.wav",
     "animal_id": "99-45",
     "location": "",
-    "date": "",
+    "date": "1999",
     "start_sec": 0.0,
     "end_sec": 378.943,
     "duration_s": 378.943,
@@ -3773,7 +5261,7 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
+    "classifier_primary_noise": "vehicle",
     "classifier_confidence": 0.421,
     "dominant_frequency_hz": 0.0,
     "call_type": "unknown",
@@ -3812,15 +5300,49 @@
         6.9585,
         3.3234
       ],
+      "mfcc_delta": [
+        0.037,
+        0.0077,
+        0.0002,
+        0.0046,
+        -0.0001,
+        -0.0027,
+        -0.0037,
+        -0.0033,
+        -0.0052,
+        -0.0044,
+        -0.0014,
+        -0.0007,
+        -0.0025
+      ],
+      "mfcc_delta2": [
+        -0.002,
+        0.001,
+        -0.0005,
+        -0.0011,
+        -0.0002,
+        0.0001,
+        0.0005,
+        0.0006,
+        0.001,
+        -0.0001,
+        -0.0007,
+        -0.0005,
+        0.0
+      ],
+      "pitch_contour_slope": -16.9865,
+      "temporal_energy_variance": 0.01098283,
+      "spectral_entropy": 0.13817,
       "zero_crossing_rate": 0.007127,
-      "snr_db": 25.4
+      "snr_db": 25.4,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
+      "primary_type": "vehicle",
       "confidence": 0.421,
       "noise_types": [
         {
-          "type": "airplane",
+          "type": "vehicle",
           "percentage": 42.1,
           "frequency_range_hz": [
             20.0,
@@ -3828,27 +5350,27 @@
           ]
         },
         {
-          "type": "car",
-          "percentage": 37.7,
-          "frequency_range_hz": [
-            20.0,
-            250.0
-          ]
-        },
-        {
           "type": "generator",
-          "percentage": 18.0,
+          "percentage": 29.1,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 2.1,
+          "percentage": 18.2,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
+          ]
+        },
+        {
+          "type": "airplane",
+          "percentage": 10.6,
+          "frequency_range_hz": [
+            50.0,
+            4000.0
           ]
         }
       ],
@@ -3860,7 +5382,7 @@
     "filename": "99-45_vehicle_02.wav",
     "animal_id": "99-45",
     "location": "",
-    "date": "",
+    "date": "1999",
     "start_sec": 0.0,
     "end_sec": 148.963,
     "duration_s": 148.963,
@@ -3869,8 +5391,8 @@
     "noise_type_ref": "vehicle",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.366,
+    "classifier_primary_noise": "vehicle",
+    "classifier_confidence": 0.539,
     "dominant_frequency_hz": 0.0,
     "call_type": "rumble",
     "call_type_confidence": 1.0,
@@ -3908,43 +5430,77 @@
         7.3884,
         7.9963
       ],
+      "mfcc_delta": [
+        -0.0149,
+        -0.0065,
+        0.0069,
+        0.0064,
+        0.0087,
+        0.0079,
+        0.0051,
+        0.0042,
+        0.0024,
+        0.0011,
+        0.0012,
+        0.0013,
+        0.0008
+      ],
+      "mfcc_delta2": [
+        -0.0011,
+        -0.0001,
+        -0.0002,
+        -0.0008,
+        -0.0001,
+        -0.0003,
+        0.0,
+        0.0001,
+        -0.0003,
+        -0.0002,
+        0.0003,
+        0.0008,
+        0.0006
+      ],
+      "pitch_contour_slope": 13.2892,
+      "temporal_energy_variance": 0.01237787,
+      "spectral_entropy": 0.245355,
       "zero_crossing_rate": 0.023953,
-      "snr_db": 36.7
+      "snr_db": 36.7,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.366,
+      "primary_type": "vehicle",
+      "confidence": 0.539,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 36.6,
+          "type": "vehicle",
+          "percentage": 53.9,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 32.9,
+          "type": "wind",
+          "percentage": 32.7,
           "frequency_range_hz": [
             20.0,
-            250.0
+            2000.0
           ]
         },
         {
           "type": "generator",
-          "percentage": 29.4,
+          "percentage": 9.8,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "wind",
-          "percentage": 1.0,
+          "type": "airplane",
+          "percentage": 3.7,
           "frequency_range_hz": [
-            200.0,
-            2000.0
+            50.0,
+            4000.0
           ]
         }
       ],
@@ -3956,7 +5512,7 @@
     "filename": "J86-1_airplane_01.wav",
     "animal_id": "J86-1",
     "location": "",
-    "date": "",
+    "date": "1986",
     "start_sec": 0.0,
     "end_sec": 215.452,
     "duration_s": 215.452,
@@ -3965,8 +5521,8 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
-    "classifier_confidence": 0.336,
+    "classifier_primary_noise": "generator",
+    "classifier_confidence": 0.345,
     "dominant_frequency_hz": 52.4,
     "call_type": "trumpet",
     "call_type_confidence": 0.6,
@@ -4007,42 +5563,76 @@
         3.9959,
         0.7722
       ],
+      "mfcc_delta": [
+        0.0382,
+        -0.0004,
+        -0.008,
+        0.0124,
+        0.0077,
+        0.0029,
+        0.0003,
+        0.0047,
+        0.0021,
+        0.0025,
+        -0.0008,
+        -0.0027,
+        0.0009
+      ],
+      "mfcc_delta2": [
+        -0.0043,
+        0.0009,
+        0.0016,
+        0.0002,
+        -0.0004,
+        -0.0003,
+        -0.0001,
+        0.0002,
+        0.0006,
+        -0.0001,
+        -0.0009,
+        -0.0005,
+        0.0001
+      ],
+      "pitch_contour_slope": -13.5333,
+      "temporal_energy_variance": 0.00031488,
+      "spectral_entropy": 0.448757,
       "zero_crossing_rate": 0.036644,
-      "snr_db": 24.0
+      "snr_db": 24.0,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
-      "confidence": 0.336,
+      "primary_type": "generator",
+      "confidence": 0.345,
       "noise_types": [
         {
-          "type": "airplane",
-          "percentage": 33.6,
+          "type": "generator",
+          "percentage": 34.5,
+          "frequency_range_hz": [
+            40.0,
+            500.0
+          ]
+        },
+        {
+          "type": "vehicle",
+          "percentage": 28.2,
           "frequency_range_hz": [
             20.0,
             500.0
           ]
         },
         {
-          "type": "generator",
-          "percentage": 33.5,
+          "type": "airplane",
+          "percentage": 19.7,
           "frequency_range_hz": [
             50.0,
-            250.0
-          ]
-        },
-        {
-          "type": "car",
-          "percentage": 29.7,
-          "frequency_range_hz": [
-            20.0,
-            250.0
+            4000.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 2.8,
+          "percentage": 17.6,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
           ]
         }
@@ -4055,7 +5645,7 @@
     "filename": "J87-27_airplane_01.wav",
     "animal_id": "J87-27",
     "location": "",
-    "date": "",
+    "date": "1987",
     "start_sec": 0.0,
     "end_sec": 97.277,
     "duration_s": 97.277,
@@ -4064,7 +5654,7 @@
     "noise_type_ref": "airplane",
     "species": "African bush elephant",
     "analysis_clip_seconds": 60.0,
-    "classifier_primary_noise": "airplane",
+    "classifier_primary_noise": "vehicle",
     "classifier_confidence": 0.355,
     "dominant_frequency_hz": 52.4,
     "call_type": "unknown",
@@ -4106,15 +5696,49 @@
         3.9761,
         -0.8576
       ],
+      "mfcc_delta": [
+        0.022,
+        0.0062,
+        0.0025,
+        -0.0026,
+        0.0013,
+        -0.0,
+        -0.0014,
+        -0.0019,
+        -0.002,
+        0.0003,
+        0.0017,
+        -0.0011,
+        -0.0016
+      ],
+      "mfcc_delta2": [
+        -0.0006,
+        -0.0001,
+        -0.0016,
+        0.0002,
+        0.0012,
+        0.0008,
+        0.0011,
+        0.0003,
+        0.0005,
+        -0.0003,
+        -0.0002,
+        -0.0005,
+        -0.0004
+      ],
+      "pitch_contour_slope": -16.079,
+      "temporal_energy_variance": 3.269e-05,
+      "spectral_entropy": 0.399351,
       "zero_crossing_rate": 0.018151,
-      "snr_db": 11.7
+      "snr_db": 11.7,
+      "feature_vector_dim": 54
     },
     "noise": {
-      "primary_type": "airplane",
+      "primary_type": "vehicle",
       "confidence": 0.355,
       "noise_types": [
         {
-          "type": "airplane",
+          "type": "vehicle",
           "percentage": 35.5,
           "frequency_range_hz": [
             20.0,
@@ -4123,25 +5747,25 @@
         },
         {
           "type": "generator",
-          "percentage": 31.0,
+          "percentage": 34.1,
           "frequency_range_hz": [
-            50.0,
-            250.0
+            40.0,
+            500.0
           ]
         },
         {
-          "type": "car",
-          "percentage": 29.1,
+          "type": "airplane",
+          "percentage": 15.6,
           "frequency_range_hz": [
-            20.0,
-            250.0
+            50.0,
+            4000.0
           ]
         },
         {
           "type": "wind",
-          "percentage": 4.3,
+          "percentage": 14.9,
           "frequency_range_hz": [
-            200.0,
+            20.0,
             2000.0
           ]
         }

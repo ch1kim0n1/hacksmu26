@@ -14,9 +14,10 @@
         "1989-06_airplane_01-call-7",
         "1989-06_airplane_01-call-8",
         "1989-06_airplane_01-call-9",
-        "1989-06_airplane_01-call-10"
+        "1989-06_airplane_01-call-10",
+        "1989-06_airplane_01-call-11"
       ],
-      "pattern": "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+      "pattern": "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
       "motif": [
         "rumble",
         "unknown",
@@ -26,45 +27,31 @@
         "bark",
         "bark",
         "rumble",
-        "bark",
         "rumble",
-        "rumble"
+        "bark",
+        "bark",
+        "unknown"
       ],
-      "total_duration_ms": 21350.0,
+      "total_duration_ms": 29450.0,
       "inter_call_gaps_ms": [
-        650.0,
-        50.0,
+        750.0,
+        150.0,
         50.0,
         1950.0,
-        1850.0,
-        1450.0,
-        1250.0,
-        150.0,
+        1950.0,
+        1650.0,
+        1350.0,
         0.0,
-        0.0
+        1750.0,
+        3750.0,
+        50.0
       ]
     },
     {
       "id": "1989-06_airplane_01-seq-1",
       "recording_id": "1989-06_airplane_01",
       "calls": [
-        "1989-06_airplane_01-call-11",
-        "1989-06_airplane_01-call-12"
-      ],
-      "pattern": "bark -> unknown",
-      "motif": [
-        "bark",
-        "unknown"
-      ],
-      "total_duration_ms": 2250.0,
-      "inter_call_gaps_ms": [
-        50.0
-      ]
-    },
-    {
-      "id": "1989-06_airplane_01-seq-2",
-      "recording_id": "1989-06_airplane_01",
-      "calls": [
+        "1989-06_airplane_01-call-12",
         "1989-06_airplane_01-call-13",
         "1989-06_airplane_01-call-14",
         "1989-06_airplane_01-call-15",
@@ -74,11 +61,9 @@
         "1989-06_airplane_01-call-19",
         "1989-06_airplane_01-call-20",
         "1989-06_airplane_01-call-21",
-        "1989-06_airplane_01-call-22",
-        "1989-06_airplane_01-call-23",
-        "1989-06_airplane_01-call-24"
+        "1989-06_airplane_01-call-22"
       ],
-      "pattern": "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
+      "pattern": "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
       "motif": [
         "bark",
         "bark",
@@ -88,7 +73,6 @@
         "rumble",
         "rumble",
         "bark",
-        "rumble",
         "rumble",
         "rumble",
         "rumble"
@@ -96,30 +80,16 @@
       "total_duration_ms": 18050.0,
       "inter_call_gaps_ms": [
         50.0,
-        2250.0,
-        750.0,
-        50.0,
+        2350.0,
+        850.0,
+        0.0,
         50.0,
         850.0,
         2450.0,
         550.0,
         150.0,
-        2750.0,
-        50.0
+        2750.0
       ]
-    },
-    {
-      "id": "1989-06_airplane_01-seq-3",
-      "recording_id": "1989-06_airplane_01",
-      "calls": [
-        "1989-06_airplane_01-call-25"
-      ],
-      "pattern": "bark",
-      "motif": [
-        "bark"
-      ],
-      "total_duration_ms": 337.82,
-      "inter_call_gaps_ms": []
     }
   ],
   "recurring_patterns": [
@@ -130,18 +100,18 @@
         "rumble"
       ],
       "pattern": "rumble -> rumble",
-      "occurrences": 8,
+      "occurrences": 7,
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 885.63,
+      "avg_gap_ms": 1038.03,
       "contexts": [
         [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
-          7
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
+          6
         ],
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           1
         ]
       ]
@@ -154,59 +124,38 @@
         "rumble"
       ],
       "pattern": "rumble -> rumble -> rumble",
-      "occurrences": 5,
-      "recordings": [
-        "1989-06_airplane_01"
-      ],
-      "avg_gap_ms": 904.55,
-      "contexts": [
-        [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
-          5
-        ]
-      ]
-    },
-    {
-      "pattern_id": "pat-fbb6969772",
-      "motif": [
-        "bark",
-        "rumble"
-      ],
-      "pattern": "bark -> rumble",
       "occurrences": 4,
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 826.19,
+      "avg_gap_ms": 1005.0,
       "contexts": [
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
-          2
-        ],
-        [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
-          2
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
+          4
         ]
       ]
     },
     {
-      "pattern_id": "pat-bd8ea08534",
+      "pattern_id": "pat-a9c6310173",
       "motif": [
-        "rumble",
-        "rumble",
-        "rumble",
-        "rumble"
+        "bark",
+        "bark"
       ],
-      "pattern": "rumble -> rumble -> rumble -> rumble",
-      "occurrences": 3,
+      "pattern": "bark -> bark",
+      "occurrences": 4,
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 904.55,
+      "avg_gap_ms": 1168.6,
       "contexts": [
         [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           3
+        ],
+        [
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
+          1
         ]
       ]
     },
@@ -222,62 +171,62 @@
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 853.12,
+      "avg_gap_ms": 1080.65,
       "contexts": [
         [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
           2
         ],
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           1
         ]
       ]
     },
     {
-      "pattern_id": "pat-a9c6310173",
+      "pattern_id": "pat-fbb6969772",
       "motif": [
         "bark",
-        "bark"
+        "rumble"
       ],
-      "pattern": "bark -> bark",
+      "pattern": "bark -> rumble",
       "occurrences": 3,
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 798.39,
+      "avg_gap_ms": 1080.65,
       "contexts": [
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
           2
         ],
         [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           1
         ]
       ]
     },
     {
-      "pattern_id": "pat-83c6010964",
+      "pattern_id": "pat-cfe26f68f4",
       "motif": [
-        "rumble",
+        "bark",
         "bark",
         "rumble",
         "rumble"
       ],
-      "pattern": "rumble -> bark -> rumble -> rumble",
+      "pattern": "bark -> bark -> rumble -> rumble",
       "occurrences": 2,
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 826.19,
+      "avg_gap_ms": 1116.67,
       "contexts": [
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           1
         ],
         [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
           1
         ]
       ]
@@ -295,10 +244,31 @@
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 904.55,
+      "avg_gap_ms": 1005.0,
       "contexts": [
         [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-bd8ea08534",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble -> rumble -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "1989-06_airplane_01"
+      ],
+      "avg_gap_ms": 1005.0,
+      "contexts": [
+        [
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
           2
         ]
       ]
@@ -315,10 +285,30 @@
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 740.0,
+      "avg_gap_ms": 1218.18,
       "contexts": [
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-c11df734b3",
+      "motif": [
+        "bark",
+        "bark",
+        "unknown"
+      ],
+      "pattern": "bark -> bark -> unknown",
+      "occurrences": 2,
+      "recordings": [
+        "1989-06_airplane_01"
+      ],
+      "avg_gap_ms": 1218.18,
+      "contexts": [
+        [
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           2
         ]
       ]
@@ -335,38 +325,38 @@
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 826.19,
+      "avg_gap_ms": 1116.67,
       "contexts": [
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           1
         ],
         [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
           1
         ]
       ]
     },
     {
-      "pattern_id": "pat-ea48eb68be",
+      "pattern_id": "pat-6a0ce05099",
       "motif": [
         "rumble",
-        "bark",
-        "rumble"
+        "rumble",
+        "bark"
       ],
-      "pattern": "rumble -> bark -> rumble",
+      "pattern": "rumble -> rumble -> bark",
       "occurrences": 2,
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 826.19,
+      "avg_gap_ms": 1116.67,
       "contexts": [
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           1
         ],
         [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
           1
         ]
       ]
@@ -382,10 +372,10 @@
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 740.0,
+      "avg_gap_ms": 1218.18,
       "contexts": [
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           2
         ]
       ]
@@ -401,15 +391,11 @@
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 677.27,
+      "avg_gap_ms": 1218.18,
       "contexts": [
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
-          1
-        ],
-        [
-          "bark -> unknown",
-          1
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
+          2
         ]
       ]
     },
@@ -424,14 +410,14 @@
       "recordings": [
         "1989-06_airplane_01"
       ],
-      "avg_gap_ms": 826.19,
+      "avg_gap_ms": 1116.67,
       "contexts": [
         [
-          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> bark -> rumble -> rumble",
+          "rumble -> unknown -> bark -> bark -> unknown -> bark -> bark -> rumble -> rumble -> bark -> bark -> unknown",
           1
         ],
         [
-          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble -> rumble",
+          "bark -> bark -> rumble -> rumble -> rumble -> rumble -> rumble -> bark -> rumble -> rumble -> rumble",
           1
         ]
       ]

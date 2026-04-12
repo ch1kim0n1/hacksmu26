@@ -40,16 +40,16 @@
       ],
       "total_duration_ms": 16950.0,
       "inter_call_gaps_ms": [
-        250.0,
-        950.0,
-        2650.0,
+        1450.0,
+        2750.0,
         1650.0,
         0.0,
-        750.0,
-        350.0,
-        150.0,
-        3550.0,
-        750.0,
+        1050.0,
+        450.0,
+        450.0,
+        2450.0,
+        850.0,
+        0.0,
         0.0,
         50.0,
         50.0,
@@ -63,24 +63,18 @@
         "2000-23_background_noise_1-call-15",
         "2000-23_background_noise_1-call-16",
         "2000-23_background_noise_1-call-17",
-        "2000-23_background_noise_1-call-18",
-        "2000-23_background_noise_1-call-19",
-        "2000-23_background_noise_1-call-20"
+        "2000-23_background_noise_1-call-18"
       ],
-      "pattern": "rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
+      "pattern": "rumble -> rumble -> rumble -> rumble",
       "motif": [
-        "rumble",
-        "rumble",
         "rumble",
         "rumble",
         "rumble",
         "rumble"
       ],
-      "total_duration_ms": 9450.0,
+      "total_duration_ms": 8950.0,
       "inter_call_gaps_ms": [
-        150.0,
         2250.0,
-        50.0,
         0.0,
         50.0
       ]
@@ -94,19 +88,19 @@
         "rumble"
       ],
       "pattern": "rumble -> rumble",
-      "occurrences": 19,
+      "occurrences": 17,
       "recordings": [
         "2000-23_background_noise_1"
       ],
-      "avg_gap_ms": 766.06,
+      "avg_gap_ms": 801.95,
       "contexts": [
         [
           "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
           14
         ],
         [
-          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
-          5
+          "rumble -> rumble -> rumble -> rumble",
+          3
         ]
       ]
     },
@@ -118,19 +112,19 @@
         "rumble"
       ],
       "pattern": "rumble -> rumble -> rumble",
-      "occurrences": 17,
+      "occurrences": 15,
       "recordings": [
         "2000-23_background_noise_1"
       ],
-      "avg_gap_ms": 770.3,
+      "avg_gap_ms": 802.39,
       "contexts": [
         [
           "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
           13
         ],
         [
-          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
-          4
+          "rumble -> rumble -> rumble -> rumble",
+          2
         ]
       ]
     },
@@ -143,19 +137,19 @@
         "rumble"
       ],
       "pattern": "rumble -> rumble -> rumble -> rumble",
-      "occurrences": 15,
+      "occurrences": 13,
       "recordings": [
         "2000-23_background_noise_1"
       ],
-      "avg_gap_ms": 775.41,
+      "avg_gap_ms": 802.92,
       "contexts": [
         [
           "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
           12
         ],
         [
-          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
-          3
+          "rumble -> rumble -> rumble -> rumble",
+          1
         ]
       ]
     }

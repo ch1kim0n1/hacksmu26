@@ -1,0 +1,13 @@
+{
+  "snr_before_db": 7.6,
+  "snr_after_db": 8.53,
+  "snr_improvement_db": 0.93,
+  "pesq": null,
+  "peak_frequency_before_hz": 43.1,
+  "peak_frequency_after_hz": 43.1,
+  "spectral_distortion": 0.3861,
+  "energy_preservation": 0.0476,
+  "quality_score": 20.8,
+  "quality_rating": "poor",
+  "flagged_for_review": true
+}

@@ -3,9 +3,8 @@
   "review_file": "data/analysis/audio_inventory_review.csv",
   "total_rows": 44,
   "status_counts": {
-    "review_classifier_mismatch": 24,
-    "trusted": 18,
-    "review_mixed": 2
+    "trusted": 14,
+    "review_classifier_mismatch": 30
   },
   "trusted_fields": [
     "call_id",

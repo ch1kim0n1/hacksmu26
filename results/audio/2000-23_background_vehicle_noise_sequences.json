@@ -16,11 +16,11 @@
         "rumble",
         "rumble"
       ],
-      "total_duration_ms": 4150.0,
+      "total_duration_ms": 4250.0,
       "inter_call_gaps_ms": [
-        150.0,
-        50.0,
-        350.0
+        250.0,
+        0.0,
+        150.0
       ]
     },
     {
@@ -48,10 +48,12 @@
         "2000-23_background_vehicle_noise-call-22",
         "2000-23_background_vehicle_noise-call-23",
         "2000-23_background_vehicle_noise-call-24",
-        "2000-23_background_vehicle_noise-call-25"
+        "2000-23_background_vehicle_noise-call-25",
+        "2000-23_background_vehicle_noise-call-26"
       ],
-      "pattern": "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
+      "pattern": "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
       "motif": [
+        "rumble",
         "rumble",
         "rumble",
         "rumble",
@@ -75,29 +77,30 @@
         "rumble",
         "rumble"
       ],
-      "total_duration_ms": 31650.0,
+      "total_duration_ms": 31550.0,
       "inter_call_gaps_ms": [
         0.0,
-        1050.0,
+        1150.0,
         850.0,
-        650.0,
+        350.0,
+        0.0,
         250.0,
-        450.0,
+        350.0,
         50.0,
-        950.0,
+        750.0,
         3150.0,
-        150.0,
+        250.0,
         4450.0,
         650.0,
         550.0,
         0.0,
         0.0,
-        650.0,
         150.0,
-        450.0,
-        3650.0,
-        350.0,
-        1650.0
+        150.0,
+        150.0,
+        550.0,
+        4550.0,
+        1850.0
       ]
     }
   ],
@@ -109,15 +112,15 @@
         "rumble"
       ],
       "pattern": "rumble -> rumble",
-      "occurrences": 24,
+      "occurrences": 25,
       "recordings": [
         "2000-23_background_vehicle_noise"
       ],
-      "avg_gap_ms": 941.67,
+      "avg_gap_ms": 903.85,
       "contexts": [
         [
-          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
-          21
+          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
+          22
         ],
         [
           "rumble -> rumble -> rumble -> rumble",
@@ -133,15 +136,15 @@
         "rumble"
       ],
       "pattern": "rumble -> rumble -> rumble",
-      "occurrences": 22,
+      "occurrences": 23,
       "recordings": [
         "2000-23_background_vehicle_noise"
       ],
-      "avg_gap_ms": 946.24,
+      "avg_gap_ms": 908.12,
       "contexts": [
         [
-          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
-          20
+          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
+          21
         ],
         [
           "rumble -> rumble -> rumble -> rumble",
@@ -158,15 +161,15 @@
         "rumble"
       ],
       "pattern": "rumble -> rumble -> rumble -> rumble",
-      "occurrences": 20,
+      "occurrences": 21,
       "recordings": [
         "2000-23_background_vehicle_noise"
       ],
-      "avg_gap_ms": 951.37,
+      "avg_gap_ms": 912.87,
       "contexts": [
         [
-          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
-          19
+          "rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble -> rumble",
+          20
         ],
         [
           "rumble -> rumble -> rumble -> rumble",

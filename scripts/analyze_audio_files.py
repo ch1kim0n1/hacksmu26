@@ -60,6 +60,52 @@ def infer_animal_id(stem: str) -> str:
     return stem.split("_")[0].strip(" _-")
 
 
+def infer_date(animal_id: str) -> str:
+    """Extract a recording date or year from the animal/recording ID.
+
+    Known patterns from ElephantVoices naming conventions:
+    - ``YY-YYMMDD-NN`` (e.g. ``04-040920-02`` -> 2004-09-20)
+    - ``YYMMDD-NN``    (e.g. ``061220-24``    -> 2006-12-20)
+    - ``YYYY-NN``      (e.g. ``2000-23``      -> 2000)
+    - ``YY-NNA``       (e.g. ``99-22A``       -> 1999)
+    - ``JYY-NN``       (e.g. ``J86-1``        -> 1986)
+    """
+    # Pattern: YY-YYMMDD-NN  (e.g. 04-040920-02)
+    m = re.match(r"\d{2}-(\d{2})(\d{2})(\d{2})-\d+", animal_id)
+    if m:
+        yy, mm, dd = m.group(1), m.group(2), m.group(3)
+        year = int(yy) + (1900 if int(yy) > 50 else 2000)
+        return f"{year}-{mm}-{dd}"
+
+    # Pattern: YYMMDD-NN  (e.g. 061220-24, 090224-09)
+    m = re.match(r"(\d{2})(\d{2})(\d{2})-\d+$", animal_id)
+    if m:
+        yy, mm, dd = m.group(1), m.group(2), m.group(3)
+        year = int(yy) + (1900 if int(yy) > 50 else 2000)
+        return f"{year}-{mm}-{dd}"
+
+    # Pattern: YYYY-NN  (e.g. 2000-23, 1989-06)
+    m = re.match(r"(\d{4})-\d+", animal_id)
+    if m:
+        return m.group(1)
+
+    # Pattern: YY-NNA  (e.g. 99-22A, 99-37)
+    m = re.match(r"(\d{2})-\d+", animal_id)
+    if m:
+        yy = int(m.group(1))
+        year = yy + (1900 if yy > 50 else 2000)
+        return str(year)
+
+    # Pattern: JYY-NN  (e.g. J86-1, J87-27)
+    m = re.match(r"J(\d{2})-\d+", animal_id, re.IGNORECASE)
+    if m:
+        yy = int(m.group(1))
+        year = yy + (1900 if yy > 50 else 2000)
+        return str(year)
+
+    return ""
+
+
 def load_analysis_clip(path: Path) -> tuple[np.ndarray, int]:
     y, sr = librosa.load(
         str(path),
@@ -78,13 +124,14 @@ def analyze_file(path: Path) -> dict[str, Any]:
     call_type = classify_call_type(features)
 
     stem = path.stem
+    animal_id = infer_animal_id(stem)
     inferred_noise = infer_noise_type(path.name)
     return {
         "call_id": stem,
         "filename": path.name,
-        "animal_id": infer_animal_id(stem),
+        "animal_id": animal_id,
         "location": "",
-        "date": "",
+        "date": infer_date(animal_id),
         "start_sec": 0.0,
         "end_sec": round(float(info.duration), 3),
         "duration_s": round(float(info.duration), 3),
