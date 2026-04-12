@@ -293,7 +293,7 @@ export default function DatabasePage() {
             <motion.button
               key={call.id}
               variants={fadeUp}
-              onClick={() => router.push(`/results/${call.id}`)}
+              onClick={() => router.push(`/results/${call.recording_id}`)}
               aria-label={`View call ${call.call_type} ${call.id.slice(0, 8)}`}
               className="group p-4 rounded-xl glass border border-ev-sand/30 card-hover text-left flex flex-col"
             >
