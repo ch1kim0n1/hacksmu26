@@ -81,6 +81,7 @@ export function SceneTransitionProvider({
   }, [isTransitioning, pathname, phase]);
 
   const startDashboardTransition = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_globeRect: GlobeRect) => {
       if (isTransitioning) return;
 

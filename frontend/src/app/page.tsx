@@ -103,7 +103,6 @@ export default function LandingPage() {
   const stepsRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
 
-  const [mobileNav, setMobileNav] = useState(false);
 
   /* ── GSAP orchestration ── */
   useEffect(() => {
