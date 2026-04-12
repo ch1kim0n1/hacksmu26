@@ -3,13 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Upload, BarChart3, Database, Waves, Radio, Layers } from "lucide-react";
+import { Upload, BarChart3, Database, Waves, Radio, Layers, Users, BookOpen, Network, Monitor } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "/upload", label: "Upload", icon: Upload },
   { href: "/recordings", label: "Recordings", icon: Layers },
   { href: "/results", label: "Results", icon: BarChart3 },
   { href: "/database", label: "Database", icon: Database },
+  { href: "/elephants", label: "Elephants", icon: Users },
+  { href: "/research/ethology", label: "Call Guide", icon: BookOpen },
+  { href: "/research/social-network", label: "Social Network", icon: Network },
+  { href: "/field-monitor", label: "Field Monitor", icon: Monitor },
   { href: "/realtime", label: "Real-Time Filter", icon: Radio },
 ];
 

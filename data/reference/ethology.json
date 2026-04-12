@@ -1,0 +1,110 @@
+{
+  "rumble": {
+    "label": "Rumble",
+    "meaning": "Low-frequency call used for long-distance coordination and maintaining social bonds within the family group.",
+    "behavioral_context": "Social bonding / group coordination",
+    "social_function": "Group cohesion",
+    "range_km": 4.0,
+    "typical_duration_s": [2.0, 6.0],
+    "typical_frequency_hz": [10, 25],
+    "caller_state": "Calm, socially engaged",
+    "common_response": "Answer rumble from group members",
+    "source": "Poole, 2011; Stoeger & Baotic, 2016"
+  },
+  "trumpet": {
+    "label": "Trumpet",
+    "meaning": "High-frequency, broadband call produced during states of high arousal including excitement, alarm, or social play.",
+    "behavioral_context": "Alarm / excitement / play",
+    "social_function": "Alert signaling",
+    "range_km": 1.5,
+    "typical_duration_s": [0.5, 2.0],
+    "typical_frequency_hz": [300, 3000],
+    "caller_state": "Highly aroused, agitated or excited",
+    "common_response": "Vigilance behavior or group alarm response",
+    "source": "Poole & Granli, 2011; Stoeger et al., 2012"
+  },
+  "roar": {
+    "label": "Roar",
+    "meaning": "Broadband, high-intensity call associated with distress, aggression, or strong social conflict.",
+    "behavioral_context": "Distress / aggression / conflict",
+    "social_function": "Threat display / distress signal",
+    "range_km": 2.0,
+    "typical_duration_s": [1.0, 4.0],
+    "typical_frequency_hz": [50, 2000],
+    "caller_state": "Distressed, aggressive, or threatened",
+    "common_response": "Group defensive formation or retreat",
+    "source": "Poole, 2011; Soltis et al., 2005"
+  },
+  "bark": {
+    "label": "Bark",
+    "meaning": "Short, sharp alarm call used to signal immediate danger or surprise to nearby group members.",
+    "behavioral_context": "Alarm / surprise",
+    "social_function": "Immediate threat alert",
+    "range_km": 0.8,
+    "typical_duration_s": [0.2, 0.8],
+    "typical_frequency_hz": [200, 1500],
+    "caller_state": "Startled, alert",
+    "common_response": "Freeze and vigilance, followed by bunching",
+    "source": "Poole & Granli, 2011; Stoeger & Baotic, 2016"
+  },
+  "cry": {
+    "label": "Cry",
+    "meaning": "Calf-specific distress vocalization emitted when separated from mother or in discomfort.",
+    "behavioral_context": "Calf distress / separation",
+    "social_function": "Maternal recall / caregiver solicitation",
+    "range_km": 0.5,
+    "typical_duration_s": [0.5, 2.5],
+    "typical_frequency_hz": [200, 800],
+    "caller_state": "Distressed, anxious, separated",
+    "common_response": "Mother or allomothers approach and comfort calf",
+    "source": "Poole, 2011; Lee & Moss, 1999"
+  },
+  "contact_call": {
+    "label": "Contact Call",
+    "meaning": "Medium-range call used to locate family members when visually separated, often answered with a matching contact call.",
+    "behavioral_context": "Separation / reunion",
+    "social_function": "Maintaining spatial proximity",
+    "range_km": 2.5,
+    "typical_duration_s": [2.0, 5.0],
+    "typical_frequency_hz": [12, 35],
+    "caller_state": "Searching, mildly anxious",
+    "common_response": "Reciprocal contact call followed by approach",
+    "source": "Poole, 2011; McComb et al., 2003"
+  },
+  "greeting": {
+    "label": "Greeting Rumble",
+    "meaning": "Rumble produced during reunion events, often accompanied by ear flapping, trunk touching, and temporal gland secretion.",
+    "behavioral_context": "Reunion after separation",
+    "social_function": "Social bond reaffirmation",
+    "range_km": 1.0,
+    "typical_duration_s": [1.5, 4.0],
+    "typical_frequency_hz": [12, 28],
+    "caller_state": "Excited, affiliative",
+    "common_response": "Mutual greeting rumbles, trunk intertwining, urination",
+    "source": "Poole & Granli, 2011; Moss & Poole, 1983"
+  },
+  "play": {
+    "label": "Play Sound",
+    "meaning": "Vocalizations produced during social play, often by juveniles, including play trumpets and short rumbles.",
+    "behavioral_context": "Social play / juveniles",
+    "social_function": "Play signaling / social learning",
+    "range_km": 0.5,
+    "typical_duration_s": [0.3, 1.5],
+    "typical_frequency_hz": [100, 2000],
+    "caller_state": "Playful, relaxed",
+    "common_response": "Continued play interaction from partner",
+    "source": "Poole & Granli, 2011; Lee & Moss, 2014"
+  },
+  "unknown": {
+    "label": "Unknown",
+    "meaning": "Call type could not be confidently classified. May be a variant, overlapping call, or degraded signal requiring manual review.",
+    "behavioral_context": "Unresolved",
+    "social_function": "Undetermined",
+    "range_km": null,
+    "typical_duration_s": null,
+    "typical_frequency_hz": null,
+    "caller_state": "Undetermined",
+    "common_response": "Requires manual classification",
+    "source": "N/A"
+  }
+}

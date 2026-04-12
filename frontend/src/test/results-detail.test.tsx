@@ -10,6 +10,7 @@ vi.mock("next/navigation", () => ({
 // Mock audio-api
 vi.mock("@/lib/audio-api", () => ({
   API_BASE: "http://localhost:8000",
+  getCall: vi.fn(),
   getRecording: vi.fn().mockResolvedValue({
     id: "test-recording-id",
     filename: "elephant_rumble.wav",
@@ -33,8 +34,41 @@ vi.mock("@/lib/audio-api", () => ({
         quality_score: 87,
         snr_improvement_db: 14.2,
       },
+      speaker_separation: {
+        speaker_count: 1,
+        speakers: [
+          {
+            id: "speaker_1",
+            fundamental_hz: 18,
+            harmonic_count: 8,
+            energy_ratio: 1,
+            duration_s: 13.2,
+          },
+        ],
+      },
     },
   }),
+  getCallHarmonics: vi.fn().mockResolvedValue({
+    fundamental_hz: 18,
+    harmonics: [],
+    total_harmonics_detected: 0,
+  }),
+  getRecordingSpeakers: vi.fn().mockResolvedValue({
+    speaker_count: 1,
+    speakers: [
+      {
+        id: "speaker_1",
+        fundamental_hz: 18,
+        harmonic_count: 8,
+        energy_ratio: 1,
+        duration_s: 13.2,
+      },
+    ],
+  }),
+  getSpeakerAudioUrl: vi.fn(
+    (recordingId: string, speakerId: string) =>
+      `http://localhost:8000/api/recordings/${recordingId}/speakers/${speakerId}/download`,
+  ),
 }));
 
 // Lazy import to let mocks settle

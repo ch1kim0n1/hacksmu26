@@ -372,6 +372,8 @@ def _status_payload(recording: dict[str, Any]) -> dict[str, Any]:
 
 def _enrich_call(call: dict[str, Any], recording: dict[str, Any] | None = None) -> dict[str, Any]:
     payload = dict(call)
+    if recording is None and payload.get("recording_id"):
+        recording = _get_store().get(str(payload["recording_id"]))
     metadata = (recording.get("metadata") if recording else payload.get("metadata")) or {}
     if recording is not None:
         payload.setdefault("recording_id", recording.get("id"))
@@ -381,7 +383,109 @@ def _enrich_call(call: dict[str, Any], recording: dict[str, Any] | None = None) 
     payload.setdefault("call_id", payload.get("id"))
     if "metadata" not in payload:
         payload["metadata"] = metadata
+    try:
+        from echofield.research.ethology_annotations import get_annotation
+
+        payload["ethology"] = get_annotation(str(payload.get("call_type") or ""))
+    except Exception:
+        payload.setdefault("ethology", None)
+    try:
+        from echofield.research.reference_library import match_against_references
+
+        fingerprint = payload.get("fingerprint") or []
+        payload["reference_matches"] = match_against_references(fingerprint, top_k=7) if fingerprint else []
+    except Exception:
+        payload.setdefault("reference_matches", [])
+    try:
+        from echofield.research.summary_generator import compute_publishability_score
+
+        result = (recording or {}).get("result") or {}
+        quality = result.get("quality") or {}
+        payload["publishability"] = compute_publishability_score(
+            float(quality.get("snr_after_db") or (payload.get("acoustic_features") or {}).get("snr_db") or 0.0),
+            float(quality.get("energy_preservation") or 0.5),
+            float(quality.get("spectral_distortion") or 0.0),
+            float(payload.get("confidence") or 0.0),
+        )
+    except Exception:
+        payload.setdefault("publishability", None)
     return payload
+
+
+def _all_recordings() -> list[dict[str, Any]]:
+    return list(getattr(_get_store(), "_recordings", {}).values())
+
+
+def _call_speaker_id(call: dict[str, Any]) -> str | None:
+    for key in ("individual_id", "speaker_id", "cluster_id", "animal_id"):
+        value = call.get(key)
+        if value and str(value).strip():
+            return str(value).strip()
+
+    features = call.get("acoustic_features") or {}
+    f0 = call.get("speaker_fundamental_hz") or features.get("fundamental_frequency_hz")
+    try:
+        f0_value = float(f0 or 0.0)
+    except (TypeError, ValueError):
+        f0_value = 0.0
+    if f0_value > 0.0:
+        bucket_hz = int(round(f0_value / 5.0) * 5)
+        return f"voice_{bucket_hz}hz"
+    return None
+
+
+def _research_impact_payload() -> dict[str, Any]:
+    base_stats = _get_store().get_stats()
+    calls = _all_calls()
+    total_calls = len(calls)
+    publishable = sum(
+        1
+        for call in calls
+        if float((call.get("acoustic_features") or {}).get("snr_db") or 0.0) >= 20
+        or float(call.get("confidence") or 0.0) >= 0.85
+    )
+    individual_ids = {_call_speaker_id(call) for call in calls if _call_speaker_id(call)}
+    noise_types: dict[str, int] = {}
+    for call in calls:
+        noise_type = (call.get("metadata") or {}).get("noise_type_ref") or call.get("noise_type_ref")
+        if noise_type:
+            key = str(noise_type)
+            noise_types[key] = noise_types.get(key, 0) + 1
+    total_duration_s = sum(
+        float(call.get("duration_ms") or 0.0) / 1000.0
+        for call in calls
+        if float(call.get("confidence") or 0.0) >= 0.7
+    )
+    snr_improvements = []
+    noise_removed_estimates = []
+    recordings_saved = 0
+    for record in _all_recordings():
+        result = record.get("result") or {}
+        quality = result.get("quality") or {}
+        quality_score = float(quality.get("quality_score") or 0.0)
+        if quality_score >= 55:
+            recordings_saved += 1
+        improvement = quality.get("snr_improvement_db")
+        if improvement is not None:
+            snr_improvements.append(float(improvement))
+        before = quality.get("snr_before_db")
+        after = quality.get("snr_after_db")
+        if before is not None and after is not None and float(after) > float(before):
+            noise_removed_estimates.append(min(99.0, max(0.0, (float(after) - float(before)) / max(abs(float(after)), 1.0) * 100.0)))
+    avg_snr = round(sum(snr_improvements) / max(len(snr_improvements), 1), 2)
+    noise_removed = round(sum(noise_removed_estimates) / max(len(noise_removed_estimates), 1), 1)
+    return {
+        **base_stats,
+        "calls_recovered": total_calls,
+        "publishable_calls": publishable,
+        "recordings_saved": recordings_saved,
+        "noise_types_defeated": noise_types,
+        "avg_snr_improvement_db": avg_snr,
+        "total_noise_energy_removed_percent": noise_removed,
+        "total_noise_energy_removed_pct": noise_removed,
+        "speakers_identified": len(individual_ids),
+        "hours_of_clean_audio": round(total_duration_s / 3600.0, 3),
+    }
 
 
 def _identify_calls(call_type: str | None = None) -> tuple[list[dict[str, Any]], dict[str, str]]:
@@ -749,7 +853,8 @@ async def upload_recording(
 ) -> UploadResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename is required")
-    suffix = Path(file.filename).suffix.lower()
+    original_filename = Path(file.filename).name
+    suffix = Path(original_filename).suffix.lower()
     if suffix not in {".wav", ".mp3", ".flac"}:
         raise HTTPException(status_code=400, detail="Unsupported audio format")
     header = await file.read(12)
@@ -783,10 +888,25 @@ async def upload_recording(
         destination.unlink(missing_ok=True)
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     duration_s = round(get_duration(y, sr), 3)
-    metadata = {k: v for k, v in {"location": location, "date": date, "recorded_at": recorded_at, "notes": notes, "file_hash": file_hash}.items() if v}
+    metadata = {
+        k: v
+        for k, v in {
+            "location": location,
+            "date": date,
+            "recorded_at": recorded_at,
+            "notes": notes,
+            "file_hash": file_hash,
+            "original_filename": original_filename,
+            "source_format": suffix.lstrip("."),
+            "source_content_type": file.content_type,
+            "sample_rate": int(sr),
+            "channels": 1,
+        }.items()
+        if v is not None and v != ""
+    }
     _get_store().add(
         recording_id,
-        destination.name,
+        original_filename,
         duration_s,
         round(destination.stat().st_size / (1024 * 1024), 3),
         metadata=metadata,
@@ -1261,7 +1381,7 @@ async def get_emotion_timeline(
 
 @app.get("/api/stats", response_model=StatsResponse)
 async def get_stats() -> StatsResponse:
-    stats = _get_store().get_stats()
+    stats = _research_impact_payload()
     stats["circuit_breakers"] = get_circuit_breaker_registry().snapshot()
     return StatsResponse(**stats)
 
@@ -2387,6 +2507,278 @@ async def filter_chunk(
         media_type="application/octet-stream",
         headers=headers,
     )
+
+
+# ─── Research Features: Ethology, Reference Library, Profiles, Social Network ───
+
+
+@app.get("/api/ethology")
+async def get_ethology_annotations() -> dict[str, Any]:
+    """Return all ethology annotations for all call types."""
+    from echofield.research.ethology_annotations import get_all_annotations
+    return get_all_annotations()
+
+
+@app.get("/api/calls/{call_id}/ethology")
+async def get_call_ethology(call_id: str) -> dict[str, Any]:
+    """Return ethology annotation for a specific call."""
+    from echofield.research.ethology_annotations import get_annotation
+    call = _get_call_database().get_call(call_id)
+    if call is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    annotation = get_annotation(str(call.get("call_type", "")))
+    return {"call_id": call_id, "ethology": annotation}
+
+
+@app.get("/api/reference-library")
+async def get_reference_library() -> list[dict[str, Any]]:
+    """Return all reference rumbles (without fingerprint vectors)."""
+    from echofield.research.reference_library import get_all_references
+    return get_all_references()
+
+
+@app.get("/api/calls/{call_id}/reference-matches")
+async def get_call_reference_matches(
+    call_id: str,
+    top_k: int = Query(default=7, ge=1, le=10),
+) -> list[dict[str, Any]]:
+    """Match a call's fingerprint against reference rumble library."""
+    from echofield.research.reference_library import match_against_references
+    call = _get_call_database().get_call(call_id)
+    if call is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    fingerprint = call.get("fingerprint") or []
+    if not fingerprint:
+        return []
+    return match_against_references(fingerprint, top_k=top_k)
+
+
+@app.get("/api/elephants")
+async def list_elephants() -> list[dict[str, Any]]:
+    """List all identified individual elephants with summary stats."""
+    calls = _all_calls()
+    individuals: dict[str, dict[str, Any]] = {}
+    for call in calls:
+        ind_id = _call_speaker_id(call)
+        if not ind_id:
+            continue
+        if ind_id not in individuals:
+            individuals[ind_id] = {
+                "individual_id": ind_id,
+                "call_count": 0,
+                "recording_count": 0,
+                "recordings": set(),
+                "locations": set(),
+                "dates": set(),
+                "call_types": [],
+                "acoustic_sums": {},
+                "acoustic_counts": 0,
+                "social_connections": set(),
+            }
+        ind = individuals[ind_id]
+        ind["call_count"] += 1
+        rec_id = call.get("recording_id")
+        if rec_id:
+            ind["recordings"].add(rec_id)
+        loc = call.get("location")
+        if loc:
+            ind["locations"].add(loc)
+        dt = call.get("date")
+        if dt:
+            ind["dates"].add(str(dt))
+        ct = call.get("call_type")
+        if ct:
+            ind["call_types"].append(ct)
+        features = call.get("acoustic_features") or {}
+        for key in ("fundamental_frequency_hz", "harmonicity", "bandwidth_hz", "snr_db", "spectral_centroid_hz", "duration_s", "pitch_contour_slope", "spectral_entropy"):
+            val = features.get(key)
+            if val is not None:
+                ind["acoustic_sums"][key] = ind["acoustic_sums"].get(key, 0.0) + float(val)
+                ind["acoustic_counts"] = max(ind["acoustic_counts"], ind["acoustic_sums"].get(f"_count_{key}", 0) + 1)
+                ind["acoustic_sums"][f"_count_{key}"] = ind["acoustic_sums"].get(f"_count_{key}", 0) + 1
+
+    # Find social connections (individuals in same recordings)
+    recording_to_individuals: dict[str, set[str]] = {}
+    for call in calls:
+        ind_id = _call_speaker_id(call)
+        rec_id = call.get("recording_id")
+        if ind_id and rec_id:
+            recording_to_individuals.setdefault(rec_id, set()).add(ind_id)
+    for rec_ids_set in recording_to_individuals.values():
+        for a in rec_ids_set:
+            for b in rec_ids_set:
+                if a != b and a in individuals:
+                    individuals[a]["social_connections"].add(b)
+
+    result = []
+    for ind in individuals.values():
+        type_counts = Counter(ind["call_types"])
+        most_common = type_counts.most_common(1)[0][0] if type_counts else "unknown"
+        n = ind["call_count"] or 1
+        sums = ind["acoustic_sums"]
+        sig = {}
+        for key in ("fundamental_frequency_hz", "harmonicity", "bandwidth_hz", "snr_db", "spectral_centroid_hz", "duration_s", "pitch_contour_slope", "spectral_entropy"):
+            count = sums.get(f"_count_{key}", 0)
+            sig[key] = round(sums.get(key, 0) / max(count, 1), 3)
+        result.append({
+            "individual_id": ind["individual_id"],
+            "call_count": ind["call_count"],
+            "recording_count": len(ind["recordings"]),
+            "recordings": sorted(ind["recordings"]),
+            "locations": sorted(ind["locations"]),
+            "dates": sorted(ind["dates"]),
+            "most_common_type": most_common,
+            "call_type_distribution": dict(type_counts),
+            "acoustic_signature": sig,
+            "active_hours": {},
+            "social_connections": sorted(ind["social_connections"]),
+        })
+    result.sort(key=lambda x: x["call_count"], reverse=True)
+    return result
+
+
+@app.get("/api/elephants/{individual_id}")
+async def get_elephant(individual_id: str) -> dict[str, Any]:
+    """Get full profile for a specific individual elephant."""
+    profiles = await list_elephants()
+    for profile in profiles:
+        if profile["individual_id"] == individual_id:
+            return profile
+    raise HTTPException(status_code=404, detail="Individual not found")
+
+
+@app.get("/api/elephants/{individual_id}/calls")
+async def get_elephant_calls(
+    individual_id: str,
+    limit: int = Query(default=100, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+) -> dict[str, Any]:
+    """Get all calls for a specific individual elephant."""
+    calls = _all_calls()
+    filtered = [c for c in calls if _call_speaker_id(c) == individual_id]
+    total = len(filtered)
+    items = [CallRecord(**_enrich_call(c)) for c in filtered[offset:offset + limit]]
+    return {"items": items, "total": total}
+
+
+@app.get("/api/social-network")
+async def get_social_network() -> dict[str, Any]:
+    """Build and return the elephant social network graph."""
+    from echofield.research.social_network import build_social_network
+    calls = _all_calls()
+    return build_social_network(calls)
+
+
+@app.get("/api/recordings/{recording_id}/conversation")
+async def get_recording_conversation(recording_id: str) -> dict[str, Any]:
+    """Get conversation-style data for a specific recording."""
+    from echofield.research.social_network import get_conversation_data
+    calls = _all_calls()
+    return get_conversation_data(calls, recording_id)
+
+
+@app.get("/api/recordings/{recording_id}/speakers")
+async def get_recording_speakers(recording_id: str) -> dict[str, Any]:
+    """Get speaker separation results for a recording."""
+    from echofield.pipeline.speaker_separation import separate_speakers, get_speaker_metadata
+    store = _get_store()
+    recording = store.get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    result = recording.get("result") or {}
+    audio_path = result.get("output_audio_path") or str(_get_recording_path(recording))
+    if not audio_path or not Path(audio_path).exists():
+        raise HTTPException(status_code=400, detail="No audio available for speaker separation")
+    y, sr = load_audio(str(audio_path))
+    separation = separate_speakers(y, sr)
+    speakers_metadata = [get_speaker_metadata(s, sr) for s in separation.get("speakers", [])]
+    return {
+        "speaker_count": separation["speaker_count"],
+        "speakers": speakers_metadata,
+    }
+
+
+@app.get("/api/recordings/{recording_id}/speakers/{speaker_id}/download")
+async def download_speaker_audio(recording_id: str, speaker_id: str) -> Response:
+    """Download isolated audio for a specific speaker."""
+    from echofield.pipeline.speaker_separation import separate_speakers
+    store = _get_store()
+    recording = store.get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    result = recording.get("result") or {}
+    audio_path = result.get("output_audio_path") or str(_get_recording_path(recording))
+    if not audio_path or not Path(audio_path).exists():
+        raise HTTPException(status_code=400, detail="No audio available")
+    y, sr = load_audio(str(audio_path))
+    separation = separate_speakers(y, sr)
+    for speaker in separation.get("speakers", []):
+        if speaker["id"] == speaker_id:
+            buf = io.BytesIO()
+            import soundfile as sf
+            sf.write(buf, speaker["audio"], sr, format="WAV")
+            buf.seek(0)
+            return Response(
+                content=buf.read(),
+                media_type="audio/wav",
+                headers={"Content-Disposition": f'attachment; filename="speaker_{speaker_id}.wav"'},
+            )
+    raise HTTPException(status_code=404, detail="Speaker not found")
+
+
+@app.get("/api/calls/{call_id}/harmonics")
+async def get_call_harmonics(call_id: str) -> dict[str, Any]:
+    """Get harmonic decomposition for a specific call."""
+    from echofield.pipeline.harmonic_decomposition import decompose_harmonics
+    call = _get_call_database().get_call(call_id)
+    if call is None:
+        raise HTTPException(status_code=404, detail="Call not found")
+    features = call.get("acoustic_features") or {}
+    fundamental_hz = float(features.get("fundamental_frequency_hz", 0))
+    if fundamental_hz <= 0:
+        return {"fundamental_hz": 0, "harmonics": [], "total_harmonics_detected": 0}
+    recording_id = call.get("recording_id", "")
+    store = _get_store()
+    recording = store.get(recording_id)
+    if recording is None:
+        return {"fundamental_hz": fundamental_hz, "harmonics": [], "total_harmonics_detected": 0}
+    result = recording.get("result") or {}
+    original_path = str(_get_recording_path(recording))
+    cleaned_path = result.get("output_audio_path")
+    if not original_path or not Path(str(original_path)).exists():
+        return {"fundamental_hz": fundamental_hz, "harmonics": [], "total_harmonics_detected": 0}
+    y_original, sr = load_audio(str(original_path))
+    y_cleaned = load_audio(str(cleaned_path))[0] if cleaned_path and Path(str(cleaned_path)).exists() else y_original
+    start_sample = int(float(call.get("start_ms", 0)) / 1000.0 * sr)
+    end_sample = start_sample + int(float(call.get("duration_ms", 0)) / 1000.0 * sr)
+    start_sample = max(0, min(start_sample, len(y_original) - 1))
+    end_sample = max(start_sample + 1, min(end_sample, len(y_original)))
+    return decompose_harmonics(
+        y_original[start_sample:end_sample],
+        y_cleaned[start_sample:end_sample] if len(y_cleaned) > end_sample else y_cleaned,
+        sr,
+        fundamental_hz,
+    )
+
+
+@app.get("/api/recordings/{recording_id}/summary")
+async def get_recording_summary(recording_id: str) -> dict[str, Any]:
+    """Get research summary for a processed recording."""
+    from echofield.research.summary_generator import generate_recording_summary
+    store = _get_store()
+    recording = store.get(recording_id)
+    if recording is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    calls_for_recording = [
+        c for c in _all_calls() if c.get("recording_id") == recording_id
+    ]
+    return generate_recording_summary(recording, calls_for_recording)
+
+
+@app.get("/api/stats/research-impact")
+async def get_research_impact_stats() -> dict[str, Any]:
+    """Extended stats for the research impact dashboard."""
+    return _research_impact_payload()
 
 
 @app.websocket("/ws/live")

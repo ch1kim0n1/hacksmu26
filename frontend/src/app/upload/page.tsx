@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity,
@@ -13,7 +14,13 @@ import {
   Layers,
   Loader2,
 } from "lucide-react";
-import { getRecordings, uploadFiles, type Recording } from "@/lib/audio-api";
+import {
+  getRecordings,
+  processRecording,
+  uploadFiles,
+  type Recording,
+  type UploadResponse,
+} from "@/lib/audio-api";
 import { SoundWave } from "@/components/ui/motion-primitives";
 
 function formatFileSize(bytes?: number): string {
@@ -66,6 +73,7 @@ function StatCard({
 }
 
 export default function UploadPage() {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [recordings, setRecordings] = useState<Recording[]>([]);
@@ -74,6 +82,9 @@ export default function UploadPage() {
 
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadPhase, setUploadPhase] = useState<
+    "idle" | "uploading" | "processing"
+  >("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
@@ -116,6 +127,36 @@ export default function UploadPage() {
     return null;
   };
 
+  const startPipelineForUploads = async (result: UploadResponse) => {
+    const targets = (result.items?.length
+      ? result.items
+      : result.recording_ids.map((recording_id) => ({
+          recording_id,
+          status: result.status ?? "pending",
+        }))
+    ).filter(
+      (item) => item.status !== "complete" && item.status !== "processing",
+    );
+
+    if (targets.length === 0) return;
+
+    const settled = await Promise.allSettled(
+      targets.map((item) =>
+        processRecording(item.recording_id, {
+          method: "hybrid",
+          aggressiveness: 1.0,
+        }),
+      ),
+    );
+    const failed = settled.filter((item) => item.status === "rejected");
+    if (failed.length > 0) {
+      const first = failed[0] as PromiseRejectedResult;
+      throw first.reason instanceof Error
+        ? first.reason
+        : new Error(`Could not start processing for ${failed.length} upload(s)`);
+    }
+  };
+
   const handleUpload = async (files: File[]) => {
     setUploadError(null);
     setUploadSuccess(null);
@@ -129,24 +170,37 @@ export default function UploadPage() {
     }
 
     setUploading(true);
+    setUploadPhase("uploading");
     setUploadProgress(0);
 
     const progressInterval = setInterval(() => {
-      setUploadProgress((prev) => (prev >= 90 ? prev : prev + Math.random() * 15));
+      setUploadProgress((prev) =>
+        prev >= 88 ? prev : prev + Math.random() * 15,
+      );
     }, 300);
 
     try {
       const result = await uploadFiles(files);
+      setUploadPhase("processing");
+      setUploadProgress(92);
+      await startPipelineForUploads(result);
       setUploadProgress(100);
+      const count = result.recording_ids.length;
       setUploadSuccess(
-        result.message || `Uploaded ${files.length} file(s) successfully`,
+        `Uploaded ${count} file${count === 1 ? "" : "s"} and started full EchoField analysis.`,
       );
       await fetchRecordings();
+      if (result.recording_ids.length === 1) {
+        router.push(`/processing/${result.recording_ids[0]}`);
+      } else {
+        router.push("/recordings?status=processing");
+      }
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       clearInterval(progressInterval);
       setUploading(false);
+      setUploadPhase("idle");
       setTimeout(() => setUploadProgress(0), 2000);
     }
   };
@@ -348,7 +402,7 @@ export default function UploadPage() {
                   <div className="mb-2 flex justify-between text-sm">
                     <span className="flex items-center gap-1.5 text-ev-elephant">
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      Uploading…
+                      {uploadPhase === "processing" ? "Starting full pipeline..." : "Uploading..."}
                     </span>
                     <span className="font-medium text-accent-savanna tabular-nums">
                       {Math.round(uploadProgress)}%

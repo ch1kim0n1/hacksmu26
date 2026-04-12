@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from echofield.pipeline.ingestion import ingest_audio_file
+from echofield.pipeline.ingestion import ingest_audio_file, validate_magic_bytes
 from echofield.pipeline.cache_manager import CacheManager
 from echofield.pipeline.hybrid_pipeline import ProcessingPipeline
 from echofield.pipeline.quality_check import assess_quality, compute_snr
@@ -49,6 +49,13 @@ def test_ingestion_handles_valid_and_invalid_files(tmp_path: Path) -> None:
     invalid_path.write_text("not audio", encoding="utf-8")
     with pytest.raises(ValueError):
         ingest_audio_file(str(invalid_path))
+
+
+def test_ingestion_accepts_common_mp3_headers() -> None:
+    assert validate_magic_bytes(b"ID3\x04\x00\x00\x00\x00\x00\x21", ".mp3")[0]
+    assert validate_magic_bytes(b"\xff\xfb\x90d", ".mp3")[0]
+    assert validate_magic_bytes(b"\xff\xf3\x90d", ".mp3")[0]
+    assert validate_magic_bytes(b"\xff\xf2\x90d", ".mp3")[0]
 
 
 def test_spectrogram_generation_output_shape_and_range(tmp_path: Path) -> None:
@@ -132,6 +139,35 @@ def test_processing_pipeline_creates_outputs(tmp_path: Path) -> None:
     assert result["calls"]
     stats = cache.get_stats()
     assert stats["file_count"] >= 3
+
+
+def test_processing_pipeline_creates_same_outputs_for_mp3(tmp_path: Path) -> None:
+    if "MP3" not in sf.available_formats():
+        pytest.skip("libsndfile build cannot encode MP3")
+
+    sr = 44_100
+    waveform = _make_waveform(sr=sr, seconds=2)
+    audio_path = tmp_path / "uploaded-elephant.mp3"
+    sf.write(audio_path, waveform, sr, format="MP3")
+
+    cache = CacheManager(str(tmp_path / "cache-mp3"), max_size_mb=32)
+    pipeline = ProcessingPipeline(DummySettings(), cache)
+    result = asyncio.run(
+        pipeline.process_recording(
+            "rec-mp3",
+            str(audio_path),
+            str(tmp_path / "processed-mp3"),
+            str(tmp_path / "spectrograms-mp3"),
+            method="spectral",
+        )
+    )
+
+    assert result["status"] == "complete"
+    assert Path(result["output_audio_path"]).exists()
+    assert Path(result["spectrogram_before_path"]).exists()
+    assert Path(result["spectrogram_after_path"]).exists()
+    assert result["quality"]["quality_score"] >= 0
+    assert result["calls"]
 
 
 # ── Colormap tests ──

@@ -16,8 +16,13 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn() }),
+}));
+
 vi.mock("@/lib/audio-api", () => ({
   uploadFiles: vi.fn(),
+  processRecording: vi.fn(),
   getRecordings: vi.fn().mockResolvedValue({ recordings: [], total: 0 }),
 }));
 

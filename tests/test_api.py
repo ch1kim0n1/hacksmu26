@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
+import pytest
 import soundfile as sf
 
 
@@ -19,6 +20,29 @@ def _upload_one(client, wav_path: Path) -> str:
 def test_upload_endpoint_with_wav_file(test_client, sample_wav_file: Path) -> None:
     recording_id = _upload_one(test_client, sample_wav_file)
     assert recording_id
+
+
+def test_upload_endpoint_with_mp3_file(test_client, tmp_path: Path) -> None:
+    if "MP3" not in sf.available_formats():
+        pytest.skip("libsndfile build cannot encode MP3")
+
+    sr = 44_100
+    t = np.linspace(0, 1, sr, endpoint=False)
+    mp3_path = tmp_path / "field-upload.mp3"
+    sf.write(mp3_path, (0.2 * np.sin(2 * np.pi * 18 * t)).astype(np.float32), sr, format="MP3")
+
+    with mp3_path.open("rb") as handle:
+        response = test_client.post(
+            "/api/upload",
+            files={"file": (mp3_path.name, handle, "audio/mpeg")},
+        )
+
+    assert response.status_code == 201
+    recording_id = response.json()["recording_ids"][0]
+    detail = test_client.get(f"/api/recordings/{recording_id}").json()
+    assert detail["filename"] == "field-upload.mp3"
+    assert detail["metadata"]["source_format"] == "mp3"
+    assert detail["metadata"]["sample_rate"] == sr
 
 
 def test_recordings_list_with_pagination(test_client, sample_wav_file: Path) -> None:

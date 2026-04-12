@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -91,7 +91,7 @@ const FILTERS = [
 
 type FilterKey = (typeof FILTERS)[number]["key"];
 
-export default function RecordingsPage() {
+function RecordingsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -455,5 +455,32 @@ export default function RecordingsPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function RecordingsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-6xl space-y-3 p-6 lg:p-8">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="rounded-xl border border-ev-sand/30 p-5 glass animate-pulse"
+            >
+              <div className="flex items-center gap-4">
+                <div className="h-10 w-10 rounded-lg bg-ev-cream" />
+                <div className="flex-1">
+                  <div className="mb-2 h-4 w-48 rounded bg-ev-cream" />
+                  <div className="h-3 w-32 rounded bg-ev-cream" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      }
+    >
+      <RecordingsPageContent />
+    </Suspense>
   );
 }
