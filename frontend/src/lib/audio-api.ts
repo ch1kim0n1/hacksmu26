@@ -424,6 +424,29 @@ export async function getCall(id: string): Promise<Call> {
   };
 }
 
+export interface SpectrogramData {
+  recording_id: string;
+  width: number;
+  height: number;
+  duration_s: number;
+  freq_max_hz: number;
+  sample_rate: number;
+  magnitudes: number[][];
+}
+
+export async function getSpectrogramData(
+  recordingId: string,
+  options?: { width?: number; height?: number }
+): Promise<SpectrogramData> {
+  const params = new URLSearchParams();
+  if (options?.width) params.set("width", String(options.width));
+  if (options?.height) params.set("height", String(options.height));
+  const query = params.toString();
+  return fetchAPI<SpectrogramData>(
+    `/api/recordings/${recordingId}/spectrogram-data${query ? `?${query}` : ""}`
+  );
+}
+
 export async function exportResearch(params: {
   format: string;
   recording_ids: string[];
