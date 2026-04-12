@@ -2273,6 +2273,62 @@ async def analytics_recording_features(recording_id: str):
     }
 
 
+@app.post("/api/filter-chunk")
+async def filter_chunk(
+    request: Request,
+    sr: int = Query(default=44100, ge=8000, le=192000),
+    preserve_harmonics: bool = Query(default=True),
+) -> Response:
+    """Filter a raw PCM chunk using the spectral-gate pipeline.
+
+    Request body: little-endian float32 PCM samples (mono).
+    Response body: filtered float32 PCM samples (same length).
+    Extra headers: X-Noise-Type, X-Noise-Confidence, X-SNR-Before-DB, X-SNR-After-DB.
+    """
+    from echofield.pipeline.spectral_gate import spectral_gate_denoise
+    from echofield.pipeline.noise_classifier import classify_noise
+    from echofield.pipeline.quality_check import compute_snr
+
+    body = await request.body()
+    if not body:
+        return Response(content=b"", media_type="application/octet-stream")
+
+    y = np.frombuffer(body, dtype="<f4").copy()
+
+    noise_info: dict[str, object] = classify_noise(y, sr)
+    noise_type = str(noise_info.get("noise_type") or "other")
+    confidence = float(noise_info.get("confidence", 0.0))
+
+    snr_before = float(compute_snr(y, sr))
+
+    result = spectral_gate_denoise(
+        y,
+        sr,
+        aggressiveness=1.0,
+        noise_type=noise_type,
+        preserve_harmonics=preserve_harmonics,
+        post_process=True,
+    )
+    cleaned: np.ndarray = result["cleaned_audio"]
+
+    snr_after = float(compute_snr(cleaned, sr))
+
+    headers = {
+        "X-Noise-Type": noise_type,
+        "X-Noise-Confidence": f"{confidence:.4f}",
+        "X-SNR-Before-DB": f"{snr_before:.2f}",
+        "X-SNR-After-DB": f"{snr_after:.2f}",
+        "Access-Control-Expose-Headers": (
+            "X-Noise-Type, X-Noise-Confidence, X-SNR-Before-DB, X-SNR-After-DB"
+        ),
+    }
+    return Response(
+        content=cleaned.astype("<f4").tobytes(),
+        media_type="application/octet-stream",
+        headers=headers,
+    )
+
+
 @app.websocket("/ws/live")
 async def ws_live(websocket: WebSocket) -> None:
     await manager.connect_global(websocket)
