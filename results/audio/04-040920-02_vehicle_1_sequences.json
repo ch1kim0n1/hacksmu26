@@ -1,0 +1,229 @@
+{
+  "sequences": [
+    {
+      "id": "04-040920-02_vehicle_1-seq-0",
+      "recording_id": "04-040920-02_vehicle_1",
+      "calls": [
+        "04-040920-02_vehicle_1-call-0",
+        "04-040920-02_vehicle_1-call-1",
+        "04-040920-02_vehicle_1-call-2"
+      ],
+      "pattern": "unknown -> unknown -> unknown",
+      "motif": [
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "total_duration_ms": 2250.0,
+      "inter_call_gaps_ms": [
+        850.0,
+        50.0
+      ]
+    },
+    {
+      "id": "04-040920-02_vehicle_1-seq-1",
+      "recording_id": "04-040920-02_vehicle_1",
+      "calls": [
+        "04-040920-02_vehicle_1-call-3",
+        "04-040920-02_vehicle_1-call-4",
+        "04-040920-02_vehicle_1-call-5",
+        "04-040920-02_vehicle_1-call-6",
+        "04-040920-02_vehicle_1-call-7",
+        "04-040920-02_vehicle_1-call-8",
+        "04-040920-02_vehicle_1-call-9",
+        "04-040920-02_vehicle_1-call-10",
+        "04-040920-02_vehicle_1-call-11",
+        "04-040920-02_vehicle_1-call-12",
+        "04-040920-02_vehicle_1-call-13",
+        "04-040920-02_vehicle_1-call-14",
+        "04-040920-02_vehicle_1-call-15",
+        "04-040920-02_vehicle_1-call-16",
+        "04-040920-02_vehicle_1-call-17",
+        "04-040920-02_vehicle_1-call-18",
+        "04-040920-02_vehicle_1-call-19"
+      ],
+      "pattern": "unknown -> unknown -> rumble -> rumble -> rumble -> bark -> bark -> bark -> rumble -> rumble -> unknown -> unknown -> bark -> unknown -> rumble -> rumble -> rumble",
+      "motif": [
+        "unknown",
+        "unknown",
+        "rumble",
+        "rumble",
+        "rumble",
+        "bark",
+        "bark",
+        "bark",
+        "rumble",
+        "rumble",
+        "unknown",
+        "unknown",
+        "bark",
+        "unknown",
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "total_duration_ms": 49329.52,
+      "inter_call_gaps_ms": [
+        2750.0,
+        2550.0,
+        3950.0,
+        150.0,
+        1950.0,
+        3350.0,
+        250.0,
+        1150.0,
+        2450.0,
+        3750.0,
+        2550.0,
+        1250.0,
+        2650.0,
+        3850.0,
+        550.0,
+        50.0
+      ]
+    }
+  ],
+  "recurring_patterns": [
+    {
+      "pattern_id": "pat-4cec18ae34",
+      "motif": [
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble",
+      "occurrences": 5,
+      "recordings": [
+        "04-040920-02_vehicle_1"
+      ],
+      "avg_gap_ms": 2075.0,
+      "contexts": [
+        [
+          "unknown -> unknown -> rumble -> rumble -> rumble -> bark -> bark -> bark -> rumble -> rumble -> unknown -> unknown -> bark -> unknown -> rumble -> rumble -> rumble",
+          5
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-86b61bacc8",
+      "motif": [
+        "unknown",
+        "unknown"
+      ],
+      "pattern": "unknown -> unknown",
+      "occurrences": 4,
+      "recordings": [
+        "04-040920-02_vehicle_1"
+      ],
+      "avg_gap_ms": 1894.44,
+      "contexts": [
+        [
+          "unknown -> unknown -> unknown",
+          2
+        ],
+        [
+          "unknown -> unknown -> rumble -> rumble -> rumble -> bark -> bark -> bark -> rumble -> rumble -> unknown -> unknown -> bark -> unknown -> rumble -> rumble -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-cf51f08930",
+      "motif": [
+        "unknown",
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "unknown -> rumble -> rumble -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "04-040920-02_vehicle_1"
+      ],
+      "avg_gap_ms": 2075.0,
+      "contexts": [
+        [
+          "unknown -> unknown -> rumble -> rumble -> rumble -> bark -> bark -> bark -> rumble -> rumble -> unknown -> unknown -> bark -> unknown -> rumble -> rumble -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-8b47ba0504",
+      "motif": [
+        "unknown",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "unknown -> rumble -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "04-040920-02_vehicle_1"
+      ],
+      "avg_gap_ms": 2075.0,
+      "contexts": [
+        [
+          "unknown -> unknown -> rumble -> rumble -> rumble -> bark -> bark -> bark -> rumble -> rumble -> unknown -> unknown -> bark -> unknown -> rumble -> rumble -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-854dccdb4b",
+      "motif": [
+        "rumble",
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "04-040920-02_vehicle_1"
+      ],
+      "avg_gap_ms": 2075.0,
+      "contexts": [
+        [
+          "unknown -> unknown -> rumble -> rumble -> rumble -> bark -> bark -> bark -> rumble -> rumble -> unknown -> unknown -> bark -> unknown -> rumble -> rumble -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-80ec7e901e",
+      "motif": [
+        "unknown",
+        "rumble"
+      ],
+      "pattern": "unknown -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "04-040920-02_vehicle_1"
+      ],
+      "avg_gap_ms": 2075.0,
+      "contexts": [
+        [
+          "unknown -> unknown -> rumble -> rumble -> rumble -> bark -> bark -> bark -> rumble -> rumble -> unknown -> unknown -> bark -> unknown -> rumble -> rumble -> rumble",
+          2
+        ]
+      ]
+    },
+    {
+      "pattern_id": "pat-a9c6310173",
+      "motif": [
+        "bark",
+        "bark"
+      ],
+      "pattern": "bark -> bark",
+      "occurrences": 2,
+      "recordings": [
+        "04-040920-02_vehicle_1"
+      ],
+      "avg_gap_ms": 2075.0,
+      "contexts": [
+        [
+          "unknown -> unknown -> rumble -> rumble -> rumble -> bark -> bark -> bark -> rumble -> rumble -> unknown -> unknown -> bark -> unknown -> rumble -> rumble -> rumble",
+          2
+        ]
+      ]
+    }
+  ]
+}

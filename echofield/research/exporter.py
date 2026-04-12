@@ -15,13 +15,43 @@ import numpy as np
 import soundfile as sf
 from matplotlib.backends.backend_pdf import PdfPages
 
+from echofield.research.call_fingerprint import ensure_call_fingerprint
+
+
+DATA_DICTIONARY = """# EchoField Research Export - Data Dictionary
+
+## calls.csv columns
+
+| Column | Type | Unit | Description |
+|--------|------|------|-------------|
+| call_id | string | - | Unique identifier for detected vocalization |
+| recording_id | string | - | Recording that contains the call |
+| recording_filename | string | - | Original recording filename |
+| call_type | string | - | Classifier call type prediction |
+| confidence | float | 0-1 | Classifier confidence |
+| start_ms | float | ms | Start offset within recording |
+| duration_ms | float | ms | Call duration |
+| sequence_id | string | - | Temporal call sequence identifier |
+| sequence_position | integer | - | Position within the sequence |
+| fingerprint | JSON array | normalized vector | EchoField acoustic fingerprint |
+| noise_type_detected | string | - | Primary detected noise source |
+| quality_score | float | 0-100 | Pipeline quality score |
+| fundamental_frequency_hz | float | Hz | Estimated fundamental frequency |
+| harmonicity | float | ratio | Harmonic-to-noise proxy |
+| snr_db | float | dB | Signal-to-noise estimate |
+"""
+
 
 def _flatten_calls(recordings: list[dict[str, Any]]) -> list[dict[str, Any]]:
     rows = []
     for recording in recordings:
         metadata = recording.get("metadata") or {}
         result = recording.get("result") or {}
+        quality = result.get("quality") or {}
+        noise_types = result.get("noise_types") or []
+        primary_noise = noise_types[0].get("type") if noise_types else None
         for call in result.get("calls", []):
+            call = ensure_call_fingerprint(dict(call))
             features = call.get("acoustic_features") or {}
             annotations = call.get("annotations") or []
             tags = sorted({
@@ -34,6 +64,7 @@ def _flatten_calls(recordings: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 {
                     "call_id": call.get("id"),
                     "recording_id": recording.get("id"),
+                    "recording_filename": recording.get("filename"),
                     "call_type": call.get("call_type"),
                     "confidence": call.get("confidence"),
                     "start_ms": call.get("start_ms"),
@@ -50,7 +81,15 @@ def _flatten_calls(recordings: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     "zero_crossing_rate": features.get("zero_crossing_rate"),
                     "snr_db": features.get("snr_db"),
                     "individual_id": call.get("individual_id"),
+                    "cluster_id": call.get("cluster_id"),
+                    "sequence_id": call.get("sequence_id"),
+                    "sequence_position": call.get("sequence_position"),
+                    "fingerprint": json.dumps(call.get("fingerprint", [])),
+                    "fingerprint_version": call.get("fingerprint_version"),
+                    "noise_type_detected": primary_noise,
+                    "quality_score": quality.get("quality_score"),
                     "review_label": call.get("review_label"),
+                    "review_status": call.get("review_status"),
                     "tags": json.dumps(tags),
                     "annotations": json.dumps(annotations),
                     "location": metadata.get("location"),
@@ -61,11 +100,77 @@ def _flatten_calls(recordings: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+_RAVEN_COLUMNS = [
+    "Selection",
+    "View",
+    "Channel",
+    "Begin Time (s)",
+    "End Time (s)",
+    "Low Freq (Hz)",
+    "High Freq (Hz)",
+    "Begin File",
+    "File Offset (s)",
+    "Score",
+    "Tags",
+    "Notes",
+]
+
+
+def export_raven(recordings: list[dict[str, Any]]) -> str:
+    """Export detected calls as a Raven Pro selection table (TSV).
+
+    Raven selection files are the standard format used by the Cornell Lab
+    of Ornithology's Raven sound analysis software and widely used in
+    bioacoustics research (e.g., ElephantVoices, Elephant Listening Project).
+
+    Args:
+        recordings: List of recording dicts as stored in RecordingStore.
+
+    Returns:
+        Tab-separated text string with Raven selection table header and one
+        row per detected call.
+    """
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=_RAVEN_COLUMNS, delimiter="\t")
+    writer.writeheader()
+
+    selection = 1
+    for recording in recordings:
+        filename = recording.get("filename") or recording.get("id") or ""
+        result = recording.get("result") or {}
+        for call in result.get("calls", []):
+            start_s = float(call.get("start_ms") or 0.0) / 1000.0
+            duration_s = float(call.get("duration_ms") or 0.0) / 1000.0
+            end_s = start_s + duration_s
+            low_freq = call.get("frequency_min_hz") or 0.0
+            high_freq = call.get("frequency_max_hz") or 0.0
+            call_type = call.get("call_type") or ""
+            confidence = call.get("confidence")
+            writer.writerow({
+                "Selection": selection,
+                "View": "Spectrogram 1",
+                "Channel": "1",
+                "Begin Time (s)": round(start_s, 6),
+                "End Time (s)": round(end_s, 6),
+                "Low Freq (Hz)": low_freq,
+                "High Freq (Hz)": high_freq,
+                "Begin File": filename,
+                "File Offset (s)": round(start_s, 6),
+                "Score": round(float(confidence), 4) if confidence is not None else "",
+                "Tags": call_type,
+                "Notes": call_type,
+            })
+            selection += 1
+
+    return buffer.getvalue()
+
+
 def export_csv(recordings: list[dict[str, Any]]) -> str:
     rows = _flatten_calls(recordings)
     fieldnames = [
         "call_id",
         "recording_id",
+        "recording_filename",
         "call_type",
         "confidence",
         "start_ms",
@@ -82,7 +187,15 @@ def export_csv(recordings: list[dict[str, Any]]) -> str:
         "zero_crossing_rate",
         "snr_db",
         "individual_id",
+        "cluster_id",
+        "sequence_id",
+        "sequence_position",
+        "fingerprint",
+        "fingerprint_version",
+        "noise_type_detected",
+        "quality_score",
         "review_label",
+        "review_status",
         "tags",
         "annotations",
         "location",
@@ -258,11 +371,15 @@ def export_zip(
     spectrogram_dir: str | Path | None = None,
     include_audio: bool = True,
     include_spectrograms: bool = True,
+    include_fingerprints: bool = True,
+    include_audio_clips: bool = False,
 ) -> io.BytesIO:
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("calls.csv", export_csv(recordings))
         archive.writestr("recordings.json", export_json(recordings))
+        archive.writestr("selections.txt", export_raven(recordings))
+        archive.writestr("DATA_DICTIONARY.md", DATA_DICTIONARY)
         archive.writestr(
             "metadata.json",
             json.dumps(
@@ -274,6 +391,18 @@ def export_zip(
                 indent=2,
             ),
         )
+        rows = _flatten_calls(recordings)
+        if include_fingerprints:
+            fingerprints = [json.loads(row.get("fingerprint") or "[]") for row in rows]
+            width = max((len(item) for item in fingerprints), default=0)
+            matrix = np.asarray([item + [0.0] * (width - len(item)) for item in fingerprints], dtype=np.float32)
+            fingerprint_buffer = io.BytesIO()
+            np.save(fingerprint_buffer, matrix)
+            archive.writestr("fingerprints.npy", fingerprint_buffer.getvalue())
+            archive.writestr(
+                "fingerprint_ids.json",
+                json.dumps([row.get("call_id") for row in rows], indent=2),
+            )
 
         if include_audio and processed_dir:
             for path in Path(processed_dir).glob("*"):
@@ -284,6 +413,28 @@ def export_zip(
             for path in Path(spectrogram_dir).glob("*"):
                 if path.suffix.lower() == ".png":
                     archive.write(path, f"spectrograms/{path.name}")
+
+        if include_audio_clips:
+            for recording in recordings:
+                result = recording.get("result") or {}
+                audio_path = result.get("output_audio_path")
+                if not audio_path or not Path(audio_path).exists():
+                    continue
+                try:
+                    y, sr = sf.read(audio_path)
+                    if getattr(y, "ndim", 1) > 1:
+                        y = np.mean(y, axis=1)
+                    for call in result.get("calls", []):
+                        start = int(float(call.get("start_ms") or 0.0) / 1000.0 * sr)
+                        end = start + int(float(call.get("duration_ms") or 0.0) / 1000.0 * sr)
+                        clip = np.asarray(y[start:end], dtype=np.float32)
+                        if clip.size == 0:
+                            continue
+                        clip_buffer = io.BytesIO()
+                        sf.write(clip_buffer, clip, sr, format="WAV")
+                        archive.writestr(f"audio_clips/{call.get('id')}.wav", clip_buffer.getvalue())
+                except Exception:
+                    continue
 
     buffer.seek(0)
     return buffer

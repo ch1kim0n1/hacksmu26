@@ -28,6 +28,7 @@ _SORTABLE_BASE_FIELDS = {
     "frequency_max_hz",
     "call_type",
     "confidence",
+    "review_status",
 }
 
 
@@ -187,9 +188,10 @@ class CallDatabase:
     @staticmethod
     def _row_to_call(row: sqlite3.Row) -> dict[str, Any]:
         metadata = json.loads(row["metadata_json"] or "{}")
+        extra_fields = metadata.pop("_call_fields", {}) if isinstance(metadata, dict) else {}
         acoustic_features = json.loads(row["acoustic_features_json"] or "{}")
         annotations = json.loads(row["annotations_json"] or "[]")
-        return {
+        call = {
             "id": row["id"],
             "recording_id": row["recording_id"],
             "animal_id": row["animal_id"],
@@ -209,6 +211,9 @@ class CallDatabase:
             "acoustic_features": acoustic_features,
             "metadata": metadata,
         }
+        if isinstance(extra_fields, dict):
+            call.update(extra_fields)
+        return call
 
     def _load_sqlite_calls(self) -> None:
         if self._db_path is None or not self._db_path.exists():
@@ -222,6 +227,22 @@ class CallDatabase:
     def _persist_call_sqlite(self, call: dict[str, Any]) -> None:
         if self._db_path is None:
             return
+        metadata_payload = dict(call.get("metadata") or {})
+        metadata_payload["_call_fields"] = {
+            key: call.get(key)
+            for key in (
+                "review_status",
+                "original_call_type",
+                "corrected_call_type",
+                "cluster_id",
+                "fingerprint",
+                "fingerprint_version",
+                "sequence_id",
+                "sequence_position",
+                "color",
+            )
+            if call.get(key) is not None
+        }
         with self._connect() as db:
             db.execute(
                 """
@@ -250,7 +271,7 @@ class CallDatabase:
                     call.get("individual_id"),
                     json.dumps(call.get("annotations") or []),
                     json.dumps(call.get("acoustic_features") or {}),
-                    json.dumps(call.get("metadata") or {}),
+                    json.dumps(metadata_payload),
                 ),
             )
             db.execute("DELETE FROM annotations WHERE call_id = ?", (call.get("id"),))
@@ -335,6 +356,7 @@ class CallDatabase:
                 "filename": row.get("filename"),
                 "location": row.get("location") or None,
                 "date": _normalize_date(row.get("date")),
+                "recorded_at": row.get("recorded_at") or row.get("date"),
                 "animal_id": row.get("animal_id") or None,
                 "species": row.get("species") or None,
                 "noise_type_ref": row.get("noise_type_ref") or None,
@@ -362,6 +384,13 @@ class CallDatabase:
                     or (analysis_row or {}).get("call_type_confidence")
                 ),
                 "review_label": None,
+                "review_status": "pending" if _safe_float((inventory_row or {}).get("call_type_confidence") or (analysis_row or {}).get("call_type_confidence")) < 0.5 else "confirmed",
+                "original_call_type": str(
+                    (inventory_row or {}).get("call_type")
+                    or (analysis_row or {}).get("call_type")
+                    or "unknown"
+                ),
+                "corrected_call_type": None,
                 "reviewed_by": None,
                 "reviewed_at": None,
                 "model_version": (analysis_row or {}).get("model_version"),
@@ -369,6 +398,12 @@ class CallDatabase:
                 "prediction_uncertainty": (analysis_row or {}).get("prediction_uncertainty"),
                 "call_type_hierarchy": (analysis_row or {}).get("call_type_hierarchy"),
                 "individual_id": (analysis_row or {}).get("individual_id"),
+                "cluster_id": (analysis_row or {}).get("cluster_id"),
+                "fingerprint": (analysis_row or {}).get("fingerprint") or [],
+                "fingerprint_version": (analysis_row or {}).get("fingerprint_version"),
+                "sequence_id": (analysis_row or {}).get("sequence_id"),
+                "sequence_position": (analysis_row or {}).get("sequence_position"),
+                "color": (analysis_row or {}).get("color"),
                 "annotations": [],
                 "acoustic_features": features,
                 "metadata": metadata,
@@ -399,6 +434,7 @@ class CallDatabase:
                 "filename": base_metadata.get("filename"),
                 "location": base_metadata.get("location"),
                 "date": _normalize_date(base_metadata.get("date")),
+                "recorded_at": base_metadata.get("recorded_at") or base_metadata.get("date"),
                 "animal_id": base_metadata.get("animal_id"),
                 "species": base_metadata.get("species"),
                 "noise_type_ref": base_metadata.get("noise_type_ref"),
@@ -428,9 +464,18 @@ class CallDatabase:
                 "classifier_probs": call.get("classifier_probs"),
                 "call_type_hierarchy": call.get("call_type_hierarchy"),
                 "review_label": call.get("review_label") or existing.get("review_label"),
+                "review_status": call.get("review_status") or existing.get("review_status") or ("pending" if _safe_float(call.get("confidence")) < 0.5 else "confirmed"),
+                "original_call_type": call.get("original_call_type") or existing.get("original_call_type") or str(call.get("call_type") or "unknown"),
+                "corrected_call_type": call.get("corrected_call_type") or existing.get("corrected_call_type"),
                 "reviewed_by": call.get("reviewed_by") or existing.get("reviewed_by"),
                 "reviewed_at": call.get("reviewed_at") or existing.get("reviewed_at"),
                 "individual_id": call.get("individual_id") or existing.get("individual_id"),
+                "cluster_id": call.get("cluster_id") or existing.get("cluster_id"),
+                "fingerprint": call.get("fingerprint") or existing.get("fingerprint") or [],
+                "fingerprint_version": call.get("fingerprint_version") or existing.get("fingerprint_version"),
+                "sequence_id": call.get("sequence_id") or existing.get("sequence_id"),
+                "sequence_position": call.get("sequence_position") if call.get("sequence_position") is not None else existing.get("sequence_position"),
+                "color": call.get("color") or existing.get("color"),
                 "annotations": call.get("annotations") or existing.get("annotations") or [],
                 "acoustic_features": features,
                 "metadata": merged_metadata,
@@ -462,7 +507,45 @@ class CallDatabase:
         if call is None:
             return None
         call["review_label"] = label
+        call["review_status"] = "corrected" if label != call.get("call_type") else "confirmed"
+        call["original_call_type"] = call.get("original_call_type") or call.get("call_type")
+        call["corrected_call_type"] = label if call["review_status"] == "corrected" else None
         call["reviewed_by"] = reviewed_by
+        call["reviewed_at"] = datetime.now(timezone.utc).isoformat()
+        self._save_review_labels()
+        self._persist_call_sqlite(call)
+        self._touch()
+        return call
+
+    def review_call(
+        self,
+        call_id: str,
+        action: str,
+        *,
+        corrected_call_type: str | None = None,
+        reviewer: str | None = None,
+    ) -> dict[str, Any] | None:
+        call = self._calls.get(call_id)
+        if call is None:
+            return None
+        call["original_call_type"] = call.get("original_call_type") or call.get("call_type")
+        if action == "confirm":
+            call["review_status"] = "confirmed"
+            call["corrected_call_type"] = None
+            call["review_label"] = call.get("call_type")
+        elif action == "reclassify":
+            if not corrected_call_type:
+                raise ValueError("corrected_call_type is required for reclassify")
+            call["review_status"] = "corrected"
+            call["corrected_call_type"] = corrected_call_type
+            call["review_label"] = corrected_call_type
+        elif action == "discard":
+            call["review_status"] = "discarded"
+            call["corrected_call_type"] = None
+            call["review_label"] = "discarded"
+        else:
+            raise ValueError(f"Unknown review action: {action}")
+        call["reviewed_by"] = reviewer
         call["reviewed_at"] = datetime.now(timezone.utc).isoformat()
         self._save_review_labels()
         self._persist_call_sqlite(call)
@@ -519,24 +602,35 @@ class CallDatabase:
         confidence = min(max(_safe_float(call.get("confidence")), 0.0), 1.0)
         return float(1.0 - abs(confidence - 0.5) * 2.0)
 
-    def review_queue(self, *, limit: int = 100, offset: int = 0) -> tuple[list[dict[str, Any]], int]:
+    def review_queue(
+        self,
+        *,
+        status: str | None = "pending",
+        max_confidence: float | None = 0.5,
+        call_type: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> tuple[list[dict[str, Any]], int]:
         candidates = [
             call
             for call in self._calls.values()
-            if call.get("review_label") in {None, ""}
-            and (
-                _safe_float(call.get("confidence")) < 0.5
-                or str(call.get("call_type") or "").lower() in {"unknown", "novel"}
-            )
+            if (status is None or call.get("review_status", "pending") == status)
+            and (max_confidence is None or _safe_float(call.get("confidence")) <= max_confidence)
+            and (call_type is None or str(call.get("call_type") or "").lower() == call_type.lower())
         ]
-        candidates.sort(key=self._entropy_from_call, reverse=True)
+        candidates.sort(key=lambda call: (_safe_float(call.get("confidence")), -self._entropy_from_call(call)))
         total = len(candidates)
         return candidates[offset : offset + limit], total
 
     def training_data(self, *, include_reviewed: bool = True) -> list[dict[str, Any]]:
         items: list[dict[str, Any]] = []
         for call in self._calls.values():
-            label = call.get("review_label") if include_reviewed and call.get("review_label") else call.get("call_type")
+            if call.get("review_status") == "discarded":
+                continue
+            if include_reviewed and call.get("review_status") in {"confirmed", "corrected"}:
+                label = call.get("corrected_call_type") or call.get("review_label") or call.get("call_type")
+            else:
+                label = call.get("call_type")
             features = call.get("acoustic_features") or {}
             if label and label != "unknown" and features:
                 items.append({"features": features, "call_type": label})

@@ -258,18 +258,20 @@ def build_spectrogram_artifacts(
         fmax=float(sr // 2),
     )
 
-    np.save(
-        npy_path,
-        {
-            "stft": stft_matrix,
-            "magnitude_db": stft_data["magnitude_db"],
-            "mel_spectrogram": mel,
-            "frequencies_hz": stft_data["frequencies"],
-            "times_s": stft_data["times"],
-            "spectrogram_type": normalized_type,
-        },
-        allow_pickle=True,
-    )
+    # Skip saving raw .npy (can be 800 MB+ per file for long recordings).
+    # The PNG visualization and in-memory data are sufficient.
+    # np.save(
+    #     npy_path,
+    #     {
+    #         "stft": stft_matrix,
+    #         "magnitude_db": stft_data["magnitude_db"],
+    #         "mel_spectrogram": mel,
+    #         "frequencies_hz": stft_data["frequencies"],
+    #         "times_s": stft_data["times"],
+    #         "spectrogram_type": normalized_type,
+    #     },
+    #     allow_pickle=True,
+    # )
     generate_spectrogram_png(
         stft_data["magnitude_db"],
         sr,
