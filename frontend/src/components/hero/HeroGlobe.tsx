@@ -16,6 +16,15 @@ type HeroGlobeProps = {
     idleRotationSpeed?: number;
     cameraPosition?: { x: number; y: number; z: number };
     controls?: { minDistance: number; maxDistance: number };
+    elephantRing?: {
+      enabled?: boolean;
+      count?: number;
+      radiusOffset?: number;
+      minScale?: number;
+      maxScale?: number;
+      walkFrameRate?: number;
+      opacity?: number;
+    };
   };
 };
 

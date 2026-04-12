@@ -515,6 +515,15 @@ export default function LandingPage() {
                 idleRotationSpeed: 0.03,
                 cameraPosition: { x: 0, y: 8, z: 248 },
                 controls: { minDistance: 180, maxDistance: 280 },
+                elephantRing: {
+                  enabled: true,
+                  count: 32,
+                  radiusOffset: 2.25,
+                  minScale: 4.2,
+                  maxScale: 5.4,
+                  walkFrameRate: 6,
+                  opacity: 0.95,
+                },
               }}
             />
           </button>

@@ -281,7 +281,19 @@ export default function UploadPage() {
   /* ── Render ── */
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
+    <div className="relative min-h-screen">
+      {/* Savanna video — fixed behind all content */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="pointer-events-none fixed inset-0 h-full w-full object-cover opacity-20 z-0"
+      >
+        <source src="/videos/Savanna.mp4" type="video/mp4" />
+      </video>
+
+    <div className="relative z-10 p-6 lg:p-8 max-w-6xl mx-auto space-y-8">
       {/* Page Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
@@ -728,6 +740,7 @@ export default function UploadPage() {
           </motion.div>
         )}
       </div>
+    </div>
     </div>
   );
 }
