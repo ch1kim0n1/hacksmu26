@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Image from "next/image";
+import { SpectrogramImage } from "@/components/spectrogram/SpectrogramImage";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -436,7 +436,7 @@ export default function ProcessingPage() {
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2 font-medium">Original</p>
                 {isComplete ? (
-                  <Image
+                  <SpectrogramImage
                     src={spectrogramBefore}
                     alt="Original spectrogram"
                     width={1600}
@@ -451,7 +451,7 @@ export default function ProcessingPage() {
               <div>
                 <p className="text-xs text-ev-warm-gray mb-2 font-medium">Cleaned</p>
                 {isComplete ? (
-                  <Image
+                  <SpectrogramImage
                     src={spectrogramAfter}
                     alt="Cleaned spectrogram"
                     width={1600}
@@ -471,7 +471,7 @@ export default function ProcessingPage() {
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="p-5 rounded-xl glass border border-ev-sand/30">
               <h2 className="text-sm font-semibold text-ev-charcoal mb-4">Before / After Comparison</h2>
               <div ref={sliderRef} className="relative w-full aspect-[2/1] rounded-xl overflow-hidden cursor-col-resize select-none" role="slider" aria-label="Before/After comparison slider" aria-valuenow={Math.round(sliderPosition)} aria-valuemin={0} aria-valuemax={100} onMouseDown={() => { isDraggingSlider.current = true; }} onTouchStart={() => { isDraggingSlider.current = true; }}>
-                <Image
+                <SpectrogramImage
                   src={spectrogramAfter}
                   alt="Cleaned spectrogram"
                   fill
@@ -481,7 +481,7 @@ export default function ProcessingPage() {
                   draggable={false}
                 />
                 <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}>
-                  <Image
+                  <SpectrogramImage
                     src={spectrogramBefore}
                     alt="Original spectrogram"
                     fill
