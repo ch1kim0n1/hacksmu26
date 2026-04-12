@@ -9,6 +9,10 @@ import {
   Waves,
   Radio,
   Layers,
+  Users,
+  BookOpen,
+  Network,
+  Monitor,
 } from "lucide-react";
 import { useMobileSidebar } from "@/hooks/useSidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";

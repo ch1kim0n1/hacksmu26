@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 const mockPush = vi.fn();
@@ -44,7 +45,7 @@ describe("Recordings Page", () => {
 
   it("renders page title", () => {
     render(<RecordingsPage />);
-    expect(screen.getByText("Recordings")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Recordings" })).toBeInTheDocument();
   });
 
   it("renders filter links", () => {
