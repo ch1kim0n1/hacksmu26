@@ -108,3 +108,19 @@ def test_compute_extended_features_handles_empty_audio():
     result = compute_extended_features(y, 22050, {})
     assert result["attack_time_s"] == 0.0
     assert result["spectral_flatness"] == 0.0
+
+
+def test_extended_features_present_after_call_detector():
+    """Verify the call_detector pipeline produces extended features."""
+    from echofield.pipeline.call_detector import CallDetector
+    sr = 22050
+    rng = np.random.default_rng(99)
+    y = rng.standard_normal(sr * 5).astype(np.float32) * 0.01
+    y[sr * 2 : sr * 3] = np.sin(2 * np.pi * 50 * np.linspace(0, 1, sr)) * 0.5
+    detector = CallDetector()
+    calls = detector.detect("test-rec", y, sr, {})
+    if len(calls) > 0:
+        features = calls[0].get("acoustic_features", {})
+        assert "attack_time_s" in features
+        assert "spectral_flatness" in features
+        assert "sequence_length" in features
