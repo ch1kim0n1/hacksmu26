@@ -17,6 +17,7 @@ import { getCall, getRecording, API_BASE, type Recording, type Call } from "@/li
 import WaveformPlayer from "@/components/audio/WaveformPlayer";
 import { QualityRing } from "@/components/ui/motion-primitives";
 import CallResearchPanel from "@/components/research/CallResearchPanel";
+import CallAnnotations from "@/components/research/CallAnnotations";
 import HarmonicDecompositionPanel from "@/components/spectrogram/HarmonicDecompositionPanel";
 import SpeakerDiarizationView from "@/components/spectrogram/SpeakerDiarizationView";
 
@@ -301,6 +302,7 @@ export default function ResultsDetailPage() {
               className="space-y-4"
             >
               <CallResearchPanel call={primaryCall} />
+              <CallAnnotations callId={primaryCall.id} />
               <HarmonicDecompositionPanel callId={primaryCall.id} />
             </motion.div>
           )}

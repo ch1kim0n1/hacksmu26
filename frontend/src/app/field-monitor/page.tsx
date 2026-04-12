@@ -6,12 +6,12 @@ import {
   Activity,
   Radio,
   ChevronDown,
-  Play,
-  Square,
   Volume2,
   Users,
   Shield,
   Waves,
+  WifiOff,
+  RefreshCw,
 } from "lucide-react";
 import {
   getRecordings,
@@ -20,7 +20,21 @@ import {
   type Recording,
 } from "@/lib/audio-api";
 
-/* ── Types for simulated detections ── */
+/* ── WebSocket connection states ── */
+
+type ConnectionStatus = "connecting" | "connected" | "disconnected";
+
+/* ── WebSocket message type from backend ── */
+
+interface WSMessage {
+  type: string;
+  recording_id: string;
+  data: Record<string, unknown>;
+  timestamp: string;
+  sequence: number;
+}
+
+/* ── Types for detections ── */
 
 interface DetectedCall {
   id: string;
@@ -31,8 +45,6 @@ interface DetectedCall {
   timestamp: number;
 }
 
-const CALL_TYPES = ["contact", "alarm", "social", "feeding", "mating", "song"];
-
 const CALL_TYPE_COLORS: Record<string, string> = {
   contact: "bg-accent-savanna text-ev-charcoal",
   alarm: "bg-danger text-white",
@@ -41,57 +53,6 @@ const CALL_TYPE_COLORS: Record<string, string> = {
   mating: "bg-[#A78BFA] text-white",
   song: "bg-accent-gold text-ev-charcoal",
 };
-
-const CALL_MEANINGS: Record<string, string[]> = {
-  contact: [
-    "Let's go — coordination rumble",
-    "I'm here — group cohesion signal",
-    "Where are you? — long-range contact",
-  ],
-  alarm: [
-    "Danger nearby — alert signal",
-    "Threat detected — warning blast",
-    "Rally together — defensive call",
-  ],
-  social: [
-    "Greeting — close-range hello",
-    "Play invitation — social bond",
-    "Reassurance — calming exchange",
-  ],
-  feeding: [
-    "Food source found — foraging rumble",
-    "Share this — resource announcement",
-    "Move on — patch exhausted signal",
-  ],
-  mating: [
-    "I am ready — estrus rumble",
-    "Announcing presence — musth call",
-    "Courtship display — harmonic signal",
-  ],
-  song: [
-    "Morning ceremony — tonal greeting",
-    "Dusk chorus — group bonding",
-    "Celebration — reunion vocalization",
-  ],
-};
-
-const INDIVIDUAL_IDS = [
-  "EL-047",
-  "EL-112",
-  "EL-089",
-  "EL-203",
-  "EL-156",
-  "EL-031",
-  "EL-078",
-];
-
-const NOISE_TYPES = [
-  "airplane",
-  "wind",
-  "generator",
-  "traffic",
-  "insects",
-];
 
 /* ── Animated sine wave canvas ── */
 
@@ -361,10 +322,15 @@ export default function FieldMonitorPage() {
   const [currentSNR, setCurrentSNR] = useState(0);
   const [currentNoise, setCurrentNoise] = useState("--");
   const [complete, setComplete] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2 | 4>(1);
 
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const detectionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  /* ── WebSocket state ── */
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectDelayRef = useRef(1000);
+  const mountedRef = useRef(true);
+
+  const WS_BASE = API_BASE.replace(/^http/, "ws");
 
   // Fetch recordings list on mount
   useEffect(() => {
@@ -388,82 +354,206 @@ export default function FieldMonitorPage() {
 
   const activeSpeakers = new Set(detections.map((d) => d.individual)).size;
 
-  const stopMonitor = useCallback(() => {
-    setRunning(false);
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (detectionTimerRef.current) clearInterval(detectionTimerRef.current);
-    timerRef.current = null;
-    detectionTimerRef.current = null;
-  }, []);
-
-  const startMonitor = useCallback(() => {
-    if (!selectedId) return;
-
-    setRunning(true);
-    setProgress(0);
-    setDetections([]);
-    setComplete(false);
-    setCurrentNoise(
-      NOISE_TYPES[Math.floor(Math.random() * NOISE_TYPES.length)]
-    );
-
-    const duration = selectedRecording?.duration_s
-      ? Math.max(selectedRecording.duration_s * 1000, 15000)
-      : 30000;
-
-    const totalSteps = 200;
-    const stepMs = duration / totalSteps / playbackSpeed;
-    let step = 0;
-
-    // Progress timer
-    timerRef.current = setInterval(() => {
-      step++;
-      const p = Math.min(step / totalSteps, 1);
-      setProgress(p);
-      setCurrentSNR(8 + Math.random() * 18 + p * 6);
-
-      if (p >= 1) {
-        setComplete(true);
-        stopMonitor();
+  /* ── WebSocket message handler ── */
+  const handleWSMessage = useCallback((msg: WSMessage) => {
+    switch (msg.type) {
+      case "PROCESSING_STARTED": {
+        setRunning(true);
+        setProgress(0);
+        setComplete(false);
+        setDetections([]);
+        setCurrentNoise("--");
+        // If a recording_id arrives, select it in the UI
+        if (msg.recording_id && msg.recording_id !== selectedId) {
+          setSelectedId(msg.recording_id);
+        }
+        // Add an activity detection for the start event
+        const newStart: DetectedCall = {
+          id: `ws-start-${msg.sequence}-${Date.now()}`,
+          callType: "social",
+          individual: "--",
+          meaning: `Processing started (${(msg.data.method as string) || "hybrid"})`,
+          confidence: 1,
+          timestamp: Date.now(),
+        };
+        setDetections((prev) => [newStart, ...prev]);
+        break;
       }
-    }, stepMs);
 
-    // Detection timer: add a call every 2-3.5 seconds
-    const addDetection = () => {
-      const callType =
-        CALL_TYPES[Math.floor(Math.random() * CALL_TYPES.length)];
-      const meanings = CALL_MEANINGS[callType] || ["Unknown vocalization"];
-      const meaning = meanings[Math.floor(Math.random() * meanings.length)];
-      const individual =
-        INDIVIDUAL_IDS[Math.floor(Math.random() * INDIVIDUAL_IDS.length)];
+      case "STAGE_UPDATE": {
+        setRunning(true);
+        const stageProgress = (msg.data.progress as number) ?? 0;
+        setProgress(stageProgress / 100);
+        break;
+      }
 
-      const newCall: DetectedCall = {
-        id: `det-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-        callType,
-        individual,
-        meaning,
-        confidence: 0.55 + Math.random() * 0.4,
-        timestamp: Date.now(),
-      };
+      case "NOISE_CLASSIFIED": {
+        const noiseType = (msg.data.noise_type as string) || "unknown";
+        const noiseConf = (msg.data.confidence as number) ?? 0;
+        setCurrentNoise(noiseType);
+        const noiseDet: DetectedCall = {
+          id: `ws-noise-${msg.sequence}-${Date.now()}`,
+          callType: "alarm",
+          individual: "--",
+          meaning: `Noise detected: ${noiseType}`,
+          confidence: noiseConf,
+          timestamp: Date.now(),
+        };
+        setDetections((prev) => [noiseDet, ...prev]);
+        break;
+      }
 
-      setDetections((prev) => [newCall, ...prev]);
+      case "QUALITY_SCORE": {
+        const snrAfter = (msg.data.snr_after as number) ?? (msg.data.snr_after_db as number) ?? 0;
+        setCurrentSNR(snrAfter);
+        const score = (msg.data.score as number) ?? (msg.data.quality_score as number) ?? 0;
+        const qualDet: DetectedCall = {
+          id: `ws-quality-${msg.sequence}-${Date.now()}`,
+          callType: "contact",
+          individual: "--",
+          meaning: `Quality score: ${(score * 100).toFixed(0)}%, SNR: ${snrAfter.toFixed(1)} dB`,
+          confidence: score,
+          timestamp: Date.now(),
+        };
+        setDetections((prev) => [qualDet, ...prev]);
+        break;
+      }
 
-      // Schedule next detection at random interval
-      const nextDelay = (2000 + Math.random() * 1500) / playbackSpeed;
-      detectionTimerRef.current = setTimeout(addDetection, nextDelay) as unknown as ReturnType<typeof setInterval>;
+      case "PROCESSING_COMPLETE": {
+        setProgress(1);
+        setRunning(false);
+        setComplete(true);
+        const completeDet: DetectedCall = {
+          id: `ws-complete-${msg.sequence}-${Date.now()}`,
+          callType: "song",
+          individual: "--",
+          meaning: "Processing complete",
+          confidence: 1,
+          timestamp: Date.now(),
+        };
+        setDetections((prev) => [completeDet, ...prev]);
+        break;
+      }
+
+      case "PROCESSING_FAILED": {
+        setRunning(false);
+        const errorMsg = (msg.data.error as string) || "Unknown error";
+        const failDet: DetectedCall = {
+          id: `ws-fail-${msg.sequence}-${Date.now()}`,
+          callType: "alarm",
+          individual: "--",
+          meaning: `Error: ${errorMsg}`,
+          confidence: 0,
+          timestamp: Date.now(),
+        };
+        setDetections((prev) => [failDet, ...prev]);
+        break;
+      }
+
+      case "SPECTROGRAM_UPDATE": {
+        // Spectrogram images are rendered from the API URL already,
+        // just trigger a re-render for the selected recording
+        break;
+      }
+
+      case "PING":
+        // Heartbeat — ignore
+        break;
+
+      default:
+        break;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
+
+  /* ── WebSocket connect / reconnect ── */
+  const connectWebSocket = useCallback(() => {
+    // Clean up any existing connection
+    if (wsRef.current) {
+      wsRef.current.onopen = null;
+      wsRef.current.onclose = null;
+      wsRef.current.onmessage = null;
+      wsRef.current.onerror = null;
+      if (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING) {
+        wsRef.current.close();
+      }
+      wsRef.current = null;
+    }
+
+    if (!mountedRef.current) return;
+
+    setConnectionStatus("connecting");
+
+    const ws = new WebSocket(`${WS_BASE}/ws/live`);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      if (!mountedRef.current) return;
+      setConnectionStatus("connected");
+      reconnectDelayRef.current = 1000; // Reset backoff on successful connection
     };
 
-    // First detection after initial delay
-    detectionTimerRef.current = setTimeout(addDetection, 1500 / playbackSpeed) as unknown as ReturnType<typeof setInterval>;
-  }, [playbackSpeed, selectedId, selectedRecording, stopMonitor]);
+    ws.onmessage = (event) => {
+      if (!mountedRef.current) return;
+      try {
+        const msg: WSMessage = JSON.parse(event.data);
+        handleWSMessage(msg);
+      } catch {
+        // Ignore malformed messages
+      }
+    };
 
-  // Cleanup on unmount
+    ws.onerror = () => {
+      // onclose will fire after onerror, so reconnect is handled there
+    };
+
+    ws.onclose = () => {
+      if (!mountedRef.current) return;
+      setConnectionStatus("disconnected");
+      wsRef.current = null;
+
+      // Auto-reconnect with exponential backoff (max 30s)
+      const delay = reconnectDelayRef.current;
+      reconnectTimeoutRef.current = setTimeout(() => {
+        if (mountedRef.current) {
+          reconnectDelayRef.current = Math.min(delay * 2, 30000);
+          connectWebSocket();
+        }
+      }, delay);
+    };
+  }, [WS_BASE, handleWSMessage]);
+
+  const manualReconnect = useCallback(() => {
+    // Clear any pending auto-reconnect
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+    reconnectDelayRef.current = 1000;
+    connectWebSocket();
+  }, [connectWebSocket]);
+
+  /* ── WebSocket lifecycle ── */
   useEffect(() => {
+    mountedRef.current = true;
+    connectWebSocket();
+
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (detectionTimerRef.current) clearInterval(detectionTimerRef.current);
+      mountedRef.current = false;
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+      if (wsRef.current) {
+        wsRef.current.onopen = null;
+        wsRef.current.onclose = null;
+        wsRef.current.onmessage = null;
+        wsRef.current.onerror = null;
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
-  }, []);
+  }, [connectWebSocket]);
 
   return (
     <div className="min-h-screen bg-ev-charcoal text-ev-cream flex flex-col">
@@ -480,10 +570,39 @@ export default function FieldMonitorPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <LiveDot />
-          <span className="text-xs uppercase tracking-wider text-success font-medium">
-            Live
-          </span>
+          {connectionStatus === "connected" ? (
+            <>
+              <LiveDot />
+              <span className="text-xs uppercase tracking-wider text-success font-medium">
+                Connected
+              </span>
+            </>
+          ) : connectionStatus === "connecting" ? (
+            <>
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-pulse relative inline-flex rounded-full h-2.5 w-2.5 bg-warning" />
+              </span>
+              <span className="text-xs uppercase tracking-wider text-warning font-medium">
+                Connecting...
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-danger" />
+              </span>
+              <span className="text-xs uppercase tracking-wider text-danger font-medium">
+                Disconnected
+              </span>
+              <button
+                onClick={manualReconnect}
+                className="flex items-center gap-1 px-2 py-1 rounded text-xs text-ev-warm-gray hover:text-ev-cream border border-white/10 hover:border-white/20 transition-colors"
+              >
+                <RefreshCw className="w-3 h-3" />
+                Reconnect
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -545,45 +664,27 @@ export default function FieldMonitorPage() {
           </AnimatePresence>
         </div>
 
-        {/* Start / Stop button */}
-        <button
-          onClick={running ? stopMonitor : startMonitor}
-          disabled={!selectedId}
-          className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-40 ${
-            running
-              ? "bg-danger/20 text-danger border border-danger/30 hover:bg-danger/30"
-              : "bg-success/20 text-success border border-success/30 hover:bg-success/30"
-          }`}
-        >
+        {/* Live status indicator */}
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 bg-white/[0.04] text-sm">
           {running ? (
             <>
-              <Square className="w-3.5 h-3.5" />
-              Stop Monitor
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
+              </span>
+              <span className="text-success font-medium">Processing</span>
+            </>
+          ) : connectionStatus === "connected" ? (
+            <>
+              <Activity className="w-3.5 h-3.5 text-accent-savanna" />
+              <span className="text-ev-dust">Listening for events</span>
             </>
           ) : (
             <>
-              <Play className="w-3.5 h-3.5" />
-              Start Monitor
+              <WifiOff className="w-3.5 h-3.5 text-ev-warm-gray" />
+              <span className="text-ev-warm-gray">Offline</span>
             </>
           )}
-        </button>
-
-        <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] p-1">
-          {[1, 2, 4].map((speed) => (
-            <button
-              key={speed}
-              type="button"
-              onClick={() => setPlaybackSpeed(speed as 1 | 2 | 4)}
-              disabled={running}
-              className={`rounded-md px-2.5 py-1 text-xs font-semibold transition-colors disabled:opacity-60 ${
-                playbackSpeed === speed
-                  ? "bg-accent-savanna text-ev-charcoal"
-                  : "text-ev-warm-gray hover:text-ev-cream"
-              }`}
-            >
-              {speed}x
-            </button>
-          ))}
         </div>
 
         {/* Duration progress */}
@@ -658,7 +759,9 @@ export default function FieldMonitorPage() {
                 <span className="text-xs">
                   {running
                     ? "Listening for calls..."
-                    : "Start monitor to detect calls"}
+                    : connectionStatus === "connected"
+                      ? "Waiting for processing events..."
+                      : "Connect to see live events"}
                 </span>
               </div>
             )}

@@ -881,3 +881,295 @@ export interface ResearchImpactStats extends Stats {
 export async function getResearchImpactStats(): Promise<ResearchImpactStats> {
   return fetchAPI<ResearchImpactStats>("/api/stats/research-impact");
 }
+
+// ─── ML Training & Active Learning ───
+
+export interface MLLabelingQueueItem {
+  call_id: string;
+  call_type: string;
+  confidence: number;
+  recording_id: string;
+  start_ms: number;
+  duration_ms: number;
+  acoustic_features?: Record<string, unknown>;
+}
+
+export async function getMLLabelingQueue(limit = 10): Promise<MLLabelingQueueItem[]> {
+  return fetchAPI<MLLabelingQueueItem[]>(`/api/ml/labeling-queue?limit=${limit}`);
+}
+
+export async function labelMLCall(
+  callId: string,
+  payload: { call_type_refined: string; social_function: string }
+): Promise<{ status: string; labels_since_last_train: number; retrain_threshold: number; should_retrain: boolean }> {
+  return fetchAPI(`/api/ml/label/${callId}`, { method: "POST", body: JSON.stringify(payload) });
+}
+
+export async function trainMLClassifier(): Promise<{
+  status: string; model_path: string; accuracy: number; training_time_s: number;
+}> {
+  return fetchAPI("/api/ml/train", { method: "POST" });
+}
+
+export async function predictMLCall(callId: string): Promise<{
+  call_id: string; call_type: string; social_function: string; confidence: number;
+  top_features: Array<[string, number]>; narrative_text: string;
+}> {
+  return fetchAPI(`/api/ml/predict/${callId}`);
+}
+
+export interface MLBenchmarks {
+  accuracy_over_time: Array<[number, number]>;
+  call_type: Record<string, unknown>;
+  social_function: Record<string, unknown>;
+}
+
+export async function getMLBenchmarks(): Promise<MLBenchmarks> {
+  return fetchAPI<MLBenchmarks>("/api/ml/benchmarks");
+}
+
+export async function getMLBenchmarksLatest(): Promise<{
+  call_type: { label_count: number; metrics: Record<string, unknown> };
+  social_function: { label_count: number; metrics: Record<string, unknown> };
+}> {
+  return fetchAPI("/api/ml/benchmarks/latest");
+}
+
+// ─── Call Comparison ───
+
+export interface CallComparisonResult {
+  call_a_id: string;
+  call_b_id: string;
+  similarity_score: number;
+  fingerprint_distance: number;
+  overlay: {
+    spectrogram_overlay_url: string;
+    waveform_overlay_url: string;
+    difference_heatmap_url: string;
+    aligned: boolean;
+    time_stretch_factor: number;
+  };
+  dimension_breakdown: {
+    timbral_similarity: number;
+    pitch_contour_similarity: number;
+    temporal_dynamics_similarity: number;
+    energy_profile_similarity: number;
+  };
+}
+
+export async function compareCalls(callA: string, callB: string): Promise<CallComparisonResult> {
+  return fetchAPI<CallComparisonResult>(`/api/calls/compare?call_a=${encodeURIComponent(callA)}&call_b=${encodeURIComponent(callB)}`);
+}
+
+export function getCallCompareOverlayUrl(callA: string, callB: string, type: "spectrogram" | "waveform" | "difference" = "spectrogram"): string {
+  return `${API_BASE}/api/calls/compare-overlay.png?call_a=${encodeURIComponent(callA)}&call_b=${encodeURIComponent(callB)}&type=${type}`;
+}
+
+export interface SimilarCallMatch {
+  call_id: string;
+  recording_id: string | null;
+  call_type: string;
+  similarity: number;
+}
+
+export async function getSimilarCalls(callId: string, limit = 10): Promise<{
+  query_call_id: string; matches: SimilarCallMatch[]; fingerprint_version: string;
+}> {
+  return fetchAPI(`/api/calls/${callId}/similar?limit=${limit}`);
+}
+
+export async function getSimilarContours(callId: string, params?: {
+  call_type?: string; limit?: number; min_similarity?: number; method?: "dtw" | "pearson";
+}): Promise<{ query_call_id: string; matches: SimilarCallMatch[]; total_compared: number }> {
+  const searchParams = new URLSearchParams();
+  if (params?.call_type) searchParams.set("call_type", params.call_type);
+  if (params?.limit) searchParams.set("limit", String(params.limit));
+  if (params?.min_similarity) searchParams.set("min_similarity", String(params.min_similarity));
+  if (params?.method) searchParams.set("method", params.method);
+  const query = searchParams.toString();
+  return fetchAPI(`/api/calls/${callId}/similar-contours${query ? `?${query}` : ""}`);
+}
+
+// ─── Pattern Detection ───
+
+export interface BehavioralPattern {
+  pattern_id: string;
+  motif: string[];
+  pattern: string;
+  occurrences: number;
+  recordings: string[];
+  avg_gap_ms: number;
+}
+
+export async function getPatterns(minOccurrences = 2): Promise<BehavioralPattern[]> {
+  return fetchAPI<BehavioralPattern[]>(`/api/patterns?min_occurrences=${minOccurrences}`);
+}
+
+export async function getPatternInstances(patternId: string): Promise<{
+  pattern: BehavioralPattern; instances: Array<Record<string, unknown>>;
+}> {
+  return fetchAPI(`/api/patterns/${encodeURIComponent(patternId)}/instances`);
+}
+
+// ─── Call Annotations ───
+
+export interface CallAnnotation {
+  id: string;
+  call_id: string;
+  note: string;
+  tags: string[];
+  researcher_id: string | null;
+  created_at: string;
+}
+
+export async function addCallAnnotation(
+  callId: string,
+  payload: { note: string; tags?: string[]; researcher_id?: string }
+): Promise<CallAnnotation> {
+  return fetchAPI<CallAnnotation>(`/api/calls/${callId}/annotations`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function getCallAnnotations(callId: string): Promise<CallAnnotation[]> {
+  return fetchAPI<CallAnnotation[]>(`/api/calls/${callId}/annotations`);
+}
+
+export async function deleteCallAnnotation(callId: string, annotationId: string): Promise<{ deleted: boolean }> {
+  return fetchAPI(`/api/calls/${callId}/annotations/${annotationId}`, { method: "DELETE" });
+}
+
+// ─── Model Management ───
+
+export interface ModelVersionInfo {
+  version: string;
+  active: boolean;
+  model_path: string;
+  metadata_path: string | null;
+  trained_at: string | null;
+  samples: number | null;
+  classes: number | null;
+  accuracy: number | null;
+  ece: number | null;
+  class_distribution: Record<string, number>;
+}
+
+export async function getModels(): Promise<ModelVersionInfo[]> {
+  return fetchAPI<ModelVersionInfo[]>("/api/models");
+}
+
+export async function activateModel(version: string): Promise<ModelVersionInfo> {
+  return fetchAPI<ModelVersionInfo>(`/api/models/${encodeURIComponent(version)}/activate`, { method: "POST" });
+}
+
+// ─── Site Analytics ───
+
+export interface SiteSummary {
+  location: string;
+  recording_count: number;
+}
+
+export async function getSites(): Promise<SiteSummary[]> {
+  return fetchAPI<SiteSummary[]>("/api/sites");
+}
+
+export interface NoiseSource {
+  noise_type: string;
+  occurrence_rate: number;
+  avg_frequency_range_hz: [number, number];
+  avg_energy_db: number;
+  temporal_pattern: Record<string, unknown> | null;
+}
+
+export interface TimeWindow {
+  start_hour: number;
+  end_hour: number;
+  avg_noise_db: number;
+  dominant_noise: string | null;
+}
+
+export interface SiteNoiseProfile {
+  location: string;
+  recordings_analyzed: number;
+  date_range: [string | null, string | null];
+  noise_sources: NoiseSource[];
+  noise_floor_db: number;
+  optimal_windows: TimeWindow[];
+  recommendations: string[];
+}
+
+export async function getSiteNoiseProfile(location: string): Promise<SiteNoiseProfile> {
+  return fetchAPI<SiteNoiseProfile>(`/api/sites/${encodeURIComponent(location)}/noise-profile`);
+}
+
+export async function getSiteRecommendations(location: string): Promise<{
+  location: string; optimal_windows: TimeWindow[]; recommendations: string[];
+}> {
+  return fetchAPI(`/api/sites/${encodeURIComponent(location)}/recommendations`);
+}
+
+// ─── Deep Analytics ───
+
+export interface PopulationAnalytics {
+  call_type_distribution: Record<string, number>;
+  social_function_distribution: Record<string, number>;
+  by_site: Record<string, { call_count: number; dominant_type: string }>;
+  temporal_patterns: { hourly_distribution: number[]; call_rate_per_recording: number[] };
+}
+
+export async function getPopulationAnalytics(): Promise<PopulationAnalytics> {
+  return fetchAPI<PopulationAnalytics>("/api/analytics/population");
+}
+
+export interface AnalyticsSocialGraph {
+  nodes: Array<{ id: string; call_count: number; dominant_type: string }>;
+  edges: Array<{ from: string; to: string; response_count: number; avg_ici_ms: number }>;
+}
+
+export async function getAnalyticsSocialGraph(): Promise<AnalyticsSocialGraph> {
+  return fetchAPI<AnalyticsSocialGraph>("/api/analytics/social-graph");
+}
+
+export async function getRecordingFeatures(recordingId: string): Promise<{
+  recording_id: string;
+  call_count: number;
+  call_types: Record<string, number>;
+  feature_distributions: Record<string, { min: number; max: number; mean: number }>;
+}> {
+  return fetchAPI(`/api/analytics/recording/${recordingId}/features`);
+}
+
+// ─── Webhooks ───
+
+export interface WebhookConfig {
+  id: string;
+  url: string;
+  event_type: string;
+  created_at: string;
+}
+
+export async function createWebhook(payload: { url: string; event_type: string }): Promise<WebhookConfig> {
+  return fetchAPI<WebhookConfig>("/api/webhooks", { method: "POST", body: JSON.stringify(payload) });
+}
+
+export async function getWebhooks(): Promise<WebhookConfig[]> {
+  return fetchAPI<WebhookConfig[]>("/api/webhooks");
+}
+
+export async function deleteWebhook(webhookId: string): Promise<{ id: string; deleted: boolean }> {
+  return fetchAPI(`/api/webhooks/${webhookId}`, { method: "DELETE" });
+}
+
+// ─── Recording Metadata PATCH ───
+
+export async function updateRecordingMetadata(
+  recordingId: string,
+  metadata: Partial<RecordingMetadata>
+): Promise<Recording> {
+  const recording = await fetchAPI<Recording>(`/api/recordings/${recordingId}/metadata`, {
+    method: "PATCH",
+    body: JSON.stringify(metadata),
+  });
+  return normalizeRecording(recording);
+}

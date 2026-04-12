@@ -24,9 +24,16 @@ const PAGE_TITLES: Record<string, string> = {
   "/processing": "Processing",
   "/export": "Export",
   "/realtime": "Real-Time Filter",
+  "/compare/calls": "Call Comparison",
   "/compare": "Compare",
   "/review": "Review",
   "/batch": "Batch Processing",
+  "/ml-training": "ML Training",
+  "/sites": "Recording Sites",
+  "/analytics": "Analytics",
+  "/patterns": "Behavioral Patterns",
+  "/models": "Model Management",
+  "/webhooks": "Webhooks",
 };
 
 export default function Header() {
