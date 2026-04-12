@@ -100,6 +100,71 @@ def _flatten_calls(recordings: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+_RAVEN_COLUMNS = [
+    "Selection",
+    "View",
+    "Channel",
+    "Begin Time (s)",
+    "End Time (s)",
+    "Low Freq (Hz)",
+    "High Freq (Hz)",
+    "Begin File",
+    "File Offset (s)",
+    "Score",
+    "Tags",
+    "Notes",
+]
+
+
+def export_raven(recordings: list[dict[str, Any]]) -> str:
+    """Export detected calls as a Raven Pro selection table (TSV).
+
+    Raven selection files are the standard format used by the Cornell Lab
+    of Ornithology's Raven sound analysis software and widely used in
+    bioacoustics research (e.g., ElephantVoices, Elephant Listening Project).
+
+    Args:
+        recordings: List of recording dicts as stored in RecordingStore.
+
+    Returns:
+        Tab-separated text string with Raven selection table header and one
+        row per detected call.
+    """
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=_RAVEN_COLUMNS, delimiter="\t")
+    writer.writeheader()
+
+    selection = 1
+    for recording in recordings:
+        filename = recording.get("filename") or recording.get("id") or ""
+        result = recording.get("result") or {}
+        for call in result.get("calls", []):
+            start_s = float(call.get("start_ms") or 0.0) / 1000.0
+            duration_s = float(call.get("duration_ms") or 0.0) / 1000.0
+            end_s = start_s + duration_s
+            low_freq = call.get("frequency_min_hz") or 0.0
+            high_freq = call.get("frequency_max_hz") or 0.0
+            call_type = call.get("call_type") or ""
+            confidence = call.get("confidence")
+            writer.writerow({
+                "Selection": selection,
+                "View": "Spectrogram 1",
+                "Channel": "1",
+                "Begin Time (s)": round(start_s, 6),
+                "End Time (s)": round(end_s, 6),
+                "Low Freq (Hz)": low_freq,
+                "High Freq (Hz)": high_freq,
+                "Begin File": filename,
+                "File Offset (s)": round(start_s, 6),
+                "Score": round(float(confidence), 4) if confidence is not None else "",
+                "Tags": call_type,
+                "Notes": call_type,
+            })
+            selection += 1
+
+    return buffer.getvalue()
+
+
 def export_csv(recordings: list[dict[str, Any]]) -> str:
     rows = _flatten_calls(recordings)
     fieldnames = [
@@ -313,6 +378,7 @@ def export_zip(
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("calls.csv", export_csv(recordings))
         archive.writestr("recordings.json", export_json(recordings))
+        archive.writestr("selections.txt", export_raven(recordings))
         archive.writestr("DATA_DICTIONARY.md", DATA_DICTIONARY)
         archive.writestr(
             "metadata.json",

@@ -1,0 +1,71 @@
+{
+  "sequences": [
+    {
+      "id": "2000-24_generator_noise_3-seq-0",
+      "recording_id": "2000-24_generator_noise_3",
+      "calls": [
+        "2000-24_generator_noise_3-call-0",
+        "2000-24_generator_noise_3-call-1",
+        "2000-24_generator_noise_3-call-2"
+      ],
+      "pattern": "bark -> rumble -> unknown",
+      "motif": [
+        "bark",
+        "rumble",
+        "unknown"
+      ],
+      "total_duration_ms": 4150.0,
+      "inter_call_gaps_ms": [
+        550.0,
+        1550.0
+      ]
+    },
+    {
+      "id": "2000-24_generator_noise_3-seq-1",
+      "recording_id": "2000-24_generator_noise_3",
+      "calls": [
+        "2000-24_generator_noise_3-call-3",
+        "2000-24_generator_noise_3-call-4",
+        "2000-24_generator_noise_3-call-5",
+        "2000-24_generator_noise_3-call-6",
+        "2000-24_generator_noise_3-call-7"
+      ],
+      "pattern": "unknown -> rumble -> rumble -> rumble -> cry",
+      "motif": [
+        "unknown",
+        "rumble",
+        "rumble",
+        "rumble",
+        "cry"
+      ],
+      "total_duration_ms": 16450.0,
+      "inter_call_gaps_ms": [
+        0.0,
+        1450.0,
+        950.0,
+        4550.0
+      ]
+    }
+  ],
+  "recurring_patterns": [
+    {
+      "pattern_id": "pat-4cec18ae34",
+      "motif": [
+        "rumble",
+        "rumble"
+      ],
+      "pattern": "rumble -> rumble",
+      "occurrences": 2,
+      "recordings": [
+        "2000-24_generator_noise_3"
+      ],
+      "avg_gap_ms": 1737.5,
+      "contexts": [
+        [
+          "unknown -> rumble -> rumble -> rumble -> cry",
+          2
+        ]
+      ]
+    }
+  ]
+}

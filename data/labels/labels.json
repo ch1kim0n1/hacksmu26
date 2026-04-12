@@ -1,0 +1,12 @@
+{
+  "test-call-1": {
+    "call_type_refined": "contact-rumble",
+    "social_function": "initiating",
+    "labeled_at": "2026-04-12T01:37:10.235014+00:00"
+  },
+  "__meta__": {
+    "labels_since_last_train": 3,
+    "total_labels": 1,
+    "updated_at": "2026-04-12T01:37:10.235018+00:00"
+  }
+}
