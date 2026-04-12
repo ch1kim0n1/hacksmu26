@@ -122,10 +122,36 @@ export default function LandingPage() {
         backdropFilter: "blur(0px)",
         borderBottomColor: "rgba(255,255,255,0)",
       });
+      gsap.set("[data-nav-brand]", {
+        color: "#3f3121",
+      });
+      gsap.set("[data-nav-logo]", {
+        filter: "brightness(0) saturate(100%)",
+      });
       gsap.to("[data-nav]", {
         backgroundColor: "rgba(44,41,38,0.92)",
         backdropFilter: "blur(16px)",
         borderBottomColor: "rgba(255,255,255,0.1)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "+=180",
+          scrub: true,
+        },
+      });
+      gsap.to("[data-nav-brand]", {
+        color: "#F7F3EA",
+        ease: "none",
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: "top top",
+          end: "+=180",
+          scrub: true,
+        },
+      });
+      gsap.to("[data-nav-logo]", {
+        filter: "brightness(1) saturate(100%)",
         ease: "none",
         scrollTrigger: {
           trigger: heroRef.current,
@@ -380,13 +406,13 @@ export default function LandingPage() {
         data-nav
         className="fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent"
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2"
-          >
-            <Image src="/logo.png" alt="EchoField logo" width={52} height={52} className="object-contain" />
-            <span className="text-4xl font-display font-semibold text-accent-savanna">EchoField</span>
+          <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+            <Link
+              href="/"
+              className="flex items-center gap-2"
+            >
+            <Image src="/logo.png" alt="EchoField logo" width={52} height={52} className="object-contain" data-nav-logo />
+            <span className="text-4xl font-display font-semibold text-[#3f3121]" data-nav-brand>EchoField</span>
           </Link>
 
         </div>
@@ -508,17 +534,17 @@ export default function LandingPage() {
           </h2>
         </div>
         {/* Scroll indicator */}
-        <div
-          data-scroll-ind
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
-        >
-          <span className="text-[11px] text-[#5d4a34]/60 tracking-[0.25em] uppercase font-medium">
-            Scroll
-          </span>
-          <svg className="w-4 h-4 text-[#5d4a34]/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7" />
-          </svg>
-        </div>
+          <div
+            data-scroll-ind
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
+          >
+            <span className="text-[11px] text-[#4b3520]/90 tracking-[0.25em] uppercase font-medium">
+              Scroll
+            </span>
+            <svg className="w-4 h-4 text-[#4b3520]/85" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7" />
+            </svg>
+          </div>
 
       </section>
 
