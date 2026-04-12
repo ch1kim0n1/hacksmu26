@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 
 type CloudTransitionSceneProps = {
   active: boolean;
-  reveal: boolean;
 };
 
 // Each cloud: left offset, width, height, animation duration, delay
@@ -19,37 +18,31 @@ const CLOUDS = [
   { left: "-24%", w: "64vw", h: "32vh", dur: 1.72, delay: -0.48 },
 ];
 
-// A cloud built from overlapping white ellipses — clearly visible, no blur
 function CloudShape() {
   return (
     <div style={{ position: "absolute", inset: 0 }}>
-      {/* Base body */}
       <div style={{ position: "absolute", left: "8%",  bottom: "2%",  width: "84%", height: "50%", background: "white", borderRadius: "50%", opacity: 0.98 }} />
-      {/* Left puff */}
       <div style={{ position: "absolute", left: "4%",  bottom: "22%", width: "40%", height: "68%", background: "white", borderRadius: "50%", opacity: 0.97 }} />
-      {/* Center-left top puff */}
       <div style={{ position: "absolute", left: "22%", bottom: "32%", width: "48%", height: "80%", background: "white", borderRadius: "50%", opacity: 0.98 }} />
-      {/* Center-right puff */}
       <div style={{ position: "absolute", left: "44%", bottom: "28%", width: "36%", height: "70%", background: "white", borderRadius: "50%", opacity: 0.96 }} />
-      {/* Right puff */}
       <div style={{ position: "absolute", left: "60%", bottom: "18%", width: "34%", height: "56%", background: "white", borderRadius: "50%", opacity: 0.95 }} />
     </div>
   );
 }
 
-export default function CloudTransitionScene({ active, reveal }: CloudTransitionSceneProps) {
+export default function CloudTransitionScene({ active }: CloudTransitionSceneProps) {
   return (
     <motion.div
       className="pointer-events-none absolute inset-0 overflow-hidden"
       initial={{ opacity: 0, scale: 1.08 }}
       animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 1.08 }}
-      transition={{ duration: active ? 0.55 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: active ? 0.5 : 0.35, ease: [0.22, 1, 0.36, 1] }}
       aria-hidden="true"
     >
-      {/* Clear blue sky — strong contrast for white clouds */}
+      {/* Clear blue sky */}
       <div className="absolute inset-0 bg-[linear-gradient(180deg,#1a5fa8_0%,#3b87cc_35%,#7ab8e8_70%,#c4dff5_100%)]" />
 
-      {/* Scrolling speed-streak lines */}
+      {/* Speed-streak lines */}
       <div
         className="absolute left-0 right-0 animate-[speedStreaks_0.22s_linear_infinite]"
         style={{
@@ -60,7 +53,7 @@ export default function CloudTransitionScene({ active, reveal }: CloudTransition
         }}
       />
 
-      {/* Cloud blobs — each is a multi-ellipse cloud shape */}
+      {/* Cloud blobs */}
       {CLOUDS.map((c, i) => (
         <motion.div
           key={i}
@@ -83,15 +76,8 @@ export default function CloudTransitionScene({ active, reveal }: CloudTransition
         </motion.div>
       ))}
 
-      {/* Bright horizon glow at bottom */}
+      {/* Horizon glow */}
       <div className="absolute bottom-0 left-0 right-0 h-[24vh] bg-[linear-gradient(to_top,rgba(255,255,255,0.6)_0%,rgba(255,255,255,0)_100%)]" />
-
-      {/* White-out on reveal */}
-      <motion.div
-        className="absolute inset-0 bg-white"
-        animate={{ opacity: reveal ? 1 : 0 }}
-        transition={{ duration: 0.40, ease: "easeIn" }}
-      />
     </motion.div>
   );
 }
