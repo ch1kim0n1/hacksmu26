@@ -8,7 +8,7 @@ export class HeroGlobeScene {
     this.options = {
       backgroundColor: "#020409",
       showStars: true,
-      atmosphereColor: "#4da3ff",
+      atmosphereColor: "#C4A46C",
       atmosphereAltitude: 0.16,
       idleRotationSpeed: 0.045,
       cameraPosition: { x: 0, y: 8, z: 230 },
