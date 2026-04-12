@@ -3,10 +3,11 @@
 import { motion } from "framer-motion";
 
 type CloudTransitionSceneProps = {
-  active: boolean;
+  active: boolean;  // full fly-through animation (Infinity repeat)
+  linger: boolean;  // a few static clouds hovering before the white fade
 };
 
-// Each cloud: left offset, width, height, animation duration, delay
+// Flying clouds — rush past the camera
 const CLOUDS = [
   { left: "-5%",  w: "58vw", h: "26vh", dur: 1.35, delay: 0     },
   { left: "42%",  w: "50vw", h: "22vh", dur: 1.50, delay: -0.42 },
@@ -16,6 +17,13 @@ const CLOUDS = [
   { left: "14%",  w: "38vw", h: "18vh", dur: 1.08, delay: -0.78 },
   { left: "54%",  w: "46vw", h: "21vh", dur: 1.25, delay: -0.18 },
   { left: "-24%", w: "64vw", h: "32vh", dur: 1.72, delay: -0.48 },
+];
+
+// Lingering clouds — large, already-placed, slowly drift up and fade away
+const LINGER_CLOUDS = [
+  { left: "2%",  top: "16%", w: "64vw", h: "30vh", delay: 0    },
+  { left: "34%", top: "46%", w: "58vw", h: "26vh", delay: 0.10 },
+  { left: "-8%", top: "64%", w: "62vw", h: "28vh", delay: 0.18 },
 ];
 
 function CloudShape() {
@@ -30,13 +38,18 @@ function CloudShape() {
   );
 }
 
-export default function CloudTransitionScene({ active }: CloudTransitionSceneProps) {
+export default function CloudTransitionScene({ active, linger }: CloudTransitionSceneProps) {
+  const visible = active || linger;
+
   return (
     <motion.div
       className="pointer-events-none absolute inset-0 overflow-hidden"
-      initial={{ opacity: 0, scale: 1.08 }}
-      animate={{ opacity: active ? 1 : 0, scale: active ? 1 : 1.08 }}
-      transition={{ duration: active ? 0.5 : 0.35, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, scale: 1.06 }}
+      animate={{ opacity: visible ? 1 : 0, scale: visible ? 1 : 1.04 }}
+      transition={{
+        duration: visible ? 0.55 : 0.25,
+        ease: [0.22, 1, 0.36, 1],
+      }}
       aria-hidden="true"
     >
       {/* Clear blue sky */}
@@ -53,8 +66,8 @@ export default function CloudTransitionScene({ active }: CloudTransitionScenePro
         }}
       />
 
-      {/* Cloud blobs */}
-      {CLOUDS.map((c, i) => (
+      {/* Flying cloud blobs — only during active */}
+      {active && CLOUDS.map((c, i) => (
         <motion.div
           key={i}
           className="absolute top-0"
@@ -70,6 +83,24 @@ export default function CloudTransitionScene({ active }: CloudTransitionScenePro
             repeat: Infinity,
             ease: [0.16, 0.0, 0.60, 1.0],
             times: [0, 0.42, 1],
+          }}
+        >
+          <CloudShape />
+        </motion.div>
+      ))}
+
+      {/* Lingering clouds — appear already visible, drift up and fade over ~1.1s */}
+      {linger && LINGER_CLOUDS.map((c, i) => (
+        <motion.div
+          key={`linger-${i}`}
+          className="absolute"
+          style={{ left: c.left, top: c.top, width: c.w, height: c.h }}
+          initial={{ opacity: 0.88, y: 0 }}
+          animate={{ opacity: 0, y: -55 }}
+          transition={{
+            duration: 1.1,
+            delay: c.delay,
+            ease: [0.22, 0.6, 0.36, 1],
           }}
         >
           <CloudShape />

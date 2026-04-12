@@ -20,7 +20,7 @@ type GlobeRect = {
   height: number;
 };
 
-type Phase = "idle" | "zoom" | "clouds" | "reveal" | "fadeout";
+type Phase = "idle" | "zoom" | "clouds" | "linger" | "reveal" | "fadeout";
 
 type SceneTransitionContextValue = {
   isTransitioning: boolean;
@@ -35,10 +35,11 @@ const SceneTransitionContext = createContext<SceneTransitionContextValue | null>
 );
 
 const DASHBOARD_ROUTE = "/dashboard";
-const ZOOM_MS     = 750;   // globe zooms toward viewer
-const CLOUD_MS    = 1050;  // falling through clouds
-const REVEAL_MS   = 450;   // white fades in over clouds
-const FADEOUT_MS  = 650;   // white fades out revealing dashboard
+const ZOOM_MS    = 1100;  // globe rushes toward viewer
+const CLOUD_MS   = 1100;  // flying through clouds
+const LINGER_MS  = 1100;  // a few clouds hovering before fade
+const REVEAL_MS  = 500;   // white fades in
+const FADEOUT_MS = 800;   // white fades out over dashboard
 
 export function SceneTransitionProvider({
   children,
@@ -62,7 +63,7 @@ export function SceneTransitionProvider({
   useEffect(() => { router.prefetch(DASHBOARD_ROUTE); }, [router]);
   useEffect(() => () => clearTimers(), [clearTimers]);
 
-  // Once dashboard has loaded during clouds phase, schedule reveal → fadeout
+  // Once the dashboard route has loaded during clouds phase, chain linger → reveal → fadeout
   useEffect(() => {
     if (
       !isTransitioning ||
@@ -77,23 +78,26 @@ export function SceneTransitionProvider({
 
     timeoutsRef.current.push(
       window.setTimeout(() => {
-        // White fades IN over the cloud scene
-        setPhase("reveal");
+        setPhase("linger");
         timeoutsRef.current.push(
           window.setTimeout(() => {
-            // White fades OUT revealing the dashboard underneath
-            setPhase("fadeout");
+            setPhase("reveal");
             timeoutsRef.current.push(
               window.setTimeout(() => {
-                setPhase("idle");
-                setGlobeRect(null);
-                setGlobeSnapshotUrl(null);
-                setIsTransitioning(false);
-                hasNavigatedRef.current = false;
-                cloudRevealScheduledRef.current = false;
-              }, FADEOUT_MS)
+                setPhase("fadeout");
+                timeoutsRef.current.push(
+                  window.setTimeout(() => {
+                    setPhase("idle");
+                    setGlobeRect(null);
+                    setGlobeSnapshotUrl(null);
+                    setIsTransitioning(false);
+                    hasNavigatedRef.current = false;
+                    cloudRevealScheduledRef.current = false;
+                  }, FADEOUT_MS)
+                );
+              }, REVEAL_MS)
             );
-          }, REVEAL_MS)
+          }, LINGER_MS)
         );
       }, remainingCloudTime)
     );
@@ -112,7 +116,6 @@ export function SceneTransitionProvider({
       hasNavigatedRef.current = false;
       cloudRevealScheduledRef.current = false;
 
-      // After zoom, switch to clouds and start navigating
       timeoutsRef.current.push(
         window.setTimeout(() => {
           setPhase("clouds");
@@ -153,44 +156,59 @@ export function SceneTransitionProvider({
         }`}
         aria-hidden="true"
       >
-        {/* Globe zoom — no background, scales over the landing page */}
+        {/* ── Globe ── scales from its landing-page position toward the viewer */}
         {globeRect && (
           <motion.div
             className="absolute rounded-full"
             style={{
               ...globeStyle,
-              backgroundImage: globeSnapshotUrl
-                ? `url(${globeSnapshotUrl})`
-                : undefined,
+              backgroundImage: globeSnapshotUrl ? `url(${globeSnapshotUrl})` : undefined,
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
               backgroundSize: "cover",
+              // Fallback: a convincing Earth-from-space gradient
               background: globeSnapshotUrl
                 ? undefined
-                : "radial-gradient(circle at 35% 35%, rgba(145,189,255,0.9) 0%, rgba(42,91,177,0.92) 36%, rgba(8,24,54,0.98) 70%, rgba(3,10,24,1) 100%)",
+                : "radial-gradient(circle at 38% 32%, rgba(168,215,255,0.95) 0%, rgba(78,151,210,0.98) 18%, rgba(30,90,170,1) 40%, rgba(18,60,130,1) 62%, rgba(8,28,68,1) 80%, rgba(2,8,22,1) 100%)",
             }}
             initial={{ scale: 1, opacity: 1 }}
             animate={
               isZooming
-                ? { scale: 18, opacity: [1, 1, 0] }
+                ? { scale: 28, opacity: [1, 1, 1, 0] }
                 : { scale: 1, opacity: 0 }
             }
             transition={
               isZooming
                 ? {
                     duration: ZOOM_MS / 1000,
-                    ease: [0.1, 0.0, 0.2, 1.0],
-                    opacity: { times: [0, 0.55, 1], duration: ZOOM_MS / 1000 },
+                    ease: [0.06, 0.0, 0.14, 1.0],
+                    // Stay fully opaque until 75% of the zoom, then fade out
+                    opacity: { times: [0, 0.5, 0.75, 1], duration: ZOOM_MS / 1000 },
                   }
                 : { duration: 0.1 }
             }
           />
         )}
 
-        {/* Falling-through-clouds scene */}
-        <CloudTransitionScene active={phase === "clouds"} />
+        {/* ── Atmosphere ── sky-blue gradient fades in at 55% of zoom duration,
+            bridging the globe zoom into the cloud scene */}
+        <div
+          className="absolute inset-0 bg-[linear-gradient(180deg,#1a5fa8_0%,#2e7cc8_40%,#6db5ea_100%)]"
+          style={{
+            opacity: isZooming ? 1 : 0,
+            transition: isZooming
+              ? `opacity 0.52s ease-in ${(ZOOM_MS * 0.52) / 1000}s`
+              : "opacity 0.15s ease-out",
+          }}
+        />
 
-        {/* White overlay — fades IN on reveal, fades OUT on fadeout over the dashboard */}
+        {/* ── Cloud scene ── */}
+        <CloudTransitionScene
+          active={phase === "clouds"}
+          linger={phase === "linger" || phase === "reveal"}
+        />
+
+        {/* ── White overlay ── fades IN during reveal, fades OUT during fadeout */}
         <motion.div
           className="absolute inset-0 bg-white"
           initial={{ opacity: 0 }}
