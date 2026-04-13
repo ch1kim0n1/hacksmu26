@@ -16,6 +16,7 @@ from typing import Any
 import numpy as np
 import librosa
 from scipy.signal import find_peaks
+from scipy.stats import kurtosis as _scipy_kurtosis, skew as _scipy_skew
 from echofield.utils.logging_config import get_logger
 
 try:
@@ -45,6 +46,31 @@ _BASE_FEATURE_KEYS = [
     "pitch_contour_slope",
     "temporal_energy_variance",
     "spectral_entropy",
+    # ── New features (25 categories) ──
+    "spectral_flatness",
+    "spectral_slope",
+    "spectral_kurtosis",
+    "spectral_skewness",
+    "spectral_flux",
+    "spectral_crest",
+    "jitter",
+    "shimmer",
+    "hnr_db",
+    "attack_time_ms",
+    "decay_time_ms",
+    "temporal_centroid",
+    "onset_strength",
+    "rms_energy",
+    "modulation_rate_hz",
+    "modulation_depth",
+    "formant_dispersion_hz",
+    "f0_variability",
+    "peak_amplitude",
+    "crest_factor",
+    "energy_ratio_low",
+    "energy_ratio_mid",
+    "energy_ratio_high",
+    "subharmonic_ratio",
 ]
 _MFCC_COUNT = 13
 _CLASSIFIER_FEATURE_KEYS = [
@@ -425,30 +451,330 @@ def _spectral_entropy(y: np.ndarray, sr: int) -> float:
         return 0.0
 
 
+
+# ── New feature helpers (25 additional acoustic categories) ──────────────
+
+
+def _compute_spectral_flatness(y: np.ndarray, sr: int) -> float:
+    """Wiener entropy: geometric mean / arithmetic mean of power spectrum."""
+    try:
+        sf = librosa.feature.spectral_flatness(y=y)
+        return round(_finite(float(np.mean(sf))), 6)
+    except Exception:
+        return 0.0
+
+
+def _compute_spectral_slope(y: np.ndarray, sr: int) -> float:
+    """Linear regression slope across mean magnitude spectrum."""
+    try:
+        S = np.abs(librosa.stft(y, n_fft=min(2048, max(256, len(y)))))
+        mean_spec = np.mean(S, axis=1)
+        if len(mean_spec) < 2:
+            return 0.0
+        x = np.arange(len(mean_spec), dtype=np.float64)
+        slope = float(np.polyfit(x, mean_spec, 1)[0])
+        return round(_finite(slope), 8)
+    except Exception:
+        return 0.0
+
+
+def _compute_spectral_kurtosis(y: np.ndarray, sr: int) -> float:
+    """Kurtosis of the mean power spectrum (peakedness)."""
+    try:
+        S = np.abs(librosa.stft(y, n_fft=min(2048, max(256, len(y)))))
+        power = np.mean(S ** 2, axis=1)
+        return round(_finite(float(_scipy_kurtosis(power, fisher=True))), 4)
+    except Exception:
+        return 0.0
+
+
+def _compute_spectral_skewness(y: np.ndarray, sr: int) -> float:
+    """Skewness of the mean power spectrum (asymmetry)."""
+    try:
+        S = np.abs(librosa.stft(y, n_fft=min(2048, max(256, len(y)))))
+        power = np.mean(S ** 2, axis=1)
+        return round(_finite(float(_scipy_skew(power))), 4)
+    except Exception:
+        return 0.0
+
+
+def _compute_spectral_flux(y: np.ndarray, sr: int) -> float:
+    """Mean L2 norm of frame-by-frame spectral change."""
+    try:
+        S = np.abs(librosa.stft(y, n_fft=min(2048, max(256, len(y)))))
+        if S.shape[1] < 2:
+            return 0.0
+        diff = np.diff(S, axis=1)
+        flux = np.sqrt(np.mean(diff ** 2, axis=0))
+        return round(_finite(float(np.mean(flux))), 6)
+    except Exception:
+        return 0.0
+
+
+def _compute_spectral_contrast(y: np.ndarray, sr: int) -> list[float]:
+    """Spectral contrast across 7 sub-bands (mean per band)."""
+    try:
+        contrast = librosa.feature.spectral_contrast(y=y, sr=sr, n_bands=6)
+        return [round(_finite(float(v)), 3) for v in np.mean(contrast, axis=1)]
+    except Exception:
+        return [0.0] * 7
+
+
+def _compute_spectral_crest(y: np.ndarray, sr: int) -> float:
+    """Peak-to-mean ratio of the magnitude spectrum, averaged over frames."""
+    try:
+        S = np.abs(librosa.stft(y, n_fft=min(2048, max(256, len(y)))))
+        mean_per_frame = np.mean(S, axis=0)
+        max_per_frame = np.max(S, axis=0)
+        safe_mean = np.where(mean_per_frame > 1e-12, mean_per_frame, 1e-12)
+        crest = max_per_frame / safe_mean
+        return round(_finite(float(np.mean(crest))), 4)
+    except Exception:
+        return 0.0
+
+
+def _compute_jitter(y: np.ndarray, sr: int) -> float:
+    """Relative period perturbation from consecutive F0 estimates."""
+    try:
+        f0 = librosa.yin(y, fmin=8, fmax=min(sr // 2 - 1, 600), sr=sr)
+        valid = f0[f0 > 0]
+        if len(valid) < 3:
+            return 0.0
+        periods = 1.0 / valid
+        diffs = np.abs(np.diff(periods))
+        return round(_finite(float(np.mean(diffs) / np.mean(periods))), 6)
+    except Exception:
+        return 0.0
+
+
+def _compute_shimmer(y: np.ndarray, sr: int) -> float:
+    """Relative amplitude perturbation from frame-wise RMS."""
+    try:
+        rms = librosa.feature.rms(y=y)[0]
+        if len(rms) < 3:
+            return 0.0
+        diffs = np.abs(np.diff(rms))
+        mean_rms = float(np.mean(rms))
+        if mean_rms < 1e-12:
+            return 0.0
+        return round(_finite(float(np.mean(diffs) / mean_rms)), 6)
+    except Exception:
+        return 0.0
+
+
+def _compute_hnr(y: np.ndarray) -> float:
+    """Harmonic-to-noise ratio in dB using HPSS."""
+    try:
+        harmonic, percussive = librosa.effects.hpss(y)
+        h_energy = float(np.sum(harmonic ** 2))
+        n_energy = float(np.sum(percussive ** 2))
+        if n_energy < 1e-12:
+            return 40.0
+        return round(_finite(10.0 * np.log10(h_energy / n_energy)), 2)
+    except Exception:
+        return 0.0
+
+
+def _compute_attack_time(y: np.ndarray, sr: int) -> float:
+    """Time in ms from signal onset to peak RMS energy."""
+    try:
+        rms = librosa.feature.rms(y=y)[0]
+        if len(rms) < 2:
+            return 0.0
+        peak_frame = int(np.argmax(rms))
+        hop = 512
+        return round(_finite(float(peak_frame * hop / sr * 1000.0)), 2)
+    except Exception:
+        return 0.0
+
+
+def _compute_decay_time(y: np.ndarray, sr: int) -> float:
+    """Time in ms from peak RMS to −20 dB below peak."""
+    try:
+        rms = librosa.feature.rms(y=y)[0]
+        if len(rms) < 2:
+            return 0.0
+        peak_frame = int(np.argmax(rms))
+        peak_val = float(rms[peak_frame])
+        if peak_val < 1e-12:
+            return 0.0
+        threshold = peak_val * 0.1  # −20 dB
+        hop = 512
+        for i in range(peak_frame + 1, len(rms)):
+            if rms[i] < threshold:
+                return round(_finite(float((i - peak_frame) * hop / sr * 1000.0)), 2)
+        return round(_finite(float((len(rms) - 1 - peak_frame) * hop / sr * 1000.0)), 2)
+    except Exception:
+        return 0.0
+
+
+def _compute_temporal_centroid(y: np.ndarray, sr: int) -> float:
+    """Energy-weighted center of mass in time (0-1 normalized)."""
+    try:
+        rms = librosa.feature.rms(y=y)[0]
+        total = float(np.sum(rms))
+        if total < 1e-12:
+            return 0.5
+        times = np.arange(len(rms), dtype=np.float64) / len(rms)
+        centroid = float(np.sum(times * rms) / total)
+        return round(_finite(centroid), 4)
+    except Exception:
+        return 0.5
+
+
+def _compute_onset_strength(y: np.ndarray, sr: int) -> float:
+    """Mean onset strength envelope."""
+    try:
+        oenv = librosa.onset.onset_strength(y=y, sr=sr)
+        return round(_finite(float(np.mean(oenv))), 4)
+    except Exception:
+        return 0.0
+
+
+def _compute_rms_energy(y: np.ndarray) -> float:
+    """Root mean square energy."""
+    try:
+        return round(_finite(float(np.sqrt(np.mean(y ** 2)))), 6)
+    except Exception:
+        return 0.0
+
+
+def _compute_modulation_rate(y: np.ndarray, sr: int) -> float:
+    """Dominant AM rate: peak frequency of the RMS envelope's FFT."""
+    try:
+        rms = librosa.feature.rms(y=y)[0]
+        if len(rms) < 8:
+            return 0.0
+        rms_centered = rms - np.mean(rms)
+        fft_mag = np.abs(np.fft.rfft(rms_centered))
+        hop = 512
+        mod_sr = sr / hop
+        freqs = np.fft.rfftfreq(len(rms_centered), d=1.0 / mod_sr)
+        # Only consider modulation rates between 0.5 and 30 Hz
+        mask = (freqs >= 0.5) & (freqs <= 30.0)
+        if not np.any(mask):
+            return 0.0
+        valid_fft = fft_mag[mask]
+        valid_freqs = freqs[mask]
+        return round(_finite(float(valid_freqs[np.argmax(valid_fft)])), 3)
+    except Exception:
+        return 0.0
+
+
+def _compute_modulation_depth(y: np.ndarray, sr: int) -> float:
+    """Amplitude modulation depth: (max - min) / (max + min) of RMS."""
+    try:
+        rms = librosa.feature.rms(y=y)[0]
+        mx = float(np.max(rms))
+        mn = float(np.min(rms))
+        denom = mx + mn
+        if denom < 1e-12:
+            return 0.0
+        return round(_finite((mx - mn) / denom), 4)
+    except Exception:
+        return 0.0
+
+
+def _compute_formant_dispersion(formant_peaks: list[float]) -> float:
+    """Mean spacing between consecutive formant peaks."""
+    if len(formant_peaks) < 2:
+        return 0.0
+    diffs = [formant_peaks[i + 1] - formant_peaks[i] for i in range(len(formant_peaks) - 1)]
+    return round(_finite(float(np.mean(diffs))), 2)
+
+
+def _compute_f0_variability(y: np.ndarray, sr: int) -> float:
+    """Standard deviation of valid F0 estimates."""
+    try:
+        f0 = librosa.yin(y, fmin=8, fmax=min(sr // 2 - 1, 600), sr=sr)
+        valid = f0[f0 > 0]
+        if len(valid) < 2:
+            return 0.0
+        return round(_finite(float(np.std(valid))), 3)
+    except Exception:
+        return 0.0
+
+
+def _compute_peak_amplitude(y: np.ndarray) -> float:
+    """Maximum absolute amplitude."""
+    try:
+        return round(_finite(float(np.max(np.abs(y)))), 6)
+    except Exception:
+        return 0.0
+
+
+def _compute_crest_factor(y: np.ndarray) -> float:
+    """Peak-to-RMS ratio."""
+    try:
+        rms = float(np.sqrt(np.mean(y ** 2)))
+        if rms < 1e-12:
+            return 0.0
+        peak = float(np.max(np.abs(y)))
+        return round(_finite(peak / rms), 4)
+    except Exception:
+        return 0.0
+
+
+def _compute_energy_ratio_3band(y: np.ndarray, sr: int) -> tuple[float, float, float]:
+    """Energy ratio in 3 bands: low (<100 Hz), mid (100-1000 Hz), high (>1000 Hz)."""
+    try:
+        n_fft = min(2048, max(256, len(y)))
+        S = np.abs(librosa.stft(y, n_fft=n_fft))
+        power = np.mean(S ** 2, axis=1)
+        freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
+        total = float(np.sum(power))
+        if total < 1e-12:
+            return (0.33, 0.34, 0.33)
+        low = float(np.sum(power[freqs < 100])) / total
+        mid = float(np.sum(power[(freqs >= 100) & (freqs < 1000)])) / total
+        high = float(np.sum(power[freqs >= 1000])) / total
+        return (round(_finite(low), 4), round(_finite(mid), 4), round(_finite(high), 4))
+    except Exception:
+        return (0.33, 0.34, 0.33)
+
+
+def _compute_subharmonic_ratio(y: np.ndarray, sr: int, f0: float) -> float:
+    """Ratio of energy below f0/2 to energy around f0."""
+    try:
+        if f0 <= 0:
+            return 0.0
+        n_fft = min(2048, max(256, len(y)))
+        S = np.abs(librosa.stft(y, n_fft=n_fft))
+        power = np.mean(S ** 2, axis=1)
+        freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
+        sub_mask = freqs < (f0 / 2.0)
+        f0_mask = (freqs >= f0 * 0.8) & (freqs <= f0 * 1.2)
+        sub_energy = float(np.sum(power[sub_mask])) if np.any(sub_mask) else 0.0
+        f0_energy = float(np.sum(power[f0_mask])) if np.any(f0_mask) else 1e-12
+        return round(_finite(sub_energy / max(f0_energy, 1e-12)), 4)
+    except Exception:
+        return 0.0
+
+
+def _compute_chroma_energy(y: np.ndarray, sr: int) -> list[float]:
+    """12 pitch-class energy values from chroma STFT."""
+    try:
+        chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+        means = np.mean(chroma, axis=1)
+        return [round(_finite(float(v)), 6) for v in means]
+    except Exception:
+        return [0.0] * 12
+
+
 def extract_acoustic_features(y: np.ndarray, sr: int) -> dict:
-    """Extract 12 acoustic features from an audio signal.
+    """Extract 40 acoustic features from an audio signal.
 
     Designed for analysis of elephant vocalizations but applicable to
-    general bioacoustic signals.
+    general bioacoustic signals. Includes 15 original features and 25
+    new categories covering spectral shape, voice quality, temporal
+    dynamics, modulation, formant analysis, and energy distribution.
 
     Args:
         y: Audio time-series as a 1-D numpy array.
         sr: Sample rate in Hz.
 
     Returns:
-        Dictionary containing all 12 acoustic metrics:
-            - fundamental_frequency_hz: float
-            - harmonicity: float (0-1)
-            - harmonic_count: int
-            - formant_peaks_hz: list[float]
-            - duration_s: float
-            - bandwidth_hz: float
-            - energy_distribution: dict with 'below_100hz' and 'above_100hz'
-            - spectral_centroid_hz: float
-            - spectral_rolloff_hz: float
-            - mfcc: list[float] (13 coefficients)
-            - zero_crossing_rate: float
-            - snr_db: float
+        Dictionary containing all acoustic metrics.
     """
     # 1. Fundamental frequency
     fundamental_frequency = _estimate_fundamental_frequency(y, sr)
@@ -493,6 +819,32 @@ def extract_acoustic_features(y: np.ndarray, sr: int) -> dict:
     energy_variance = _temporal_energy_variance(y, sr)
     spectral_entropy = _spectral_entropy(y, sr)
 
+    # ── New features (25 categories) ──
+    spectral_flatness = _compute_spectral_flatness(y, sr)
+    spectral_slope = _compute_spectral_slope(y, sr)
+    spectral_kurtosis = _compute_spectral_kurtosis(y, sr)
+    spectral_skewness = _compute_spectral_skewness(y, sr)
+    spectral_flux = _compute_spectral_flux(y, sr)
+    spectral_contrast = _compute_spectral_contrast(y, sr)
+    spectral_crest = _compute_spectral_crest(y, sr)
+    jitter = _compute_jitter(y, sr)
+    shimmer = _compute_shimmer(y, sr)
+    hnr_db = _compute_hnr(y)
+    attack_time_ms = _compute_attack_time(y, sr)
+    decay_time_ms = _compute_decay_time(y, sr)
+    temporal_centroid = _compute_temporal_centroid(y, sr)
+    onset_strength = _compute_onset_strength(y, sr)
+    rms_energy = _compute_rms_energy(y)
+    modulation_rate_hz = _compute_modulation_rate(y, sr)
+    modulation_depth = _compute_modulation_depth(y, sr)
+    formant_dispersion_hz = _compute_formant_dispersion(formant_peaks)
+    f0_variability = _compute_f0_variability(y, sr)
+    peak_amplitude = _compute_peak_amplitude(y)
+    crest_factor = _compute_crest_factor(y)
+    energy_low, energy_mid, energy_high = _compute_energy_ratio_3band(y, sr)
+    subharmonic_ratio = _compute_subharmonic_ratio(y, sr, fundamental_frequency)
+    chroma_energy = _compute_chroma_energy(y, sr)
+
     return {
         "fundamental_frequency_hz": round(_finite(fundamental_frequency), 2),
         "harmonicity": round(_finite(harmonicity), 4),
@@ -511,6 +863,33 @@ def extract_acoustic_features(y: np.ndarray, sr: int) -> dict:
         "spectral_entropy": spectral_entropy,
         "zero_crossing_rate": round(_finite(zero_crossing_rate), 6),
         "snr_db": _finite(snr),
+        # ── New features ──
+        "spectral_flatness": spectral_flatness,
+        "spectral_slope": spectral_slope,
+        "spectral_kurtosis": spectral_kurtosis,
+        "spectral_skewness": spectral_skewness,
+        "spectral_flux": spectral_flux,
+        "spectral_contrast": spectral_contrast,
+        "spectral_crest": spectral_crest,
+        "jitter": jitter,
+        "shimmer": shimmer,
+        "hnr_db": hnr_db,
+        "attack_time_ms": attack_time_ms,
+        "decay_time_ms": decay_time_ms,
+        "temporal_centroid": temporal_centroid,
+        "onset_strength": onset_strength,
+        "rms_energy": rms_energy,
+        "modulation_rate_hz": modulation_rate_hz,
+        "modulation_depth": modulation_depth,
+        "formant_dispersion_hz": formant_dispersion_hz,
+        "f0_variability": f0_variability,
+        "peak_amplitude": peak_amplitude,
+        "crest_factor": crest_factor,
+        "energy_ratio_low": energy_low,
+        "energy_ratio_mid": energy_mid,
+        "energy_ratio_high": energy_high,
+        "subharmonic_ratio": subharmonic_ratio,
+        "chroma_energy": chroma_energy,
         "feature_vector_dim": len(_CLASSIFIER_FEATURE_KEYS),
     }
 
@@ -537,6 +916,31 @@ def _features_to_vector(features: dict) -> list[float]:
         float(features.get("pitch_contour_slope", 0)),
         float(features.get("temporal_energy_variance", 0)),
         float(features.get("spectral_entropy", 0)),
+        # New 25 features
+        float(features.get("spectral_flatness", 0)),
+        float(features.get("spectral_slope", 0)),
+        float(features.get("spectral_kurtosis", 0)),
+        float(features.get("spectral_skewness", 0)),
+        float(features.get("spectral_flux", 0)),
+        float(features.get("spectral_crest", 0)),
+        float(features.get("jitter", 0)),
+        float(features.get("shimmer", 0)),
+        float(features.get("hnr_db", 0)),
+        float(features.get("attack_time_ms", 0)),
+        float(features.get("decay_time_ms", 0)),
+        float(features.get("temporal_centroid", 0)),
+        float(features.get("onset_strength", 0)),
+        float(features.get("rms_energy", 0)),
+        float(features.get("modulation_rate_hz", 0)),
+        float(features.get("modulation_depth", 0)),
+        float(features.get("formant_dispersion_hz", 0)),
+        float(features.get("f0_variability", 0)),
+        float(features.get("peak_amplitude", 0)),
+        float(features.get("crest_factor", 0)),
+        float(features.get("energy_ratio_low", 0)),
+        float(features.get("energy_ratio_mid", 0)),
+        float(features.get("energy_ratio_high", 0)),
+        float(features.get("subharmonic_ratio", 0)),
     ]
     return [_finite(float(value)) for value in [*base, *mfcc, *mfcc_delta, *mfcc_delta2]]
 

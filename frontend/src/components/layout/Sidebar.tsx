@@ -59,6 +59,7 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: "Research",
     items: [
+      { href: "/research/analytics", label: "Research Analytics", icon: Waves },
       { href: "/export", label: "Export", icon: Download },
     ],
   },

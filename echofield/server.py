@@ -6,6 +6,7 @@ import asyncio
 import hashlib
 import io
 import json
+import os
 import shutil
 import uuid
 from collections import Counter
@@ -241,6 +242,19 @@ async def lifespan(application: FastAPI):
     application.state.al_manager = ActiveLearningManager()
     active_model = application.state.model_registry.active_model_path()
     load_classifier(active_model or settings.classifier_model_path)
+
+    # Inject simulated data for research analytics demo
+    if os.getenv("ECHOFIELD_DEMO_DATA", "true").lower() in ("1", "true", "yes"):
+        from echofield.research.data_simulator import generate_simulated_data
+        sim_calls = generate_simulated_data(n_calls=3000)
+        for c in sim_calls:
+            application.state.call_database._calls[c["id"]] = c
+        logger.info("Loaded %d simulated call records for research analytics", len(sim_calls))
+
+    # Cache slot for aggregated acoustic overview
+    application.state.acoustic_overview_cache = None
+    application.state.acoustic_overview_revision = -1
+
     try:
         yield
     finally:
@@ -2142,6 +2156,229 @@ async def compare_research_stats(request: StatsRequest) -> ResearchStatsResponse
         [group_b_map[call_id] for call_id in request.group_b_ids],
     )
     return ResearchStatsResponse(**result)
+
+
+# ── Research Acoustic Overview (aggregated data for Plotly charts) ──
+
+# Key features for distributions & radar charts
+_OVERVIEW_FEATURES = [
+    "fundamental_frequency_hz", "harmonicity", "bandwidth_hz",
+    "spectral_centroid_hz", "spectral_rolloff_hz", "snr_db",
+    "spectral_flatness", "spectral_entropy", "jitter", "shimmer",
+    "hnr_db", "rms_energy", "attack_time_ms", "decay_time_ms",
+    "modulation_rate_hz", "modulation_depth", "onset_strength",
+    "crest_factor", "f0_variability", "subharmonic_ratio",
+    "spectral_flux", "spectral_crest", "temporal_centroid",
+    "peak_amplitude", "duration_s", "zero_crossing_rate",
+]
+
+
+def _build_acoustic_overview(calls: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Build the complete acoustic overview payload from the call database."""
+    import numpy as _np
+
+    all_calls = [c for cid, c in calls.items() if cid != "__meta__" and c.get("acoustic_features")]
+    if not all_calls:
+        return {
+            "feature_distributions": {},
+            "correlation_matrix": {"features": [], "matrix": []},
+            "call_type_profiles": {},
+            "temporal_patterns": {},
+            "f0_distributions": {},
+            "quality_metrics": {"snr_values": [], "energy_preservation": []},
+            "individual_profiles": {},
+            "pca_projection": [],
+            "total_calls": 0,
+        }
+
+    # Group calls by type
+    by_type: dict[str, list[dict]] = {}
+    for c in all_calls:
+        ct = c.get("call_type", "unknown")
+        by_type.setdefault(ct, []).append(c)
+
+    # 1. Feature distributions
+    feature_distributions: dict[str, dict[str, Any]] = {}
+    for feat in _OVERVIEW_FEATURES:
+        feat_by_type: dict[str, Any] = {}
+        for ct, type_calls in by_type.items():
+            vals = []
+            for c in type_calls:
+                af = c.get("acoustic_features", {})
+                v = af.get(feat)
+                if v is not None and isinstance(v, (int, float)):
+                    vals.append(float(v))
+            if vals:
+                arr = _np.array(vals)
+                feat_by_type[ct] = {
+                    "mean": round(float(_np.mean(arr)), 4),
+                    "std": round(float(_np.std(arr)), 4),
+                    "min": round(float(_np.min(arr)), 4),
+                    "max": round(float(_np.max(arr)), 4),
+                    "values": [round(float(v), 4) for v in arr[:500]],
+                }
+        feature_distributions[feat] = feat_by_type
+
+    # 2. Correlation matrix (among overview features)
+    all_vectors = []
+    for c in all_calls[:2000]:  # cap for perf
+        af = c.get("acoustic_features", {})
+        vec = [float(af.get(f, 0) or 0) for f in _OVERVIEW_FEATURES]
+        all_vectors.append(vec)
+    mat = _np.array(all_vectors)
+    if mat.shape[0] > 2:
+        corr = _np.corrcoef(mat.T)
+        corr = _np.nan_to_num(corr, nan=0.0)
+        correlation_matrix = {
+            "features": _OVERVIEW_FEATURES,
+            "matrix": [[round(float(v), 4) for v in row] for row in corr],
+        }
+    else:
+        correlation_matrix = {"features": [], "matrix": []}
+
+    # 3. Call type profiles (mean feature per type, normalized 0-1 for radar)
+    call_type_profiles: dict[str, dict[str, float]] = {}
+    global_min = {f: float("inf") for f in _OVERVIEW_FEATURES}
+    global_max = {f: float("-inf") for f in _OVERVIEW_FEATURES}
+    raw_means: dict[str, dict[str, float]] = {}
+    for ct, type_calls in by_type.items():
+        means: dict[str, float] = {}
+        for feat in _OVERVIEW_FEATURES:
+            vals = [float(c.get("acoustic_features", {}).get(feat, 0) or 0) for c in type_calls]
+            m = float(_np.mean(vals)) if vals else 0.0
+            means[feat] = m
+            global_min[feat] = min(global_min[feat], m)
+            global_max[feat] = max(global_max[feat], m)
+        raw_means[ct] = means
+    for ct, means in raw_means.items():
+        normed: dict[str, float] = {}
+        for feat in _OVERVIEW_FEATURES:
+            rng = global_max[feat] - global_min[feat]
+            normed[feat] = round((means[feat] - global_min[feat]) / max(rng, 1e-9), 4)
+        normed["__raw__"] = means  # type: ignore[assignment]
+        call_type_profiles[ct] = normed
+
+    # 4. Temporal patterns (hourly distribution per type)
+    temporal_patterns: dict[str, list[int]] = {}
+    for ct, type_calls in by_type.items():
+        hours = [0] * 24
+        for c in type_calls:
+            recorded = (c.get("metadata") or {}).get("recorded_at", "")
+            if recorded and "T" in str(recorded):
+                try:
+                    h = int(str(recorded).split("T")[1].split(":")[0])
+                    hours[h % 24] += 1
+                except (IndexError, ValueError):
+                    pass
+            else:
+                # Distribute roughly if no timestamp
+                h = hash(c.get("id", "")) % 24
+                hours[h] += 1
+        temporal_patterns[ct] = hours
+
+    # 5. F0 distributions (histogram per type)
+    f0_distributions: dict[str, dict[str, Any]] = {}
+    for ct, type_calls in by_type.items():
+        f0_vals = [float(c.get("acoustic_features", {}).get("fundamental_frequency_hz", 0) or 0) for c in type_calls]
+        f0_vals = [v for v in f0_vals if v > 0]
+        if f0_vals:
+            arr = _np.array(f0_vals)
+            counts, bin_edges = _np.histogram(arr, bins=30)
+            f0_distributions[ct] = {
+                "bins": [round(float(b), 2) for b in bin_edges],
+                "counts": [int(c) for c in counts],
+            }
+
+    # 6. Quality metrics
+    snr_vals = [float(c.get("acoustic_features", {}).get("snr_db", 0) or 0) for c in all_calls if c.get("acoustic_features", {}).get("snr_db")]
+    energy_vals = [float(c.get("acoustic_features", {}).get("rms_energy", 0) or 0) for c in all_calls if c.get("acoustic_features", {}).get("rms_energy")]
+    quality_metrics = {
+        "snr_values": [round(v, 2) for v in snr_vals[:1000]],
+        "energy_preservation": [round(v, 6) for v in energy_vals[:1000]],
+    }
+
+    # 7. Individual profiles (top 10 by call count)
+    by_individual: dict[str, list[dict]] = {}
+    for c in all_calls:
+        aid = c.get("animal_id") or c.get("individual_id")
+        if aid:
+            by_individual.setdefault(str(aid), []).append(c)
+    top_individuals = sorted(by_individual.items(), key=lambda x: -len(x[1]))[:10]
+    individual_profiles: dict[str, dict[str, Any]] = {}
+    for aid, ind_calls in top_individuals:
+        type_counts: dict[str, int] = {}
+        feat_sums: dict[str, float] = {f: 0.0 for f in _OVERVIEW_FEATURES[:12]}
+        for c in ind_calls:
+            ct = c.get("call_type", "unknown")
+            type_counts[ct] = type_counts.get(ct, 0) + 1
+            af = c.get("acoustic_features", {})
+            for f in _OVERVIEW_FEATURES[:12]:
+                feat_sums[f] += float(af.get(f, 0) or 0)
+        n = max(len(ind_calls), 1)
+        individual_profiles[aid] = {
+            "call_count": len(ind_calls),
+            "features": {f: round(v / n, 4) for f, v in feat_sums.items()},
+            "call_types": type_counts,
+        }
+
+    # 8. PCA projection (2D)
+    pca_projection: list[dict[str, Any]] = []
+    try:
+        from sklearn.decomposition import PCA
+        sample = all_calls[:2000]
+        pca_feats = _OVERVIEW_FEATURES[:12]  # use top 12 for PCA
+        vectors = []
+        meta_list = []
+        for c in sample:
+            af = c.get("acoustic_features", {})
+            vec = [float(af.get(f, 0) or 0) for f in pca_feats]
+            vectors.append(vec)
+            meta_list.append({"call_type": c.get("call_type", "unknown"), "call_id": c.get("id", "")})
+        arr = _np.array(vectors)
+        # Standardize
+        mu = _np.mean(arr, axis=0)
+        std = _np.std(arr, axis=0)
+        std[std < 1e-9] = 1.0
+        arr_norm = (arr - mu) / std
+        pca = PCA(n_components=2)
+        coords = pca.fit_transform(arr_norm)
+        for i, (x, y) in enumerate(coords):
+            pca_projection.append({
+                "x": round(float(x), 4),
+                "y": round(float(y), 4),
+                "call_type": meta_list[i]["call_type"],
+                "call_id": meta_list[i]["call_id"],
+            })
+    except Exception:
+        pass  # sklearn not available or data issue
+
+    return {
+        "feature_distributions": feature_distributions,
+        "correlation_matrix": correlation_matrix,
+        "call_type_profiles": call_type_profiles,
+        "temporal_patterns": temporal_patterns,
+        "f0_distributions": f0_distributions,
+        "quality_metrics": quality_metrics,
+        "individual_profiles": individual_profiles,
+        "pca_projection": pca_projection,
+        "total_calls": len(all_calls),
+    }
+
+
+@app.get("/api/research/acoustic-overview")
+async def get_research_acoustic_overview():
+    """Return pre-aggregated acoustic data for the research analytics dashboard."""
+    db = _get_call_database()
+    # Simple revision-based caching
+    current_rev = getattr(db, "_revision", 0)
+    cached = getattr(app.state, "acoustic_overview_cache", None)
+    cached_rev = getattr(app.state, "acoustic_overview_revision", -1)
+    if cached is not None and cached_rev == current_rev:
+        return cached
+    result = _build_acoustic_overview(db._calls)
+    app.state.acoustic_overview_cache = result
+    app.state.acoustic_overview_revision = current_rev
+    return result
 
 
 @app.post("/api/export/research")

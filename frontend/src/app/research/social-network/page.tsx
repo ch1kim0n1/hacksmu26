@@ -632,11 +632,11 @@ export default function SocialNetworkPage() {
                     No relationships found.
                   </p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-0 divide-y divide-ev-sand/30">
                     {topEdges.map((edge, i) => (
                       <div
                         key={`top-${i}`}
-                        className="rounded-lg border border-ev-sand/30 bg-white/60 p-2.5"
+                        className="bg-white/60 p-2.5"
                       >
                         <div className="flex items-center gap-1.5 mb-1">
                           <span

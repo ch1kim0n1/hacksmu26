@@ -1140,6 +1140,47 @@ export async function getRecordingFeatures(recordingId: string): Promise<{
   return fetchAPI(`/api/analytics/recording/${recordingId}/features`);
 }
 
+// ─── Research Acoustic Overview ───
+
+export interface FeatureDistributionStats {
+  mean: number;
+  std: number;
+  min: number;
+  max: number;
+  values: number[];
+}
+
+export interface AcousticOverview {
+  feature_distributions: Record<string, Record<string, FeatureDistributionStats>>;
+  correlation_matrix: {
+    features: string[];
+    matrix: number[][];
+  };
+  call_type_profiles: Record<string, Record<string, number>>;
+  temporal_patterns: Record<string, number[]>;
+  f0_distributions: Record<string, { bins: number[]; counts: number[] }>;
+  quality_metrics: {
+    snr_values: number[];
+    energy_preservation: number[];
+  };
+  individual_profiles: Record<string, {
+    call_count: number;
+    features: Record<string, number>;
+    call_types: Record<string, number>;
+  }>;
+  pca_projection: Array<{
+    x: number;
+    y: number;
+    call_type: string;
+    call_id: string;
+  }>;
+  total_calls: number;
+}
+
+export async function getAcousticOverview(): Promise<AcousticOverview> {
+  return fetchAPI<AcousticOverview>("/api/research/acoustic-overview");
+}
+
 // ─── Webhooks ───
 
 export interface WebhookConfig {

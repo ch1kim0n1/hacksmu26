@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import Link from "next/link";
 import { SpectrogramImage } from "@/components/spectrogram/SpectrogramImage";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
